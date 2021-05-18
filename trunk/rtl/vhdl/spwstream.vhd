@@ -35,14 +35,17 @@ entity spwstream is
         txclkfreq:      real := 0.0;
 
         -- Selection of a receiver front-end implementation.
-        rximpl:         spw_implementation_type := impl_generic;
+        rximpl:         spw_implementation_type_rec := impl_generic;
 
         -- Maximum number of bits received per system clock
         -- (must be 1 in case of impl_generic).
         rxchunk:        integer range 1 to 4 := 1;
+        
+        -- Width of shift registers in clock recovery front-end; added: SL
+        REGWIDTH:       integer range 1 to 3 := 2;
 
         -- Selection of a transmitter implementation.
-        tximpl:         spw_implementation_type := impl_generic;
+        tximpl:         spw_implementation_type_xmit := impl_generic;
 
         -- Size of the receive FIFO as the 2-logarithm of the number of bytes.
         -- Must be at least 6 (64 bytes).
@@ -199,7 +202,7 @@ architecture spwstream_arch of spwstream is
     constant disconnect_time:   integer := integer(sysfreq * 850.0e-9);
 
     -- Initial tx clock scaler (10 Mbit).
-    type impl_to_real_type is array(spw_implementation_type) of real;
+    type impl_to_real_type is array(spw_implementation_type_xmit) of real;
     constant tximpl_to_txclk_freq: impl_to_real_type :=
         (impl_generic => sysfreq, impl_fast => txclkfreq);
     constant effective_txclk_freq: real := tximpl_to_txclk_freq(tximpl);
@@ -352,6 +355,18 @@ begin
                 spw_di      => spw_di,
                 spw_si      => spw_si );
     end generate;
+    recvfront_sel2: if rximpl = impl_clkrec generate
+        recvfront_clkrec: spwrecvfront_clkrec
+            generic map (
+                REGWIDTH    => REGWIDTH )
+            port map(
+                rxen        => recv_rxen,
+                inact       => recv_inact,
+                inbvalid    => recv_inbvalid,
+                inbits      => recv_inbits,
+                spw_di      => spw_di,
+                spw_si      => spw_si );
+     end generate;
 
     -- Instantiate RX memory.
     rxmem: spwram

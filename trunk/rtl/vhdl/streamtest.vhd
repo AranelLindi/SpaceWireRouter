@@ -38,13 +38,13 @@ entity streamtest is
         tickdiv:    integer range 12 to 24 := 20;
 
         -- Receiver front-end implementation.
-        rximpl:     spw_implementation_type := impl_generic;
+        rximpl:     spw_implementation_type_rec := impl_generic;
 
         -- Maximum number of bits received per system clock (impl_fast only).
         rxchunk:    integer range 1 to 4 := 1;
 
         -- Transmitter implementation.
-        tximpl:     spw_implementation_type := impl_generic;
+        tximpl:     spw_implementation_type_xmit := impl_generic;
 
         -- Size of receive FIFO.
         rxfifosize_bits: integer range 6 to 14 := 11;

@@ -30,9 +30,9 @@ architecture tb_arch of streamtest_tb is
             sysfreq:    real;
             txclkfreq:  real;
             tickdiv:    integer range 12 to 24 := 20;
-            rximpl:     spw_implementation_type := impl_generic;
+            rximpl:     spw_implementation_type_rec := impl_generic;
             rxchunk:    integer range 1 to 4 := 1;
-            tximpl:     spw_implementation_type := impl_generic;
+            tximpl:     spw_implementation_type_xmit := impl_generic;
             rxfifosize_bits: integer range 6 to 14 := 11;
             txfifosize_bits: integer range 2 to 14 := 11 );
         port (

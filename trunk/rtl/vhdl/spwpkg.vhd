@@ -9,7 +9,8 @@ package spwpkg is
 
 
     -- Indicates a platform-specific implementation.
-    type spw_implementation_type is ( impl_generic, impl_fast );
+    type spw_implementation_type_rec is ( impl_generic, impl_fast, impl_clkrec ); -- modified: SL
+    type spw_implementation_type_xmit is ( impl_generic, impl_fast ); -- added: SL
 
 
     -- Input signals to spwlink.
@@ -232,9 +233,9 @@ package spwpkg is
         generic (
             sysfreq:        real;                           -- clk freq in Hz
             txclkfreq:      real := 0.0;                    -- txclk freq in Hz
-            rximpl:         spw_implementation_type := impl_generic;
+            rximpl:         spw_implementation_type_rec := impl_generic;
             rxchunk:        integer range 1 to 4 := 1;      -- max bits per clk
-            tximpl:         spw_implementation_type := impl_generic;
+            tximpl:         spw_implementation_type_xmit := impl_generic;
             rxfifosize_bits: integer range 6 to 14 := 11;   -- rx fifo size
             txfifosize_bits: integer range 2 to 14 := 11    -- tx fifo size
         );
@@ -372,7 +373,24 @@ package spwpkg is
             spw_si:     in  std_logic       -- Strobe In signal from SpaceWire bus
         );
     end component spwrecvfront_fast;
-
+    
+    
+    -- Front-end for SpaceWire Receiver (clock recovery); added: SL
+    component spwrecvfront_clkrec is
+        generic (
+            REGWIDTH:       integer range 1 to 3 := 2
+        );
+        port (
+            -- no clk
+            rxen:       in std_logic;       -- high to enable receiver
+            inact:      out std_logic;      -- high if activiy on input
+            inbvalid:   out std_logic;      -- high if inbits contains a valid received bit
+            inbits:     out std_logic_vector(0 downto 0); -- received bit
+            spw_di:     in std_logic;       -- Data In signal from SpaceWire bus
+            spw_si:     in std_logic        -- Strobe In signal from SpaceWire bus
+        );
+    end component spwrecvfront_clkrec;
+    
 
     -- Synchronous two-port memory.
     component spwram is
