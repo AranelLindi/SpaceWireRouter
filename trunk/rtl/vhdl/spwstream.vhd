@@ -35,7 +35,7 @@ entity spwstream is
         txclkfreq:      real := 0.0;
 
         -- Selection of a receiver front-end implementation.
-        rximpl:         spw_implementation_type_rec := impl_generic;
+        rximpl:         spw_implementation_type_rec := impl_clkrec;
 
         -- Maximum number of bits received per system clock
         -- (must be 1 in case of impl_generic).

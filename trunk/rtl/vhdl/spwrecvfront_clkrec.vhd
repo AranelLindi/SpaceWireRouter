@@ -50,7 +50,7 @@ entity spwrecvfront_clkrec is
         -- Strobe In signal from SpaceWire bus.
         spw_si: in std_logic;
         
-        inbits: out std_ulogic_vector(0 downto 0)
+        inbits: out std_logic_vector(0 downto 0)
        );
 end spwrecvfront_clkrec;
 
@@ -88,7 +88,6 @@ begin
             -- one for falling edges. The first flip-flop of the "falling" path is
             -- activated by falling edge of recclk. ALL other registers pass their 
             -- data on rising edge.
-            
             if rising_edge(recclk) then
                 -- assignment of other shift registers for "rising"-path                                             
                 FR(0) <= s_spw_di;
