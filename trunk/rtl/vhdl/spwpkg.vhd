@@ -378,10 +378,10 @@ package spwpkg is
     -- Front-end for SpaceWire Receiver (clock recovery); added: SL
     component spwrecvfront_clkrec is
         generic (
-            REGWIDTH:       integer range 1 to 3 := 2
+            WIDTH:       integer range 1 to 3
         );
         port (
-            -- no clk
+            clk:        in std_logic;       -- system clock (to validate clock recovery only!)
             rxen:       in std_logic;       -- high to enable receiver
             inact:      out std_logic;      -- high if activiy on input
             inbvalid:   out std_logic;      -- high if inbits contains a valid received bit

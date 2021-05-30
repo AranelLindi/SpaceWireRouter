@@ -26,7 +26,7 @@ entity spwrecv is
 
     port (
         -- System clock.
-	clk:        in  std_logic;
+	    clk:        in  std_logic;
 
         -- High to enable receiver; low to disable and reset receiver.
         rxen:       in  std_logic;

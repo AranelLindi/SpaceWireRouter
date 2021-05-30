@@ -42,7 +42,7 @@ entity spwstream is
         rxchunk:        integer range 1 to 4 := 1;
         
         -- Width of shift registers in clock recovery front-end; added: SL
-        REGWIDTH:       integer range 1 to 3 := 2;
+        WIDTH:       integer range 1 to 3 := 3;
 
         -- Selection of a transmitter implementation.
         tximpl:         spw_implementation_type_xmit := impl_generic;
@@ -355,11 +355,13 @@ begin
                 spw_di      => spw_di,
                 spw_si      => spw_si );
     end generate;
+    -- added: SL
     recvfront_sel2: if rximpl = impl_clkrec generate
         recvfront_clkrec: spwrecvfront_clkrec
             generic map (
-                REGWIDTH    => REGWIDTH )
+                WIDTH       => WIDTH )
             port map(
+                clk         => clk,
                 rxen        => recv_rxen,
                 inact       => recv_inact,
                 inbvalid    => recv_inbvalid,
