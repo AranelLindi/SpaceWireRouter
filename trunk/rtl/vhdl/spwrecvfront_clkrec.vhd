@@ -87,6 +87,7 @@ architecture spwrecvfront_clkrec_arch of spwrecvfront_clkrec is
     -- output register (receiver signal)
     signal s_inbvalid: std_ulogic;
 begin
+
     -- Clock recovery process.
     Clock: recclk <= spw_di xor spw_si;
     
@@ -126,6 +127,33 @@ begin
             end if;
     end process;
     
+    -- Validates clock recovery signal for receiver
+    process(clk)
+        variable sw: boolean;
+    begin
+        if rising_edge(clk) then
+            if sw = true then
+                if recclk = '1' then
+                    sw := not sw;
+                    if rxen = '1' then
+                        s_inbvalid <= '1';
+                    end if;
+                else
+                    s_inbvalid <= '0';
+                end if;
+            elsif sw = false then
+                if recclk = '0' then
+                    sw := not sw;
+                    if rxen = '1' then
+                        s_inbvalid <= '1';
+                    end if;
+                else
+                    s_inbvalid <= '0';
+                end if;
+            end if;
+        end if;
+    end process;
+    
     -- Drives shift registers on rising clock edge.
     ClkRecRisingEdge: process(recclk)
         begin        
@@ -160,7 +188,6 @@ begin
     
     -- Taks bits from both paths alternately, depending on clock signal.
     ClkRecMultiplexer: process(recclk)
-        variable switch: boolean;
     begin
         if (recclk = '0') then
             inbits(0) <= ff_rising_data(WIDTH-1);
@@ -170,23 +197,6 @@ begin
                 inbits(0) <= ff_falling_data(WIDTH-2);
             else
                 inbits(0) <= ff_falling_data_0;
-            end if;
-            
-        end if;
-    end process;
-    
-    ClkRecValidation: process(clk)
-    begin
-        if rising_edge(clk) then
-            if rxen = '1' then
-                -- checks for valid clock signals.
-                -- (Signal change must be recognized for s_inbvalid='1')
-                s_inbvalid <= recclk xor spw_di xor spw_si;
-                
-            else
-                -- reset receiver
-                s_inbvalid <= '0';
-                
             end if;
             
         end if;
