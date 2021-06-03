@@ -38,7 +38,7 @@ entity streamtest is
         tickdiv:    integer range 12 to 24 := 20;
 
         -- Receiver front-end implementation.
-        rximpl:     spw_implementation_type_rec := impl_clkrec;
+        rximpl:     spw_implementation_type_rec := impl_generic;
 
         -- Maximum number of bits received per system clock (impl_fast only).
         rxchunk:    integer range 1 to 4 := 1;

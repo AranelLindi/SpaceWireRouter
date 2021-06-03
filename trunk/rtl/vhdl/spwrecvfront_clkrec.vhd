@@ -1,8 +1,8 @@
 ----------------------------------------------------------------------------------
 -- Company: University of Wuerzburg, Germany
--- Engineer: Stefan Lindoerfer
+-- Engineer: Stefan Lindoerfer, Student
 -- 
--- Create Date: 30.05.2021 13:16
+-- Create Date: 03.06.2021 21:42
 -- Design Name: Clock Recovery Front-End Module for SpaceWire Light IP Core
 -- Module Name: spwrecvfront_clkrec
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
@@ -14,9 +14,7 @@
 -- Dependencies: SpaceWire Light IP Core from https://opencores.org/projects/spacewire_light
 -- 
 -- Revision:
--- Revision 0.01 - File Created; not yet tested - behavioral simulation was fine
--- Additional Comments: (Only basic functionality implemented so far.) 
--- 18.05.2021 - Begin to migrate design to IP, not yet completed!
+-- Revision 0.1 - Behavior and Timing Simulation worked, not yet tested on Hardware
 ----------------------------------------------------------------------------------
 
 library IEEE;
@@ -57,7 +55,7 @@ architecture spwrecvfront_clkrec_arch of spwrecvfront_clkrec is
     -- recovered clock signal.
     signal recclk: std_ulogic;
     
-    -- asynchronous phased switching...
+    -- asynchronous phased switching (Latch)...
     -- ... for rising edges.
     --  Latch 1: (Equal)
     signal ff_EQ_data: std_ulogic;
@@ -66,7 +64,7 @@ architecture spwrecvfront_clkrec_arch of spwrecvfront_clkrec is
     -- Reset
     signal s_EQ_reset: std_ulogic;
     
-    -- ... for falling edges.
+    -- ... for falling edges. 
     --  Latch 2: (Unequal)
     signal ff_UEQ_data: std_ulogic;
     -- Set
@@ -89,16 +87,16 @@ architecture spwrecvfront_clkrec_arch of spwrecvfront_clkrec is
 begin
 
     -- Clock recovery process.
-    Clock: recclk <= spw_di xor spw_si;
+    ClkRec: recclk <= spw_di xor spw_si;
     
     -- Drive outputs
     inact <= s_inbvalid;
     inbvalid <= s_inbvalid;   
      
-    -- Latch 1: Data == Strobe
+    -- Latch 1: Data XNOR Strobe
     s_EQ_set <= '1' when (spw_di = '1' and spw_si = '1') else '0';
     s_EQ_reset <= '1' when (spw_di = '0' and spw_si = '0') else '0';
-    Latch1: process(s_EQ_set, s_EQ_reset) -- asynchrone phasengesteuerte Schaltung
+    Latch1: process(s_EQ_set, s_EQ_reset)
         begin
             if (s_EQ_reset = '1') then
                 -- Reset
@@ -111,7 +109,7 @@ begin
             end if;
     end process;
     
-    -- Latch 2: Data != Strobe
+    -- Latch 2: Data XOR Strobe
     s_UEQ_set <= '1' when (spw_di = '1' and spw_si = '0') else '0';
     s_UEQ_reset <= '1' when (spw_di = '0' and spw_si = '1') else '0';
     Latch2: process(s_UEQ_set, s_UEQ_reset)
@@ -119,36 +117,48 @@ begin
             if (s_UEQ_reset = '1') then
                 -- Reset
                 ff_UEQ_data <= '0';
-                
+                         
             elsif (s_UEQ_set = '1') then
                 -- Set
-                ff_UEQ_data <= '1';
-                
+                ff_UEQ_data <= '1';   
+                             
             end if;
     end process;
     
-    -- Validates clock recovery signal for receiver
-    process(clk)
-        variable sw: boolean;
+    -- Validates recclk-signal for receiver.
+    ClkRecValidation: process(clk)
+        variable switch: boolean; -- (default value: false)
     begin
+        -- Detects clock edge change in recclk and activates then
+        -- the signal for a valid received bit.
         if rising_edge(clk) then
-            if sw = true then
+            if switch = true then
                 if recclk = '1' then
-                    sw := not sw;
+                    switch := not switch;
+                    
                     if rxen = '1' then
                         s_inbvalid <= '1';
+                        
                     end if;
+                    
                 else
+                    -- reset receiver
                     s_inbvalid <= '0';
+                    
                 end if;
-            elsif sw = false then
+            elsif switch = false then
                 if recclk = '0' then
-                    sw := not sw;
+                    switch := not switch;
+                    
                     if rxen = '1' then
                         s_inbvalid <= '1';
+                        
                     end if;
+                    
                 else
+                    -- reset receiver
                     s_inbvalid <= '0';
+                    
                 end if;
             end if;
         end if;
@@ -158,13 +168,14 @@ begin
     ClkRecRisingEdge: process(recclk)
         begin        
             if rising_edge(recclk) then                           
-                -- 
+                -- shift register construct
                 ff_rising_data(0) <= ff_EQ_data;
+                
                 for i in 0 to (WIDTH-2) loop
                     ff_rising_data(i+1) <= ff_rising_data(i);
                 end loop;
                 
-                -- 
+                -- generic shift register construct
                 if (WIDTH > 1) then -- (pre-compiled statement)
                     ff_falling_data(0) <= ff_falling_data_0;
                     
@@ -180,13 +191,13 @@ begin
     -- Drives shift registers on falling clock edge.
     ClkRecFallingEdge: process(recclk)
     begin
-        if falling_edge(recclk) then       
-            ff_falling_data_0 <= ff_UEQ_data;
-            
+        if falling_edge(recclk) then    
+            ff_falling_data_0 <= ff_UEQ_data;   
+                     
         end if;    
     end process;
     
-    -- Taks bits from both paths alternately, depending on clock signal.
+    -- Takes bits from both paths alternately, depending on clock signal.
     ClkRecMultiplexer: process(recclk)
     begin
         if (recclk = '0') then
@@ -195,10 +206,11 @@ begin
         elsif (recclk = '1') then
             if (WIDTH > 1) then -- (pre-compiled statement)
                 inbits(0) <= ff_falling_data(WIDTH-2);
+                
             else
                 inbits(0) <= ff_falling_data_0;
-            end if;
-            
+                
+            end if;            
         end if;
     end process;
 end spwrecvfront_clkrec_arch;
