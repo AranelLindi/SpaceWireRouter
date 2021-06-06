@@ -23,10 +23,13 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity spwrecvfront_clkrec is
     generic (
-            WIDTH: integer range 1 to 3 := 2
+    	    -- Width of shift registers for synchronization (depending on
+    	    -- bitrate to avoid metastability)
+    	    -- Default Value: 2
+            WIDTH: integer range 1 to 3
        );
     Port (  
-            -- System clock.
+            -- System clock (for Validation of recovered clock signal).
             clk     :   in  std_logic;
             
             -- Data In signal from SpaceWire bus.
@@ -138,7 +141,7 @@ begin
                     
                     if rxen = '1' then
                         s_inbvalid <= '1';
-                        
+                        -- (else case not necessary!)
                     end if;
                     
                 else
@@ -152,7 +155,7 @@ begin
                     
                     if rxen = '1' then
                         s_inbvalid <= '1';
-                        
+                        -- (else case not necessary!)
                     end if;
                     
                 else
@@ -192,8 +195,8 @@ begin
     ClkRecFallingEdge: process(recclk)
     begin
         if falling_edge(recclk) then    
-            ff_falling_data_0 <= ff_UEQ_data;   
-                     
+            -- 
+            ff_falling_data_0 <= ff_UEQ_data;       
         end if;    
     end process;
     

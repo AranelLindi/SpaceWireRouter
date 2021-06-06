@@ -34,7 +34,9 @@ architecture tb_arch of streamtest_tb is
             rxchunk:    integer range 1 to 4 := 1;
             tximpl:     spw_implementation_type_xmit := impl_generic;
             rxfifosize_bits: integer range 6 to 14 := 11;
-            txfifosize_bits: integer range 2 to 14 := 11 );
+            txfifosize_bits: integer range 2 to 14 := 11;
+            WIDTH: integer range 1 to 3 -- added: SL
+            );
         port (
             clk:        in  std_logic;
             rxclk:      in  std_logic;
@@ -91,7 +93,8 @@ begin
             rxchunk     => 1,
             tximpl      => impl_generic,
             rxfifosize_bits => 9,
-            txfifosize_bits => 8 )
+            txfifosize_bits => 8,
+            WIDTH       => 2 )
         port map (
             clk         => sysclk,
             rxclk       => sysclk,

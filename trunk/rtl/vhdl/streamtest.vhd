@@ -43,6 +43,9 @@ entity streamtest is
         -- Maximum number of bits received per system clock (impl_fast only).
         rxchunk:    integer range 1 to 4 := 1;
 
+        -- Width of shift registers for synchronization depending on transmission rate (impl_clkrec only).
+        WIDTH:      integer range 1 to 3 := 1; -- added: SL
+
         -- Transmitter implementation.
         tximpl:     spw_implementation_type_xmit := impl_generic;
 
@@ -217,7 +220,8 @@ begin
             rxchunk         => rxchunk,
             tximpl          => tximpl,
             rxfifosize_bits => rxfifosize_bits,
-            txfifosize_bits => txfifosize_bits )
+            txfifosize_bits => txfifosize_bits,
+            WIDTH           => WIDTH )
         port map (
             clk         => clk,
             rxclk       => rxclk,
