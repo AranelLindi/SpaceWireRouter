@@ -1,13 +1,13 @@
 ----------------------------------------------------------------------------------
 -- Company: University of Wuerzburg, Germany
--- Engineer: Stefan Lindoerfer, Student
+-- Engineer: Stefan Lindoerfer
 -- 
 -- Create Date: 03.06.2021 21:42
 -- Design Name: Clock Recovery Front-End Module for SpaceWire Light IP Core
 -- Module Name: spwrecvfront_clkrec
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
 -- Target Devices: 
--- Tool Versions: made for SpW Light IP Core Version from 05.12.2018
+-- Tool Versions: Created for SpW Light IP Core Version from 05.12.2018
 -- Description: extracts a clock pulse from the Data-Strobe signals of a SpaceWire
 -- connection (clock recovery) and uses it to decode the data input bits and forwards them
 -- to the receiver module of the IP Core.
@@ -134,7 +134,7 @@ begin
     begin
         -- Detects clock edge change in recclk and activates then
         -- the signal for a valid received bit.
-        if rising_edge(clk) then
+        if rising_edge(clk) or falling_edge(clk) then -- falling_edge(clk) added: 09.06.21: check carefully if necessary!
             if switch = true then
                 if recclk = '1' then
                     switch := not switch;

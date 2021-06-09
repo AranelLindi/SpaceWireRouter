@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
 -- Company: University of Wuerzburg, Germany
--- Engineer: Stefan Lindoerfer, Student
+-- Engineer: Stefan Lindoerfer
 -- 
 -- Create Date: 06.06.2021 16:26
 -- Design Name: Testbench for Clock Recovery Front-End Module for SpaceWire Light IP Receiver
@@ -24,6 +24,7 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
+
 
 entity spwrecvfront_clkrec_tb is
 end;
@@ -58,43 +59,50 @@ architecture spwrecvfront_clkrec_tb_arch of spwrecvfront_clkrec_tb is
     -- High if spw_si should be generated correctly, low if no changes should be made.
     shared variable strobe_output: std_logic := '1';
     
-    signal recoveredclock: std_ulogic;
+    -- Signal for clock recovery.
+    signal clock_recovery: std_ulogic;
     
+    -- Incomming bit in queue.
+    signal rbit: std_ulogic;
     
-    -- Transfer rate of Data.
-    constant clock_recovery_period: time := 100 ns; -- T = 100ns => f = 10MHz
+    -- Bit list with sendet bits recognized als valid by receiver (spwrecv)
+    signal bin: std_ulogic_vector(0 downto 0);
     
+    -- #################################
+    -- CHANGE TESTVARIABLES HERE...       
+    -- Data transmission frequency.
+    constant data_clock_freq: real := 10.0e6; -- 10 MHz == 10 Mbps
+       
+    -- System clock frequency.   
+    constant sys_clock_freq: real := 20.0e6; -- 20 MHz
+    
+   
     -- Number of loop iterations to be performed.
-    constant num_iterations: integer := 3;
+    constant num_iterations: integer := 1;
     
     -- Bit sequence that is transmitted.
-    constant bseq: std_logic_vector := "01011001110001";
+    constant bseq: std_logic_vector := "010101100111000";
     
     -- Determines whether the activation input signal (rxen) of the
     -- receiver is changed depending on time. This is supposed to 
     -- have the effect of deactivation the front-end.
-    constant activateRxenStressTest: boolean := false;
+    constant RxenStressTest: boolean := false;
     
     -- Determines whether the strobe signal is temporarily not generated
     -- correctly in order to make the behavior of the dut visible.
-    constant activateStrobeStressTest: boolean := false;
+    constant StrobeStressTest: boolean := false;
     
     -- Width of shift registers in recvfront_clkrec. Depending on 
     -- transmission rate, necessary for synchronization and avoiding
     -- metastability. Causes a clock shift!
-    constant Width: integer range 1 to 3 := 2;
-    
-    -- System clock frequence.
-    constant sys_clock_freq: real := 20.0e6; -- 20 MHz
-    
-    -- used to influence transmission frequency to test clock recovery feature.
-    --shared variable div: integer := 1;
+    constant NumberOfShiftRegisters: integer range 1 to 3 := 2;
+    -- #################################
 begin
     -- Design under test:
     dut: spwrecvfront_clkrec
         generic map (
                 -- Width of shift registers (default: 2)
-                WIDTH   =>  Width
+                WIDTH   =>  NumberOfShiftRegisters
                 )
         port map (
                 clk     =>  clk,
@@ -102,13 +110,14 @@ begin
                 spw_si  =>  spw_si,
                 rxen    =>  rxen,
                 inact   =>  inact,
-                inbvalid=>  inbvalid,
+                inbvalid => inbvalid,
                 inbits  =>  inbits
                 );
 
     -- Generate system clock.
     SysClk: process is
-    begin
+        variable sw: boolean := false;
+    begin   
         clk <= '1';
         wait for (0.5 sec) / sys_clock_freq;
         clk <= '0';
@@ -120,7 +129,7 @@ begin
         variable strobe_sw: std_ulogic := '0'; -- default value: false
     begin
         for i in 0 to num_iterations loop
-            for j in 0 to bseq'Length-1 loop
+            for j in 0 to (bseq'Length-1) loop
                 spw_di <= bseq(j);
                 
                 -- checks whether the strobe signal should be generated correctly.
@@ -129,18 +138,18 @@ begin
                     strobe_sw := not strobe_sw;
                 end if;
                 
-                wait for clock_recovery_period;
+                wait for (0.5 sec) / data_clock_freq;
             end loop;
         end loop;
         wait;
     end process;
     
-    -- enables setting of control signals for stress test
+    -- Controls rxen signal via RxenStressTest-variable
     ControlRxenCreation: process is
-        constant rxen_on: time := clock_recovery_period * bseq'Length / 5;
-        constant rxen_off: time := clock_recovery_period * bseq'Length / 2;
+        constant rxen_on: time := (0.5 sec) / data_clock_freq * bseq'Length / 5;
+        constant rxen_off: time := (0.5 sec) / data_clock_freq * bseq'Length / 2;
     begin
-        if activateRxenStressTest = false then
+        if RxenStressTest = false then
             rxen <= '1';
             wait;
         end if;
@@ -151,15 +160,17 @@ begin
             rxen <= '0';
             wait for rxen_off;
         end loop;
-        --wait;
+        wait;
     end process;
     
-    -- 
+    -- Controlls influence of strobe signal and can be activated
+    -- by changing StrobeStressTest-variable above.
     ControlStrobeCreation: process
-        constant strobe_on: time := clock_recovery_period * bseq'Length / 3;
-        constant strobe_off: time := clock_recovery_period * bseq'Length / 1;
+        constant strobe_on: time := (0.5 sec) / data_clock_freq * bseq'Length / 3;
+        constant strobe_off: time := (0.5 sec) / data_clock_freq * bseq'Length / 1;
     begin
-        if activateStrobeStressTest = false then
+        if StrobeStressTest = false then
+            strobe_output := '1';
             wait;
         end if;
         
@@ -170,18 +181,33 @@ begin
             wait for strobe_off;
             strobe_output := '1';
         end loop;
-        --wait;
+        wait;
     end process;
     
-    -- Clock recovery for illustration.
-    recoveredclock <= spw_di xor spw_si;
+    -- Clock recovery. (to check correctness. Is generated in
+    -- same way in the front-end but none output signal)
+    clock_recovery <= spw_di xor spw_si;   
     
---    process(rxen, inact, inbvalid, inbits)
---    begin
---        if inbvalid = '1' then
---            bitreceived <= '1';
---        else
---            bitreceived <= '0';
---        end if;
---    end process;
+    -- Simplified receiver functionality that should show which
+    -- bits are forwarded fromt the front-end to the receiver.
+    -- (Similar function structure as in spwrecv.vhd)
+    -- Process incomming bit
+    process(rxen, inact, inbits)
+    begin
+        if inbvalid = '1' then
+            rbit <= inbits(0);
+        end if;
+        
+        if rxen = '0' then
+            rbit <= 'U';
+        end if;
+    end process;
+    
+    -- Update bit on system clock beat.
+    process(clk)
+    begin
+        if rising_edge(clk) then
+            bin(0) <= rbit; 
+        end if;
+    end process;
 end;
