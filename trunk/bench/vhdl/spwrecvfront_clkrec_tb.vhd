@@ -146,8 +146,8 @@ begin
     
     -- Controls rxen signal via RxenStressTest-variable
     ControlRxenCreation: process is
-        constant rxen_on: time := (0.5 sec) / data_clock_freq * bseq'Length / 5;
-        constant rxen_off: time := (0.5 sec) / data_clock_freq * bseq'Length / 2;
+        constant rxen_on: time := (0.5 sec) / data_clock_freq * bseq'Length / 6;
+        constant rxen_off: time := (0.5 sec) / data_clock_freq * bseq'Length / 7;
     begin
         if RxenStressTest = false then
             rxen <= '1';
@@ -159,6 +159,7 @@ begin
             wait for rxen_on;
             rxen <= '0';
             wait for rxen_off;
+            rxen <= '1';
         end loop;
         wait;
     end process;
@@ -166,8 +167,8 @@ begin
     -- Controlls influence of strobe signal and can be activated
     -- by changing StrobeStressTest-variable above.
     ControlStrobeCreation: process
-        constant strobe_on: time := (0.5 sec) / data_clock_freq * bseq'Length / 3;
-        constant strobe_off: time := (0.5 sec) / data_clock_freq * bseq'Length / 1;
+        constant strobe_on: time := (0.5 sec) / data_clock_freq * bseq'Length / 5;
+        constant strobe_off: time := (0.5 sec) / data_clock_freq * bseq'Length / 6;
     begin
         if StrobeStressTest = false then
             strobe_output := '1';
@@ -198,7 +199,7 @@ begin
             rbit <= inbits(0);
         end if;
         
-        if rxen = '0' then
+        if rxen = '0' or inbvalid = '0' then
             rbit <= 'U';
         end if;
     end process;
