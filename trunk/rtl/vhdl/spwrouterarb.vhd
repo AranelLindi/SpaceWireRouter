@@ -16,12 +16,13 @@
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
 USE work.spwrouterpkg.ALL;
 
 ENTITY spwrouterarb IS
     GENERIC (
-        -- Number of SpaceWire ports (1 to 31; 0 is internal port)
-        numports : INTEGER RANGE 1 TO 32
+        -- Number of SpaceWire ports.
+        numports : INTEGER RANGE 0 TO 31
     );
     PORT (
         -- System clock.
@@ -30,32 +31,66 @@ ENTITY spwrouterarb IS
         -- Reset.
         rst : IN STD_LOGIC;
 
-        -- Destination of port x.
-        dest : IN logic_vector_array((numports - 1) DOWNTO 0) OF STD_LOGIC_VECTOR(7 DOWNTO 0);
+        -- Destination of port x. -- why 8 bits?? (must bei changed in pkg too!!)
+        dest : IN larray(numports DOWNTO 0) OF STD_LOGIC_VECTOR(7 DOWNTO 0);
 
         -- Request of port x.
-        request : IN logic_array((numports - 1) DOWNTO 0);
+        req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
 
         -- Granted to port x.
-        granted : OUT logic_array((numports - 1) DOWNTO 0);
+        grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
         -- Routing switch matrix.
-        routing : OUT logic_matrix((numports - 1) DOWNTO 0, (numports - 1) DOWNTO 0)
+        rout : OUT larray(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0) -- Falls es hier probleme gibt, auf matrix wechseln!
     );
 END spwrouterarb;
 
-architecture spwrouterarb_arch of spwrouterarb is
+ARCHITECTURE spwrouterarb_arch OF spwrouterarb IS
     -- Router switch matrix.
-    signal s_routing: logic_matrix((numports-1) downto 0, (numports-1) downto 0);
-    
+    SIGNAL s_routing : larray(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0); -- hängt mit out port zusammen! siehe oben
+
     -- Occupied port x.
-    signal s_occupied: logic_array((numports-1) downto 0);
-    
+    SIGNAL s_occupied : logic_array(numports DOWNTO 0) := (OTHERS => '0');
+
     -- Requests to port x.
-    signal s_request: logic_vector_array((numports-1) downto 0) of std_logic_vector((numports-1) downto 0);
+    SIGNAL s_request : logic_vector_array(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0);
 
     -- Granted to port x.
-    signal s_granted: logic_array((numports-1) downto 0);
+    SIGNAL s_granted : logic_array(numports DOWNTO 0) := (OTHERS => '0'); -- initialisierung in ursprungscode nicht vorgehsehen! evtl fehlerquelle!
+BEGIN
+    -- Drive outputs.
+    grnt <= s_granted;
+    rout <= s_routing;
 
-    -- hier weitermachen!    
-end architecture spwrouterarb_arch;
+    -- Route occupation signal
+    FOR i IN 0 TO numports LOOP
+        -- inner loop nur nötig wenn mit rout(i) nicht eine ganze Zeile angesprochen werden kann!! Operatoren sind so definiert, dass sie auch eine komplete Zeile verarbeiten!
+        s_occupied(i) <= OR rout(i); -- hoffentlich richtig addressiert
+    END LOOP;
+
+    -- Source port number which requests port as destination port.
+    FOR i IN 0 TO numports LOOP
+        FOR j IN 0 TO numports LOOP
+            s_request(i, j) <= '1' WHEN req(i) = '1' AND to_integer(unsigned(dest(i))) = j ELSE
+            '0'; -- potenzielle fehlerquelle!
+        END LOOP;
+    END LOOP;
+
+    -- Generate Arbiter_Round for every port.
+    spwrouterarbiter_round : FOR i IN 0 TO numports GENERATE
+        PORT MAP(
+            clk => clk,
+            rst => rst,
+            occ => s_occupied(i),
+            req => s_request,
+            grnt => s_routing(i) -- hier evtl. eine Fehlerquelle wegen falscher zuordnung?
+        );
+    END GENERATE spwrouterarbiter_round;
+
+    -- Connection enabling signal
+    FOR i IN 0 TO numports LOOP
+        FOR j IN 0 TO numports LOOP
+            s_granted(i) <= OR s_routing(j, i); -- potenzielle Fehlerquelle! SOLL: Immer spaltenweise nach unten!
+        END LOOP;
+    END LOOP;
+END ARCHITECTURE spwrouterarb_arch;

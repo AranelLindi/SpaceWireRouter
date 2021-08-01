@@ -14,22 +14,51 @@
 -- Revision:
 ----------------------------------------------------------------------------------
 
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all; -- Eventuell fehlt hier 'use ieee.std_logic_unsigned.all;' !
-use work.spwpkg.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL; -- Eventuell fehlt hier 'use ieee.std_logic_unsigned.all;' !
+USE work.spwpkg.ALL;
 
-package spwrouterpkg is
+PACKAGE spwrouterpkg IS
     -- Type declarations:
 
     -- Pre-defined arrays for implementation types (front-end of receiver/transmitter)
-    type rximpl_array is array (natural range<>) of spw_implementation_type_rec;
-    type tximpl_array is array (natural range<>) of spw_implementation_type_xmit;
+    TYPE rximpl_array IS ARRAY (NATURAL RANGE <>) OF spw_implementation_type_rec;
+    TYPE tximpl_array IS ARRAY (NATURAL RANGE <>) OF spw_implementation_type_xmit;
 
-    -- Arbiter: Destination of port x
-    type logic_vector_array is array(natural range<>) of std_logic_vector(natural range<> downto 0);
-    type logic_array is array(natural range<>) of std_logic;
-    type logic_matrix is array(natural range<>, natural range<>) of std_logic;
+    -- Generel used types.
+    TYPE larray IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR(NATURAL RANGE <>);
+    TYPE matrix_t IS ARRAY(NATURAL RANGE <>, NATURAL RANGE <>) OF STD_LOGIC;
+
+    -- Finite state machine used in router table.
+    Type spwroutertablestates is (S_Idle, S_Write, S_Read, S_Wait);
 
     -- Component declarations:
-end package;
+
+    COMPONENT spwrouterarb_round IS
+        GENERIC (
+            numports : INTEGER RANGE 0 TO 31
+        );
+        PORT (
+            clk : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
+            occ : IN STD_LOGIC;
+            req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+        );
+    END COMPONENT;
+
+    COMPONENT spwrouterarb IS
+        GENERIC (
+            numports : INTEGER RANGE 0 TO 31
+        );
+        PORT (
+            clk : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
+            dest : IN larray(numports DOWNTO 0) OF STD_LOGIC_VECTOR(7 DOWNTO 0);
+            req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            rout : OUT larray(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0)
+        );
+    END COMPONENT;
+END PACKAGE;

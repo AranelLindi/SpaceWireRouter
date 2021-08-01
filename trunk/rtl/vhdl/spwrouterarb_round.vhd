@@ -16,77 +16,85 @@
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
-USE ieee.std_logic_unsigned.ALL;
-USE ieee.math_real."ceil";
-USE ieee.math_real."log2";
 
 ENTITY spwrouterarb_round IS
     GENERIC (
-        -- Number of SpaceWire ports (1 to 31; 0 is internal port)
-        numports : INTEGER RANGE 1 TO 32
+        -- Number of SpaceWire ports.
+        numports : INTEGER RANGE 0 TO 31
     );
     PORT (
         -- System clock.
         clk : IN STD_LOGIC;
 
-        -- Reset.
+        -- Synchronous reset.
         rst : IN STD_LOGIC;
 
-        -- Occupied.
+        -- High if relevant port is already being used by another
+        -- process. Low when the port is unused.
         occ : IN STD_LOGIC;
 
-        -- Request.
-        req : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+        -- Corresponding bit is high when respective port sends
+        -- a request to the port which is defined under occ.
+        req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-        -- Granted.
-        grnt : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0)
+        -- Bit sequence that indicates the access of another port.
+        grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
     );
 END spwrouterarb_round;
 
 ARCHITECTURE spwrouterarb_round_arch OF spwrouterarb_round IS
-    -- Number of bits that necessary to represent all (numports-1) ports.
-    --constant blength: integer := integer(ceil(log2(real(numports-1))));
-
-    SIGNAL s_granted : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
-    SIGNAL s_lstgrnt : INTEGER RANGE 0 TO (numports - 1);
-
-    SIGNAL s_request : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
-
+    -- Output registers
+    SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    SIGNAL s_request : STD_LOGIC_VECTOR(numports DOWNTO 0);
     SIGNAL s_occupied : STD_LOGIC;
+
+    -- Last granted port.
+    SIGNAL s_lstgrnt : INTEGER RANGE 0 TO numports;
 BEGIN
     -- Drive other outputs.
     grnt <= s_granted;
-    req <= s_request;
+    s_request <= req;
     s_occupied <= occ;
 
     PROCESS (clk, rst)
-        --variable cport: std_logic_vector(blength downto 0) := (others => '0');
     BEGIN
         IF (rst = '1') THEN
             s_granted <= (OTHERS => '0');
             s_lstgrnt <= 0;
 
         ELSIF raising_edge(clk) THEN
-            -- Roll out arbitration for every port..
-            arbitrationI : FOR i IN 0 TO (numports - 1) GENERATE
+
+            -- Roll out arbitration logic for every port.
+            arbitration : FOR i IN 0 TO numports LOOP
                 IF (s_lstgrnt = i) THEN
-                    -- ... and check permission.
-                    arbitrationII : FOR j IN 0 TO (numports - 1) GENERATE
+
+                    -- Following ports in line (0..numports..0) are given prefered access to current
+                    -- port. Normally in if-statements early conditions takes priority over later.
+                    -- Through rolling out for-loops, many seperate if statements will be
+                    -- created. Therefore the highes priority must be listed last in order to
+                    -- be able to overwrite any previous decision with lower priority.
+
+                    lowerpriority : FOR j IN i DOWNTO 0 LOOP
                         IF (s_request(j) = '1' AND s_occupied = '0') THEN
                             s_granted <= (j => '1', OTHERS => '0');
                             s_lstgrnt <= j;
                         END IF;
-                    END GENERATE arbitrationII;
+                    END LOOP lowerpriority;
+                    higherpriority : FOR k IN numports TO (i + 1) LOOP
+                        IF (s_request(k) = '1' AND s_occupied = '0') THEN
+                            s_granted <= (k => '1', OTHERS => '0');
+                            s_lstgrnt <= k;
+                        END IF;
+                    END LOOP higherpriority;
                 END IF;
-            END GENERATE arbitrationI;
+            END LOOP arbitration;
 
-            -- Apparently implemented to prevent granted permission for a port
-            -- that didn't request that... but, is that necessary? Check!
-            FOR i IN 0 TO (numports - 1) GENERATE
+            -- Probably to reset s_granted signal in case that none request was applied.
+            FOR i IN 0 TO numports LOOP
                 IF (s_request(i) = '0' AND s_granted(i) = '1') THEN
                     s_granted(i) <= '0';
                 END IF;
-            END GENERATE;
+            END LOOP;
         END IF;
     END PROCESS;
 

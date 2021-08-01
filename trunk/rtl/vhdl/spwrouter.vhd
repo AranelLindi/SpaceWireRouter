@@ -21,8 +21,8 @@ USE work.spwrouterpkg.ALL;
 
 ENTITY spwrouter IS
     GENERIC (
-        -- Number of SpaceWire ports (1 to 31; 0 is internal port)
-        numports : INTEGER RANGE 1 TO 32
+        -- Number of SpaceWire ports.
+        numports : INTEGER RANGE 0 TO 31
 
         -- System clock frequency in Hz.
         sysfreq : real;
@@ -34,7 +34,7 @@ ENTITY spwrouter IS
         tickdiv : INTEGER RANGE 12 TO 24 := 20;
 
         -- Receiver front-end implementation for every port. (Used syntax requires VHDL-2008!)
-        rximpl : rximpl_array((numports - 1) DOWNTO 0) := (OTHERS => impl_generic);
+        rximpl : rximpl_array(numports DOWNTO 0) := (OTHERS => impl_generic);
 
         -- Maximum number of bits received per system clock (impl_fast only).
         rxchunk : INTEGER RANGE 1 TO 4 := 1;
@@ -43,7 +43,7 @@ ENTITY spwrouter IS
         WIDTH : INTEGER RANGE 1 TO 3 := 2;
 
         -- Transmitter implementation for every port. (Used syntax requires VHDL-2008!)
-        tximpl : tximpl_array((numports - 1) DOWNTO 0) := (OTHERS => impl_generic);
+        tximpl : tximpl_array(numports DOWNTO 0) := (OTHERS => impl_generic);
 
         -- Size of the receive FIFO as the 2-logarithm of the number of bytes.
         -- Must be at least 6 (64 bytes)
@@ -66,16 +66,16 @@ ENTITY spwrouter IS
         rst : IN STD_LOGIC;
 
         -- Data In signal from SpaceWire bus.
-        spw_di : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+        spw_di : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
 
         -- Strobe In signal from SpaceWire bus.
-        spw_si : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+        spw_si : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
 
         -- Data Out signal from SpaceWire bus.
-        spw_do : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+        spw_do : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
         -- Strobe Out signal from SpaceWire bus.
-        spw_do : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0)
+        spw_do : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
         -- More ports eventually in further development process
     );
 END spwrouter;
@@ -85,7 +85,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
 
 BEGIN
     -- Generate (numports-1) physical ports including port 0 (internal port)
-    gen_ports : FOR i IN 1 TO (numports - 1) GENERATE
+    gen_ports : FOR i IN 1 TO numports GENERATE
         portX : spwstream GENERIC MAP(
             sysfreq => sysfreq,
             txclkfreq => txclkfreq,
