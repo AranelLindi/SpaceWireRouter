@@ -62,7 +62,7 @@ BEGIN
             s_granted <= (OTHERS => '0');
             s_lstgrnt <= 0;
 
-        ELSIF raising_edge(clk) THEN
+        ELSIF rising_edge(clk) THEN
 
             -- Roll out arbitration logic for every port.
             arbitration : FOR i IN 0 TO numports LOOP

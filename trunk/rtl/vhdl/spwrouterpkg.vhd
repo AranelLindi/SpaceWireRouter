@@ -31,7 +31,7 @@ PACKAGE spwrouterpkg IS
     TYPE matrix_t IS ARRAY(NATURAL RANGE <>, NATURAL RANGE <>) OF STD_LOGIC;
 
     -- Finite state machine used in router table.
-    Type spwroutertablestates is (S_Idle, S_Write, S_Read, S_Wait);
+    TYPE spwroutertablestates IS (S_Idle, S_Write, S_Read, S_Wait);
 
     -- Component declarations:
 
