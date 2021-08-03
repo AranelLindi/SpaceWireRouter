@@ -51,11 +51,13 @@ ARCHITECTURE spwrouterarb_round_arch OF spwrouterarb_round IS
     -- Last granted port.
     SIGNAL s_lstgrnt : INTEGER RANGE 0 TO numports;
 BEGIN
-    -- Drive other outputs.
-    grnt <= s_granted;
+    -- Intermediate signals
     s_request <= req;
     s_occupied <= occ;
 
+    -- Drive output.
+    grnt <= s_granted;
+    
     PROCESS (clk, rst)
     BEGIN
         IF (rst = '1') THEN
@@ -63,7 +65,6 @@ BEGIN
             s_lstgrnt <= 0;
 
         ELSIF rising_edge(clk) THEN
-
             -- Roll out arbitration logic for every port.
             arbitration : FOR i IN 0 TO numports LOOP
                 IF (s_lstgrnt = i) THEN
