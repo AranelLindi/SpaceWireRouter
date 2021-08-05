@@ -8,7 +8,7 @@
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
--- Description: 
+-- Description: Contains type and component definitions of spwrouter elements.
 -- Dependencies: none
 -- 
 -- Revision:
@@ -31,7 +31,7 @@ PACKAGE spwrouterpkg IS
     TYPE matrix_t IS ARRAY(NATURAL RANGE <>, NATURAL RANGE <>) OF STD_LOGIC;
 
     -- Finite state machine used in router table.
-    TYPE spwroutertablestates IS
+    TYPE spwroutertablestates IS (
         S_Idle,
         S_Write0,
         S_Write1,
@@ -42,10 +42,21 @@ PACKAGE spwrouterpkg IS
         S_Wait1,
         S_Wait2,
         S_Wait3
-        );
+    );
+
+    -- Finite state machine used in control register.
+    TYPE spwrouterregsstates IS (
+        S_Idle,
+        S_Read0,
+        S_Read1,
+        S_Write0,
+        S_Write1,
+        S_Wait0,
+        S_Wait1
+    );
 
     -- Component declarations:
-    -- Round Robin Arbiter
+    -- Round Robin Arbiter (spwrouterarb_table.vhd)
     COMPONENT spwrouterarb_round IS
         GENERIC (
             numports : INTEGER RANGE 0 TO 31
@@ -59,6 +70,7 @@ PACKAGE spwrouterpkg IS
         );
     END COMPONENT;
 
+    -- (spwrouterarb.vhd)
     COMPONENT spwrouterarb IS
         GENERIC (
             numports : INTEGER RANGE 0 TO 31
@@ -73,7 +85,7 @@ PACKAGE spwrouterpkg IS
         );
     END COMPONENT;
 
-    -- TimeCode Controller
+    -- TimeCode Controller (spwroutertcc.vhd)
     COMPONENT spwroutertcc IS
         GENERIC (
             numports : INTEGER RANGE 0 TO 31
@@ -83,7 +95,7 @@ PACKAGE spwrouterpkg IS
             rst : IN STD_LOGIC;
             running : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             lst_time : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-            tick_in : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            tc_en : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
             tick_out : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
             time_out : OUT matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0);
             tick_in : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
@@ -91,4 +103,23 @@ PACKAGE spwrouterpkg IS
             auto_time_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
             auto_cycle : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
-    END PACKAGE;
+    END COMPONENT;
+
+    -- Router Table (spwroutertable.vhd)
+    COMPONENT spwroutertable IS
+        GENERIC (
+            numports : INTEGER RANGE 0 TO 31
+        );
+        PORT (
+            clk : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
+            act : IN STD_LOGIC;
+            readwrite : IN STD_LOGIC;
+            dByte : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+            addr : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+            wdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            rdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            proc : OUT STD_LOGIC
+        );
+    END COMPONENT;
+END PACKAGE;

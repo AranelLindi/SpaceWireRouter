@@ -42,7 +42,7 @@ ENTITY spwroutertcc IS
 
         -- High if port has enabled TimeCode feature - except port0! 
         -- (Each bit corresponds to one port)
-        tick_in : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0); -- portTimeCodeEnable
+        tc_en : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0); -- portTimeCodeEnable
 
         -- High if corresponding port requests a TimeCode transmission - except port0!
         tick_out : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0); -- portTickIn
@@ -110,7 +110,7 @@ BEGIN
 
     -- Selection which port will receive TimeCode.
     PortTick : FOR i IN 0 TO (numports - 1) GENERATE
-        s_tick_out(i) <= s_ports_out(i) WHEN (tick_in(i) = '1' AND running(i) = '1') ELSE
+        s_tick_out(i) <= s_ports_out(i) WHEN (tc_en(i) = '1' AND running(i) = '1') ELSE
         '0';
 
         -- vermutlich muss hier s_time_out(i)(7 downto 0) = s_conc_tc stehen? Kucken ob Fehler auftreten!
