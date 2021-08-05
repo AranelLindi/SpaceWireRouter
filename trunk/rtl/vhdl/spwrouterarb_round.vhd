@@ -16,6 +16,7 @@
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+USE work.spwrouterpkg.ALL;
 
 ENTITY spwrouterarb_round IS
     GENERIC (
@@ -26,7 +27,7 @@ ENTITY spwrouterarb_round IS
         -- System clock.
         clk : IN STD_LOGIC;
 
-        -- Synchronous reset.
+        -- Asynchronous reset.
         rst : IN STD_LOGIC;
 
         -- High if relevant port is already being used by another

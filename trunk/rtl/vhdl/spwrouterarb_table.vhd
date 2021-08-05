@@ -31,7 +31,7 @@ ENTITY spwrouterarb_table IS
         -- System clock.
         clk : IN STD_LOGIC;
 
-        -- Synchronous reset.
+        -- Asynchronous reset.
         rst : IN STD_LOGIC;
 
         -- Requests from all ports. (Bit corresponds to port)

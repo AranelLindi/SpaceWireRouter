@@ -29,7 +29,7 @@ ENTITY spwroutertable IS
         -- System clock.
         clk : IN STD_LOGIC;
 
-        -- Synchronous reset.
+        -- Asynchronous reset.
         rst : IN STD_LOGIC;
 
         -- High if read/write operation is to be performed.

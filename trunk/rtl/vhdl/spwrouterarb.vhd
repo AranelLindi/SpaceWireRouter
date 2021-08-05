@@ -28,7 +28,7 @@ ENTITY spwrouterarb IS
         -- System clock.
         clk : IN STD_LOGIC;
 
-        -- Synchronous reset.
+        -- Asynchronous reset.
         rst : IN STD_LOGIC;
 
         -- Destination of port x.

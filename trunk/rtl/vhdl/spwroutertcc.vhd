@@ -31,7 +31,7 @@ ENTITY spwroutertcc IS
         -- System clock.
         clk : IN STD_LOGIC;
 
-        -- Synchronous reset.
+        -- Asynchronous reset.
         rst : IN STD_LOGIC;
 
         -- High if coresponding port is running or low when its in another state.
