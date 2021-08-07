@@ -122,4 +122,29 @@ PACKAGE spwrouterpkg IS
             proc : OUT STD_LOGIC
         );
     END COMPONENT;
+
+    -- Control Register (spwrouterregs.vhd)
+    COMPONENT spwrouterregs IS
+        GENERIC (
+            numports : INTEGER RANGE 0 TO 31
+        );
+        PORT (
+            clk : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
+            txclk : IN STD_LOGIC;
+            rxclk : IN STD_LOGIC;
+            writeData : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            readData : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            readwrite : IN STD_LOGIC;
+            dByte : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+            addr : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            proc : OUT STD_LOGIC;
+            strobe : IN STD_LOGIC;
+            cycle : IN STD_LOGIC;
+            portstatus : IN array_t(0 TO 31) OF STD_LOGIC_VECTOR(31 DOWNTO 0);
+            receiveTimecode : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+            autoTimeCodeValue : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+            autoTimeCodeCycleTime : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        );
+    END COMPONENT;
 END PACKAGE;
