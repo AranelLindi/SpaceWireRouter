@@ -34,10 +34,10 @@ ENTITY spwrouterregs IS
         rst : IN STD_LOGIC;
 
         -- Transmit clock.
-        txclk : IN STD_LOGIC;
+        --txclk : IN STD_LOGIC;
 
         -- Receiver clock.
-        rxclk : IN STD_LOGIC;
+        --rxclk : IN STD_LOGIC;
 
         -- Data to write into register. (Everythings that has no own writing port)
         writeData : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -67,7 +67,7 @@ ENTITY spwrouterregs IS
         -- **** **** **** PORT STATUS **** **** ****
         -- Port status register. Created for maximum ports of 32.
         -- (Each port takes over writing in its associated line.)
-        portstatus : IN array_t(0 TO 31) OF STD_LOGIC_VECTOR(31 DOWNTO 0);
+        portstatus : IN array_t(0 TO 31)(31 DOWNTO 0);
 
         -- **** **** **** TIMECODE **** **** ****
         -- TimeCode receive register.
@@ -82,7 +82,7 @@ ENTITY spwrouterregs IS
         --
         -- **** **** **** Add more registers here **** **** ****
     );
-END spwrouterregs
+END spwrouterregs;
 
 ARCHITECTURE spwrouterregs_arch OF spwrouterregs IS
     -- Number of rows in table. (0 to 2**abits-1)
@@ -162,7 +162,7 @@ ARCHITECTURE spwrouterregs_arch OF spwrouterregs IS
     -- TimeCode
     SIGNAL s_autoTimeCodeValue : STD_LOGIC_VECTOR(7 DOWNTO 0);
     SIGNAL s_autoTimeCodeCycleTime : STD_LOGIC_VECTOR (31 DOWNTO 0);
-    
+
     -- Intermediate signals.
     SIGNAL s_proc : STD_LOGIC;
 BEGIN
@@ -280,7 +280,7 @@ BEGIN
             -- TODO: Built-in async reset for spwrams!
 
         ELSIF rising_edge(clk) THEN
-            CASE state
+            CASE state IS
                 WHEN S_Idle =>
                     IF ((s_selectRoutingTable = '0') AND (cycle = '1') AND (strobe = '1')) THEN
                         IF (readwrite = '1') THEN -- TODO: FALLS das Beschreiben der Register schief geht, weil readwrite im nächsten Takt nicht mehr HIGH ist, dann 'wen' bei allen Registern auf '1' setzen und prüfen ob das funktioniert. (Könnte eventuell auch kollidieren, weil dann ja beides gleichzeitig möglich wäre: schreiben und lesen)
@@ -1084,7 +1084,7 @@ BEGIN
     PORT MAP(
         rclk => clk,
         wclk => clk,
-        ren => '1';
+        ren => '1',
         raddr => s_addr_table5,
         rdata => s_read_table5,
         wen => readwrite,
@@ -1108,4 +1108,4 @@ BEGIN
         waddr => s_addr_table6,
         wdata => s_write_table6
     );
-END spwrouterregs_arch
+END spwrouterregs_arch;

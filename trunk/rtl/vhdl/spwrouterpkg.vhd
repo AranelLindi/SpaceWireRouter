@@ -27,7 +27,7 @@ PACKAGE spwrouterpkg IS
     TYPE tximpl_array IS ARRAY (NATURAL RANGE <>) OF spw_implementation_type_xmit;
 
     -- Generel used types.
-    TYPE array_t IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR(NATURAL RANGE <>);
+    TYPE array_t IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR;
     TYPE matrix_t IS ARRAY(NATURAL RANGE <>, NATURAL RANGE <>) OF STD_LOGIC;
 
     -- Finite state machine used in router table.
@@ -78,10 +78,10 @@ PACKAGE spwrouterpkg IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            dest : IN larray(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0);
+            dest : IN larray(numports DOWNTO 0)(numports DOWNTO 0);
             req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-            rout : OUT larray(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0)
+            rout : OUT larray(numports DOWNTO 0)(numports DOWNTO 0)
         );
     END COMPONENT;
 
@@ -141,7 +141,7 @@ PACKAGE spwrouterpkg IS
             proc : OUT STD_LOGIC;
             strobe : IN STD_LOGIC;
             cycle : IN STD_LOGIC;
-            portstatus : IN array_t(0 TO 31) OF STD_LOGIC_VECTOR(31 DOWNTO 0);
+            portstatus : IN array_t(0 TO 31)(31 DOWNTO 0);
             receiveTimecode : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
             autoTimeCodeValue : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
             autoTimeCodeCycleTime : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)

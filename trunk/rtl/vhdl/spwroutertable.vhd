@@ -84,11 +84,11 @@ BEGIN
     -- Creates 32x256 routing table in ROM.
     -- (Synthesizer for Spartan3 infers to use ROM Block)
     ramXilinx : spwram
-    MAP GENERIC (
+    GENERIC MAP(
         abits => 8,
         dbits => 32
-    );
-    MAP PORT (
+    )
+    PORT MAP(
         rclk => clk,
         wclk => clk,
         ren => '1',

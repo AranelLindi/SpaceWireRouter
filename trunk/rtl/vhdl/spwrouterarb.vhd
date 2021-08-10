@@ -32,7 +32,7 @@ ENTITY spwrouterarb IS
         rst : IN STD_LOGIC;
 
         -- Destination of port x.
-        dest : IN array_t(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0);
+        dest : IN array_t(numports DOWNTO 0)(numports DOWNTO 0);
 
         -- Request of port x.
         req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
@@ -41,13 +41,13 @@ ENTITY spwrouterarb IS
         grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
         -- Routing switch matrix.
-        rout : OUT array_t(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0) -- Falls es hier probleme gibt, auf matrix wechseln!
+        rout : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0) -- Falls es hier probleme gibt, auf matrix wechseln!
     );
 END spwrouterarb;
 
 ARCHITECTURE spwrouterarb_arch OF spwrouterarb IS
     -- Router switch matrix.
-    SIGNAL s_routing : array_t(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0); -- hängt mit out port zusammen! siehe oben
+    SIGNAL s_routing : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- hängt mit out port zusammen! siehe oben
 
     -- Occupied port x.
     SIGNAL s_occupied : std_logic_vector(numports DOWNTO 0) := (OTHERS => '0');
@@ -63,18 +63,18 @@ BEGIN
     rout <= s_routing;
 
     -- Route occupation signal
-    FOR i IN 0 TO numports LOOP
+    occSig: FOR i IN 0 TO numports generate
         -- unten: hier inner loop nur nötig wenn mit rout(i) nicht eine ganze Zeile angesprochen werden kann!! Operatoren sind so definiert, dass sie auch eine komplete Zeile verarbeiten!
         s_occupied(i) <= OR rout(i); -- hoffentlich richtig addressiert
-    END LOOP;
+    END generate;
 
     -- Source port number which requests port as destination port.
-    FOR i IN 0 TO numports LOOP
-        FOR j IN 0 TO numports LOOP
+    outererloop: FOR i IN 0 TO numports generate
+        innerloop: FOR j IN 0 TO numports generate
             s_request(i, j) <= '1' WHEN req(i) = '1' AND to_integer(unsigned(dest(i))) = j ELSE
             '0'; -- potenzielle fehlerquelle!
-        END LOOP;
-    END LOOP;
+        END generate;
+    END generate;
 
     -- Generate Arbiter_Round for every port.
     spwrouterarbiter_roundrobin : FOR i IN 0 TO numports GENERATE
@@ -88,9 +88,9 @@ BEGIN
     END GENERATE spwrouterarbiter_roundrobin;
 
     -- Connection enabling signal
-    FOR i IN 0 TO numports LOOP
-        FOR j IN 0 TO numports LOOP
+    outerloopII: FOR i IN 0 TO numports generate
+        innerloopII: FOR j IN 0 TO numports generate
             s_granted(i) <= OR s_routing(j, i); -- potenzielle Fehlerquelle! SOLL: Immer spaltenweise nach unten!
-        END LOOP;
-    END LOOP;
+        END generate;
+    END generate;
 END ARCHITECTURE spwrouterarb_arch;
