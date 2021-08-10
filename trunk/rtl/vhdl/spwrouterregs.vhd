@@ -39,14 +39,14 @@ ENTITY spwrouterregs IS
         -- Receiver clock.
         --rxclk : IN STD_LOGIC;
 
-        -- Data to write into register. (Everythings that has no own writing port)
+        -- Data to write into register. (Everything that has no own writing port)
         writeData : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-        -- Data to read from register. (Router Tabel or generel data)
+        -- Data to read from register. (Router Table or general data)
         readData : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-        -- High wenn geschrieben, low wenn gelesen werden soll
-        -- Gilt nur für Routing Tabelle
+        -- High wenn geschrieben, low wenn gelesen werden soll.
+        -- Gilt nur für Routing Table
         readwrite : IN STD_LOGIC; -- writeEnable
 
         -- Selects Bytes of the 32 bits. Gilt für alle register
