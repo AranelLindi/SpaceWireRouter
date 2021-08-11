@@ -63,10 +63,10 @@ ARCHITECTURE spwrouterarb_table_tb_arch OF spwrouterarb_table_tb IS
 
     -- Initial values.
     rst <= '0';
-    req <= (0 => '1', (OTHERS => '0'));
+    req <= ((0 => '1'), (OTHERS => '0'));
 BEGIN
 
-    -- Insert values for generic parameters !!
+    -- Design under test.
     dut : spwrouterarb_table GENERIC MAP(numports => sim_numports)
     PORT MAP(
         clk => clk,

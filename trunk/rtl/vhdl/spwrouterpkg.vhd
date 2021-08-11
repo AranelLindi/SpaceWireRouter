@@ -9,6 +9,7 @@
 -- Target Devices: 
 -- Tool Versions: 
 -- Description: Contains type and component definitions of spwrouter elements.
+--
 -- Dependencies: none
 -- 
 -- Revision:
@@ -26,7 +27,7 @@ PACKAGE spwrouterpkg IS
     TYPE rximpl_array IS ARRAY (NATURAL RANGE <>) OF spw_implementation_type_rec;
     TYPE tximpl_array IS ARRAY (NATURAL RANGE <>) OF spw_implementation_type_xmit;
 
-    -- Generel used types.
+    -- General used types.
     TYPE array_t IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR;
     TYPE matrix_t IS ARRAY(NATURAL RANGE <>, NATURAL RANGE <>) OF STD_LOGIC;
 
@@ -42,7 +43,7 @@ PACKAGE spwrouterpkg IS
         S_Wait1,
         S_Wait2,
         S_Wait3
-    );
+    ); -- 10
 
     -- Finite state machine used in control register.
     TYPE spwrouterregsstates IS (
@@ -53,7 +54,25 @@ PACKAGE spwrouterpkg IS
         S_Write1,
         S_Wait0,
         S_Wait1
-    );
+    ); -- 7
+
+    -- Finite state machine used in spwstream container.
+    TYPE spwrouterportstates IS (
+        S_Idle,
+        S_Dest0,
+        S_Dest1,
+        S_Dest2,
+        S_RT0,
+        S_RT1,
+        S_RT2,
+        S_Data0,
+        S_Data1,
+        S_Data2,
+        S_Data3,
+        S_Dummy0,
+        S_Dummy1,
+        S_Dummy2
+    ); -- 14
 
     -- Component declarations:
     -- Round Robin Arbiter (spwrouterarb_table.vhd)
@@ -147,4 +166,8 @@ PACKAGE spwrouterpkg IS
             autoTimeCodeCycleTime : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
     END COMPONENT;
+
+    -- Router Port (spwrouterport.vhd)
+    component spwrouterport is -- TODO!
+    end component;
 END PACKAGE;
