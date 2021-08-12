@@ -20,6 +20,8 @@
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+--use IEEE.STD_LOGIC_ARITH.all;
+use IEEE.STD_LOGIC_UNSIGNED.all;
 USE work.spwrouterpkg.ALL;
 
 ENTITY spwroutertcc IS
@@ -48,13 +50,13 @@ ENTITY spwroutertcc IS
         tick_out : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0); -- portTickIn
 
         -- Contains for every port TimeCode to send - except port0!
-        time_out : OUT matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0); -- portTimeCodeIn
+        time_out : OUT array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0); -- portTimeCodeIn
 
         -- High if corresponding port received a TimeCode - except port0!
         tick_in : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0); -- portTickOut
 
         -- Received TimeCodes from all ports - except port0!
-        time_in : IN matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0); -- portTimeCodeOut
+        time_in : IN array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0); -- portTimeCodeOut
 
         -- TimeCode that is sent from Host.
         auto_time_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0); -- autoTimeCodeValue
@@ -80,7 +82,7 @@ ARCHITECTURE spwroutertcc_arch OF spwroutertcc IS
 
     -- Output registers.
     SIGNAL s_tick_out : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
-    SIGNAL s_time_out : matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0);
+    SIGNAL s_time_out : array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0);
 
     -- Counter interval for automatic TimeCode generation.
     -- [max. Interval: (2**32 - 1) * (1 / clk_frequency)]
@@ -103,7 +105,7 @@ BEGIN
     s_conc_tc <= s_tc_ctrlflag & s_tc_counterval;
 
     -- Drive other outputs.
-    last_tc <= s_conc_tc;
+    lst_time <= s_conc_tc;
     tick_out <= s_tick_out;
     time_out <= s_time_out;
     auto_time_out <= s_conc_auto_tc;
@@ -114,7 +116,7 @@ BEGIN
         '0';
 
         -- vermutlich muss hier s_time_out(i)(7 downto 0) = s_conc_tc stehen? Kucken ob Fehler auftreten!
-        s_time_out(i) <= s_conc_tc WHEN (auto_cycle = x"00000000") ELSE
+        s_time_out(i)(7 DOWNTO 0) <= s_conc_tc WHEN (auto_cycle = x"00000000") ELSE
         s_conc_auto_tc;
 
     END GENERATE PortTick;
@@ -133,7 +135,7 @@ BEGIN
             -- In case of automatic TimeCode generation: every
             -- port will get the new TC. (If (s_auto_enable = '0'),
             -- counter has not yet reached interval limit in auto_cylce.)
-            IF (auto_cyle /= x"00000000") THEN
+            IF (auto_cycle /= x"00000000") THEN
                 IF (s_auto_enable = '1') THEN
                     s_ports_out <= (OTHERS => '1');
 
@@ -143,10 +145,10 @@ BEGIN
                 END IF;
             ELSE
                 -- TimeCode Target
-                TCTarget : FOR i IN (numports - 1) DOWNTO 0 GENERATE
+                FOR i IN (numports - 1) DOWNTO 0 LOOP
                     IF (tick_in(i) = '1') THEN
                         IF (time_in(i) = (s_tc_counterval + 1)) THEN -- hier steht im original: port1TimeCodeOut(5 downto 0) = counterValuePlus1 ?!
-                            s_ports_out <= (i => '0', OTHERS => '1'); -- potenzielle Fehlerquelle! Liegt vermutlich daran, dass eingangsport von numport downto 1 gemacht wurde! Falls hier fehler auftreten, dann auf downto 0 ändern und i-1 machen!
+                            s_ports_out <= ((i => '0'), (OTHERS => '1')); -- potenzielle Fehlerquelle! Liegt vermutlich daran, dass eingangsport von numport downto 1 gemacht wurde! Falls hier fehler auftreten, dann auf downto 0 ändern und i-1 machen!
 
                         END IF;
                     END IF;
@@ -155,7 +157,7 @@ BEGIN
                     s_tc_counterval <= time_in(i)(5 DOWNTO 0); -- potenzielle Fehlerquelle!
                     s_tc_ctrlflag <= time_in(i)(7 DOWNTO 6);
 
-                END GENERATE TCTarget;
+                END LOOP;
             END IF;
         END IF;
     END PROCESS TCGenerate;

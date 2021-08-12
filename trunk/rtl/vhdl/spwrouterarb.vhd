@@ -78,11 +78,22 @@ BEGIN
 
     -- Generate Arbiter_Round for every port.
     spwrouterarbiter_roundrobin : FOR i IN 0 TO numports GENERATE
-        spwrouterarbiter_round PORT MAP(
+        signal s_request_vec : std_logic_vector(numports downto 0);
+        begin
+        
+            -- Convert matrix line into vector.
+            Conv: for j in numports downto 0 generate
+                s_request_vec(j) <= s_request(i, j);
+            end generate;
+    
+        Roundx : spwrouterarb_round generic map (
+            numports => numports
+        ) 
+        PORT MAP(
             clk => clk,
             rst => rst,
             occ => s_occupied(i),
-            req => s_request(i),
+            req => s_request_vec, -- vorher: s_request(i)
             grnt => s_routing(i) -- hier evtl. eine Fehlerquelle wegen falscher zuordnung?
         );
     END GENERATE spwrouterarbiter_roundrobin;
@@ -90,7 +101,15 @@ BEGIN
     -- Connection enabling signal
     outerloopII: FOR i IN 0 TO numports generate
         innerloopII: FOR j IN 0 TO numports generate
-            s_granted(i) <= OR s_routing(j, i); -- potenzielle Fehlerquelle! SOLL: Immer spaltenweise nach unten!
+            signal s_routing_vec: std_logic_vector(numports downto 0);
+            begin
+            
+            -- Convert matrix line into vector.
+            Conv: for k in numports downto 0 generate
+                s_routing_vec(k) <= s_routing(j)(i); -- prüfen ob hier aus Spaltenvektoren, Reihenvektoren wurden! -- potenzielle Fehlerquelle!
+            end generate;
+            
+            s_granted(i) <= OR s_routing_vec; -- vorher: s_routing(j)(i); -- potenzielle Fehlerquelle! SOLL: Immer spaltenweise nach unten!
         END generate;
     END generate;
 END ARCHITECTURE spwrouterarb_arch;

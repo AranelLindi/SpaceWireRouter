@@ -22,7 +22,7 @@ USE work.spwrouterpkg.ALL;
 ENTITY spwrouter IS
     GENERIC (
         -- Number of SpaceWire ports.
-        numports : INTEGER RANGE 0 TO 31
+        numports : INTEGER RANGE 0 TO 31;
 
         -- System clock frequency in Hz.
         sysfreq : real;
@@ -75,7 +75,7 @@ ENTITY spwrouter IS
         spw_do : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
         -- Strobe Out signal from SpaceWire bus.
-        spw_do : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+        spw_so : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
         -- More ports eventually in further development process
     );
 END spwrouter;
@@ -98,14 +98,14 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
     -- Matrix mit empfangenen TimeCodes aller Ports (außer port0, index verschoben!)
     SIGNAL s_recTimeCodesList : matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0);
 
-    SIGNAL iSelectDestinationPort : array_t(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0); -- potenzielle fehlerquelle: im usprungscode steht hier 'gNumberOfInternalPort - 1 downto 0' -- vielleicht doch von numports-1 downto 0 ?
-    SIGNAL iSwitchPortNumber : array_t(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0);
+    SIGNAL iSelectDestinationPort : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- potenzielle fehlerquelle: im usprungscode steht hier 'gNumberOfInternalPort - 1 downto 0' -- vielleicht doch von numports-1 downto 0 ?
+    SIGNAL iSwitchPortNumber : array_t(numports DOWNTO 0)(numports DOWNTO 0);
 
     -- Arbiter
-    SIGNAL s_dest : array_t(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0);
+    SIGNAL s_dest : array_t(numports DOWNTO 0)(numports DOWNTO 0);
     SIGNAL s_req : STD_LOGIC_VECTOR(numports DOWNTO 0);
     SIGNAL s_grnt : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_rout : array_t(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0);
+    SIGNAL s_rout : array_t(numports DOWNTO 0)(numports DOWNTO 0);
 BEGIN
     -- Generate (numports-1) physical ports including port 0 (internal port)
     gen_ports : FOR i IN 1 TO numports GENERATE

@@ -97,10 +97,10 @@ PACKAGE spwrouterpkg IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            dest : IN larray(numports DOWNTO 0)(numports DOWNTO 0);
+            dest : IN array_t(numports DOWNTO 0)(numports DOWNTO 0);
             req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-            rout : OUT larray(numports DOWNTO 0)(numports DOWNTO 0)
+            rout : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0)
         );
     END COMPONENT;
 
@@ -116,7 +116,7 @@ PACKAGE spwrouterpkg IS
             lst_time : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
             tc_en : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
             tick_out : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
-            time_out : OUT matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0);
+            time_out : OUT array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0);
             tick_in : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
             time_in : IN matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0);
             auto_time_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
