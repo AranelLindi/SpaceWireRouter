@@ -36,34 +36,31 @@ ARCHITECTURE spwrouterarb_table_tb_arch OF spwrouterarb_table_tb IS
         );
     END COMPONENT;
 
+    -- TODO: Initial values...
+
+    -- Number of SpaceWire ports.
+    CONSTANT numports : INTEGER RANGE 0 TO 31 := 5;
+
     -- System clock.
     SIGNAL clk : STD_LOGIC;
 
     -- Asynchronous reset.
-    SIGNAL rst : STD_LOGIC;
+    SIGNAL rst : STD_LOGIC := '0';
 
     -- Requests from all ports. (Bit corresponds to port)
-    SIGNAL req : STD_LOGIC_VECTOR((numports + 1) DOWNTO 0);
+    SIGNAL req : STD_LOGIC_VECTOR((numports + 1) DOWNTO 0) := (0 => '1', OTHERS => '0');
 
     -- Contains which port gets access.
     SIGNAL grnt : STD_LOGIC_VECTOR((numports + 1) DOWNTO 0);
-
-
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
     SIGNAL stop_the_clock : BOOLEAN;
-
-
     --- TODO: Number of simulated ports.
     CONSTANT sim_numports : INTEGER RANGE 0 TO 31 := 4;
 
     -- TODO: Testbench switcher.
-    VARIABLE sw_rst : BOOLEAN := true; -- constrols reset.
+    SHARED VARIABLE sw_rst : BOOLEAN := true; -- constrols reset.
 
-
-    -- Initial values.
-    rst <= '0';
-    req <= ((0 => '1'), (OTHERS => '0'));
 BEGIN
 
     -- Design under test.
@@ -75,14 +72,14 @@ BEGIN
         grnt => grnt);
 
     -- Changes requesting ports.
-    reqPorts: PROCESS (clk)
+    reqPorts : PROCESS (clk)
         VARIABLE ports : INTEGER RANGE 0 TO sim_numports := 0;
     BEGIN
         IF rising_edge(clk) THEN
-            req <= (to_unsigned(ports, req'Length));
+            req <= STD_LOGIC_VECTOR(to_unsigned(ports, req'Length));
 
             IF ports = sim_numports THEN
-                ports = 0;
+                ports := 0;
             END IF;
         END IF;
     END PROCESS;
@@ -90,7 +87,7 @@ BEGIN
     -- Set simulation time.
     stimulus : PROCESS
     BEGIN
-        WAIT 10 sec;
+        WAIT FOR 10 sec;
 
         stop_the_clock <= true;
         WAIT;

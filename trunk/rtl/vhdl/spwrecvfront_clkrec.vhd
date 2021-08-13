@@ -17,203 +17,205 @@
 -- Revision 0.1 - Behavior and Timing Simulation worked, not yet tested on Hardware
 ----------------------------------------------------------------------------------
 
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+ENTITY spwrecvfront_clkrec IS
+    GENERIC (
+        -- Width of shift registers for synchronization (depending on
+        -- bitrate to avoid metastability)
+        -- Default Value: 2
+        WIDTH : INTEGER RANGE 1 TO 3
+    );
+    PORT (
+        -- System clock (for Validation of recovered clock signal).
+        clk : IN STD_LOGIC;
 
+        -- Data In signal from SpaceWire bus.
+        spw_di : IN STD_LOGIC;
 
-entity spwrecvfront_clkrec is
-    generic (
-    	    -- Width of shift registers for synchronization (depending on
-    	    -- bitrate to avoid metastability)
-    	    -- Default Value: 2
-            WIDTH: integer range 1 to 3
-       );
-    Port (  
-            -- System clock (for Validation of recovered clock signal).
-            clk     :   in  std_logic;
-            
-            -- Data In signal from SpaceWire bus.
-            spw_di  :   in  std_logic;
-            
-            -- Strobe In signal from SpaceWire bus.
-            spw_si  :   in  std_logic;
-            
-            -- High to enable receiver; low to disable and reset receiver
-            rxen    :   in  std_logic;
-            
-            -- High if there has been recent activity on the input lines.
-            inact   :   out std_logic;
-            
-            -- High if inbits contains a valid received bit.
-            -- If inbvalid='1', the application must sample inbits on
-            -- the rising edge of clk.
-            inbvalid:   out std_logic;
-            
-            -- Received bit.
-            inbits  :   out std_logic_vector(0 downto 0)
-        );        
-end spwrecvfront_clkrec;
+        -- Strobe In signal from SpaceWire bus.
+        spw_si : IN STD_LOGIC;
 
-architecture spwrecvfront_clkrec_arch of spwrecvfront_clkrec is
+        -- High to enable receiver; low to disable and reset receiver
+        rxen : IN STD_LOGIC;
+
+        -- High if there has been recent activity on the input lines.
+        inact : OUT STD_LOGIC;
+
+        -- High if inbits contains a valid received bit.
+        -- If inbvalid='1', the application must sample inbits on
+        -- the rising edge of clk.
+        inbvalid : OUT STD_LOGIC;
+
+        -- Received bit.
+        inbits : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
+    );
+END spwrecvfront_clkrec;
+
+ARCHITECTURE spwrecvfront_clkrec_arch OF spwrecvfront_clkrec IS
     -- recovered clock signal.
-    signal recclk: std_ulogic;
-    
+    SIGNAL recclk : STD_ULOGIC;
+
     -- asynchronous phased switching (Latch)...
     -- ... for rising edges.
     --  Latch 1: (Equal)
-    signal ff_EQ_data: std_ulogic;
+    SIGNAL ff_EQ_data : STD_ULOGIC;
     -- Set
-    signal s_EQ_set: std_ulogic;
+    SIGNAL s_EQ_set : STD_ULOGIC;
     -- Reset
-    signal s_EQ_reset: std_ulogic;
-    
+    SIGNAL s_EQ_reset : STD_ULOGIC;
+
     -- ... for falling edges. 
     --  Latch 2: (Unequal)
-    signal ff_UEQ_data: std_ulogic;
+    SIGNAL ff_UEQ_data : STD_ULOGIC;
     -- Set
-    signal s_UEQ_set: std_ulogic;
+    SIGNAL s_UEQ_set : STD_ULOGIC;
     -- Reset
-    signal s_UEQ_reset: std_ulogic;
+    SIGNAL s_UEQ_reset : STD_ULOGIC;
 
     -- Data In - shift registers...
     -- ... for rising edges
-    signal ff_rising_data: std_ulogic_vector((WIDTH-1) downto 0);
-    
+    SIGNAL ff_rising_data : STD_ULOGIC_VECTOR((WIDTH - 1) DOWNTO 0);
+
     -- ... for falling edges
     --  One ff is activated on falling edge ...
-    signal ff_falling_data_0: std_ulogic;
+    SIGNAL ff_falling_data_0 : STD_ULOGIC;
     -- ... rest on rising edge
-    signal ff_falling_data: std_ulogic_vector((WIDTH-2) downto 0);
-    
+    SIGNAL ff_falling_data : STD_ULOGIC_VECTOR((WIDTH - 2) DOWNTO 0);
+
     -- output register (receiver signal)
-    signal s_inbvalid: std_ulogic;
-begin
+    SIGNAL s_inbvalid : STD_ULOGIC;
+BEGIN
 
     -- Clock recovery process.
-    ClkRec: recclk <= spw_di xor spw_si;
-    
+    ClkRec : recclk <= spw_di XOR spw_si;
+
     -- Drive outputs
     inact <= s_inbvalid;
-    inbvalid <= s_inbvalid;   
-     
+    inbvalid <= s_inbvalid;
+
     -- Latch 1: Data XNOR Strobe
-    s_EQ_set <= '1' when (spw_di = '1' and spw_si = '1') else '0';
-    s_EQ_reset <= '1' when (spw_di = '0' and spw_si = '0') else '0';
-    Latch1: process(s_EQ_set, s_EQ_reset)
-        begin
-            if (s_EQ_reset = '1') then
-                -- Reset
-                ff_EQ_data <= '0';
-                
-            elsif (s_EQ_set = '1') then
-                -- Set
-                ff_EQ_data <= '1';
-                
-            end if;
-    end process;
-    
+    s_EQ_set <= '1' WHEN (spw_di = '1' AND spw_si = '1') ELSE
+        '0';
+    s_EQ_reset <= '1' WHEN (spw_di = '0' AND spw_si = '0') ELSE
+        '0';
+    Latch1 : PROCESS (s_EQ_set, s_EQ_reset)
+    BEGIN
+        IF (s_EQ_reset = '1') THEN
+            -- Reset
+            ff_EQ_data <= '0';
+
+        ELSIF (s_EQ_set = '1') THEN
+            -- Set
+            ff_EQ_data <= '1';
+
+        END IF;
+    END PROCESS;
+
     -- Latch 2: Data XOR Strobe
-    s_UEQ_set <= '1' when (spw_di = '1' and spw_si = '0') else '0';
-    s_UEQ_reset <= '1' when (spw_di = '0' and spw_si = '1') else '0';
-    Latch2: process(s_UEQ_set, s_UEQ_reset)
-        begin
-            if (s_UEQ_reset = '1') then
-                -- Reset
-                ff_UEQ_data <= '0';
-                         
-            elsif (s_UEQ_set = '1') then
-                -- Set
-                ff_UEQ_data <= '1';   
-                             
-            end if;
-    end process;
-    
+    s_UEQ_set <= '1' WHEN (spw_di = '1' AND spw_si = '0') ELSE
+        '0';
+    s_UEQ_reset <= '1' WHEN (spw_di = '0' AND spw_si = '1') ELSE
+        '0';
+    Latch2 : PROCESS (s_UEQ_set, s_UEQ_reset)
+    BEGIN
+        IF (s_UEQ_reset = '1') THEN
+            -- Reset
+            ff_UEQ_data <= '0';
+
+        ELSIF (s_UEQ_set = '1') THEN
+            -- Set
+            ff_UEQ_data <= '1';
+
+        END IF;
+    END PROCESS;
+
     -- Validates recclk-signal for receiver.
-    ClkRecValidation: process(clk)
-        variable switch: boolean; -- (default value: false)
-    begin
+    ClkRecValidation : PROCESS (clk)
+        VARIABLE switch : BOOLEAN; -- (default value: false)
+    BEGIN
         -- Detects clock edge change in recclk and activates then
         -- the signal for a valid received bit.
-        if rising_edge(clk) or falling_edge(clk) then -- falling_edge(clk) added: 09.06.21: check carefully if necessary!
-            if switch = true then
-                if recclk = '1' then
-                    switch := not switch;
-                    
-                    if rxen = '1' then
+        IF rising_edge(clk) THEN
+            IF switch = true THEN
+                IF recclk = '1' THEN
+                    switch := NOT switch;
+
+                    IF rxen = '1' THEN
                         s_inbvalid <= '1';
                         -- (else case not necessary!)
-                    end if;
-                    
-                else
+                    END IF;
+
+                ELSE
                     -- reset receiver
                     s_inbvalid <= '0';
-                    
-                end if;
-            elsif switch = false then
-                if recclk = '0' then
-                    switch := not switch;
-                    
-                    if rxen = '1' then
+
+                END IF;
+            ELSIF switch = false THEN
+                IF recclk = '0' THEN
+                    switch := NOT switch;
+
+                    IF rxen = '1' THEN
                         s_inbvalid <= '1';
                         -- (else case not necessary!)
-                    end if;
-                    
-                else
+                    END IF;
+
+                ELSE
                     -- reset receiver
                     s_inbvalid <= '0';
-                    
-                end if;
-            end if;
-        end if;
-    end process;
-    
+
+                END IF;
+            END IF;
+        END IF;
+    END PROCESS;
+
     -- Drives shift registers on rising clock edge.
-    ClkRecRisingEdge: process(recclk)
-        begin        
-            if rising_edge(recclk) then                           
-                -- shift register construct
-                ff_rising_data(0) <= ff_EQ_data;
-                
-                for i in 0 to (WIDTH-2) loop
-                    ff_rising_data(i+1) <= ff_rising_data(i);
-                end loop;
-                
-                -- generic shift register construct
-                if (WIDTH > 1) then -- (pre-compiled statement)
-                    ff_falling_data(0) <= ff_falling_data_0;
-                    
-                    for i in 0 to (WIDTH-3) loop
-                        ff_falling_data(i+1) <= ff_falling_data(i);
-                    end loop;
-                    
-                end if;
-                
-            end if;
-    end process;
-    
+    ClkRecRisingEdge : PROCESS (recclk)
+    BEGIN
+        IF rising_edge(recclk) THEN
+            -- shift register construct
+            ff_rising_data(0) <= ff_EQ_data;
+
+            FOR i IN 0 TO (WIDTH - 2) LOOP
+                ff_rising_data(i + 1) <= ff_rising_data(i);
+            END LOOP;
+
+            -- generic shift register construct
+            IF (WIDTH > 1) THEN -- (pre-compiled statement)
+                ff_falling_data(0) <= ff_falling_data_0;
+
+                FOR i IN 0 TO (WIDTH - 3) LOOP
+                    ff_falling_data(i + 1) <= ff_falling_data(i);
+                END LOOP;
+
+            END IF;
+
+        END IF;
+    END PROCESS;
+
     -- Drives shift registers on falling clock edge.
-    ClkRecFallingEdge: process(recclk)
-    begin
-        if falling_edge(recclk) then    
+    ClkRecFallingEdge : PROCESS (recclk)
+    BEGIN
+        IF falling_edge(recclk) THEN
             -- 
-            ff_falling_data_0 <= ff_UEQ_data;       
-        end if;    
-    end process;
-    
+            ff_falling_data_0 <= ff_UEQ_data;
+        END IF;
+    END PROCESS;
+
     -- Takes bits from both paths alternately, depending on clock signal.
-    ClkRecMultiplexer: process(recclk)
-    begin
-        if (recclk = '0') then
-            inbits(0) <= ff_rising_data(WIDTH-1);
-            
-        elsif (recclk = '1') then
-            if (WIDTH > 1) then -- (pre-compiled statement)
-                inbits(0) <= ff_falling_data(WIDTH-2);
-                
-            else
+    ClkRecMultiplexer : PROCESS (recclk)
+    BEGIN
+        IF (recclk = '0') THEN
+            inbits(0) <= ff_rising_data(WIDTH - 1);
+
+        ELSIF (recclk = '1') THEN
+            IF (WIDTH > 1) THEN -- (pre-compiled statement)
+                inbits(0) <= ff_falling_data(WIDTH - 2);
+
+            ELSE
                 inbits(0) <= ff_falling_data_0;
-                
-            end if;            
-        end if;
-    end process;
-end spwrecvfront_clkrec_arch;
+
+            END IF;
+        END IF;
+    END PROCESS;
+END spwrecvfront_clkrec_arch;

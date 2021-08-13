@@ -21,194 +21,190 @@
 -- 
 ----------------------------------------------------------------------------------
 
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
+ENTITY spwrecvfront_clkrec_tb IS
+END;
 
-
-entity spwrecvfront_clkrec_tb is
-end;
-
-architecture spwrecvfront_clkrec_tb_arch of spwrecvfront_clkrec_tb is
+ARCHITECTURE spwrecvfront_clkrec_tb_arch OF spwrecvfront_clkrec_tb IS
     -- Component Declaration: must be equal to entity in spwrecvfront_clkrec.
-    component spwrecvfront_clkrec
-        generic(
-            WIDTH: integer range 1 to 3
-            );
-        port(
-            clk: in std_logic;
-            spw_di: in std_logic;
-            spw_si: in std_logic;
-            rxen: in std_logic;
-            inact: out std_logic;
-            inbvalid: out std_logic;
-            inbits: out std_logic_vector(0 downto 0)
-            );
-    end component;
-    
+    COMPONENT spwrecvfront_clkrec
+        GENERIC (
+            WIDTH : INTEGER RANGE 1 TO 3
+        );
+        PORT (
+            clk : IN STD_LOGIC;
+            spw_di : IN STD_LOGIC;
+            spw_si : IN STD_LOGIC;
+            rxen : IN STD_LOGIC;
+            inact : OUT STD_LOGIC;
+            inbvalid : OUT STD_LOGIC;
+            inbits : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
+        );
+    END COMPONENT;
+
     -- Simulation signal declarations.
-    signal clk: std_logic;
-    signal spw_di: std_logic;
-    signal spw_si: std_logic;
-    signal rxen: std_logic;
-    signal inact: std_logic;
-    signal inbvalid: std_logic;
-    signal inbits: std_logic_vector(0 downto 0);
-    
+    SIGNAL clk : STD_LOGIC;
+    SIGNAL spw_di : STD_LOGIC;
+    SIGNAL spw_si : STD_LOGIC;
+    SIGNAL rxen : STD_LOGIC;
+    SIGNAL inact : STD_LOGIC;
+    SIGNAL inbvalid : STD_LOGIC;
+    SIGNAL inbits : STD_LOGIC_VECTOR(0 DOWNTO 0);
+
     -- Testbench specific declarations.
     -- High if spw_si should be generated correctly, low if no changes should be made.
-    shared variable strobe_output: std_logic := '1';
-    
+    SHARED VARIABLE strobe_output : STD_LOGIC := '1';
+
     -- Signal for clock recovery.
-    signal clock_recovery: std_ulogic;
-    
+    SIGNAL clock_recovery : STD_ULOGIC;
+
     -- Incomming bit in queue.
-    signal rbit: std_ulogic;
-    
+    SIGNAL rbit : STD_ULOGIC;
+
     -- Bit list with sendet bits recognized als valid by receiver (spwrecv)
-    signal bin: std_ulogic_vector(0 downto 0);
-    
+    SIGNAL bin : STD_ULOGIC_VECTOR(0 DOWNTO 0);
+
     -- #################################
     -- CHANGE TESTVARIABLES HERE...       
     -- Data transmission frequency.
-    constant data_clock_freq: real := 10.0e6; -- 10 MHz == 10 Mbps
-       
+    CONSTANT data_clock_freq : real := 10.0e6; -- 10 MHz == 10 Mbps
+
     -- System clock frequency.   
-    constant sys_clock_freq: real := 20.0e6; -- 20 MHz
-    
-   
+    CONSTANT sys_clock_freq : real := 20.0e6; -- 20 MHz
     -- Number of loop iterations to be performed.
-    constant num_iterations: integer := 1;
-    
+    CONSTANT num_iterations : INTEGER := 1;
+
     -- Bit sequence that is transmitted.
-    constant bseq: std_logic_vector := "010101100111000";
-    
+    CONSTANT bseq : STD_LOGIC_VECTOR := "010101100111000";
+
     -- Determines whether the activation input signal (rxen) of the
     -- receiver is changed depending on time. This is supposed to 
     -- have the effect of deactivation the front-end.
-    constant RxenStressTest: boolean := false;
-    
+    CONSTANT RxenStressTest : BOOLEAN := false;
+
     -- Determines whether the strobe signal is temporarily not generated
     -- correctly in order to make the behavior of the dut visible.
-    constant StrobeStressTest: boolean := false;
-    
+    CONSTANT StrobeStressTest : BOOLEAN := false;
+
     -- Width of shift registers in recvfront_clkrec. Depending on 
     -- transmission rate, necessary for synchronization and avoiding
     -- metastability. Causes a clock shift!
-    constant NumberOfShiftRegisters: integer range 1 to 3 := 2;
+    CONSTANT NumberOfShiftRegisters : INTEGER RANGE 1 TO 3 := 2;
     -- #################################
-begin
+BEGIN
     -- Design under test:
-    dut: spwrecvfront_clkrec
-        generic map (
-                -- Width of shift registers (default: 2)
-                WIDTH   =>  NumberOfShiftRegisters
-                )
-        port map (
-                clk     =>  clk,
-                spw_di  =>  spw_di,
-                spw_si  =>  spw_si,
-                rxen    =>  rxen,
-                inact   =>  inact,
-                inbvalid => inbvalid,
-                inbits  =>  inbits
-                );
+    dut : spwrecvfront_clkrec
+    GENERIC MAP(
+        -- Width of shift registers (default: 2)
+        WIDTH => NumberOfShiftRegisters
+    )
+    PORT MAP(
+        clk => clk,
+        spw_di => spw_di,
+        spw_si => spw_si,
+        rxen => rxen,
+        inact => inact,
+        inbvalid => inbvalid,
+        inbits => inbits
+    );
 
     -- Generate system clock.
-    SysClk: process is
-        variable sw: boolean := false;
-    begin   
+    SysClk : PROCESS IS
+        VARIABLE sw : BOOLEAN := false;
+    BEGIN
         clk <= '1';
-        wait for (0.5 sec) / sys_clock_freq;
+        WAIT FOR (0.5 sec) / sys_clock_freq;
         clk <= '0';
-        wait for (0.5 sec) / sys_clock_freq;
-    end process;
-    
+        WAIT FOR (0.5 sec) / sys_clock_freq;
+    END PROCESS;
+
     -- produces DataIn and StrobeIn by using bit sequence in bseq.
-    DataStrobeCreation: process
-        variable strobe_sw: std_ulogic := '0'; -- default value: false
-    begin
-        for i in 0 to num_iterations loop
-            for j in 0 to (bseq'Length-1) loop
+    DataStrobeCreation : PROCESS
+        VARIABLE strobe_sw : STD_ULOGIC := '0'; -- default value: false
+    BEGIN
+        FOR i IN 0 TO num_iterations LOOP
+            FOR j IN 0 TO (bseq'Length - 1) LOOP
                 spw_di <= bseq(j);
-                
+
                 -- checks whether the strobe signal should be generated correctly.
-                if strobe_output = '1' then
-                    spw_si <= bseq(j) xor strobe_sw;
-                    strobe_sw := not strobe_sw;
-                end if;
-                
-                wait for (0.5 sec) / data_clock_freq;
-            end loop;
-        end loop;
-        wait;
-    end process;
-    
+                IF strobe_output = '1' THEN
+                    spw_si <= bseq(j) XOR strobe_sw;
+                    strobe_sw := NOT strobe_sw;
+                END IF;
+
+                WAIT FOR (0.5 sec) / data_clock_freq;
+            END LOOP;
+        END LOOP;
+        WAIT;
+    END PROCESS;
+
     -- Controls rxen signal via RxenStressTest-variable
-    ControlRxenCreation: process is
-        constant rxen_on: time := (0.5 sec) / data_clock_freq * bseq'Length / 6;
-        constant rxen_off: time := (0.5 sec) / data_clock_freq * bseq'Length / 7;
-    begin
-        if RxenStressTest = false then
+    ControlRxenCreation : PROCESS IS
+        CONSTANT rxen_on : TIME := (0.5 sec) / data_clock_freq * bseq'Length / 6;
+        CONSTANT rxen_off : TIME := (0.5 sec) / data_clock_freq * bseq'Length / 7;
+    BEGIN
+        IF RxenStressTest = false THEN
             rxen <= '1';
-            wait;
-        end if;
-        
-        for i in 0 to num_iterations loop
+            WAIT;
+        END IF;
+
+        FOR i IN 0 TO num_iterations LOOP
             rxen <= '1';
-            wait for rxen_on;
+            WAIT FOR rxen_on;
             rxen <= '0';
-            wait for rxen_off;
+            WAIT FOR rxen_off;
             rxen <= '1';
-        end loop;
-        wait;
-    end process;
-    
+        END LOOP;
+        WAIT;
+    END PROCESS;
+
     -- Controlls influence of strobe signal and can be activated
     -- by changing StrobeStressTest-variable above.
-    ControlStrobeCreation: process
-        constant strobe_on: time := (0.5 sec) / data_clock_freq * bseq'Length / 5;
-        constant strobe_off: time := (0.5 sec) / data_clock_freq * bseq'Length / 6;
-    begin
-        if StrobeStressTest = false then
+    ControlStrobeCreation : PROCESS
+        CONSTANT strobe_on : TIME := (0.5 sec) / data_clock_freq * bseq'Length / 5;
+        CONSTANT strobe_off : TIME := (0.5 sec) / data_clock_freq * bseq'Length / 6;
+    BEGIN
+        IF StrobeStressTest = false THEN
             strobe_output := '1';
-            wait;
-        end if;
-        
-        for i in 0 to num_iterations loop
+            WAIT;
+        END IF;
+
+        FOR i IN 0 TO num_iterations LOOP
             strobe_output := '1';
-            wait for strobe_on;
+            WAIT FOR strobe_on;
             strobe_output := '0';
-            wait for strobe_off;
+            WAIT FOR strobe_off;
             strobe_output := '1';
-        end loop;
-        wait;
-    end process;
-    
+        END LOOP;
+        WAIT;
+    END PROCESS;
+
     -- Clock recovery. (to check correctness. Is generated in
     -- same way in the front-end but none output signal)
-    clock_recovery <= spw_di xor spw_si;   
-    
+    clock_recovery <= spw_di XOR spw_si;
+
     -- Simplified receiver functionality that should show which
     -- bits are forwarded fromt the front-end to the receiver.
     -- (Similar function structure as in spwrecv.vhd)
     -- Process incomming bit
-    process(rxen, inact, inbits)
-    begin
-        if inbvalid = '1' then
+    PROCESS (rxen, inact, inbits)
+    BEGIN
+        IF inbvalid = '1' THEN
             rbit <= inbits(0);
-        end if;
-        
-        if rxen = '0' or inbvalid = '0' then
+        END IF;
+
+        IF rxen = '0' OR inbvalid = '0' THEN
             rbit <= 'U';
-        end if;
-    end process;
-    
+        END IF;
+    END PROCESS;
+
     -- Update bit on system clock beat.
-    process(clk)
-    begin
-        if rising_edge(clk) then
-            bin(0) <= rbit; 
-        end if;
-    end process;
-end;
+    PROCESS (clk)
+    BEGIN
+        IF rising_edge(clk) THEN
+            bin(0) <= rbit;
+        END IF;
+    END PROCESS;
+END;

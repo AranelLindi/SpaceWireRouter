@@ -37,45 +37,38 @@ ARCHITECTURE spwrouterarb_round_tb_arch OF spwrouterarb_round_tb IS
         );
     END COMPONENT;
 
+    -- TODO: Initial values...
+
+    -- Number of SpaceWire ports.
+    CONSTANT numports : INTEGER RANGE 0 TO 31 := 5;
+
     -- System clock.
     SIGNAL clk : STD_LOGIC;
 
     -- Asynchronous reset.
-    SIGNAL rst : STD_LOGIC;
+    SIGNAL rst : STD_LOGIC := '0';
 
     -- High if relevant port is already being used by another
     -- process. Low when the port is unused.
-    SIGNAL occ : STD_LOGIC;
+    SIGNAL occ : STD_LOGIC := '0';
 
     -- Corresponding bit is High when respective port sends
     -- a request to the port which is defined under occ.
-    SIGNAL req : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    SIGNAL req : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
 
     -- Bit sequence that indicates the access of another port.
     SIGNAL grnt : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-
-
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
     SIGNAL stop_the_clock : BOOLEAN;
-
-
     -- TODO: Number of simulated ports.
     CONSTANT sim_numports : INTEGER RANGE 0 TO 31 := 4;
 
     -- TODO: Testbench switcher.
-    VARIABLE sw_rst : BOOLEAN := true; -- controls reset.
-
-
+    SHARED VARIABLE sw_rst : BOOLEAN := true; -- controls reset.
     -- Counter: Helps to raise events.
     SIGNAL counter : INTEGER := 0;
-
-
-    -- TODO: Initial values.
-    rst <= '0';
-    occ <= (OTHERS => '0');
-    req <= (OTHERS => '0');
 BEGIN
 
     -- Design under test.
@@ -93,7 +86,7 @@ BEGIN
         -- TODO: Change counter values.
         IF ((counter = 40 OR counter = 68) AND sw_rst = true) THEN
             rst <= '1';
-            ELSE
+        ELSE
             rst <= '0';
         END IF;
     END PROCESS;
@@ -103,14 +96,14 @@ BEGIN
         VARIABLE cnt : INTEGER RANGE 0 TO sim_numports := 0;
     BEGIN
         occ <= NOT occ;
-        req <= (cnt => '1', (OTHERS => '0'));
-        WAIT clock_period;
+        req <= (cnt => '1', OTHERS => '0');
+        WAIT FOR clock_period;
     END PROCESS;
 
     -- Set simulation time.
     stimulus : PROCESS
     BEGIN
-        WAIT 10 sec;
+        WAIT FOR 10 sec;
 
         stop_the_clock <= true;
         WAIT;

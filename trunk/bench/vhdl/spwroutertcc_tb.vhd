@@ -45,20 +45,25 @@ ARCHITECTURE spwroutertcc_tb_arch OF spwroutertcc_tb IS
         );
     END COMPONENT;
 
+    -- TODO: Initial values...
+
+    -- Number of SpaceWire ports.
+    CONSTANT numports : INTEGER RANGE 0 TO 31 := 5;
+
     -- System clock.
     SIGNAL clk : STD_LOGIC;
 
     -- Asynchronous reset.
-    SIGNAL rst : STD_LOGIC;
+    SIGNAL rst : STD_LOGIC := '0';
 
     -- High if corresponding port is running or low when its in another state.
-    SIGNAL running : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    SIGNAL running : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '1');
 
     -- Last Timecode that was received.
     SIGNAL lst_time : STD_LOGIC_VECTOR(7 DOWNTO 0);
 
     -- High if port has enabled TimeCode feature - except port0!
-    SIGNAL tc_en : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+    SIGNAL tc_en : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0) := (2 => '0', OTHERS => '1'); -- 2nd port disabled TCs, others activated
 
     -- High if corresponding port requests a TimeCode transmission - except port0!
     SIGNAL tick_out : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
@@ -67,46 +72,32 @@ ARCHITECTURE spwroutertcc_tb_arch OF spwroutertcc_tb IS
     SIGNAL time_out : matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0);
 
     -- High if corresponding port received a TimeCode - except port0!
-    SIGNAL tick_in : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+    SIGNAL tick_in : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0) := (OTHERS => '0');
 
     -- Received TimeCodes from all ports - except port0!
-    SIGNAL time_in : matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0);
+    SIGNAL time_in : matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0) := (OTHERS => (OTHERS => '0'));
 
     -- TimeCode that is send from Host.
     SIGNAL auto_time_out : STD_LOGIC_VECTOR(7 DOWNTO 0);
 
     -- Transmission interval for automatic TimeCode sending.
-    SIGNAL auto_cycle : STD_LOGIC_VECTOR(31 DOWNTO 0);
-
-
+    SIGNAL auto_cycle : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0'); -- start with deactivated auto TC generation.
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
     SIGNAL stop_the_clock : BOOLEAN;
-
-
     -- TODO: Number of simulated ports.
     CONSTANT sim_numports : INTEGER RANGE 0 TO 31 := 4;
 
     -- TODO: Testbench switcher.
-    VARIABLE sw_rst : BOOLEAN := true; -- controls reset.
-    VARIABLE sw_TC_incoming : BOOLEAN := true; -- controls incoming TC.
-    VARIABLE sw_wrong_TC : BOOLEAN := true; -- incoming TC is smaller or bigger than it should be.
-
-
+    SHARED VARIABLE sw_rst : BOOLEAN := true; -- controls reset.
+    SHARED VARIABLE sw_TC_incoming : BOOLEAN := true; -- controls incoming TC.
+    SHARED VARIABLE sw_wrong_TC : BOOLEAN := true; -- incoming TC is smaller or bigger than it should be.
     -- Counter: Helps to raise events.
-    SIGNAL counter : INTEGER := 0;
+    SHARED VARIABLE counter : INTEGER := 0;
 
     -- Auxiliary variables
-    VARIABLE internTC : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0'); -- saves last TC.
-    
-    
-    -- TODO: Initial values.
-    rst <= '0';
-    running <= (OTHERS => '1'); -- all ports are active
-    tc_en <= (2 => '0', OTHERS => '1'); -- 2nd port disabled TCs, others activated
-    tick_in <= (OTHERS => '0');
-    time_in <= (OTHERS => '0');
-    auto_cycle <= (OTHERS => '0'); -- start with deactivated auto TC generation.
+    SHARED VARIABLE internTC : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0'); -- saves last TC.
+
 BEGIN
     -- Design under test.
     dut : spwroutertcc GENERIC MAP(numports => sim_numports)
@@ -128,7 +119,7 @@ BEGIN
     BEGIN
         -- TODO: Change counter values.
         IF ((counter = 12 OR counter = 28) AND sw_rst = true) THEN
-            rst <= '1'
+            rst <= '1';
         ELSE
             rst <= '0';
         END IF;
@@ -140,11 +131,13 @@ BEGIN
         VARIABLE iport : INTEGER := 1;
     BEGIN
         IF (counter MOD 10 = 0 AND sw_TC_incoming = true) THEN
-            time_in(iport) <= internTC;
+            FOR i IN 0 TO 7 LOOP
+                time_in(iport, i) <= internTC(i);
+            END LOOP;
 
             -- Changing MSB to make the number larger or smaller and provoke an error.
             IF (sw_wrong_TC = true) THEN
-                time_in(iport)(iport) <= NOT time_in(iport)(iport); -- flip MSB.
+                time_in(iport, iport) <= NOT time_in(iport, iport); -- flip MSB.
             END IF;
 
             tick_in <= (iport => '1', OTHERS => '0');
@@ -154,7 +147,7 @@ BEGIN
     -- Set simulation time.
     stimulus : PROCESS
     BEGIN
-        WAIT 10 sec; -- Simulation time before clock stops.
+        WAIT FOR 10 sec; -- Simulation time before clock stops.
 
         stop_the_clock <= true;
         WAIT;
@@ -167,9 +160,9 @@ BEGIN
             clk <= '0', '1' AFTER clock_period / 2;
 
             IF counter = 100 THEN
-                counter = 0;
+                counter := 0;
             END IF;
-            counter = counter + 1;
+            counter := counter + 1;
             WAIT FOR clock_period;
         END LOOP;
         WAIT;

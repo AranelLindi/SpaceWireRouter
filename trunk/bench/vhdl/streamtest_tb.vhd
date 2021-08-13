@@ -89,7 +89,7 @@ begin
             sysfreq     => sys_clock_freq,
             txclkfreq   => sys_clock_freq,
             tickdiv     => 16,
-            rximpl      => impl_clkrec,
+            rximpl      => impl_generic,
             rxchunk     => 1,
             tximpl      => impl_generic,
             rxfifosize_bits => 9,

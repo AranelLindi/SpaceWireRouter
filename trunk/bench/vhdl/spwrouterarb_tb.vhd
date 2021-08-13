@@ -36,48 +36,46 @@ ARCHITECTURE spwrouterarb_tb_arch OF spwrouterarb_tb IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            dest : IN array_t(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0);
+            dest : IN array_t(numports DOWNTO 0)(numports DOWNTO 0);
             req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-            rout : OUT array_t(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0)
+            rout : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0)
         );
     END COMPONENT;
+
+    -- TODO: Initial values...
+
+    -- Number of SpaceWire ports.
+    CONSTANT numports : INTEGER RANGE 0 TO 31 := 5;
 
     -- System clock.
     SIGNAL clk : STD_LOGIC;
 
     -- Asynchronous reset.
-    SIGNAL rst : STD_LOGIC;
+    SIGNAL rst : STD_LOGIC := '0';
 
     -- Destination of port x.
-    SIGNAL dest : array_t(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0);
+    SIGNAL dest : array_t(numports DOWNTO 0)(numports DOWNTO 0) := (1 => (1 => '1'), 2 => (1 => '1'), OTHERS => (OTHERS => '0')); -- (1,1) = '1', (2, 1) = '1'), (others => '0')
 
     -- Request of port x.
-    SIGNAL req : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    SIGNAL req : STD_LOGIC_VECTOR(numports DOWNTO 0) := (numports => '1', OTHERS => '0');
 
     -- Granted to port x.
     SIGNAL grnt : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
     -- Routing switch matrix.
-    SIGNAL rout : array_t(numports DOWNTO 0) OF STD_LOGIC_VECTOR(numports DOWNTO 0);
-
-
+    SIGNAL rout : array_t(numports DOWNTO 0)(numports DOWNTO 0);
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
     SIGNAL stop_the_clock : BOOLEAN;
-    
-    
     -- TODO: Number of simulated ports.
     CONSTANT sim_numports : INTEGER RANGE 0 TO 31 := 4;
 
     -- TODO: Testbench switcher.
-    VARIABLE sw_rst : BOOLEAN := true; -- controls reset.
-    
-    
-    -- TODO: Initial values.
-    rst <= '0';
-    dest <= ((1, 1) => '1', (2, 1) => '1', (OTHERS => (OTHERS => '0'))); -- potenzielle fehlerquelle! syntax vermutlich falsch und was soll hier überhaupt rein?
-    req <= (numports => '1', (OTHERS => '0'));
+    SHARED VARIABLE sw_rst : BOOLEAN := true; -- controls reset.
+
+    -- Internal counter.
+    SHARED VARIABLE counter : INTEGER := 0;
 BEGIN
     -- Design under test.
     dut : spwrouterarb GENERIC MAP(numports => sim_numports)
@@ -101,7 +99,7 @@ BEGIN
     -- Set simulation time.
     stimulus : PROCESS
     BEGIN
-        WAIT 10 sec;
+        WAIT FOR 10 sec;
 
         WAIT; -- wait forever.
     END PROCESS;
@@ -113,9 +111,9 @@ BEGIN
             clk <= '0', '1' AFTER clock_period / 2;
 
             IF counter = 100 THEN
-                counter = 0;
+                counter := 0;
             END IF;
-            counter = counter + 1;
+            counter := counter + 1;
             WAIT FOR clock_period;
         END LOOP;
         WAIT;

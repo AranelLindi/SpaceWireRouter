@@ -18,6 +18,7 @@
 LIBRARY IEEE;
 USE IEEE.Std_logic_1164.ALL;
 USE IEEE.Numeric_Std.ALL;
+USE work.spwrouterpkg.ALL;
 
 ENTITY spwrouterregs_tb IS
 END;
@@ -46,71 +47,57 @@ ARCHITECTURE spwrouterregs_tb_arch OF spwrouterregs_tb IS
     );
   END COMPONENT;
 
+  -- TODO: Initial values...  
+
   -- System clock.
   SIGNAL clk : STD_LOGIC;
 
   -- Asynchronous reset.
-  SIGNAL rst : STD_LOGIC;
+  SIGNAL rst : STD_LOGIC := '0';
 
   -- Data to write into registers. (Everything that has no own port)
-  SIGNAL writeData : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL writeData : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
 
   -- Data to read from register. (Router Table or general data)
   SIGNAL readData : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
   -- High wenn geschrieben, low wenn gelesen werden soll.
   -- Gilt nur für Routing Table
-  SIGNAL readwrite : STD_LOGIC;
+  SIGNAL readwrite : STD_LOGIC := '0';
 
   -- Selects bytes of the 32 bits. Gilt für alle register.
-  SIGNAL dByte : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL dByte : STD_LOGIC_VECTOR(3 DOWNTO 0) := (OTHERS => '0');
 
   -- Memory address. Depending on bit assignment, operation
   -- is carried out in corresponding table or routing table.
-  SIGNAL addr : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL addr : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
 
   -- High when an operation is performing.
   SIGNAL proc : STD_LOGIC;
 
   -- TODO: ?? noch unklar
-  SIGNAL strobe : STD_LOGIC;
-  SIGNAL cycle : STD_LOGIC;
+  SIGNAL strobe : STD_LOGIC := '0';
+  SIGNAL cycle : STD_LOGIC := '0';
 
   -- Port status register. Created for maximum ports of 32.
   -- (Each port takes over writing in its associated line.)
-  SIGNAL portstatus : array_t(0 TO 31)(31 DOWNTO 0);
+  SIGNAL portstatus : array_t(0 TO 31)(31 DOWNTO 0) := (OTHERS => (OTHERS => '0'));
 
   -- TimeCode receive register.
-  SIGNAL receiveTimeCode : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL receiveTimeCode : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
 
   -- AutoTimeCode value register.
   SIGNAL autoTimeCodeValue : STD_LOGIC_VECTOR(7 DOWNTO 0);
 
   -- AutoTimeCodeCycleTime register.
   SIGNAL autoTimeCodeCycleTime : STD_LOGIC_VECTOR(31 DOWNTO 0);
-
-
   -- Clock period. (100 MHz)
   CONSTANT clock_period : TIME := 10 ns;
   SIGNAL stop_the_clock : BOOLEAN;
-
-
   -- TODO: Number of simulated ports.
   CONSTANT sim_numports : INTEGER RANGE 0 TO 31 := 4;
 
   -- TODO: Testbench switcher.
-
-  
-  -- Initial values.
-  rst <= '0';
-  writeData <= (OTHERS => '0');
-  readwrite <= '0';
-  dByte <= (OTHERS => '0');
-  addr <= (OTHERS => '0');
-  strobe <= '0';
-  cycle <= '0';
-  portstatus <= (OTHERS => (OTHERS => '0'));
-  receiveTimeCode <= (OTHERS => '0');
 BEGIN
   -- Design under test.
   dut : spwrouterregs GENERIC MAP(numports => sim_numports)

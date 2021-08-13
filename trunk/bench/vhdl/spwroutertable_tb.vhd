@@ -7,7 +7,8 @@
 -- Module Name: spwroutertable_tb
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
 -- Target Devices: 
--- Tool Versions: 
+-- Tool Versions:
+-- Description: 
 --
 -- Dependencies: spwpkg (spwram)
 -- 
@@ -40,31 +41,32 @@ ARCHITECTURE spwroutertable_tb_arch OF spwroutertable_tb IS
         );
     END COMPONENT;
 
+    -- TODO: Initial values...
     -- System clock.
     SIGNAL clk : STD_LOGIC;
 
     -- Asynchronous reset.
-    SIGNAL rst : STD_LOGIC;
+    SIGNAL rst : STD_LOGIC := '0';
 
     -- High if read/write operation is to be performed.
     -- (Only recognized when FSM is in idle.)
-    SIGNAL act : STD_LOGIC;
+    SIGNAL act : STD_LOGIC := '0';
 
     -- type of operation: High if a write process and Low if
     -- a read process should be executed. (Works only if 
     -- act is High and FSM is in idle state.)
-    SIGNAL readwrite : STD_LOGIC;
+    SIGNAL readwrite : STD_LOGIC := '0';
 
     -- Specifies the byte that is to be overwritten during a
     -- write operation in the register.
     -- (Word width 32 bits == 4 Bytes)
-    SIGNAL dByte : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    SIGNAL dByte : STD_LOGIC_VECTOR(3 DOWNTO 0) := (OTHERS => '1');
 
     -- Memory address at which the operation is to be executed.
-    SIGNAL addr : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL addr : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
 
     -- Word to be written in register.
-    SIGNAL wdata : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL wdata : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '1');
 
     -- Word to be read from a register.
     SIGNAL rdata : STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -78,17 +80,9 @@ ARCHITECTURE spwroutertable_tb_arch OF spwroutertable_tb IS
     CONSTANT sim_numports : INTEGER RANGE 0 TO 31 := 4;
 
     -- TODO: Testbench switcher
-    VARIABLE sw_rst : BOOLEAN := true; -- controls reset.
+    SHARED VARIABLE sw_rst : BOOLEAN := true; -- controls reset.
     -- Counter: Helps to fire events.
     SIGNAL counter : INTEGER := 0;
-
-    -- TODO: Initial values.
-    rst <= '0';
-    act <= '0';
-    readwrite <= '0';
-    dByte <= (OTHERS => '1');
-    addr <= (OTHERS => '0');
-    wdata <= (OTHERS => '1');
 BEGIN
     -- Design under test.
     dut : spwroutertable GENERIC MAP(numports => sim_numports)
@@ -113,23 +107,23 @@ BEGIN
         addr <= (OTHERS => '0'); -- write in 1st field of array
         wdata <= "10101011101010101010101011101010"; -- word to be written
 
-        WAIT 2 * clock_periods;
+        WAIT FOR (2 * clock_period);
 
         -- 2. Read
         act <= '1';
         readwrite <= '0'; -- read
-        dByte <= ((3 => '1'), (0 => '1'), (OTHERS => '0')); -- read first and last byte
+        dByte <= (3 => '1', 0 => '1', OTHERS => '0'); -- read first and last byte
         addr <= (OTHERS => '0'); -- first array field
 
-        WAIT 2 * clock_periods;
+        WAIT FOR (2 * clock_period);
 
         -- 3. Try to read in inactive mode
         act <= '0'; -- should be '1'
         readwrite <= '0'; -- read
-        dByte <= ((3 => '1'), (0 => '1'), (OTHERS => '0')); -- read first and last byte
+        dByte <= (3 => '1', 0 => '1', OTHERS => '0'); -- read first and last byte
         addr <= (OTHERS => '0'); -- first array field
 
-        WAIT 2 * clock_periods;
+        WAIT FOR (2 * clock_period);
 
         -- 4. Write without permission
         act <= '1';
@@ -138,12 +132,12 @@ BEGIN
         addr <= (OTHERS => '0'); -- first array field
         wdata <= (OTHERS => '0'); -- replace with nulls
 
-        WAIT 2 * clock_periods;
+        WAIT FOR (2 * clock_period);
 
         -- 5. Proof that it didn't overwrite
         act <= '1';
         readwrite <= '0'; -- read
-        dByte <= ((3 => '1'), (0 => '1'), (OTHERS => '0')); -- read first and last byte
+        dByte <= (3 => '1', 0 => '1', OTHERS => '0'); -- read first and last byte
         addr <= (OTHERS => '0'); -- first array field
     END PROCESS;
 
@@ -153,7 +147,7 @@ BEGIN
         -- TODO: Change counter values.
         IF ((counter = 30 OR counter = 50) AND sw_rst = true) THEN
             rst <= '1';
-            ELSE
+        ELSE
             rst <= '0';
         END IF;
     END PROCESS;
@@ -161,7 +155,7 @@ BEGIN
     -- Set simulation time.
     stimulus : PROCESS
     BEGIN
-        WAIT 10 sec; -- Simulation time before clock stops.
+        WAIT FOR 10 sec; -- Simulation time before clock stops.
 
         stop_the_clock <= true;
         WAIT;
@@ -174,9 +168,9 @@ BEGIN
             clk <= '0', '1' AFTER clock_period / 2;
 
             IF counter = 100 THEN
-                counter = 0;
+                counter <= 0;
             END IF;
-            counter = counter + 1;
+            counter <= counter + 1;
             WAIT FOR clock_period;
         END LOOP;
         WAIT;
