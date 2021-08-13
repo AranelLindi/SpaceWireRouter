@@ -47,7 +47,10 @@ ARCHITECTURE spwrouterregs_tb_arch OF spwrouterregs_tb IS
     );
   END COMPONENT;
 
-  -- TODO: Initial values...  
+  -- TODO: Initial values... 
+  
+  -- Number of SpaceWire ports.
+  CONSTANT numports : INTEGER range 0 to 31 := 5;
 
   -- System clock.
   SIGNAL clk : STD_LOGIC;
@@ -94,13 +97,12 @@ ARCHITECTURE spwrouterregs_tb_arch OF spwrouterregs_tb IS
   -- Clock period. (100 MHz)
   CONSTANT clock_period : TIME := 10 ns;
   SIGNAL stop_the_clock : BOOLEAN;
-  -- TODO: Number of simulated ports.
-  CONSTANT sim_numports : INTEGER RANGE 0 TO 31 := 4;
+
 
   -- TODO: Testbench switcher.
 BEGIN
   -- Design under test.
-  dut : spwrouterregs GENERIC MAP(numports => sim_numports)
+  dut : spwrouterregs GENERIC MAP(numports => numports)
   PORT MAP(
     clk => clk,
     rst => rst,

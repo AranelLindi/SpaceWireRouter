@@ -18,6 +18,7 @@
 LIBRARY IEEE;
 USE IEEE.Std_logic_1164.ALL;
 USE IEEE.Numeric_Std.ALL;
+--use work.spwrouterpkg.all;
 
 ENTITY spwrouterarb_round_tb IS
 END;
@@ -33,14 +34,15 @@ ARCHITECTURE spwrouterarb_round_tb_arch OF spwrouterarb_round_tb IS
             rst : IN STD_LOGIC;
             occ : IN STD_LOGIC;
             req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-            grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+            grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            lst : out std_logic_vector(4 downto 0)
         );
     END COMPONENT;
 
     -- TODO: Initial values...
 
     -- Number of SpaceWire ports.
-    CONSTANT numports : INTEGER RANGE 0 TO 31 := 5;
+    CONSTANT numports : INTEGER RANGE 0 TO 31 := 1;
 
     -- System clock.
     SIGNAL clk : STD_LOGIC;
@@ -58,53 +60,78 @@ ARCHITECTURE spwrouterarb_round_tb_arch OF spwrouterarb_round_tb IS
 
     -- Bit sequence that indicates the access of another port.
     SIGNAL grnt : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    
+    signal lst : std_logic_vector(4 downto 0);
 
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
     SIGNAL stop_the_clock : BOOLEAN;
-    -- TODO: Number of simulated ports.
-    CONSTANT sim_numports : INTEGER RANGE 0 TO 31 := 4;
-
+    
     -- TODO: Testbench switcher.
-    SHARED VARIABLE sw_rst : BOOLEAN := true; -- controls reset.
+    SIGNAL sw_rst : BOOLEAN := false; -- controls reset.
     -- Counter: Helps to raise events.
     SIGNAL counter : INTEGER := 0;
 BEGIN
 
     -- Design under test.
-    dut : spwrouterarb_round GENERIC MAP(numports => sim_numports)
+    dut : spwrouterarb_round GENERIC MAP(numports => numports)
     PORT MAP(
         clk => clk,
         rst => rst,
         occ => occ,
         req => req,
-        grnt => grnt);
+        grnt => grnt,
+        lst => lst);
 
     -- Produce reset.
-    reset : PROCESS
-    BEGIN
-        -- TODO: Change counter values.
-        IF ((counter = 40 OR counter = 68) AND sw_rst = true) THEN
-            rst <= '1';
-        ELSE
-            rst <= '0';
-        END IF;
-    END PROCESS;
+--    reset : PROCESS
+--    BEGIN
+--        -- TODO: Change counter values.
+--        IF ((counter = 40 OR counter = 68) AND sw_rst = true) THEN
+--            rst <= '1';
+--        ELSE
+--            rst <= '0';
+--        END IF;
+--    END PROCESS;
 
-    -- Performs test actions.
-    SEQUENCE : PROCESS
-        VARIABLE cnt : INTEGER RANGE 0 TO sim_numports := 0;
-    BEGIN
-        occ <= NOT occ;
-        req <= (cnt => '1', OTHERS => '0');
-        WAIT FOR clock_period;
-    END PROCESS;
+--    -- Performs test actions.
+--    Seq : PROCESS
+--        VARIABLE cnt : INTEGER RANGE 0 TO sim_numports := 0;
+--    BEGIN
+--        occ <= NOT occ;
+--        req <= (cnt => '1', OTHERS => '0');
+--        WAIT FOR clock_period;
+--    END PROCESS;
 
     -- Set simulation time.
     stimulus : PROCESS
     BEGIN
-        WAIT FOR 10 sec;
-
+        rst <= '1';
+    
+        WAIT FOR clock_period;
+        
+        rst <= '0';
+        
+        occ <= '0';
+        req <= (0 => '1', others => '0');
+        
+        wait for clock_period;
+        
+        --occ <= '1';
+        req <= (1 => '1', others => '0');
+        
+        wait for clock_period;
+        
+        occ <= '0';
+        req <= (others => '1');
+        
+        wait for clock_period;
+        
+        occ <= '0';
+        req <= (others => '0');
+        
+        wait for clock_period;
+        
         stop_the_clock <= true;
         WAIT;
     END PROCESS;

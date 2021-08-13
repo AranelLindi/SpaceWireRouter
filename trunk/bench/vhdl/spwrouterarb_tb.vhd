@@ -68,17 +68,16 @@ ARCHITECTURE spwrouterarb_tb_arch OF spwrouterarb_tb IS
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
     SIGNAL stop_the_clock : BOOLEAN;
-    -- TODO: Number of simulated ports.
-    CONSTANT sim_numports : INTEGER RANGE 0 TO 31 := 4;
+    
 
     -- TODO: Testbench switcher.
-    SHARED VARIABLE sw_rst : BOOLEAN := true; -- controls reset.
+    SIGNAL sw_rst : BOOLEAN := true; -- controls reset.
 
     -- Internal counter.
-    SHARED VARIABLE counter : INTEGER := 0;
+    SIGNAL counter : INTEGER := 0;
 BEGIN
     -- Design under test.
-    dut : spwrouterarb GENERIC MAP(numports => sim_numports)
+    dut : spwrouterarb GENERIC MAP(numports => numports)
     PORT MAP(
         clk => clk,
         rst => rst,
@@ -111,9 +110,9 @@ BEGIN
             clk <= '0', '1' AFTER clock_period / 2;
 
             IF counter = 100 THEN
-                counter := 0;
+                counter <= 0;
             END IF;
-            counter := counter + 1;
+            counter <= counter + 1;
             WAIT FOR clock_period;
         END LOOP;
         WAIT;

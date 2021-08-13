@@ -37,9 +37,9 @@ ARCHITECTURE spwroutertcc_tb_arch OF spwroutertcc_tb IS
             lst_time : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
             tc_en : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
             tick_out : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
-            time_out : OUT matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0);
+            time_out : OUT array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0);
             tick_in : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
-            time_in : IN matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0);
+            time_in : IN array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0);
             auto_time_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
             auto_cycle : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
@@ -69,13 +69,13 @@ ARCHITECTURE spwroutertcc_tb_arch OF spwroutertcc_tb IS
     SIGNAL tick_out : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
 
     -- Contains for every port TimeCode to send - except port0!
-    SIGNAL time_out : matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0);
+    SIGNAL time_out : array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0);
 
     -- High if corresponding port received a TimeCode - except port0!
     SIGNAL tick_in : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0) := (OTHERS => '0');
 
     -- Received TimeCodes from all ports - except port0!
-    SIGNAL time_in : matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0) := (OTHERS => (OTHERS => '0'));
+    SIGNAL time_in : array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0) := (OTHERS => (OTHERS => '0'));
 
     -- TimeCode that is send from Host.
     SIGNAL auto_time_out : STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -85,22 +85,20 @@ ARCHITECTURE spwroutertcc_tb_arch OF spwroutertcc_tb IS
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
     SIGNAL stop_the_clock : BOOLEAN;
-    -- TODO: Number of simulated ports.
-    CONSTANT sim_numports : INTEGER RANGE 0 TO 31 := 4;
 
     -- TODO: Testbench switcher.
-    SHARED VARIABLE sw_rst : BOOLEAN := true; -- controls reset.
-    SHARED VARIABLE sw_TC_incoming : BOOLEAN := true; -- controls incoming TC.
-    SHARED VARIABLE sw_wrong_TC : BOOLEAN := true; -- incoming TC is smaller or bigger than it should be.
+    SIGNAL sw_rst : BOOLEAN := true; -- controls reset.
+    SIGNAL sw_TC_incoming : BOOLEAN := true; -- controls incoming TC.
+    SIGNAL sw_wrong_TC : BOOLEAN := true; -- incoming TC is smaller or bigger than it should be.
     -- Counter: Helps to raise events.
-    SHARED VARIABLE counter : INTEGER := 0;
+    SIGNAL counter : INTEGER := 0;
 
     -- Auxiliary variables
-    SHARED VARIABLE internTC : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0'); -- saves last TC.
+    SIGNAL internTC : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0'); -- saves last TC.
 
 BEGIN
     -- Design under test.
-    dut : spwroutertcc GENERIC MAP(numports => sim_numports)
+    dut : spwroutertcc GENERIC MAP(numports => numports)
     PORT MAP(
         clk => clk,
         rst => rst,
@@ -132,12 +130,12 @@ BEGIN
     BEGIN
         IF (counter MOD 10 = 0 AND sw_TC_incoming = true) THEN
             FOR i IN 0 TO 7 LOOP
-                time_in(iport, i) <= internTC(i);
+                time_in(iport)(i) <= internTC(i);
             END LOOP;
 
             -- Changing MSB to make the number larger or smaller and provoke an error.
             IF (sw_wrong_TC = true) THEN
-                time_in(iport, iport) <= NOT time_in(iport, iport); -- flip MSB.
+                time_in(iport)(iport) <= NOT time_in(iport)(iport); -- flip MSB.
             END IF;
 
             tick_in <= (iport => '1', OTHERS => '0');
@@ -160,9 +158,9 @@ BEGIN
             clk <= '0', '1' AFTER clock_period / 2;
 
             IF counter = 100 THEN
-                counter := 0;
+                counter <= 0;
             END IF;
-            counter := counter + 1;
+            counter <= counter + 1;
             WAIT FOR clock_period;
         END LOOP;
         WAIT;

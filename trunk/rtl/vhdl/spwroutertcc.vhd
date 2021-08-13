@@ -148,7 +148,7 @@ BEGIN
                 FOR i IN (numports - 1) DOWNTO 0 LOOP
                     IF (tick_in(i) = '1') THEN
                         IF (time_in(i) = (s_tc_counterval + 1)) THEN -- hier steht im original: port1TimeCodeOut(5 downto 0) = counterValuePlus1 ?!
-                            s_ports_out <= ((i => '0'), (OTHERS => '1')); -- potenzielle Fehlerquelle! Liegt vermutlich daran, dass eingangsport von numport downto 1 gemacht wurde! Falls hier fehler auftreten, dann auf downto 0 ändern und i-1 machen!
+                            s_ports_out <= (i => '0', OTHERS => '1'); -- potenzielle Fehlerquelle! Liegt vermutlich daran, dass eingangsport von numport downto 1 gemacht wurde! Falls hier fehler auftreten, dann auf downto 0 ändern und i-1 machen!
 
                         END IF;
                     END IF;

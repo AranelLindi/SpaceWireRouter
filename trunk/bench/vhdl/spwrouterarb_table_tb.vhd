@@ -55,16 +55,15 @@ ARCHITECTURE spwrouterarb_table_tb_arch OF spwrouterarb_table_tb IS
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
     SIGNAL stop_the_clock : BOOLEAN;
-    --- TODO: Number of simulated ports.
-    CONSTANT sim_numports : INTEGER RANGE 0 TO 31 := 4;
+
 
     -- TODO: Testbench switcher.
-    SHARED VARIABLE sw_rst : BOOLEAN := true; -- constrols reset.
+    SIGNAL sw_rst : BOOLEAN := true; -- constrols reset.
 
 BEGIN
 
     -- Design under test.
-    dut : spwrouterarb_table GENERIC MAP(numports => sim_numports)
+    dut : spwrouterarb_table GENERIC MAP(numports => numports)
     PORT MAP(
         clk => clk,
         rst => rst,
@@ -73,12 +72,12 @@ BEGIN
 
     -- Changes requesting ports.
     reqPorts : PROCESS (clk)
-        VARIABLE ports : INTEGER RANGE 0 TO sim_numports := 0;
+        VARIABLE ports : INTEGER RANGE 0 TO numports := 0;
     BEGIN
         IF rising_edge(clk) THEN
             req <= STD_LOGIC_VECTOR(to_unsigned(ports, req'Length));
 
-            IF ports = sim_numports THEN
+            IF ports = numports THEN
                 ports := 0;
             END IF;
         END IF;
