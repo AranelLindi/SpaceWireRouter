@@ -39,7 +39,7 @@ ARCHITECTURE spwrouterarb_table_tb_arch OF spwrouterarb_table_tb IS
     -- TODO: Initial values...
 
     -- Number of SpaceWire ports.
-    CONSTANT numports : INTEGER RANGE 0 TO 31 := 5;
+    CONSTANT numports : INTEGER RANGE 0 TO 31 := 2;
 
     -- System clock.
     SIGNAL clk : STD_LOGIC;
@@ -48,7 +48,7 @@ ARCHITECTURE spwrouterarb_table_tb_arch OF spwrouterarb_table_tb IS
     SIGNAL rst : STD_LOGIC := '0';
 
     -- Requests from all ports. (Bit corresponds to port)
-    SIGNAL req : STD_LOGIC_VECTOR((numports + 1) DOWNTO 0) := (0 => '1', OTHERS => '0');
+    SIGNAL req : STD_LOGIC_VECTOR((numports + 1) DOWNTO 0) := (OTHERS => '0');
 
     -- Contains which port gets access.
     SIGNAL grnt : STD_LOGIC_VECTOR((numports + 1) DOWNTO 0);
@@ -70,23 +70,35 @@ BEGIN
         req => req,
         grnt => grnt);
 
-    -- Changes requesting ports.
-    reqPorts : PROCESS (clk)
-        VARIABLE ports : INTEGER RANGE 0 TO numports := 0;
-    BEGIN
-        IF rising_edge(clk) THEN
-            req <= STD_LOGIC_VECTOR(to_unsigned(ports, req'Length));
-
-            IF ports = numports THEN
-                ports := 0;
-            END IF;
-        END IF;
-    END PROCESS;
-
-    -- Set simulation time.
+    -- Simulation.
     stimulus : PROCESS
     BEGIN
-        WAIT FOR 10 sec;
+        rst <= '1';
+        
+        WAIT FOR clock_period/4;
+        
+        rst <= '0';
+        req <= (others => '0');
+        
+        WAIT FOR clock_period;
+        
+        req <= (0 => '1', others => '0');
+        
+        WAIT FOR clock_period;
+        
+        req <= (1 => '1', 2 => '1', others => '0');
+        
+        WAIT FOR clock_period;
+        
+        req <= (others => '1');
+        
+        WAIT FOR clock_period;
+        
+        req <= (2 => '1', others => '0');
+        
+        --rst <= '1';        
+    
+        WAIT FOR clock_period;
 
         stop_the_clock <= true;
         WAIT;

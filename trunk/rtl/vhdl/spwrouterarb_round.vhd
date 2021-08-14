@@ -8,7 +8,9 @@
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
--- Description: 
+-- Description: Ein Ring wird konstruiert, der alle Ports enthält und dem numerisch
+-- darauffolgendem Port die höchste Priorität einräumt (numports..0). Ausgehend dabei ist der
+-- Port, dem zuletzt der Zugriff gewährt wurde. Bsp für 1 bei insgesamt 3 Ports: 2..0..1
 -- Dependencies: none
 -- 
 -- Revision:
@@ -22,7 +24,10 @@ use ieee.numeric_std.all;
 ENTITY spwrouterarb_round IS
     GENERIC (
         -- Number of SpaceWire ports.
-        numports : INTEGER RANGE 0 TO 31
+        numports : INTEGER RANGE 0 TO 31;
+        
+        -- Bit length to map ports.
+        blen : INTEGER RANGE 0 TO 4 -- (max 5 bits for 0-31 ports)
     );
     PORT (
         -- System clock.
@@ -32,17 +37,15 @@ ENTITY spwrouterarb_round IS
         rst : IN STD_LOGIC;
 
         -- High if relevant port is already being used by another
-        -- process. Low when the port is unused.
+        -- transfer process. Low when the port is unused.
         occ : IN STD_LOGIC;
 
         -- Corresponding bit is high when respective port sends
-        -- a request to the port which is defined under occ.
+        -- a request to the port.
         req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
 
         -- Bit sequence that indicates the access of another port.
-        grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-        
-        lst : out std_logic_vector(4 downto 0) -- debug
+        grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
     );
 END spwrouterarb_round;
 
@@ -53,7 +56,7 @@ ARCHITECTURE spwrouterarb_round_arch OF spwrouterarb_round IS
     SIGNAL s_occupied : STD_LOGIC;
 
     -- Last granted port.
-    SIGNAL s_lstgrnt : std_logic_vector(4 downto 0); -- (5 bits for 0-31 ports)
+    SIGNAL s_lstgrnt : std_logic_vector(blen downto 0);
 BEGIN
     -- Intermediate signals
     s_request <= req;
@@ -61,22 +64,19 @@ BEGIN
 
     -- Drive output.
     grnt <= s_granted;
-    
-    -- Debug
-    lst <= s_lstgrnt;
-    
+       
     PROCESS (clk, rst)
     BEGIN
-        IF (rst = '1') THEN
+        IF (rst = '1') THEN -- reset
             s_granted <= (OTHERS => '0');
             s_lstgrnt <= std_logic_vector(to_unsigned(0, s_lstgrnt'length));
 
         ELSIF rising_edge(clk) THEN
-            -- Roll out arbitration logic for every port.
+            -- Roll-out arbitration logic for every port.
             arbitration : FOR i IN 0 TO numports LOOP
                 IF (s_lstgrnt = std_logic_vector(to_unsigned(i, s_lstgrnt'length))) THEN
 
-                    -- Following ports in line (0..numports..0) are given prefered access to current
+                    -- Following ports in line (0..1..numports..0) are given prefered access to current
                     -- port. Normally in if-statements early conditions takes priority over later.
                     -- Through rolling out for-loops, many seperate if statements will be
                     -- created. Therefore the highes priority must be listed last in order to
@@ -97,7 +97,7 @@ BEGIN
                 END IF;
             END LOOP arbitration;
 
-            -- Probably to reset s_granted signal in case that none request was applied.
+            -- Revoke previously granted access that is no longer required.
             FOR i IN 0 TO numports LOOP
                 IF (s_request(i) = '0' AND s_granted(i) = '1') THEN
                     s_granted(i) <= '0';

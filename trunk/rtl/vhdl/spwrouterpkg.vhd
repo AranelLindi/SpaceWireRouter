@@ -78,7 +78,8 @@ PACKAGE spwrouterpkg IS
     -- Round Robin Arbiter (spwrouterarb_table.vhd)
     COMPONENT spwrouterarb_round IS
         GENERIC (
-            numports : INTEGER RANGE 0 TO 31
+            numports : INTEGER RANGE 0 TO 31;
+            blen : INTEGER RANGE 0 TO 4
         );
         PORT (
             clk : IN STD_LOGIC;

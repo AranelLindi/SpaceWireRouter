@@ -8,7 +8,7 @@
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
--- Description: 
+-- Description: Simulation time: 55 ns
 --
 -- Dependencies: none
 -- 
@@ -18,6 +18,7 @@
 LIBRARY IEEE;
 USE IEEE.Std_logic_1164.ALL;
 USE IEEE.Numeric_Std.ALL;
+USE IEEE.MATH_REAL.all;
 --use work.spwrouterpkg.all;
 
 ENTITY spwrouterarb_round_tb IS
@@ -27,104 +28,73 @@ ARCHITECTURE spwrouterarb_round_tb_arch OF spwrouterarb_round_tb IS
 
     COMPONENT spwrouterarb_round
         GENERIC (
-            numports : INTEGER RANGE 0 TO 31
+            numports : INTEGER RANGE 0 TO 31;
+            blen : INTEGER RANGE 0 TO 4
         );
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
             occ : IN STD_LOGIC;
             req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-            grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-            lst : out std_logic_vector(4 downto 0)
+            grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
         );
     END COMPONENT;
 
     -- TODO: Initial values...
 
     -- Number of SpaceWire ports.
-    CONSTANT numports : INTEGER RANGE 0 TO 31 := 1;
+    CONSTANT numports : INTEGER RANGE 0 TO 31 := 2; -- 3 ports
+    
+    -- Bit length to map all ports.
+    CONSTANT blen : INTEGER RANGE 0 TO 4 := INTEGER(ceil(log2(real(numports))));
 
     -- System clock.
     SIGNAL clk : STD_LOGIC;
 
     -- Asynchronous reset.
-    SIGNAL rst : STD_LOGIC := '0';
+    SIGNAL rst : STD_LOGIC := '0'; -- Caution! It may be necessary to set rst at beginning to high for short period of time. 
 
-    -- High if relevant port is already being used by another
-    -- process. Low when the port is unused.
-    SIGNAL occ : STD_LOGIC := '0';
+    -- High if the relevant port is already being used by another transfer process. Low when the port is unused.
+    SIGNAL occ : STD_LOGIC := '0'; -- Port is not occupied.
 
-    -- Corresponding bit is High when respective port sends
-    -- a request to the port which is defined under occ.
-    SIGNAL req : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
+    -- Corresponding bit is High when respective port sends a request to the port.
+    SIGNAL req : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0'); -- No access request was made from any port.
 
     -- Bit sequence that indicates the access of another port.
     SIGNAL grnt : STD_LOGIC_VECTOR(numports DOWNTO 0);
     
-    signal lst : std_logic_vector(4 downto 0);
 
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
     SIGNAL stop_the_clock : BOOLEAN;
-    
-    -- TODO: Testbench switcher.
-    SIGNAL sw_rst : BOOLEAN := false; -- controls reset.
-    -- Counter: Helps to raise events.
-    SIGNAL counter : INTEGER := 0;
 BEGIN
 
     -- Design under test.
-    dut : spwrouterarb_round GENERIC MAP(numports => numports)
+    dut : spwrouterarb_round GENERIC MAP(numports => numports, blen => blen)
     PORT MAP(
         clk => clk,
         rst => rst,
         occ => occ,
         req => req,
-        grnt => grnt,
-        lst => lst);
+        grnt => grnt);
 
-    -- Produce reset.
---    reset : PROCESS
---    BEGIN
---        -- TODO: Change counter values.
---        IF ((counter = 40 OR counter = 68) AND sw_rst = true) THEN
---            rst <= '1';
---        ELSE
---            rst <= '0';
---        END IF;
---    END PROCESS;
-
---    -- Performs test actions.
---    Seq : PROCESS
---        VARIABLE cnt : INTEGER RANGE 0 TO sim_numports := 0;
---    BEGIN
---        occ <= NOT occ;
---        req <= (cnt => '1', OTHERS => '0');
---        WAIT FOR clock_period;
---    END PROCESS;
-
-    -- Set simulation time.
+    -- Simulation.
     stimulus : PROCESS
     BEGIN
         rst <= '1';
     
-        WAIT FOR clock_period;
+        WAIT FOR clock_period/4;
         
-        rst <= '0';
-        
+        rst <= '0';       
         occ <= '0';
-        req <= (0 => '1', others => '0');
+        req <= (2 => '1', others => '0');
         
-        wait for clock_period;
+        WAIT FOR clock_period/4;
+        wait for clock_period/2;
         
-        --occ <= '1';
-        req <= (1 => '1', others => '0');
-        
-        wait for clock_period;
-        
-        occ <= '0';
         req <= (others => '1');
         
+        wait for clock_period/2;
         wait for clock_period;
         
         occ <= '0';
@@ -132,6 +102,11 @@ BEGIN
         
         wait for clock_period;
         
+        occ <= '1';
+        req <= (others => '1');
+        
+        wait for clock_period;
+               
         stop_the_clock <= true;
         WAIT;
     END PROCESS;

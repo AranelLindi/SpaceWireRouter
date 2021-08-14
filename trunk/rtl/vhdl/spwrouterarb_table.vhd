@@ -20,7 +20,7 @@
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
-USE work.spwrouterpkg.ALL;
+--USE work.spwrouterpkg.ALL;
 
 ENTITY spwrouterarb_table IS
     GENERIC (
@@ -52,7 +52,7 @@ BEGIN
     PROCESS (clk, rst)
     BEGIN
         IF (rst = '1') THEN
-            s_granted <= (OTHERS => '0');
+            s_granted <= (0 => '1', OTHERS => '0');
 
         ELSIF rising_edge(clk) THEN
 
@@ -63,16 +63,16 @@ BEGIN
             -- Example: Port4: 5..6..7..0..1..2..3 --> 1..0..7..6..5
 
             arbitrationaccess : FOR i IN (numports + 1) DOWNTO 0 LOOP
-                IF (grnt(i) = '1' AND req(i) = '0') THEN
+                IF (s_granted(i) = '1' AND req(i) = '0') THEN
                     preports : FOR j IN (i - 1) DOWNTO 0 LOOP
                         IF (req(j) = '1') THEN
-                            s_granted <= ((j => '1'), (OTHERS => '0'));
+                            s_granted <= (j => '1', OTHERS => '0');
                         END IF;
                     END LOOP preports;
                     -- except current port i
                     seqports : FOR k IN (numports + 1) DOWNTO (i + 1) LOOP
                         IF (req(k) = '1') THEN
-                            s_granted <= ((k => '1'), (OTHERS => '0'));
+                            s_granted <= (k => '1', OTHERS => '0');
                         END IF;
                     END LOOP seqports;
                 END IF;

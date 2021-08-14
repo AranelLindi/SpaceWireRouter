@@ -17,6 +17,7 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
+USE ieee.Math_real.all;
 USE work.spwrouterpkg.ALL;
 
 ENTITY spwrouterarb IS
@@ -46,6 +47,9 @@ ENTITY spwrouterarb IS
 END spwrouterarb;
 
 ARCHITECTURE spwrouterarb_arch OF spwrouterarb IS
+    -- Bit length to map all ports (for spwrouterarb_round).
+    CONSTANT blen : INTEGER RANGE 0 TO 4 := INTEGER(ceil(log2(reil(numports))));
+
     -- Router switch matrix.
     SIGNAL s_routing : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- hängt mit out port zusammen! siehe oben
 
@@ -87,7 +91,8 @@ BEGIN
             end generate;
     
         Roundx : spwrouterarb_round generic map (
-            numports => numports
+            numports => numports,
+            blen => blen
         ) 
         PORT MAP(
             clk => clk,
