@@ -8,16 +8,16 @@
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
--- Description: Simulate Router Table Arbiter.
+-- Description: Simulation time: 55 ns.
 --
--- Dependencies: spwrouterpkg
+-- Dependencies: none
 -- 
 -- Revision:
 ----------------------------------------------------------------------------------
 
 LIBRARY IEEE;
-USE IEEE.Std_logic_1164.ALL;
-USE IEEE.Numeric_Std.ALL;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
 
 ENTITY spwrouterarb_table_tb IS
 END;
@@ -45,21 +45,18 @@ ARCHITECTURE spwrouterarb_table_tb_arch OF spwrouterarb_table_tb IS
     SIGNAL clk : STD_LOGIC;
 
     -- Asynchronous reset.
-    SIGNAL rst : STD_LOGIC := '0';
+    SIGNAL rst : STD_LOGIC := '0'; -- Caution! It may be necessary to set rst at beginning to high for short period of time. 
 
     -- Requests from all ports. (Bit corresponds to port)
-    SIGNAL req : STD_LOGIC_VECTOR((numports + 1) DOWNTO 0) := (OTHERS => '0');
+    SIGNAL req : STD_LOGIC_VECTOR((numports + 1) DOWNTO 0) := (OTHERS => '0'); -- No access request was made from any port.
 
     -- Contains which port gets access.
     SIGNAL grnt : STD_LOGIC_VECTOR((numports + 1) DOWNTO 0);
+    
+    
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
     SIGNAL stop_the_clock : BOOLEAN;
-
-
-    -- TODO: Testbench switcher.
-    SIGNAL sw_rst : BOOLEAN := true; -- constrols reset.
-
 BEGIN
 
     -- Design under test.
@@ -73,28 +70,29 @@ BEGIN
     -- Simulation.
     stimulus : PROCESS
     BEGIN
-        rst <= '1';
+        rst <= '1'; -- Reset to initialize signals in dut.
         
         WAIT FOR clock_period/4;
         
+        -- Set initial values for simulation.
         rst <= '0';
-        req <= (others => '0');
+        req <= (others => '0'); -- No port wants access.
         
         WAIT FOR clock_period;
         
-        req <= (0 => '1', others => '0');
+        req <= (0 => '1', others => '0'); -- Port0 requieres access.
         
         WAIT FOR clock_period;
         
-        req <= (1 => '1', 2 => '1', others => '0');
+        req <= (1 => '1', 2 => '1', others => '0'); -- More ports wants access, watch control logic.
         
         WAIT FOR clock_period;
         
-        req <= (others => '1');
+        req <= (others => '1'); -- All ports ask for access. No change should take place.
         
         WAIT FOR clock_period;
         
-        req <= (2 => '1', others => '0');
+        req <= (2 => '1', others => '0'); -- Port2 wants access, system should grant it.
         
         --rst <= '1';        
     

@@ -18,9 +18,8 @@
 -- Revision:
 ----------------------------------------------------------------------------------
 
-LIBRARY ieee;
-USE ieee.std_logic_1164.ALL;
---USE work.spwrouterpkg.ALL;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
 
 ENTITY spwrouterarb_table IS
     GENERIC (
@@ -52,7 +51,7 @@ BEGIN
     PROCESS (clk, rst)
     BEGIN
         IF (rst = '1') THEN
-            s_granted <= (0 => '1', OTHERS => '0');
+            s_granted <= (0 => '1', OTHERS => '0'); -- Assign increased priority for port0 (internal configuration port).
 
         ELSIF rising_edge(clk) THEN
 

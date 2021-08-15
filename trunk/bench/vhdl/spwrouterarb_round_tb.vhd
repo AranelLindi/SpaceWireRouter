@@ -8,7 +8,7 @@
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
--- Description: Simulation time: 55 ns
+-- Description: Simulation time: 55 ns.
 --
 -- Dependencies: none
 -- 
@@ -16,10 +16,9 @@
 ----------------------------------------------------------------------------------
 
 LIBRARY IEEE;
-USE IEEE.Std_logic_1164.ALL;
-USE IEEE.Numeric_Std.ALL;
-USE IEEE.MATH_REAL.all;
---use work.spwrouterpkg.all;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+USE IEEE.MATH_REAL.ALL;
 
 ENTITY spwrouterarb_round_tb IS
 END;
@@ -81,29 +80,27 @@ BEGIN
     -- Simulation.
     stimulus : PROCESS
     BEGIN
-        rst <= '1';
+        rst <= '1'; -- Reset to initialize signals in dut.
     
         WAIT FOR clock_period/4;
         
+        -- Set initial values for simulation.
         rst <= '0';       
-        occ <= '0';
-        req <= (2 => '1', others => '0');
+        occ <= '0'; -- Port is not occupied.
+        req <= (2 => '1', others => '0'); -- 2nc port mades access request. 
         
-        WAIT FOR clock_period/4;
-        wait for clock_period/2;
+        WAIT FOR clock_period/4 + clock_period/2; -- Should ensure that signals are at desired value up to rising_edge(clk)
         
-        req <= (others => '1');
+        req <= (others => '1'); -- Every port made a access request.
         
-        wait for clock_period/2;
-        wait for clock_period;
+        wait for clock_period/2 + clock_period;
         
-        occ <= '0';
-        req <= (others => '0');
+        req <= (others => '0'); -- No port requieres access.
         
         wait for clock_period;
         
-        occ <= '1';
-        req <= (others => '1');
+        occ <= '1'; -- Now port is occupied, should never give any permission.
+        req <= (others => '1'); -- Every port made a request.
         
         wait for clock_period;
                

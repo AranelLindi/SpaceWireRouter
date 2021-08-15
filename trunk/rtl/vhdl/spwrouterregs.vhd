@@ -457,514 +457,337 @@ BEGIN
                         -- Status Port 0
                         s_addr_table4 <= std_logic_vector(to_unsigned(0, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(0)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(0)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(0)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(0)(31 DOWNTO 24);
-                        END IF;
+                        -- Loop is rolled out...                        
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(0)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
+                        
+                        -- to... (example)
+--                        IF (dByte(0) = '1') THEN
+--                            s_write_table4(7 DOWNTO 0) <= portstatus(0)(7 DOWNTO 0);
+--                        END IF;
+--                        IF (dByte(1) = '1') THEN
+--                            s_write_table4(15 DOWNTO 8) <= portstatus(0)(15 DOWNTO 8);
+--                        END IF;
+--                        IF (dByte(2) = '1') THEN
+--                            s_write_table4(23 DOWNTO 16) <= portstatus(0)(23 DOWNTO 16);
+--                        END IF;
+--                        IF (dByte(3) = '1') THEN
+--                            s_write_table4(31 DOWNTO 24) <= portstatus(0)(31 DOWNTO 24);
+--                        END IF;
+                        
                     ELSIF (s_table_4 = '1' AND s_addr_04 = '1') THEN
                         -- Status Port 1
                         s_addr_table4 <= std_logic_vector(to_unsigned(1, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(1)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(1)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(1)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(1)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(1)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_08 = '1') THEN
                         -- Status Port 2
                         s_addr_table4 <= std_logic_vector(to_unsigned(2, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(2)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(2)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(2)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(2)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied 
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(2)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_0C = '1') THEN
                         -- Status Port 3
                         s_addr_table4 <= std_logic_vector(to_unsigned(3, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(3)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(3)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(3)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(3)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(3)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_10 = '1') THEN
                         -- Status Port 4
                         s_addr_table4 <= std_logic_vector(to_unsigned(4, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(4)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(4)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(4)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(4)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(4)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_14 = '1') THEN
                         -- Status Port 5
                         s_addr_table4 <= std_logic_vector(to_unsigned(5, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(5)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(5)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(5)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(5)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(5)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_18 = '1') THEN
                         -- Status Port 6
                         s_addr_table4 <= std_logic_vector(to_unsigned(6, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(6)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(6)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(6)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(6)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(6)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_1C = '1') THEN
                         -- Status Port 7
                         s_addr_table4 <= std_logic_vector(to_unsigned(7, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(7)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(7)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(7)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(7)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(7)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_20 = '1') THEN
                         -- Status Port 8
                         s_addr_table4 <= std_logic_vector(to_unsigned(8, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(8)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(8)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(8)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(8)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(8)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_24 = '1') THEN
                         -- Status Port 9
                         s_addr_table4 <= std_logic_vector(to_unsigned(9, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(9)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(9)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(9)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(9)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(9)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_28 = '1') THEN
                         -- Status Port 10
                         s_addr_table4 <= std_logic_vector(to_unsigned(10, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(10)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(10)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(10)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(10)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(10)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_2C = '1') THEN
                         -- Status Port 11
                         s_addr_table4 <= std_logic_vector(to_unsigned(11, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(11)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(11)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(11)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(11)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(11)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_30 = '1') THEN
                         -- Status Port 12
                         s_addr_table4 <= std_logic_vector(to_unsigned(12, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(12)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(12)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(12)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(12)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(12)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_34 = '1') THEN
                         -- Status Port 13
                         s_addr_table4 <= std_logic_vector(to_unsigned(13, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(13)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(13)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(13)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(13)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(13)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_38 = '1') THEN
                         -- Status Port 14
                         s_addr_table4 <= std_logic_vector(to_unsigned(14, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(14)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(14)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(14)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(14)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(14)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_3C = '1') THEN
                         -- Status Port 15
                         s_addr_table4 <= std_logic_vector(to_unsigned(15, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(15)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(15)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(15)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(15)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(15)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_40 = '1') THEN
                         -- Status Port 16
                         s_addr_table4 <= std_logic_vector(to_unsigned(16, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(16)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(16)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(16)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(16)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(16)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_44 = '1') THEN
                         -- Status Port 17
                         s_addr_table4 <= std_logic_vector(to_unsigned(17, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(17)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(17)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(17)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(17)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(17)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_48 = '1') THEN
                         -- Status Port 18
                         s_addr_table4 <= std_logic_vector(to_unsigned(18, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(18)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(18)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(18)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(18)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(18)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_4C = '1') THEN
                         -- Status Port 19
                         s_addr_table4 <= std_logic_vector(to_unsigned(19, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(19)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(19)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(19)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(19)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(19)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_50 = '1') THEN
                         -- Status Port 20
                         s_addr_table4 <= std_logic_vector(to_unsigned(20, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(20)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(20)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(20)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(20)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(20)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_54 = '1') THEN
                         -- Status Port 21
                         s_addr_table4 <= std_logic_vector(to_unsigned(21, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(21)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(21)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(21)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(21)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(21)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_58 = '1') THEN
                         -- Status Port 22
                         s_addr_table4 <= std_logic_vector(to_unsigned(22, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(22)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(22)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(22)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(22)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(22)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_5C = '1') THEN
                         -- Status Port 23
                         s_addr_table4 <= std_logic_vector(to_unsigned(23, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(23)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(23)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(23)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(23)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(23)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_60 = '1') THEN
                         -- Status Port 24
                         s_addr_table4 <= std_logic_vector(to_unsigned(24, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(24)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(24)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(24)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(24)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(24)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_64 = '1') THEN
                         -- Status Port 25
                         s_addr_table4 <= std_logic_vector(to_unsigned(25, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(25)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(25)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(25)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(25)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(25)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_68 = '1') THEN
                         -- Status Port 26
                         s_addr_table4 <= std_logic_vector(to_unsigned(26, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(26)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(26)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(26)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(26)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(26)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_6C = '1') THEN
                         -- Status Port 27
                         s_addr_table4 <= std_logic_vector(to_unsigned(27, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(27)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(27)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(27)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(27)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(27)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_70 = '1') THEN
                         -- Status Port 28
                         s_addr_table4 <= std_logic_vector(to_unsigned(28, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(28)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(28)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(28)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(28)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(28)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_74 = '1') THEN
                         -- Status Port 29
                         s_addr_table4 <= std_logic_vector(to_unsigned(29, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(29)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(29)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(29)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(29)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(29)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_78 = '1') THEN
                         -- Status Port 30
                         s_addr_table4 <= std_logic_vector(to_unsigned(30, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(30)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(30)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(30)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(30)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(30)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_7C = '1') THEN
                         -- Status Port 31
                         s_addr_table4 <= std_logic_vector(to_unsigned(31, s_addr_table4'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table4(7 DOWNTO 0) <= portstatus(31)(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table4(15 DOWNTO 8) <= portstatus(31)(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table4(23 DOWNTO 16) <= portstatus(31)(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table4(31 DOWNTO 24) <= portstatus(31)(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(31)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_5 = '1' AND s_addr_00 = '1') THEN -- TimeCode register (0x0000_5000)
                         -- TimeCode receive register
                         s_addr_table5 <= std_logic_vector(to_unsigned(0, s_addr_table5'length));
@@ -974,51 +797,32 @@ BEGIN
                     ELSIF (s_table_5 = '1' AND s_addr_08 = '1') THEN
                         -- AutoTimeCode value register
                         s_addr_table5 <= std_logic_vector(to_unsigned(2, s_addr_table5'length));
-
-                        IF (dByte(0) = '1') THEN
-                            s_write_table5(7 DOWNTO 0) <= s_DataInBuffer(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table5(15 DOWNTO 8) <= s_DataInBuffer(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table5(23 DOWNTO 16) <= s_DataInBuffer(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table5(31 DOWNTO 24) <= s_DataInBuffer(31 DOWNTO 24);
-                        END IF;
+                        
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table5(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= s_DataInBuffer(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;                        
                     ELSIF (s_table_5 = '1' AND s_addr_0C = '1') THEN
                         -- AutoTimeCodeCycleTimeRegister
                         s_addr_table5 <= std_logic_vector(to_unsigned(3, s_addr_table5'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table5(7 DOWNTO 0) <= s_DataInBuffer(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table5(15 DOWNTO 8) <= s_DataInBuffer(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table5(23 DOWNTO 16) <= s_DataInBuffer(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table5(31 DOWNTO 24) <= s_DataInBuffer(31 DOWNTO 24);
-                        END IF;
-
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table5(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= s_DataInBuffer(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;
                     ELSIF (s_table_6 = '1' AND s_addr_00 = '1') THEN -- Info register (0x0000_0600)
                         s_addr_table6 <= std_logic_vector(to_unsigned(0, s_addr_table6'length));
 
-                        IF (dByte(0) = '1') THEN
-                            s_write_table6(7 DOWNTO 0) <= s_DataInBuffer(7 DOWNTO 0);
-                        END IF;
-                        IF (dByte(1) = '1') THEN
-                            s_write_table6(15 DOWNTO 8) <= s_DataInBuffer(15 DOWNTO 8);
-                        END IF;
-                        IF (dByte(2) = '1') THEN
-                            s_write_table6(23 DOWNTO 16) <= s_DataInBuffer(23 DOWNTO 16);
-                        END IF;
-                        IF (dByte(3) = '1') THEN
-                            s_write_table6(31 DOWNTO 24) <= s_DataInBuffer(31 DOWNTO 24);
-                        END IF;
+                        -- Check byte by byte whether data should be copied
+                        FOR i IN 1 TO 4 LOOP
+                            IF (dByte(i - 1) = '1' THEN
+                                s_write_table6(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= s_DataInBuffer(((8 * i) - 1) DOWNTO (8 * (i - 1)));
+                            END IF;
+                        END LOOP;                          
                     END IF; -- add here more tables and registers...
 
                     s_proc_out <= '1';

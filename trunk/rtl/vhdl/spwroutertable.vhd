@@ -9,16 +9,16 @@
 -- Target Devices: 
 -- Tool Versions: 
 -- Description: Contains a FSM that controls access to routing table in ROM.
--- Dependencies: none
+--
+-- Dependencies: spwram (defined in spwpkg); spwroutertablestates (defined in spwrouterpkg)
 -- 
 -- Revision:
 ----------------------------------------------------------------------------------
 
-LIBRARY ieee;
-USE ieee.std_logic_1164.ALL;
---USE ieee.numeric_std.ALL; -- vermutlich für Berechnungen!
-USE work.spwrouterpkg.ALL;
-USE work.spwpkg.ALL; -- Xilinx Spartan3 RAM
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE WORK.SPWPKG.ALL; -- Xilinx Spartan3 RAM
+USE WORK.SPWROUTERPKG.spwroutertablestates;
 
 ENTITY spwroutertable IS
     GENERIC (
@@ -32,18 +32,16 @@ ENTITY spwroutertable IS
         -- Asynchronous reset.
         rst : IN STD_LOGIC;
 
-        -- High if read/write operation is to be performed.
-        -- (Only recognized when FSM is in idle.)
+        -- High if read/write operation is to be carried out. (Only recognized in idle state;  
+        -- doesn't have to be High all operation time!) Low when nothing should be done.
         act : IN STD_LOGIC; -- strobe
 
-        -- Type of operation: High if a write process and Low if 
-        -- a read process should be executed. (Works only if 
-        -- act is High and FSM is in idle state.)
+        -- Type of operation: High if a write process and Low if a read process should be executed.
+        -- (Works only if act is High and FSM is in idle state.)
         readwrite : IN STD_LOGIC; -- writeEnable
 
-        -- Specifies the byte that is to be overwritten during a
-        -- write operation in the register.
-        -- (Word width 32 bits == 4 Bytes)
+        -- Specifies bytes which should be overwritten during a write operation in the register. (Word width 32 bits == 4 Bytes)
+        -- (Only applies to write operations!)
         dByte : IN STD_LOGIC_VECTOR(3 DOWNTO 0); -- dataByteEnable
 
         -- Memory address at which the operation is to be executed.
@@ -56,7 +54,10 @@ ENTITY spwroutertable IS
         rdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0); -- readData
 
         -- High if a read or write operation is in progress.
-        proc : OUT STD_LOGIC -- acknowledge
+        proc : OUT STD_LOGIC; -- acknowledge
+        
+        -- Debug: Output state
+        instate : out spwroutertablestates
     );
 END spwroutertable;
 
@@ -80,6 +81,9 @@ BEGIN
     -- Drive outputs
     proc <= s_proc;
     rdata <= s_rdata;
+    
+    -- Debug
+    instate <= state;
 
     -- Creates 32x256 routing table in ROM.
     -- (Synthesizer for Spartan3 infers to use ROM Block)
