@@ -23,8 +23,11 @@ USE work.spwpkg.ALL;
 
 ENTITY spwrouterport IS
     GENERIC (
-        -- Number of SpaceWire ports. (evtl. nicht benötigt)
+        -- Number of SpaceWire ports.
         numports : INTEGER RANGE 0 TO 31;
+
+        -- Bit length to map ports.
+        blen : INTEGER RANGE 0 TO 4; -- (max 5 bits for 0-31 ports)
 
         -- Port number.
         portnum : INTEGER RANGE 0 TO 31;
@@ -207,11 +210,11 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
     SIGNAL s_data_out : STD_LOGIC_VECTOR(8 DOWNTO 0); -- check -- receiveFIFODataOut
 
     SIGNAL s_req_out : STD_LOGIC; -- check -- iRequestOut
-    SIGNAL s_destport : STD_LOGIC_VECTOR(7 DOWNTO 0); -- iDestinationPortOut
+    SIGNAL s_destport : STD_LOGIC_VECTOR(7 DOWNTO 0); -- check -- iDestinationPortOut
     SIGNAL s_data_out : STD_LOGIC_VECTOR(8 DOWNTO 0); -- iDataOut -- check
-    SIGNAL s_strobe_out : STD_LOGIC; -- iStrobeOut
-    SIGNAL s_RoutingTable_addr : STD_LOGIC_VECTOR(7 DOWNTO 0); -- iRoutingTableAddress
-    SIGNAL s_RoutingTable_req : STD_LOGIC; -- iRoutingTableRequest
+    SIGNAL s_strobe_out : STD_LOGIC; -- check -- iStrobeOut
+    SIGNAL s_RoutingTable_addr : STD_LOGIC_VECTOR(7 DOWNTO 0); -- check -- iRoutingTableAddress
+    SIGNAL s_RoutingTable_req : STD_LOGIC; -- check -- iRoutingTableRequest
     --
     -- Eigene Signale
     SIGNAL s_bool_destports : STD_LOGIC; -- check
@@ -223,7 +226,7 @@ BEGIN
     requestOut <= s_req_out; -- check
     strobeOut <= s_strobe_out; -- check
     data_out <= s_data_out; -- check
-    (busMasterRequestOut, busMasterStrobeOut) <= s_RoutingTable_req;
+    (busMasterRequestOut, busMasterStrobeOut) <= s_RoutingTable_req; -- check
     busMasterAddressOut <= x"0000" & "000000" & s_RoutingTable_addr & "00";
     busMasterWriteEnableOut <= '0';
     busMasterByteEnableOut <= "1111";
@@ -348,9 +351,9 @@ BEGIN
                 WHEN S_Dest2 =>
                     -- Transmit request to destination port.
                     FOR i IN 1 TO numports LOOP
-                        s_bool_destports <= OR (linkUp(i) = '1' AND s_destport(4 DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(i, s_destport'length)));
+                        s_bool_destports <= OR (linkUp(i) = '1' AND s_destport(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(i, s_destport'length)));
                     END LOOP;
-                    IF ((s_destport(4 DOWNTO 0) = "00000")) OR s_bool_destports THEN
+                    IF ((s_destport(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(0, s_destport'length)))) OR s_bool_destports THEN
                         s_req_out <= '1';
                         state <= S_Data0;
                     ELSE

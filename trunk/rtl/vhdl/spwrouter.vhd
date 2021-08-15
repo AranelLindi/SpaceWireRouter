@@ -14,10 +14,11 @@
 -- Revision:
 ----------------------------------------------------------------------------------
 
-LIBRARY ieee;
-USE ieee.std_logic_1164.ALL;
-USE work.spwpkg.ALL;
-USE work.spwrouterpkg.ALL;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+--USE work.spwpkg.ALL;
+USE WORK.SPWROUTERPKG.ALL;
 
 ENTITY spwrouter IS
     GENERIC (
@@ -102,73 +103,25 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
     SIGNAL iSwitchPortNumber : array_t(numports DOWNTO 0)(numports DOWNTO 0);
 
     -- Arbiter
-    SIGNAL s_dest : array_t(numports DOWNTO 0)(numports DOWNTO 0);
-    SIGNAL s_req : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_grnt : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_rout : array_t(numports DOWNTO 0)(numports DOWNTO 0);
+    SIGNAL s_dest : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- destinationPort
+    SIGNAL s_req : STD_LOGIC_VECTOR(numports DOWNTO 0); -- requestOut
+    SIGNAL s_grnt : STD_LOGIC_VECTOR(numports DOWNTO 0); -- granted
+    SIGNAL s_rout : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- routingSwitch
 BEGIN
     -- Generate (numports-1) physical ports including port 0 (internal port)
     gen_ports : FOR i IN 1 TO numports GENERATE
-        portX : spwstream GENERIC MAP(
-            sysfreq => sysfreq,
-            txclkfreq => txclkfreq,
-            rximpl => rximpl(i),
-            rxchunk => rxchunk,
-            tximpl => tximpl(i),
-            rxfifosize_bits => rxfifosize_bits,
-            txfifosize_bits => txfifosize_bits,
-            WIDTH => WIDTH
+        portX : spwrouterport GENERIC MAP(
+            
         )
         PORT MAP(
-            clk => clk,
-            rxclk => rxclk,
-            txclk => txclk,
-            rst => rst,
-            autostart => '1', -- every port uses autostart!
-            linkstart => OPEN,
-            linkdis => OPEN,
-            txdivcnt => (OTHERS => '0'),
-            tick_in => s_reqTimeCode(i - 1), -- Check!
-            ctrl_in => s_TimeCodes(i - 1)(7 DOWNTO 6), -- CHECK aber fehler möglich!
-            time_in => s_TimeCodes(i - 1)(5 DOWNTO 0), -- CHECK aber fehler möglich!
-            txwrite => txwrite, -- matrix?! (numports-1 x 8 bits)
-            txflag => txflag, -- array?!
-            txdata => txdata, -- matrix?! (numports-1 x 8 bits)
-            txrdy => txrdy, -- array?!
-            txhalff => OPEN,
-            tick_out => s_recTimeCode(i - 1), -- CHECK
-            ctrl_out => s_recTimeCodeList(i - 1)(7 DOWNTO 6), -- CHECK aber fehler möglich
-            time_out => s_recTimeCodeList(i - 1)(5 DOWNTO 0), -- CHECK aber fehler möglich
-            rxvalid => rxvalid, -- array?!
-            rxhalff => OPEN,
-            rxflag => rxflag, -- array?!
-            rxdata => rxdata, -- matrix?! (numports-1 x 8 bits)
-            rxread => rxread, -- array?!
-            started => started, -- array?!
-            connecting => connecting, -- array?!
-            running => s_running(i), -- CHECK
-            errdisc => errdisc, -- array?!
-            errpar => errpar, -- array?!
-            erresc => erresc, -- array?!
-            errcred => errcred, -- array?!
-            spw_di => spw_di(i),
-            spw_si => spw_si(i),
-            spw_do => spw_do(i),
-            spw_so => spw_so(i)
+            
         );
     END GENERATE gen_ports;
 
     -- Internal port 0
-    port0 : spwstream
+    port0 : spwrouterport
     GENERIC MAP(
-        sysfreq => sysfreq,
-        txclkfreq => txclkfreq,
-        rximpl => rximpl(i),
-        rxchunk => rxchunk,
-        tximpl => tximpl(i),
-        rxfifosize_bits => rxfifosize_bits,
-        txfifosize_bits => txfifosize_bits,
-        WIDTH => WIDTH
+        
     )
     PORT MAP(
         -- TODO: Hier konfigurieren!
@@ -189,7 +142,7 @@ BEGIN
         rout => s_rout
     ); -- CHECK soweit alles!
 
-    -- the destination portnumber regarding to the source portnumber
+    -- The destination PortNo regarding to the source PortNo.
     destPort : FOR i IN 0 TO numports GENERATE
         FOR j IN 0 TO numports LOOP
             -- Matrix transponieren: Potenzielle Fehlerquelle!
@@ -197,7 +150,7 @@ BEGIN
         END LOOP;
     END GENERATE destPort;
 
-    -- the source to the destination portnumber
+    -- The source to the destination PortNo PortNo.
     srcPort : FOR i IN 0 TO numports GENERATE
         iSwitchPortNumber(i) <= s_rout(i);
     END GENERATE srcPort;
@@ -206,7 +159,28 @@ BEGIN
     -- glaube das brauche ich nicht, da bei mir der Port
     -- das managt.
     --end generate spx;
+
     -- Router Control Register here!!
+    ControlRegister : spwrouterregs
+    generic map (
+        numports => numports
+    )
+    port map (
+        clk => clk,
+        rst => rst,
+        writeData => iBusSlaveDataIn,
+        readData => ibusMasterDataOut,
+        readwrite => iBusSlaveWriteEnableIn,
+        dByte => iBusSlaveByteEnableIn,
+        addr => address,
+        proc => iBusSlaveAcknowledgeOut,
+        strobe => iBusSlaveStrobeIn,
+        cycle => iBusSlaveWriteEnableIn, 
+        portstatus => ,
+        receiveTimeCode => routerTimeCode,
+        autoTimeCodeValue => autoTimeCodeValue,
+        autoTimeCodeCycleTime => autoTimeCodeCycleTime
+    );
 
     -- Bus arbiter
     busArbiter : spwrouterarb_table
@@ -223,8 +197,14 @@ BEGIN
     PROCESS (clk)
     BEGIN
         IF rising_edge(clk) THEN
-            FOR i IN 0 TO numports LOOP
+
+            -- Hier fehlt noch was
+
+
+            FOR i IN numports DOWNTO 0 LOOP
                 -- hier fehlt noch was
+
+                
             END LOOP;
         END IF;
     END PROCESS;
@@ -244,7 +224,7 @@ BEGIN
         time_out => s_TimeCodes, -- CHECK aber fehler möglich
         tick_in => s_recTimeCode, -- CHECK
         time_in => s_recTimeCodeList, -- CHECK aber fehler möglich
-        auto_time_out = >, -- register access (wird in register gespeichert)
+        auto_time_out => , -- register access (wird in register gespeichert)
         auto_cycle => -- register access (wird in register gespeichert)
     );
 END ARCHITECTURE spwrouter_arch;

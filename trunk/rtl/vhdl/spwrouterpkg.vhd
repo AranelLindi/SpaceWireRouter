@@ -169,6 +169,60 @@ PACKAGE spwrouterpkg IS
     END COMPONENT;
 
     -- Router Port (spwrouterport.vhd)
-    component spwrouterport is -- TODO!
-    end component;
+    COMPONENT spwrouterport IS
+        GENERIC (
+            numports : INTEGER RANGE 0 TO 31;
+            blen : INTEGER RANGE 0 TO 4;
+            portnum : INTEGER RANGE 0 TO 31;
+            sysfreq : real;
+            txclkfreq : real;
+            rximpl : spw_implementation_type_rec;
+            rxchunk : INTEGER RANGE 1 TO 4;
+            WIDTH : INTEGER RANGE 1 TO 3;
+            tximpl : spw_implementation_type_xmit;
+            rxfifosize_bits : INTEGER RANGE 6 TO 14;
+            txfifosize_bits : INTEGER RANGE 2 TO 14
+        );
+        PORT (
+            clk : IN STD_LOGIC;
+            rxclk : IN STD_LOGIC;
+            txclk : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
+            autostart : IN STD_LOGIC;
+            linkstart : IN STD_LOGIC;
+            linkdis : IN STD_LOGIC;
+            txdivcnt : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+            tick_in : IN STD_LOGIC;
+            tc_in : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+            data_in : IN STD_LOGIC_VECTOR(8 DOWNTO 0);
+            txrdy : OUT STD_LOGIC;
+            tick_out : OUT STD_LOGIC;
+            tc_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+            data_out : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
+            started : OUT STD_LOGIC;
+            connecting : OUT STD_LOGIC;
+            running : OUT STD_LOGIC;
+            errdisc : OUT STD_LOGIC;
+            errpar : OUT STD_LOGIC;
+            erresc : OUT STD_LOGIC;
+            errcred : OUT STD_LOGIC;
+            spw_di : IN STD_LOGIC;
+            spw_si : IN STD_LOGIC;
+            spw_do : OUT STD_LOGIC;
+            spw_so : OUT STD_LOGIC;
+            linkUp : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            destinationPortOut : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+            sourcePortOut : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+            strobeOut : OUT STD_LOGIC;
+            strobeIn : IN STD_LOGIC;
+            busMasterAddressOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            busMasterDataIn : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            busMasterDataOut : OUT std_logic_vecter(31 DOWNTO 0);
+            busMasterWriteEnableOut : OUT STD_LOGIC;
+            busMasterStrobeOut : OUT STD_LOGIC;
+            busMasterRequestOut : OUT STD_LOGIC;
+            busMasterAcknowledgeIn : IN STD_LOGIC;
+            requestOut : OUT STD_LOGIC
+        );
+    END COMPONENT;
 END PACKAGE;
