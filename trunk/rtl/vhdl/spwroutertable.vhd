@@ -5,12 +5,13 @@
 -- Create Date: 01.08.2021 21:13
 -- Design Name: SpaceWire Router Table
 -- Module Name: spwroutertable
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
 -- Description: Contains a FSM that controls access to routing table in ROM.
 --
--- Dependencies: spwram (defined in spwpkg); spwroutertablestates (defined in spwrouterpkg)
+-- Dependencies: spwram (defined in spwpkg),
+-- spwroutertablestates (defined in spwrouterpkg)
 -- 
 -- Revision:
 ----------------------------------------------------------------------------------

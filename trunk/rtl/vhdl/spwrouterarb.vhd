@@ -5,10 +5,12 @@
 -- Create Date: 31.07.2021 21:26
 -- Design Name: SpaceWire Router Package
 -- Module Name: spwrouterarb
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
--- Description: Framework of a round robin arbiter which controls access between the ports.
+-- Description: Framework of a round robin arbiter which controls access between
+-- the ports.
+--
 -- Dependencies: spwrouterpkg
 -- 
 -- Revision:

@@ -5,12 +5,13 @@
 -- Create Date: 31.07.2021 22:38
 -- Design Name: SpaceWire Router Package
 -- Module Name: spwrouterarb_round
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
 -- Description: Ein Ring wird konstruiert, der alle Ports enthält und dem numerisch
 -- darauffolgendem Port die höchste Priorität einräumt (numports..0). Ausgehend dabei ist der
 -- Port, dem zuletzt der Zugriff gewährt wurde. Bsp für 1 bei insgesamt 3 Ports: 2..0..1
+--
 -- Dependencies: none
 -- 
 -- Revision:

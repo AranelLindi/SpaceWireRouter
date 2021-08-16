@@ -5,13 +5,13 @@
 -- Create Date: 02.08.2021 21:06
 -- Design Name: SpaceWire Router TimeCode Control
 -- Module Name: spwrouterttc
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
 -- Description: Allows provision and administration of SpaceWire TimeCodes.
 --
--- CAUTION! The assignment is shifted for every std_logic_vector-port that excludes
--- port0 (internal port): Port1 has index 0, Port2 -> 1, etc.
+-- CAUTION! The assignment is shifted for every std_logic_vector-port that 
+-- excludes port0 (internal port): Port1 has index 0, Port2 -> 1, etc.
 --
 -- Dependencies: spwrouterpkg
 -- 

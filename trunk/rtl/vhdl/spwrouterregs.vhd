@@ -5,10 +5,11 @@
 -- Create Date: 04.08.2021 14:28
 -- Design Name: SpaceWire Control Register
 -- Module Name: spwrouterregs
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
--- Description: Manages internal registers and controls reading and writing process. 
+-- Description: Manages internal registers and controls reading and writing
+-- process. 
 --
 -- Dependencies: spwrouterpkg (spwram)
 -- 

@@ -5,10 +5,11 @@
 -- Create Date: 31.07.2021 12:53
 -- Design Name: SpaceWire Router Top Module
 -- Module Name: spwrouter
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
 -- Description: 
+--
 -- Dependencies: none
 -- 
 -- Revision:

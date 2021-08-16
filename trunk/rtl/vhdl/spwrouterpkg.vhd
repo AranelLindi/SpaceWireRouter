@@ -5,7 +5,7 @@
 -- Create Date: 31.07.2021 14:59
 -- Design Name: SpaceWire Router Package
 -- Module Name: spwrouterpkg
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
 -- Description: Contains type and component definitions of spwrouter elements.
@@ -167,6 +167,12 @@ PACKAGE spwrouterpkg IS
             autoTimeCodeCycleTime : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
     END COMPONENT;
+    
+    
+    
+    -- spwrouterarb_table fehlt noch!
+    
+    
 
     -- Router Port (spwrouterport.vhd)
     COMPONENT spwrouterport IS

@@ -5,12 +5,13 @@
 -- Create Date: 03.06.2021 21:42
 -- Design Name: Clock Recovery Front-End Module for SpaceWire Light IP Core
 -- Module Name: spwrecvfront_clkrec
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: Created for SpW Light IP Core Version from 05.12.2018
 -- Description: extracts a clock pulse from the Data-Strobe signals of a SpaceWire
 -- connection (clock recovery) and uses it to decode the data input bits and forwards them
 -- to the receiver module of the IP Core.
+--
 -- Dependencies: SpaceWire Light IP Core from https://opencores.org/projects/spacewire_light
 -- 
 -- Revision:
