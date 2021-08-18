@@ -50,13 +50,13 @@ ENTITY spwroutertcc IS
         tick_out : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0); -- portTickIn
 
         -- Contains for every port TimeCode to send - except port0!
-        time_out : OUT array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0); -- portTimeCodeIn
+        time_out : OUT array_t(0 TO (numports - 1))(7 DOWNTO 0); -- portTimeCodeIn
 
         -- High if corresponding port received a TimeCode - except port0!
         tick_in : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0); -- portTickOut
 
         -- Received TimeCodes from all ports - except port0!
-        time_in : IN array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0); -- portTimeCodeOut
+        time_in : IN array_t(0 TO (numports - 1))(7 DOWNTO 0); -- portTimeCodeOut
 
         -- TimeCode that is sent from Host.
         auto_time_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0); -- autoTimeCodeValue
@@ -82,7 +82,7 @@ ARCHITECTURE spwroutertcc_arch OF spwroutertcc IS
 
     -- Output registers.
     SIGNAL s_tick_out : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
-    SIGNAL s_time_out : array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0);
+    SIGNAL s_time_out : array_t(0 TO (numports - 1))(7 DOWNTO 0);
 
     -- Counter interval for automatic TimeCode generation.
     -- [max. Interval: (2**32 - 1) * (1 / clk_frequency)]

@@ -19,14 +19,14 @@
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
-use ieee.numeric_std.all;
+USE ieee.numeric_std.ALL;
 --USE work.spwrouterpkg.ALL;
 
 ENTITY spwrouterarb_round IS
     GENERIC (
         -- Number of SpaceWire ports.
         numports : INTEGER RANGE 0 TO 31;
-        
+
         -- Bit length to map ports.
         blen : INTEGER RANGE 0 TO 4 -- (max 5 bits for 0-31 ports)
     );
@@ -57,7 +57,7 @@ ARCHITECTURE spwrouterarb_round_arch OF spwrouterarb_round IS
     SIGNAL s_occupied : STD_LOGIC;
 
     -- Last granted port.
-    SIGNAL s_lstgrnt : std_logic_vector(blen downto 0);
+    SIGNAL s_lstgrnt : STD_LOGIC_VECTOR(blen DOWNTO 0);
 BEGIN
     -- Intermediate signals
     s_request <= req;
@@ -65,17 +65,17 @@ BEGIN
 
     -- Drive output.
     grnt <= s_granted;
-       
+
     PROCESS (clk, rst)
     BEGIN
         IF (rst = '1') THEN -- reset
             s_granted <= (OTHERS => '0');
-            s_lstgrnt <= std_logic_vector(to_unsigned(0, s_lstgrnt'length));
+            s_lstgrnt <= STD_LOGIC_VECTOR(to_unsigned(0, s_lstgrnt'length));
 
         ELSIF rising_edge(clk) THEN
             -- Roll-out arbitration logic for every port.
             arbitration : FOR i IN 0 TO numports LOOP
-                IF (s_lstgrnt = std_logic_vector(to_unsigned(i, s_lstgrnt'length))) THEN
+                IF (s_lstgrnt = STD_LOGIC_VECTOR(to_unsigned(i, s_lstgrnt'length))) THEN
 
                     -- Following ports in line (0..1..numports..0) are given prefered access to current
                     -- port. Normally in if-statements early conditions takes priority over later.
@@ -86,13 +86,13 @@ BEGIN
                     lowerpriority : FOR j IN i DOWNTO 0 LOOP
                         IF (s_request(j) = '1' AND s_occupied = '0') THEN
                             s_granted <= (j => '1', OTHERS => '0');
-                            s_lstgrnt <= std_logic_vector(to_unsigned(j, s_lstgrnt'length));
+                            s_lstgrnt <= STD_LOGIC_VECTOR(to_unsigned(j, s_lstgrnt'length));
                         END IF;
                     END LOOP lowerpriority;
                     higherpriority : FOR k IN numports DOWNTO (i + 1) LOOP
                         IF (s_request(k) = '1' AND s_occupied = '0') THEN
                             s_granted <= (k => '1', OTHERS => '0');
-                            s_lstgrnt <= std_logic_vector(to_unsigned(k, s_lstgrnt'length));
+                            s_lstgrnt <= STD_LOGIC_VECTOR(to_unsigned(k, s_lstgrnt'length));
                         END IF;
                     END LOOP higherpriority;
                 END IF;

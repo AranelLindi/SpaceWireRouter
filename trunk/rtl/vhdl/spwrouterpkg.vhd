@@ -98,10 +98,10 @@ PACKAGE spwrouterpkg IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            dest : IN array_t(numports DOWNTO 0)(numports DOWNTO 0);
+            dest : IN array_t(0 TO numports)(numports DOWNTO 0); -- hier ersten Index umgedreht
             req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-            rout : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0)
+            rout : OUT array_t(0 TO numports)(numports DOWNTO 0) -- hier ersten Index umgedreht
         );
     END COMPONENT;
 
@@ -117,9 +117,9 @@ PACKAGE spwrouterpkg IS
             lst_time : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
             tc_en : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
             tick_out : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
-            time_out : OUT array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0);
+            time_out : OUT array_t(0 TO (numports - 1))(7 DOWNTO 0); -- hier ersten Index umgedreht
             tick_in : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
-            time_in : IN matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0);
+            time_in : IN array_t(0 TO (numports - 1))(7 DOWNTO 0); -- hier ersten Index umgedreht
             auto_time_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
             auto_cycle : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
@@ -161,18 +161,25 @@ PACKAGE spwrouterpkg IS
             proc : OUT STD_LOGIC;
             strobe : IN STD_LOGIC;
             cycle : IN STD_LOGIC;
-            portstatus : IN array_t(0 TO 31)(31 DOWNTO 0);
+            portstatus : IN array_t(0 TO 31)(31 DOWNTO 0); -- hier ersten Index umgedreht
             receiveTimecode : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
             autoTimeCodeValue : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
             autoTimeCodeCycleTime : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
     END COMPONENT;
-    
-    
-    
-    -- spwrouterarb_table fehlt noch!
-    
-    
+
+    -- Arbiter for routing table and registers.
+    COMPONENT spwrouterarb_table IS
+        GENERIC (
+            numports : INTEGER RANGE 0 TO 31
+        );
+        PORT (
+            clk : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
+            req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+        );
+    END COMPONENT;
 
     -- Router Port (spwrouterport.vhd)
     COMPONENT spwrouterport IS
@@ -199,36 +206,37 @@ PACKAGE spwrouterpkg IS
             linkdis : IN STD_LOGIC;
             txdivcnt : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
             tick_in : IN STD_LOGIC;
-            tc_in : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-            data_in : IN STD_LOGIC_VECTOR(8 DOWNTO 0);
-            txrdy : OUT STD_LOGIC;
+            time_in : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+            txdata : IN STD_LOGIC_VECTOR(8 DOWNTO 0);
             tick_out : OUT STD_LOGIC;
-            tc_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-            data_out : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
+            time_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+            rxdata : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
             started : OUT STD_LOGIC;
             connecting : OUT STD_LOGIC;
             running : OUT STD_LOGIC;
-            errdisc : OUT STD_LOGIC;
-            errpar : OUT STD_LOGIC;
+            errparr : OUT STD_LOGIC;
             erresc : OUT STD_LOGIC;
             errcred : OUT STD_LOGIC;
+            linkUp : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            req_out : OUT STD_LOGIC;
+            destport : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            srcport : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            grnt : IN STD_LOGIC;
+            busy_out : OUT STD_LOGIC;
+            req_in : IN STD_LOGIC;
+            busy_in : IN STD_LOGIC;
+            baddr : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            bdat_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            bdat_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            dByte : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+            readwrite : OUT STD_LOGIC;
+            bstrobe : OUT STD_LOGIC;
+            breq_out : OUT STD_LOGIC;
+            bproc : IN STD_LOGIC;
             spw_di : IN STD_LOGIC;
             spw_si : IN STD_LOGIC;
             spw_do : OUT STD_LOGIC;
-            spw_so : OUT STD_LOGIC;
-            linkUp : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-            destinationPortOut : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-            sourcePortOut : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-            strobeOut : OUT STD_LOGIC;
-            strobeIn : IN STD_LOGIC;
-            busMasterAddressOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            busMasterDataIn : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-            busMasterDataOut : OUT std_logic_vecter(31 DOWNTO 0);
-            busMasterWriteEnableOut : OUT STD_LOGIC;
-            busMasterStrobeOut : OUT STD_LOGIC;
-            busMasterRequestOut : OUT STD_LOGIC;
-            busMasterAcknowledgeIn : IN STD_LOGIC;
-            requestOut : OUT STD_LOGIC
+            spw_so : OUT STD_LOGIC
         );
     END COMPONENT;
 END PACKAGE;

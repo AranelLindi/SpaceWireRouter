@@ -30,29 +30,7 @@ ENTITY spwrouter IS
         sysfreq : real;
 
         -- txclk frequency in Hz (if tximpl = impl_fast)
-        txclkfreq : real;
-
-        -- 2-log of division factor from system clock freq to timecode freq.
-        tickdiv : INTEGER RANGE 12 TO 24 := 20;
-
-        -- Receiver front-end implementation for every port. (Used syntax requires VHDL-2008!)
-        rximpl : rximpl_array(numports DOWNTO 0) := (OTHERS => impl_generic);
-
-        -- Maximum number of bits received per system clock (impl_fast only).
-        rxchunk : INTEGER RANGE 1 TO 4 := 1;
-
-        -- Width of shift registers for synchronization depending on transmission rate (impl_clkrec only).
-        WIDTH : INTEGER RANGE 1 TO 3 := 2;
-
-        -- Transmitter implementation for every port. (Used syntax requires VHDL-2008!)
-        tximpl : tximpl_array(numports DOWNTO 0) := (OTHERS => impl_generic);
-
-        -- Size of the receive FIFO as the 2-logarithm of the number of bytes.
-        -- Must be at least 6 (64 bytes)
-        rxfifosize_bits : INTEGER RANGE 6 TO 14 := 11;
-
-        -- Size of the transmit FIFO as the 2-logarithm of the number of bytes.
-        txfifosize_bits : INTEGER RANGE 2 TO 14 := 11
+        txclkfreq : real
     );
     PORT (
         -- System clock.
@@ -78,55 +56,189 @@ ENTITY spwrouter IS
 
         -- Strobe Out signal from SpaceWire bus.
         spw_so : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
-        -- More ports eventually in further development process
     );
 END spwrouter;
 
 ARCHITECTURE spwrouter_arch OF spwrouter IS
-    -- Define signals here!
-
-    -- Enthält eine 1 wenn der betreffende Port den "running"-status besitzt
-    SIGNAL s_running : STD_LOGIC_VECTOR(numports DOWNTO 0);
-
     -- Enthält eine 1 wenn der betreffende Port einen TimeCode senden soll. (Achtung: Index verschoben! Port0 ist nicht dabei!)
-    SIGNAL s_reqTimeCode : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+    SIGNAL s_tick_out : STD_LOGIC_VECTOR(0 TO (numports - 1)); -- check
 
     -- Enthält eine 1 wenn der betreffende Port ein TimeCode empfangen hat (Achtung! Index verschoben, port0 ist nicht dabei!)
-    SIGNAL s_recTimeCode : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+    SIGNAL s_tick_in : STD_LOGIC_VECTOR(0 TO (numports - 1)); -- check
 
     -- Matrix mit TimeCodes für jeden Port (achtung! Index verschoben, ist nicht dabei!)
-    SIGNAL s_TimeCodes : matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0);
+    SIGNAL s_time_out : array_t(0 TO (numports - 1))(7 DOWNTO 0); -- check
 
     -- Matrix mit empfangenen TimeCodes aller Ports (außer port0, index verschoben!)
-    SIGNAL s_recTimeCodesList : matrix_t((numports - 1) DOWNTO 0, 7 DOWNTO 0);
+    SIGNAL s_time_in : matrix_t(0 TO (numports - 1), 7 DOWNTO 0); -- check
 
-    SIGNAL iSelectDestinationPort : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- potenzielle fehlerquelle: im usprungscode steht hier 'gNumberOfInternalPort - 1 downto 0' -- vielleicht doch von numports-1 downto 0 ?
-    SIGNAL iSwitchPortNumber : array_t(numports DOWNTO 0)(numports DOWNTO 0);
+    SIGNAL iSelectDestinationPort : array_t(0 TO numports)(numports DOWNTO 0); -- check -- potenzielle fehlerquelle: im usprungscode steht hier 'gNumberOfInternalPort - 1 downto 0' -- vielleicht doch von numports-1 downto 0 ?
+    
+    SIGNAL iSwitchPortNumber : array_t(0 TO numports)(numports DOWNTO 0); -- check
+
+
+    -- Dateneingang für Port.
+    signal iDataIn : array_t(0 to numports)(8 downto 0); -- check -- txdata
+    signal iDataOut : array_t(0 to numports)(8 downto 0); -- check -- rxdata
+
+
+    -- Register Port Status
+    signal s_prtstat : array_t(0 to 31)(31 downto 0) := (others => (others => '0'));
+    signal iBusMasterDataOut : std_logic_vector(31 downto 0);
+    signal iBusSlaveAcknowledgeOut : std_logic;
+    signal iBusSlaveAddressIn : std_logic_vector(31 downto 0);
+    signal iBusSlaveStrobeIn: std_logic;
+    signal iBusSlaveCycleIn : std_logic;
+    signal iBusSlaveWriteEnableIn : std_logic;
+    signal iBusSlaveByteEnableIn: std_logic_vector(3 downto 0);
+    signal iBusSlaveOriginalPort: std_logic_vector(numports downto 0);
+    signal iBusSlaveDataIn: std_logic_vector(31 downto 0);
+
+
+    signal busSlaveDataOut : std_logic_vector(31 downto 0);
+
+
+
+    signal busMasterAddressOut : array_t(0 to numports)(31 downto 0);
+
+    signal busMasterDataOut : array_t(0 TO numports)(31 downto 0);
+
+    signal busMasterByteEnableOut : array_t(0 to numports)(3 downto 0);
+
+
+    signal busMasterWriteEnableOut : std_logic_vector(0 TO numports);
+
+    signal busMasterStrobeOut : std_logic_vector(0 to numports);
+
+    signal busMasterAcknowledgeIn: std_logic_vector(0 to numports);
+
 
     -- Arbiter
-    SIGNAL s_dest : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- destinationPort
-    SIGNAL s_req : STD_LOGIC_VECTOR(numports DOWNTO 0); -- requestOut
-    SIGNAL s_grnt : STD_LOGIC_VECTOR(numports DOWNTO 0); -- granted
-    SIGNAL s_rout : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- routingSwitch
+    SIGNAL iLinkUp : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    -- spwrouterarb_table
+    SIGNAL busMasterRequestOut : STD_LOGIC_VECTOR(0 TO numports);
+    SIGNAL busMasterGranted : STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+    SIGNAL s_dest : array_t(0 TO numports)(numports DOWNTO 0); -- check -- destinationPort
+    SIGNAL s_req_out : STD_LOGIC_VECTOR(numports downto 0); -- check -- requestOut
+    signal s_req_in : std_logic_vector(numports downto 0); -- chec -- requestIn
+    SIGNAL s_grnt : STD_LOGIC_VECTOR(numports DOWNTO 0); -- check -- granted
+    SIGNAL s_rout : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- check -- routingSwitch
+
+
+    signal s_src : array_t(0 TO numports)(numports downto 0); -- sourcePortOut (sorcePortrOut)
+
+    signal s_busy_out : std_logic_vector(numports downto 0); -- strobeOut
+    signal s_busy_in : std_logic_vector(numports downto 0); -- strobeIn
+
+    -- timecode (timecode control -> register)
+    SIGNAL s_lst_time : STD_LOGIC_VECTOR(7 DOWNTO 0); -- check
+    SIGNAL autoTimeCodeValue : STD_LOGIC_VECTOR(7 DOWNTO 0); -- check
+    SIGNAL autoTimeCodeCycleTime : STD_LOGIC_VECTOR(31 DOWNTO 0); -- check
+
 BEGIN
-    -- Generate (numports-1) physical ports including port 0 (internal port)
-    gen_ports : FOR i IN 1 TO numports GENERATE
-        portX : spwrouterport GENERIC MAP(
-            
+    -- Generate (numports-1) physical ports (excluding port0).
+    ports : FOR i IN 1 TO numports GENERATE
+        portx : spwrouterport GENERIC MAP(
+
         )
         PORT MAP(
-            
+            clk => clk, -- check
+            rxclk => rxclk, -- check
+            txclk => txclk, -- check
+            rst => rst, -- check
+            autostart => '1', -- check -- autostart is always active
+            linkstart => '0', -- check
+            linkdis => '0', -- check -- link disabling is always deactivated
+            txdivcnt => s_prtstat(i)(15 downto 0), -- check aber eventuell wieder auf "00000000" setzen weil unnötig
+            tick_in => s_tick_in(i - 1), -- check (-1, weil index verschoben; port0 ist nicht dabei!)
+            time_in => s_time_out(i - 1), -- check
+            txdata => iDataIn(i), -- check -- enthält flag und daten (9 bits)
+            tick_out => s_tick_out(i - 1), -- check (-1, weil index verschoben; port0 ist nicht dabei!)
+            time_out => s_time_in(i - 1), -- check (-1, ...)
+            rxdata => iDataOut(i), -- check -- enthält flag und daten (9 bits) 
+            started => s_prtstat(i)(24), -- check
+            connecting => s_prtstat(i)(25), -- check
+            running => (iLinkUp(i), s_prtstat(i)(26)), -- check, falls syntax ok ist
+            errparr => s_prtstat(i)(27), -- check
+            erresc => s_prtstat(i)(28), -- check
+            errcred => s_prtstat(i)(29), -- check
+            linkUp => iLinkUp, -- (eingang) -- check
+            req_out => s_req_out(i), -- check
+            destport => s_dest(i), -- check
+            srcport => s_src(i), -- check
+            grnt => s_grnt(i), -- check
+            busy_out => s_busy_out(i),
+            req_in => s_req_in(i), -- check
+            busy_in => s_busy_in(i), -- check
+            baddr => busMasterAddressOut(i), -- check
+            bdat_in => busSlaveDataOut, -- check
+            bdat_out => busMasterDataOut(i), -- check
+            dByte => busMasterByteEnableOut(i), -- check
+            readwrite => busMasterWriteEnableOut(i), -- check
+            bstrobe => busMasterStrobeOut(i), -- check
+            breq_out => busMasterRequestOut(i), -- check
+            bproc => busMasterAcknowledgeIn(i), -- check
+            spw_di => spw_di(i), -- check
+            spw_si => spw_si(i), -- check
+            spw_do => spw_do(i), -- check
+            spw_so => spw_so(i) -- check
         );
-    END GENERATE gen_ports;
+    END GENERATE ports;
+
+    -- Timing adjustment.
+    -- BusSlaveAccessSelector.
+    PROCESS (clk)
+        SIGNAL s_bool_busMasterRequestOut : STD_LOGIC;
+    BEGIN
+        IF rising_edge(clk) THEN
+            FOR i IN 0 TO numports LOOP
+                s_bool_busMasterRequestOut <= OR (busMasterRequestOut(i) = '1');
+            END LOOP;
+
+            IF (s_bool_busMasterRequestOut = '1') THEN
+                iBusSlaveCycleIn <= '1';
+            ELSE
+                iBusSlaveCycleIn <= '0';
+            END IF;
+
+            FOR i IN numports DOWNTO 1 LOOP
+                IF (busMasterGranted(i) = '1') THEN
+                    iBusSlaveStrobeIn <= busMasterStrobeOut(i);
+                    iBusSlaveAddressIn <= busMasterAddressOut(i);
+                    iBusSlaveByteEnableIn <= busMasterByteEnableOut(i);
+                    iBusSlaveWriteEnableIn <= busMasterWriteEnableOut(i);
+                    iBusSlaveOriginalPortIn <= x"ff";
+                    iBusSlaveDataIn <= (OTHERS => '0');
+                    busMasterAcknowledgeIn <= (i => iBusSlaveAcknowledgeOut, OTHERS => '0');
+                END IF;
+            END LOOP;
+            IF (busMasterGranted(0) = '1') THEN
+                iBusSlaveStrobeIn <= busMasterStrobeOut(0);
+                iBusSlaveAddressIn <= busMasterAddressOut(0);
+                iBusSlaveByteEnableIn <= busMasterByteEnableOut(0);
+                iBusSlaveWriteEnableIn <= busMasterWriteEnableOut(0);
+                iBusSlaveOriginalPortIn <= busMasterOriginalPortOut(0);
+                iBusSlaveDataIn <= busMasterDataOut(0);
+                busMasterAcknowledgeIn <= (0 => iBusSlaveAcknowledgeOut, OTHERS => '0');
+            END IF;
+
+            busSlaveDataOut <= ibusMasterDataOut;
+            busMasterUserDataOut <= ibusMasterDataOut; -- kann womöglich gelöscht werden; warum?
+            busMasterUserAcknowledgeOut <= iBusMasterUserAcknowledgeOut;
+        END IF;
+    END PROCESS;
 
     -- Internal port 0
     port0 : spwrouterport
     GENERIC MAP(
-        
+
     )
     PORT MAP(
-        -- TODO: Hier konfigurieren!
-        tick_in => '0'; -- TimeCodes in Port0 deaktivieren!
+        spw_di => spw_di(0),
+        spw_si => spw_si(0),
+        spw_do => spw_do(0),
+        spw_so => spw_so(0)
     ); -- nach und nach noch vervollständigen!
 
     -- Arbiter
@@ -135,13 +247,13 @@ BEGIN
         numports => numports
     )
     PORT MAP(
-        clk => clk,
-        rst => rst,
-        dest => s_dest,
-        req => s_req,
-        grnt => s_grnt,
-        rout => s_rout
-    ); -- CHECK soweit alles!
+        clk => clk, -- check
+        rst => rst, -- check
+        dest => s_dest, -- check
+        req => s_req_out, -- check
+        grnt => s_grnt, -- check
+        rout => s_rout -- check
+    ); -- CHECK
 
     -- The destination PortNo regarding to the source PortNo.
     destPort : FOR i IN 0 TO numports GENERATE
@@ -149,39 +261,39 @@ BEGIN
             -- Matrix transponieren: Potenzielle Fehlerquelle!
             iSelectDestinationPort(i, j) <= s_rout(j, i);
         END LOOP;
-    END GENERATE destPort;
+    END GENERATE destPort; -- check (vorläufig)
 
     -- The source to the destination PortNo PortNo.
     srcPort : FOR i IN 0 TO numports GENERATE
         iSwitchPortNumber(i) <= s_rout(i);
-    END GENERATE srcPort;
+    END GENERATE srcPort; -- check (vorläufig)
 
-    spx : --for i in 0 to numports generate -- was ist spx?
+    --spx : --for i in 0 to numports generate -- was ist spx?
     -- glaube das brauche ich nicht, da bei mir der Port
     -- das managt.
     --end generate spx;
 
     -- Router Control Register here!!
     ControlRegister : spwrouterregs
-    generic map (
+    GENERIC MAP(
         numports => numports
     )
-    port map (
-        clk => clk,
-        rst => rst,
-        writeData => iBusSlaveDataIn,
-        readData => ibusMasterDataOut,
-        readwrite => iBusSlaveWriteEnableIn,
-        dByte => iBusSlaveByteEnableIn,
-        addr => address,
-        proc => iBusSlaveAcknowledgeOut,
-        strobe => iBusSlaveStrobeIn,
-        cycle => iBusSlaveWriteEnableIn, 
-        portstatus => ,
-        receiveTimeCode => routerTimeCode,
-        autoTimeCodeValue => autoTimeCodeValue,
-        autoTimeCodeCycleTime => autoTimeCodeCycleTime
-    );
+    PORT MAP(
+        clk => clk, -- check
+        rst => rst, -- check
+        writeData => iBusSlaveDataIn, -- check
+        readData => iBusMasterDataOut, -- check
+        readwrite => iBusSlaveWriteEnableIn, -- check
+        dByte => iBusSlaveByteEnableIn, -- check
+        addr => iBusSlaveAddressIn, -- check
+        proc => iBusSlaveAcknowledgeOut, -- check
+        strobe => iBusSlaveStrobeIn, -- check
+        cycle => iBusSlaveWriteEnableIn, -- check
+        portstatus => s_prtstat, -- check
+        receiveTimeCode => s_lst_time, -- check
+        autoTimeCodeValue => autoTimeCodeValue, -- check
+        autoTimeCodeCycleTime => autoTimeCodeCycleTime -- check
+    ); -- vorläufiger check
 
     -- Bus arbiter
     busArbiter : spwrouterarb_table
@@ -189,26 +301,11 @@ BEGIN
         numports => numports
     )
     PORT MAP(
-        clk => clk,
-        rst => rst,
-        req = >, -- nicht s_req !!
-        grnt => -- muss irgendwas mit bus system sein!
-    );
-    -- Timing adjustmend. BusSlaveAccessSelector
-    PROCESS (clk)
-    BEGIN
-        IF rising_edge(clk) THEN
-
-            -- Hier fehlt noch was
-
-
-            FOR i IN numports DOWNTO 0 LOOP
-                -- hier fehlt noch was
-
-                
-            END LOOP;
-        END IF;
-    END PROCESS;
+        clk => clk, -- check
+        rst => rst, -- check
+        req => busMasterRequestOut, -- check (achtung, nicht s_req_out!)
+        grnt => busMasterGranted -- check
+    ); -- check
 
     -- timeCode forwarding logic
     TimeCodeControl : spwroutertcc
@@ -216,16 +313,16 @@ BEGIN
         numports => numports
     )
     PORT MAP(
-        clk => clk,
-        rst => rst,
-        running => s_running, -- CHECK!
-        lst_time = >, -- register access
-        tc_en => (OTHERS => '1'), -- TimeCodes sind für alle Ports aktiviert und können nicht deaktiviert werden. Eventuell dieses Port in spwroutertcc streichen?
-        tick_out => s_reqTimeCode, -- CHECK aber fehler möglich!
-        time_out => s_TimeCodes, -- CHECK aber fehler möglich
-        tick_in => s_recTimeCode, -- CHECK
+        clk => clk, -- check
+        rst => rst, -- check
+        running => iLinkUp, -- CHECK!
+        lst_time => s_lst_time, -- check
+        tc_en => (OTHERS => '1'), -- TimeCodes sind für alle Ports aktiviert und können nicht deaktiviert werden.
+        tick_out => s_tick_out, -- CHECK
+        time_out => s_time_out, -- check
+        tick_in => s_tick_in, -- check
         time_in => s_recTimeCodeList, -- CHECK aber fehler möglich
-        auto_time_out => , -- register access (wird in register gespeichert)
-        auto_cycle => -- register access (wird in register gespeichert)
-    );
+        auto_time_out => autoTimeCodeValue, -- check
+        auto_cycle => autoTimeCodeCycleTime -- check
+    ); -- check
 END ARCHITECTURE spwrouter_arch;

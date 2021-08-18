@@ -56,9 +56,9 @@ ENTITY spwroutertable IS
 
         -- High if a read or write operation is in progress.
         proc : OUT STD_LOGIC; -- acknowledge
-        
+
         -- Debug: Output state
-        instate : out spwroutertablestates
+        instate : OUT spwroutertablestates
     );
 END spwroutertable;
 
@@ -82,7 +82,7 @@ BEGIN
     -- Drive outputs
     proc <= s_proc;
     rdata <= s_rdata;
-    
+
     -- Debug
     instate <= state;
 

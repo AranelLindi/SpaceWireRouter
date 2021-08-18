@@ -298,148 +298,148 @@ BEGIN
                     -- Routing table is handled separately.
                     IF (s_table_4 = '1' AND s_addr_00 = '1') THEN -- Status register (0x0000_0400)
                         -- Status Port 0
-                        s_addr_table4 <= std_logic_vector(to_unsigned(0, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(0, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_04 = '1') THEN
                         -- Status Port 1
-                        s_addr_table4 <= std_logic_vector(to_unsigned(1, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(1, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_08 = '1') THEN
                         -- Status Port 2
-                        s_addr_table4 <= std_logic_vector(to_unsigned(2, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(2, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_0C = '1') THEN
                         -- Status Port 3
-                        s_addr_table4 <= std_logic_vector(to_unsigned(3, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(3, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_10 = '1') THEN
                         -- Status Port 4
-                        s_addr_table4 <= std_logic_vector(to_unsigned(4, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(4, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_14 = '1') THEN
                         -- Status Port 5
-                        s_addr_table4 <= std_logic_vector(to_unsigned(5, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(5, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_18 = '1') THEN
                         -- Status Port 6
-                        s_addr_table4 <= std_logic_vector(to_unsigned(6, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(6, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_1C = '1') THEN
                         -- Status Port 7
-                        s_addr_table4 <= std_logic_vector(to_unsigned(7, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(7, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_20 = '1') THEN
                         -- Status Port 8
-                        s_addr_table4 <= std_logic_vector(to_unsigned(8, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(8, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_24 = '1') THEN
                         -- Status Port 9
-                        s_addr_table4 <= std_logic_vector(to_unsigned(9, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(9, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_28 = '1') THEN
                         -- Status Port 10
-                        s_addr_table4 <= std_logic_vector(to_unsigned(10, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(10, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_2C = '1') THEN
                         -- Status Port 11
-                        s_addr_table4 <= std_logic_vector(to_unsigned(11, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(11, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_30 = '1') THEN
                         -- Status Port 12
-                        s_addr_table4 <= std_logic_vector(to_unsigned(12, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(12, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_34 = '1') THEN
                         -- Status Port 13
-                        s_addr_table4 <= std_logic_vector(to_unsigned(13, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(13, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_38 = '1') THEN
                         -- Status Port 14
-                        s_addr_table4 <= std_logic_vector(to_unsigned(14, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(14, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_3C = '1') THEN
                         -- Status Port 15
-                        s_addr_table4 <= std_logic_vector(to_unsigned(15, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(15, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_40 = '1') THEN
                         -- Status Port 16
-                        s_addr_table4 <= std_logic_vector(to_unsigned(16, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(16, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_44 = '1') THEN
                         -- Status Port 17
-                        s_addr_table4 <= std_logic_vector(to_unsigned(17, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(17, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_48 = '1') THEN
                         -- Status Port 18
-                        s_addr_table4 <= std_logic_vector(to_unsigned(18, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(18, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_4C = '1') THEN
                         -- Status Port 19
-                        s_addr_table4 <= std_logic_vector(to_unsigned(19, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(19, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_50 = '1') THEN
                         -- Status Port 20
-                        s_addr_table4 <= std_logic_vector(to_unsigned(20, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(20, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_54 = '1') THEN
                         -- Status Port 21
-                        s_addr_table4 <= std_logic_vector(to_unsigned(21, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(21, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_58 = '1') THEN
                         -- Status Port 22
-                        s_addr_table4 <= std_logic_vector(to_unsigned(22, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(22, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_5C = '1') THEN
                         -- Status Port 23
-                        s_addr_table4 <= std_logic_vector(to_unsigned(23, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(23, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_60 = '1') THEN
                         -- Status Port 24
-                        s_addr_table4 <= std_logic_vector(to_unsigned(24, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(24, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_64 = '1') THEN
                         -- Status Port 25
-                        s_addr_table4 <= std_logic_vector(to_unsigned(25, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(25, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_68 = '1') THEN
                         -- Status Port 26
-                        s_addr_table4 <= std_logic_vector(to_unsigned(26, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(26, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_6C = '1') THEN
                         -- Status Port 27
-                        s_addr_table4 <= std_logic_vector(to_unsigned(27, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(27, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_70 = '1') THEN
                         -- Status Port 28
-                        s_addr_table4 <= std_logic_vector(to_unsigned(28, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(28, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_74 = '1') THEN
                         -- Status Port 29
-                        s_addr_table4 <= std_logic_vector(to_unsigned(29, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(29, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_78 = '1') THEN
                         -- Status Port 30
-                        s_addr_table4 <= std_logic_vector(to_unsigned(30, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(30, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_4 = '1' AND s_addr_7C = '1') THEN
                         -- Status Port 31
-                        s_addr_table4 <= std_logic_vector(to_unsigned(31, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(31, s_addr_table4'length));
                         s_DataOutBuffer <= s_read_table4;
                     ELSIF (s_table_5 = '1' AND s_addr_00 = '1') THEN -- TimeCode register (0x0000_5000)
                         -- TimeCode receive register
-                        s_addr_table5 <= std_logic_vector(to_unsigned(0, s_addr_table5'length));
+                        s_addr_table5 <= STD_LOGIC_VECTOR(to_unsigned(0, s_addr_table5'length));
                         s_DataOutBuffer <= s_read_table5;
                         -- (1) N/A
                     ELSIF (s_table_5 = '1' AND s_addr_08 = '1') THEN
                         -- Automatic TimeCode value
-                        s_addr_table5 <= std_logic_vector(to_unsigned(2, s_addr_table5'length));
+                        s_addr_table5 <= STD_LOGIC_VECTOR(to_unsigned(2, s_addr_table5'length));
                         s_autoTimeCodeValue <= s_read_table5;
                     ELSIF (s_table_5 = '1' AND s_addr_0C = '1') THEN
                         -- Automatic TimeCode Cycle Register
-                        s_addr_table5 <= std_logic_vector(to_unsigned(3, s_addr_table5'length));
+                        s_addr_table5 <= STD_LOGIC_VECTOR(to_unsigned(3, s_addr_table5'length));
                         s_autoTimeCodeCycleTime <= s_read_table5;
                     ELSIF (s_table_6 = '1' AND s_addr_00 = '1') THEN -- Info register (0x0000_0600)
                         -- Info
-                        s_addr_table6 <= std_logic_vector(to_unsigned(0, s_addr_table6'length));
+                        s_addr_table6 <= STD_LOGIC_VECTOR(to_unsigned(0, s_addr_table6'length));
                         s_DataOutBuffer <= s_read_table5;
                     ELSE
                         s_DataOutBuffer <= (OTHERS => '0');
@@ -456,7 +456,7 @@ BEGIN
                     -- Write Register Select.
                     IF (s_table_4 = '1' AND s_addr_00 = '1') THEN -- Status register (0x0000_0400)
                         -- Status Port 0
-                        s_addr_table4 <= std_logic_vector(to_unsigned(0, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(0, s_addr_table4'length));
 
                         -- Loop is rolled out...                        
                         FOR i IN 1 TO 4 LOOP
@@ -464,24 +464,24 @@ BEGIN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(0)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
-                        
+
                         -- to... (example)
---                        IF (dByte(0) = '1') THEN
---                            s_write_table4(7 DOWNTO 0) <= portstatus(0)(7 DOWNTO 0);
---                        END IF;
---                        IF (dByte(1) = '1') THEN
---                            s_write_table4(15 DOWNTO 8) <= portstatus(0)(15 DOWNTO 8);
---                        END IF;
---                        IF (dByte(2) = '1') THEN
---                            s_write_table4(23 DOWNTO 16) <= portstatus(0)(23 DOWNTO 16);
---                        END IF;
---                        IF (dByte(3) = '1') THEN
---                            s_write_table4(31 DOWNTO 24) <= portstatus(0)(31 DOWNTO 24);
---                        END IF;
-                        
+                        --                        IF (dByte(0) = '1') THEN
+                        --                            s_write_table4(7 DOWNTO 0) <= portstatus(0)(7 DOWNTO 0);
+                        --                        END IF;
+                        --                        IF (dByte(1) = '1') THEN
+                        --                            s_write_table4(15 DOWNTO 8) <= portstatus(0)(15 DOWNTO 8);
+                        --                        END IF;
+                        --                        IF (dByte(2) = '1') THEN
+                        --                            s_write_table4(23 DOWNTO 16) <= portstatus(0)(23 DOWNTO 16);
+                        --                        END IF;
+                        --                        IF (dByte(3) = '1') THEN
+                        --                            s_write_table4(31 DOWNTO 24) <= portstatus(0)(31 DOWNTO 24);
+                        --                        END IF;
+
                     ELSIF (s_table_4 = '1' AND s_addr_04 = '1') THEN
                         -- Status Port 1
-                        s_addr_table4 <= std_logic_vector(to_unsigned(1, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(1, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -491,7 +491,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_08 = '1') THEN
                         -- Status Port 2
-                        s_addr_table4 <= std_logic_vector(to_unsigned(2, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(2, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied 
                         FOR i IN 1 TO 4 LOOP
@@ -501,7 +501,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_0C = '1') THEN
                         -- Status Port 3
-                        s_addr_table4 <= std_logic_vector(to_unsigned(3, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(3, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -511,7 +511,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_10 = '1') THEN
                         -- Status Port 4
-                        s_addr_table4 <= std_logic_vector(to_unsigned(4, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(4, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -521,7 +521,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_14 = '1') THEN
                         -- Status Port 5
-                        s_addr_table4 <= std_logic_vector(to_unsigned(5, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(5, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -531,7 +531,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_18 = '1') THEN
                         -- Status Port 6
-                        s_addr_table4 <= std_logic_vector(to_unsigned(6, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(6, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -541,7 +541,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_1C = '1') THEN
                         -- Status Port 7
-                        s_addr_table4 <= std_logic_vector(to_unsigned(7, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(7, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -551,7 +551,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_20 = '1') THEN
                         -- Status Port 8
-                        s_addr_table4 <= std_logic_vector(to_unsigned(8, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(8, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -561,7 +561,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_24 = '1') THEN
                         -- Status Port 9
-                        s_addr_table4 <= std_logic_vector(to_unsigned(9, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(9, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -571,7 +571,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_28 = '1') THEN
                         -- Status Port 10
-                        s_addr_table4 <= std_logic_vector(to_unsigned(10, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(10, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -581,7 +581,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_2C = '1') THEN
                         -- Status Port 11
-                        s_addr_table4 <= std_logic_vector(to_unsigned(11, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(11, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -591,7 +591,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_30 = '1') THEN
                         -- Status Port 12
-                        s_addr_table4 <= std_logic_vector(to_unsigned(12, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(12, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -601,7 +601,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_34 = '1') THEN
                         -- Status Port 13
-                        s_addr_table4 <= std_logic_vector(to_unsigned(13, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(13, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -611,7 +611,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_38 = '1') THEN
                         -- Status Port 14
-                        s_addr_table4 <= std_logic_vector(to_unsigned(14, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(14, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -621,7 +621,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_3C = '1') THEN
                         -- Status Port 15
-                        s_addr_table4 <= std_logic_vector(to_unsigned(15, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(15, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -631,7 +631,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_40 = '1') THEN
                         -- Status Port 16
-                        s_addr_table4 <= std_logic_vector(to_unsigned(16, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(16, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -641,7 +641,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_44 = '1') THEN
                         -- Status Port 17
-                        s_addr_table4 <= std_logic_vector(to_unsigned(17, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(17, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -651,7 +651,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_48 = '1') THEN
                         -- Status Port 18
-                        s_addr_table4 <= std_logic_vector(to_unsigned(18, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(18, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -661,7 +661,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_4C = '1') THEN
                         -- Status Port 19
-                        s_addr_table4 <= std_logic_vector(to_unsigned(19, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(19, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -671,7 +671,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_50 = '1') THEN
                         -- Status Port 20
-                        s_addr_table4 <= std_logic_vector(to_unsigned(20, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(20, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -681,7 +681,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_54 = '1') THEN
                         -- Status Port 21
-                        s_addr_table4 <= std_logic_vector(to_unsigned(21, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(21, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -691,7 +691,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_58 = '1') THEN
                         -- Status Port 22
-                        s_addr_table4 <= std_logic_vector(to_unsigned(22, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(22, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -701,7 +701,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_5C = '1') THEN
                         -- Status Port 23
-                        s_addr_table4 <= std_logic_vector(to_unsigned(23, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(23, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -711,7 +711,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_60 = '1') THEN
                         -- Status Port 24
-                        s_addr_table4 <= std_logic_vector(to_unsigned(24, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(24, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -721,7 +721,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_64 = '1') THEN
                         -- Status Port 25
-                        s_addr_table4 <= std_logic_vector(to_unsigned(25, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(25, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -731,7 +731,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_68 = '1') THEN
                         -- Status Port 26
-                        s_addr_table4 <= std_logic_vector(to_unsigned(26, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(26, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -741,7 +741,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_6C = '1') THEN
                         -- Status Port 27
-                        s_addr_table4 <= std_logic_vector(to_unsigned(27, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(27, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -751,7 +751,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_70 = '1') THEN
                         -- Status Port 28
-                        s_addr_table4 <= std_logic_vector(to_unsigned(28, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(28, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -761,7 +761,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_74 = '1') THEN
                         -- Status Port 29
-                        s_addr_table4 <= std_logic_vector(to_unsigned(29, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(29, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -771,7 +771,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_78 = '1') THEN
                         -- Status Port 30
-                        s_addr_table4 <= std_logic_vector(to_unsigned(30, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(30, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -781,7 +781,7 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_4 = '1' AND s_addr_7C = '1') THEN
                         -- Status Port 31
-                        s_addr_table4 <= std_logic_vector(to_unsigned(31, s_addr_table4'length));
+                        s_addr_table4 <= STD_LOGIC_VECTOR(to_unsigned(31, s_addr_table4'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -791,23 +791,23 @@ BEGIN
                         END LOOP;
                     ELSIF (s_table_5 = '1' AND s_addr_00 = '1') THEN -- TimeCode register (0x0000_5000)
                         -- TimeCode receive register
-                        s_addr_table5 <= std_logic_vector(to_unsigned(0, s_addr_table5'length));
+                        s_addr_table5 <= STD_LOGIC_VECTOR(to_unsigned(0, s_addr_table5'length));
 
                         s_write_table5 <= x"000000" & receiveTimeCode;
 
                     ELSIF (s_table_5 = '1' AND s_addr_08 = '1') THEN
                         -- AutoTimeCode value register
-                        s_addr_table5 <= std_logic_vector(to_unsigned(2, s_addr_table5'length));
-                        
+                        s_addr_table5 <= STD_LOGIC_VECTOR(to_unsigned(2, s_addr_table5'length));
+
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
                             IF (dByte(i - 1) = '1' THEN
                                 s_write_table5(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= s_DataInBuffer(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
-                        END LOOP;                        
+                        END LOOP;
                     ELSIF (s_table_5 = '1' AND s_addr_0C = '1') THEN
                         -- AutoTimeCodeCycleTimeRegister
-                        s_addr_table5 <= std_logic_vector(to_unsigned(3, s_addr_table5'length));
+                        s_addr_table5 <= STD_LOGIC_VECTOR(to_unsigned(3, s_addr_table5'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
@@ -816,14 +816,14 @@ BEGIN
                             END IF;
                         END LOOP;
                     ELSIF (s_table_6 = '1' AND s_addr_00 = '1') THEN -- Info register (0x0000_0600)
-                        s_addr_table6 <= std_logic_vector(to_unsigned(0, s_addr_table6'length));
+                        s_addr_table6 <= STD_LOGIC_VECTOR(to_unsigned(0, s_addr_table6'length));
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
                             IF (dByte(i - 1) = '1' THEN
                                 s_write_table6(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= s_DataInBuffer(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
-                        END LOOP;                          
+                        END LOOP;
                     END IF; -- add here more tables and registers...
 
                     s_proc_out <= '1';

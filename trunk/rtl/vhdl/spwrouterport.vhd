@@ -140,13 +140,13 @@ ENTITY spwrouterport IS
 
         busy_out : OUT STD_LOGIC; -- strobeOut
 
-        rdy_in : IN STD_LOGIC; -- readyIn
+        --rdy_in : IN STD_LOGIC; -- readyIn -- wird eventuell nicht gebraucht
 
         req_in : IN STD_LOGIC; -- requestIn
 
         busy_in : IN STD_LOGIC; -- strobeIn
 
-        rdy_out : OUT STD_LOGIC; -- readyOut
+        --rdy_out : OUT STD_LOGIC; -- readyOut -- wird eventuell nicht gebraucht
 
         baddr : OUT STD_LOGIC_VECTOR(31 DOWNTO 0); -- busMasterAddressOut
 
@@ -156,7 +156,7 @@ ENTITY spwrouterport IS
 
         dByte : OUT STD_LOGIC_VECTOR(3 DOWNTO 0); -- busMasterByteEnableOut
 
-        readwrite : OUT STD_LOGIC; -- busMasterByteEnableOut
+        readwrite : OUT STD_LOGIC; -- busMasterWriteEnableOut
 
         bstrobe : OUT STD_LOGIC; -- busMasterStrobeOut
 
@@ -194,24 +194,24 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
     SIGNAL s_req_out : STD_LOGIC; -- check -- iRequestOut
     SIGNAL s_destport : STD_LOGIC_VECTOR(7 DOWNTO 0); -- check -- iDestinationPortOut
     SIGNAL s_strobe_out : STD_LOGIC; -- check -- iStrobeOut
-    SIGNAL s_RoutingTable_addr : STD_LOGIC_VECTOR(7 DOWNTO 0); -- check -- iRoutingTableAddress
-    SIGNAL s_RoutingTable_req : STD_LOGIC; -- check -- iRoutingTableRequest
+    SIGNAL s_rout_addr : STD_LOGIC_VECTOR(7 DOWNTO 0); -- check -- iRoutingTableAddress
+    SIGNAL s_rout_req : STD_LOGIC; -- check -- iRoutingTableRequest
     --
     -- Eigene Signale
     SIGNAL s_bool_destports : STD_LOGIC; -- check
     SIGNAL s_rxvalid : STD_LOGIC; -- check
 BEGIN
     -- Drive outputs
-    sourcePortOut <= STD_LOGIC_VECTOR(to_unsigned(portnum, sourcePortOut'length)); -- check
-    destinationPortOut <= s_destport; -- check
-    requestOut <= s_req_out; -- check
-    strobeOut <= s_strobe_out; -- check
+    srcport <= STD_LOGIC_VECTOR(to_unsigned(portnum, srcport'length)); -- check
+    destport <= s_destport; -- check
+    req_out <= s_req_out; -- check
+    busy_out <= s_strobe_out; -- check
     rxdata <= s_rxdata; -- check
-    (busMasterRequestOut, busMasterStrobeOut) <= s_RoutingTable_req; -- check
-    busMasterAddressOut <= x"0000" & "000000" & s_RoutingTable_addr & "00";
-    busMasterWriteEnableOut <= '0';
-    busMasterByteEnableOut <= "1111";
-    busMasterDataOut <= (OTHERS => '0'); -- Hä? Wird nirgends sonst geändert?!
+    (breq_out, bstrobe) <= s_rout_req; -- check
+    baddr <= x"0000" & "000000" & s_rout_addr & "00";
+    readwrite <= '0'; -- read
+    dByte <= "1111";
+    bdat_out <= (OTHERS => '0'); -- Hä? Wird nirgends sonst geändert?!
     -- busMaster... signale erst umbennenen wenn deren bedeutung eindeutig geklärt ist!!
 
     -- Intermediate steps. (16.08.21)
@@ -266,13 +266,13 @@ BEGIN
         spw_so => spw_so -- check
     );
 
-    -- Update registers on rising edge of system clock. 
-    PROCESS (clk)
-    BEGIN
-        IF rising_edge(clk) THEN
-            rdy_out <= s_txrdy; -- check
-        END IF;
-    END PROCESS;
+    -- Synchronous update. -- Auskommentiert, da rdy_out / readyOut augenscheinlich nicht benötigt wird
+--    PROCESS (clk)
+--    BEGIN
+--        IF rising_edge(clk) THEN
+--            rdy_out <= s_txrdy; -- check
+--        END IF;
+--    END PROCESS;
 
     -- Finite state machine.
     PROCESS (clk, rst)
@@ -284,8 +284,8 @@ BEGIN
             s_destport <= x"00";
             s_rxdata <= (OTHERS => '0');
             s_strobe_out <= '0';
-            s_RoutingTable_addr <= (OTHERS => '0');
-            s_RoutingTable_req <= '0';
+            s_rout_addr <= (OTHERS => '0');
+            s_rout_req <= '0';
 
         ELSIF rising_edge(clk) THEN
             CASE state IS
@@ -308,17 +308,16 @@ BEGIN
                         IF (s_rxdata_buffer(7 DOWNTO 5) = "000") THEN
                             -- Physical port addressed.
                             s_destport <= s_rxdata_buffer(7 DOWNTO 0); -- enthält die Portnummer als erstes Byte eines Pakets!!
-                            IF (s_rxdata_buffer(7 DOWNTO 0) > STD_LOGIC_VECTOR(to_unsigned(numports, s_rxdata'length))) THEN
+                            IF (s_rxdata_buffer(7 DOWNTO 0) > STD_LOGIC_VECTOR(to_unsigned(numports, s_rxdata_buffer'length))) THEN
                                 -- Discard invalid addressed packet. (destination port does not exist)
-                                --iPacketDropped <= '1';
                                 state <= S_Dummy0;
                             ELSE
                                 state <= S_Dest2;
                             END IF;
                         ELSE
                             -- Logical port is addressed. Routing table is used.
-                            s_RoutingTable_addr <= s_rxdata_buffer(7 DOWNTO 0);
-                            s_RoutingTable_req <= '1';
+                            s_rout_addr <= s_rxdata_buffer(7 DOWNTO 0);
+                            s_rout_req <= '1';
                             state <= S_RT0;
                         END IF;
                     ELSE
@@ -331,6 +330,7 @@ BEGIN
                     FOR i IN 1 TO numports LOOP
                         s_bool_destports <= OR (linkUp(i) = '1' AND s_destport(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(i, s_destport'length)));
                     END LOOP;
+
                     IF ((s_destport(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(0, s_destport'length)))) OR s_bool_destports THEN
                         s_req_out <= '1';
                         state <= S_Data0;
@@ -341,16 +341,16 @@ BEGIN
 
                 WHEN S_Table0 =>
                     -- Wait acknowledge.
-                    IF (busMasterAcknowledgeIn = '1') THEN
+                    IF (bproc = '1') THEN
                         state <= S_RT1; -- RT == Routing table
                     END IF;
 
                 WHEN S_RT1 =>
                     -- Logical addressing: Request to data which is read from routing table.
-                    s_RoutingTable_req <= '0';
+                    s_rout_req <= '0';
 
                     FOR i IN numports DOWNTO 0 LOOP
-                        IF (linkUp(i) = '1' AND busMasterDataIn(i) = '1') THEN
+                        IF (linkUp(i) = '1' AND bdat_in(i) = '1') THEN
                             s_destport <= STD_LOGIC_VECTOR(to_unsigned(i, s_destport'length));
                             s_req_out <= '1';
                             state <= S_RT2;
@@ -362,15 +362,15 @@ BEGIN
                     END IF;
 
                 WHEN S_RT2 =>
-                    -- Wait to permit (grantedIn) from arbiter (logical address access).
-                    IF (grantedIn = '1') THEN
+                    -- Wait to permit (grnt) from arbiter (logical address access).
+                    IF (grnt = '1') THEN
                         state <= S_Data2;
                     END IF;
 
                 WHEN S_Data0 =>
-                    -- Wait to permit (grantedIn) from arbiter (physical address access).
+                    -- Wait to permit (grnt) from arbiter (physical address access).
                     s_strobe_out <= '0';
-                    IF (grantedIn = '1' AND s_rxvalid = '1') THEN
+                    IF (grnt = '1' AND s_rxvalid = '1') THEN
                         s_rxread <= '1';
                         state <= S_Data1;
                     END IF;
@@ -388,7 +388,7 @@ BEGIN
                         s_rxdata <= s_rxdata_buffer;
                         IF (s_rxdata_buffer(8) = '1') THEN
                             state <= S_Data3;
-                        ELSIF (grantedIn = '1' AND s_rxvalid = '1') THEN
+                        ELSIF (grnt = '1' AND s_rxvalid = '1') THEN
                             s_rxread <= '1';
                             state <= S_Data1;
                         ELSE
@@ -404,7 +404,6 @@ BEGIN
 
                 WHEN S_Dummy0 =>
                     -- dummy read (may block forever)
-                    iPacketDropped <= '0';
                     s_req_out <= '0';
                     iWatchdogClear <= '1';
                     IF (s_rxvalid = '1') THEN
@@ -425,8 +424,8 @@ BEGIN
                         state <= S_Dummy0;
                     END IF;
 
-                    --when others =>  -- Eventuell durch when others => state <= S_Idle; ersetzen! (Problem der ungenutzen Zustände!)
-                    --    state <= S_Idle;
+                when others =>  -- Because of unused state problem.
+                    state <= S_Idle;
             END CASE;
         END IF;
     END PROCESS;
