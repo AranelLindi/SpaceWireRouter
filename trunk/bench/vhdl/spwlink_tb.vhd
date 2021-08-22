@@ -37,16 +37,19 @@ entity spwlink_tb is
         tx_clock_div:   integer     := 1 ;
 
         -- Receiver implementation
-        rximpl: spw_implementation_type := impl_generic ;
+        rximpl: spw_implementation_type_rec := impl_generic ;
 
         -- Bits per sysclk for fast receiver
         rxchunk:        integer     := 1 ;
 
         -- Transmitter implementation
-        tximpl: spw_implementation_type := impl_generic ;
+        tximpl: spw_implementation_type_xmit := impl_generic ;
 
         -- Wait before starting test bench
-        startwait:      time        := 0 sec
+        startwait:      time        := 0 sec;
+        
+        -- Width of shift registers (impl_clkrec only!); added: SL
+        WIDTH : integer := 2
     );
 
 end spwlink_tb;
@@ -238,6 +241,19 @@ begin
                 inbits  => s_inbits,
                 spw_di  => spw_di,
                 spw_si  => spw_si );
+    end generate;
+    spwrecvfront_clkrec_if: if rximpl = impl_clkrec generate
+    	spwrecvfront_clkrec_inst: spwrecvfront_clkrec
+            generic map (
+            	 WIDTH => WIDTH )
+            port map (
+                clk => sysclk,
+                rxen => s_rxen,
+                inact => s_inact,
+                inbvalid => s_inbvalid,
+                inbits => s_inbits,
+                spw_di => spw_di,
+                spw_si => spw_si );
     end generate;
 
     s_linki <= ( autostart  => autostart,
@@ -548,6 +564,7 @@ begin
         case rximpl is
             when impl_generic => prints("  rximpl         = impl_generic");
             when impl_fast =>    prints("  rximpl         = impl_fast");
+            when impl_clkrec  => prints("  rximpl         = impl_clkrec");
         end case;
         print("  rxchunk       ", rxchunk);
         case tximpl is

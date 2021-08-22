@@ -16,9 +16,9 @@ architecture tb_arch of spwlink_tb_all is
             tx_clock_freq:  real        := 20.0e6 ;
             input_rate:     real        := 10.0e6 ;
             tx_clock_div:   integer     := 1 ;
-            rximpl: spw_implementation_type := impl_generic ;
+            rximpl: spw_implementation_type_rec := impl_generic ;
             rxchunk:        integer     := 1 ;
-            tximpl: spw_implementation_type := impl_generic ;
+            tximpl: spw_implementation_type_xmit := impl_generic ;
             startwait:      time        := 0 sec );
     end component;
 

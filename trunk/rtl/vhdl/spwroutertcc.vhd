@@ -44,19 +44,19 @@ ENTITY spwroutertcc IS
 
         -- High if port has enabled TimeCode feature - except port0! 
         -- (Each bit corresponds to one port)
-        tc_en : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0); -- portTimeCodeEnable
+        tc_en : IN STD_LOGIC_VECTOR(numports DOWNTO 1); -- portTimeCodeEnable
 
         -- High if corresponding port requests a TimeCode transmission - except port0!
-        tick_out : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0); -- portTickIn
+        tick_out : OUT STD_LOGIC_VECTOR(numports DOWNTO 1); -- portTickIn
 
         -- Contains for every port TimeCode to send - except port0!
-        time_out : OUT array_t(0 TO (numports - 1))(7 DOWNTO 0); -- portTimeCodeIn
+        time_out : OUT array_t(1 TO numports)(7 DOWNTO 0); -- portTimeCodeIn
 
         -- High if corresponding port received a TimeCode - except port0!
-        tick_in : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0); -- portTickOut
+        tick_in : IN STD_LOGIC_VECTOR(numports DOWNTO 1); -- portTickOut
 
         -- Received TimeCodes from all ports - except port0!
-        time_in : IN array_t(0 TO (numports - 1))(7 DOWNTO 0); -- portTimeCodeOut
+        time_in : IN array_t(1 TO numports)(7 DOWNTO 0); -- portTimeCodeOut
 
         -- TimeCode that is sent from Host.
         auto_time_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0); -- autoTimeCodeValue
@@ -78,11 +78,11 @@ ARCHITECTURE spwroutertcc_arch OF spwroutertcc IS
     SIGNAL s_tc_ctrlflag : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
     -- Specifies which port gets the TimeCode.
-    SIGNAL s_ports_out : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+    SIGNAL s_ports_out : STD_LOGIC_VECTOR(numports DOWNTO 1);
 
     -- Output registers.
-    SIGNAL s_tick_out : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
-    SIGNAL s_time_out : array_t(0 TO (numports - 1))(7 DOWNTO 0);
+    SIGNAL s_tick_out : STD_LOGIC_VECTOR(numports DOWNTO 1);
+    SIGNAL s_time_out : array_t(1 TO numports)(7 DOWNTO 0);
 
     -- Counter interval for automatic TimeCode generation.
     -- [max. Interval: (2**32 - 1) * (1 / clk_frequency)]
@@ -111,7 +111,7 @@ BEGIN
     auto_time_out <= s_conc_auto_tc;
 
     -- Selection which port will receive TimeCode.
-    PortTick : FOR i IN 0 TO (numports - 1) GENERATE
+    PortTick : FOR i IN 1 TO numports GENERATE
         s_tick_out(i) <= s_ports_out(i) WHEN (tc_en(i) = '1' AND running(i) = '1') ELSE
         '0';
 
@@ -145,7 +145,7 @@ BEGIN
                 END IF;
             ELSE
                 -- TimeCode Target
-                FOR i IN (numports - 1) DOWNTO 0 LOOP
+                FOR i IN numports DOWNTO 1 LOOP
                     IF (tick_in(i) = '1') THEN
                         IF (time_in(i) = (s_tc_counterval + 1)) THEN -- hier steht im original: port1TimeCodeOut(5 downto 0) = counterValuePlus1 ?!
                             s_ports_out <= (i => '0', OTHERS => '1'); -- potenzielle Fehlerquelle! Liegt vermutlich daran, dass eingangsport von numport downto 1 gemacht wurde! Falls hier fehler auftreten, dann auf downto 0 ändern und i-1 machen!

@@ -15,13 +15,15 @@ END PACKAGE;
 
 PACKAGE BODY spwrouterfunc IS
     FUNCTION select7x1 (selectBit : STD_LOGIC_VECTOR(0 TO numports); bits : STD_LOGIC_VECTOR(0 TO numports)) RETURN STD_LOGIC IS
-        SIGNAL cond : STD_LOGIC;
+        variable cond : STD_LOGIC;
     BEGIN
-        FOR i IN 0 TO numports LOOP
-            cond <= OR (selectBit(i) AND bits(i));
-        END LOOP;
+        --FOR i IN 0 TO numports LOOP
+            --cond := OR (selectBit(i) AND bits(i));
+        --END LOOP;
 
-        RETURN cond;
+        return or (selectBit and bits); -- unsicher ob das den gleichen Effekt 
+
+        --RETURN cond;
     END select7x1;
 
     FUNCTION select7x1xVector8(selectVector : IN STD_LOGIC_VECTOR(0 TO numports); bits : array_t(0 TO numports)(numports DOWNTO 0)) RETURN STD_LOGIC_VECTOR IS

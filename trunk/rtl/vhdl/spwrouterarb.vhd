@@ -50,7 +50,7 @@ END spwrouterarb;
 
 ARCHITECTURE spwrouterarb_arch OF spwrouterarb IS
     -- Bit length to map all ports (for spwrouterarb_round).
-    CONSTANT blen : INTEGER RANGE 0 TO 4 := INTEGER(ceil(log2(reil(numports))));
+    CONSTANT blen : INTEGER RANGE 0 TO 4 := INTEGER(ceil(log2(real(numports))));
 
     -- Router switch matrix.
     SIGNAL s_routing : array_t(0 TO numports)(numports DOWNTO 0); -- hängt mit out port zusammen! siehe oben
