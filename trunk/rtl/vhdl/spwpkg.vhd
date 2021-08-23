@@ -238,7 +238,7 @@ package spwpkg is
             tximpl:         spw_implementation_type_xmit := impl_generic;
             rxfifosize_bits: integer range 6 to 14 := 11;   -- rx fifo size
             txfifosize_bits: integer range 2 to 14 := 11;   -- tx fifo size
-            WIDTH:          integer range 1 to 3 := 1 -- width of shift registers (clock recovery); added: SL
+            WIDTH:          integer range 1 to 3 := 2 -- width of shift registers (clock recovery); added: SL
         );
         port (
             clk:        in  std_logic;          -- system clock

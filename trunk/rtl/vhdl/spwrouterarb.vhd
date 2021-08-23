@@ -35,7 +35,7 @@ ENTITY spwrouterarb IS
         rst : IN STD_LOGIC;
 
         -- Destination of port x.
-        dest : IN array_t(0 TO numports)(numports DOWNTO 0);
+        dest : IN array_t(0 TO numports)(7 DOWNTO 0);
 
         -- Request of port x.
         req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);

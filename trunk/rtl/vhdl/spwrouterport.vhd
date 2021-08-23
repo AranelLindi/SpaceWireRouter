@@ -130,7 +130,7 @@ ENTITY spwrouterport IS
         errdisc : OUT STD_LOGIC; -- check
 
         -- Parity error detected in the run state. Trigger a link reset; auto-clearing.
-        errparr : OUT STD_LOGIC; -- check
+        errpar : OUT STD_LOGIC; -- check
 
         -- Invalid escape sequence detected in the run state. Triggers a link reset; auto-clearing.
         erresc : OUT STD_LOGIC; -- check
@@ -146,10 +146,10 @@ ENTITY spwrouterport IS
 
         -- Contains the binary code of the destination port of the packet.
         -- Applies to both physical and logical addressing.
-        destinationPortOut : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- destinationPortOut
+        destinationPortOut : OUT STD_LOGIC_VECTOR(7 DOWNTO 0); -- destinationPortOut
 
         -- The binary form (number) of the this port.
-        sourcePortOut : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- sourcePortOut
+        sourcePortOut : OUT STD_LOGIC_VECTOR(blen DOWNTO 0); -- sourcePortOut
 
         -- High if the port gets permission for data transfer.
         grantedIn : IN STD_LOGIC; -- grantedIn
@@ -241,15 +241,17 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
     SIGNAL iDestinationPortOut : STD_LOGIC_VECTOR(7 DOWNTO 0);
     SIGNAL s_validport : STD_LOGIC; -- für boolsche or operationen
     SIGNAL s_reqports : STD_LOGIC;
+    SIGNAL s_txrdy : STD_LOGIC;
 BEGIN
     -- Drive outputs
     sourcePortOut <= STD_LOGIC_VECTOR(to_unsigned(pnum, sourcePortOut'length));
     destinationPortOut <= iDestinationPortOut;
     requestOut <= iRequestOut;
     strobeOut <= iStrobeOut;
-    dataOut <= iDataOut;
-    (busMasterRequestOut, busMasterStrobeOut) <= iRoutingTableRequest;
-    busMasterAddressOut <= ((9 DOWNTO 2) => iRoutingTableAddress, OTHERS => '0');
+    rxdata <= iDataOut; -- dataOut
+    busMasterRequestOut <= iRoutingTableRequest;
+    busMasterStrobeOut <= iRoutingTableRequest;
+    busMasterAddressOut <= (9 DOWNTO 2 => iRoutingTableAddress, OTHERS => '0');
     busMasterWriteEnableOut <= '0';
     busMasterByteEnableOut <= (OTHERS => '1');
     busMasterDataOut <= (OTHERS => '0');
@@ -257,7 +259,9 @@ BEGIN
     -- Intermediate steps.
     iTransmitFIFOWriteEnable <= strobeIn WHEN requestIn = '1' ELSE
         '0';
-    iTransmitFIFODataIn <= dataIn;
+    iTransmitFIFODataIn <= txdata; -- dataIn
+    iTransmitFIFOReady <= s_txrdy;
+    iReadyOut <= s_txrdy;
 
 
     -- SpaceWire port.
@@ -287,7 +291,7 @@ BEGIN
         txflag => iTransmitFIFODataIn(8), -- check
         txdata => iTransmitFIFODataIn(7 DOWNTO 0), -- check
         txwrite => iTransmitFIFOWriteEnable, -- check
-        txrdy => (iTransmitFIFOReady, iReadyOut), -- check
+        txrdy => s_txrdy, -- check
         txhalff => OPEN, -- check
         tick_out => tick_out, -- check
         ctrl_out => time_out(7 DOWNTO 6), -- check
@@ -300,7 +304,7 @@ BEGIN
         started => started, -- check
         connecting => connecting, -- check
         running => running, -- check
-        errparr => errparr, -- check
+        errpar => errpar, -- check
         erresc => erresc, -- check
         errcred => errcred, -- check
         errdisc => errdisc, -- check
@@ -380,8 +384,9 @@ BEGIN
                 WHEN S_Dest2 =>
                     -- Transmit request to destination port.
                     FOR i IN 1 TO numports LOOP
-                        s_validport <= OR (linkUp(i) = '1' AND iDestinationPortOut(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(i, blen + 1))); -- potenzielle Fehlerquelle mit blen+1 !! Im Original Code werden hier 5 Bits (4 downto 0) abgefragt. falls blen == 4 ist, muss folglich blen+1 für 5 gelten!
-
+                        if (linkUp(i) = '1' AND iDestinationPortOut(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(i, blen + 1))) then
+                            s_validport <= '1'; -- potenzielle Fehlerquelle mit blen+1 !! Im Original Code werden hier 5 Bits (4 downto 0) abgefragt. falls blen == 4 ist, muss folglich blen+1 für 5 gelten!
+                        end if;
                     END LOOP;
 
                     IF ((iDestinationPortOut(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(0, blen + 1))) OR (s_validport = '1')) THEN
@@ -407,8 +412,9 @@ BEGIN
 
                     -- Wird benötigt um festzustellen ob kein Port ausgewählt wurde!
                     FOR i IN 0 TO numports LOOP
-                        s_reqports <= OR (linkUp(i) = '1' AND busMasterDataIn(i) = '1');
-
+                        if (linkUp(i) = '1' AND busMasterDataIn(i) = '1') then
+                            s_reqports <= '1';
+                        end if;
                     END LOOP;
 
                     -- Wichtig! Hier auch wieder umgedrehte Prioritäten!

@@ -432,7 +432,7 @@ BEGIN
                     ELSIF (s_table_5 = '1' AND s_addr_08 = '1') THEN
                         -- Automatic TimeCode value
                         s_addr_table5 <= STD_LOGIC_VECTOR(to_unsigned(2, s_addr_table5'length));
-                        s_autoTimeCodeValue <= s_read_table5;
+                        s_autoTimeCodeValue <= s_read_table5(7 DOWNTO 0);
                     ELSIF (s_table_5 = '1' AND s_addr_0C = '1') THEN
                         -- Automatic TimeCode Cycle Register
                         s_addr_table5 <= STD_LOGIC_VECTOR(to_unsigned(3, s_addr_table5'length));
@@ -460,7 +460,7 @@ BEGIN
 
                         -- Loop is rolled out...                        
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(0)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -485,7 +485,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(1)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -495,7 +495,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied 
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(2)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -505,7 +505,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(3)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -515,7 +515,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(4)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -525,7 +525,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(5)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -535,7 +535,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(6)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -545,7 +545,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(7)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -555,7 +555,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(8)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -565,7 +565,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(9)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -575,7 +575,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(10)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -585,7 +585,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(11)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -595,7 +595,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(12)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -605,7 +605,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(13)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -615,7 +615,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(14)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -625,7 +625,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(15)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -635,7 +635,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(16)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -645,7 +645,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(17)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -655,7 +655,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(18)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -665,7 +665,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(19)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -675,7 +675,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(20)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -685,7 +685,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(21)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -695,7 +695,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(22)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -705,7 +705,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(23)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -715,7 +715,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(24)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -725,7 +725,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(25)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -735,7 +735,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(26)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -745,7 +745,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(27)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -755,7 +755,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(28)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -765,7 +765,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(29)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -775,7 +775,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(30)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -785,7 +785,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table4(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= portstatus(31)(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -801,7 +801,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table5(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= s_DataInBuffer(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -811,7 +811,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table5(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= s_DataInBuffer(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;
@@ -820,7 +820,7 @@ BEGIN
 
                         -- Check byte by byte whether data should be copied
                         FOR i IN 1 TO 4 LOOP
-                            IF (dByte(i - 1) = '1' THEN
+                            IF (dByte(i - 1) = '1') THEN
                                 s_write_table6(((8 * i) - 1) DOWNTO (8 * (i - 1))) <= s_DataInBuffer(((8 * i) - 1) DOWNTO (8 * (i - 1)));
                             END IF;
                         END LOOP;

@@ -10,7 +10,7 @@ PACKAGE spwrouterfunc IS
 
     FUNCTION select7x1(selectBit : STD_LOGIC_VECTOR(0 TO numports); bits : STD_LOGIC_VECTOR(0 TO numports)) RETURN STD_LOGIC;
     FUNCTION select7x1xVector8(selectVector : STD_LOGIC_VECTOR(0 TO numports); bits : array_t(0 TO numports)(numports DOWNTO 0)) RETURN STD_LOGIC_VECTOR;
-    FUNCTION select7x1xVector9(selectVector : STD_LOGIC_VECTOR(0 TO numports); bits : array_t(0 TO numports)(numports DOWNTO 0)) RETURN STD_LOGIC_VECTOR;
+    FUNCTION select7x1xVector9(selectVector : STD_LOGIC_VECTOR(0 TO numports); bits : array_t(0 TO numports)(8 DOWNTO 0)) RETURN STD_LOGIC_VECTOR;
 END PACKAGE;
 
 PACKAGE BODY spwrouterfunc IS
@@ -38,16 +38,16 @@ PACKAGE BODY spwrouterfunc IS
         RETURN STD_LOGIC_VECTOR(to_unsigned(0, numports)); -- länge passt wahrscheinlich nicht
     END select7x1xVector8;
 
-    function select7x1xVector9(selectVector : std_logic_vector(0 to numports); bits: array_t(0 to numports)(numports downto 0)) return std_logic_vector is
+    function select7x1xVector9(selectVector : std_logic_vector(0 to numports); bits: array_t(0 to numports)(8 downto 0)) return std_logic_vector is
     begin
         for i in numports downto 0 loop
-            if (selectVector = std_logic_vector(to_unsigned(i, selectVector'length))) then
+            if (selectVector = std_logic_vector(to_unsigned(i, 9))) then
                 return bits(i);
             end if;
         end loop;
 
         -- else case
-        return std_logic_vector(to_unsigned(0, numports)); -- länge passt wahrscheinlich nicht
+        return std_logic_vector(to_unsigned(0, 9)); -- länge passt wahrscheinlich nicht; nach Änderung +1 mal schauen!
     end select7x1xVector9;
 END PACKAGE BODY;
 

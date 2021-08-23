@@ -98,7 +98,7 @@ PACKAGE spwrouterpkg IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            dest : IN array_t(0 TO numports)(numports DOWNTO 0); -- hier ersten Index umgedreht
+            dest : IN array_t(0 TO numports)(7 DOWNTO 0); -- hier ersten Index umgedreht
             req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
             rout : OUT array_t(0 TO numports)(numports DOWNTO 0) -- hier ersten Index umgedreht
@@ -151,8 +151,8 @@ PACKAGE spwrouterpkg IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            txclk : IN STD_LOGIC;
-            rxclk : IN STD_LOGIC;
+            --txclk : IN STD_LOGIC;
+            --rxclk : IN STD_LOGIC;
             writeData : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             readData : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             readwrite : IN STD_LOGIC;
@@ -188,13 +188,13 @@ PACKAGE spwrouterpkg IS
             blen : INTEGER RANGE 0 TO 4;
             pnum : INTEGER RANGE 0 TO 31;
             sysfreq : real;
-            txclkfreq : real;
+            txclkfreq : real := 0.0;
             rximpl : spw_implementation_type_rec;
-            rxchunk : INTEGER RANGE 1 TO 4;
-            WIDTH : INTEGER RANGE 1 TO 3;
+            rxchunk : INTEGER RANGE 1 TO 4 := 1;
+            WIDTH : INTEGER RANGE 1 TO 3 := 2;
             tximpl : spw_implementation_type_xmit;
-            rxfifosize_bits : INTEGER RANGE 6 TO 14;
-            txfifosize_bits : INTEGER RANGE 2 TO 14
+            rxfifosize_bits : INTEGER RANGE 6 TO 14 := 11;
+            txfifosize_bits : INTEGER RANGE 2 TO 14 := 11
         );
         PORT (
             clk : IN STD_LOGIC;
@@ -215,13 +215,13 @@ PACKAGE spwrouterpkg IS
             connecting : OUT STD_LOGIC;
             running : OUT STD_LOGIC;
             errdisc : OUT STD_LOGIC;
-            errparr : OUT STD_LOGIC;
+            errpar : OUT STD_LOGIC;
             erresc : OUT STD_LOGIC;
             errcred : OUT STD_LOGIC;
             linkUp : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             requestOut : OUT STD_LOGIC;
-            destinationPortOut : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-            sourcePortOut : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            destinationPortOut : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+            sourcePortOut : OUT STD_LOGIC_VECTOR(blen DOWNTO 0);
             grantedIn : IN STD_LOGIC;
             strobeOut : OUT STD_LOGIC;
             readyIn : IN STD_LOGIC;
@@ -229,7 +229,7 @@ PACKAGE spwrouterpkg IS
             strobeIn : IN STD_LOGIC;
             readyOut : OUT STD_LOGIC;
             busMasterAddressOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            busMasterDataIn : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            busMasterDataIn : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             busMasterDataOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             busMasterByteEnableOut: OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
             busMasterWriteEnableOut : OUT STD_LOGIC;
@@ -242,4 +242,32 @@ PACKAGE spwrouterpkg IS
             spw_so : OUT STD_LOGIC
         );
     END COMPONENT;
+    
+    -- Router Entity
+    component spwrouter is
+        GENERIC (
+            numports : INTEGER RANGE 0 TO 31;
+            sysfreq : real;
+            txclkfreq : real;            
+            rx_impl : rximpl_array(numports DOWNTO 0);
+            tx_impl : tximpl_array(numports DOWNTO 0)
+        );
+        PORT (
+            clk : IN STD_LOGIC;
+            rxclk : IN STD_LOGIC;
+            txclk : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
+            started : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            connecting : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            running : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            errdisc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            errpar : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            erresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            errcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            spw_di : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            spw_si : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            spw_do : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            spw_so : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+            );
+    end component;
 END PACKAGE;

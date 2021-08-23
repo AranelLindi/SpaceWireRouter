@@ -31,7 +31,13 @@ ENTITY spwrouter IS
         sysfreq : real;
 
         -- txclk frequency in Hz (if tximpl = impl_fast)
-        txclkfreq : real
+        txclkfreq : real;
+        
+        -- Selection of receiver front-end implementation.
+        rx_impl : rximpl_array(numports DOWNTO 0);
+
+        -- Selection of transmitter implementation.
+        tx_impl : tximpl_array(numports DOWNTO 0)
     );
     PORT (
         -- System clock.
@@ -46,13 +52,7 @@ ENTITY spwrouter IS
         -- Router reset signal.
         rst : IN STD_LOGIC;
 
-        -- Selection of a receiver front-end implementation.
-        rx_impl : IN rximpl_array(numports DOWNTO 0);
-
-        -- Selection of a transmitter implementation.
-        tx_impl : IN tximpl_array(numports DOWNTO 0);
-
-        -- Corresponding bit is High if the port is in startet state.
+        -- Corresponding bit is High if the port is in started state.
         started : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
         -- Corresponding bit is High if the port is in connecting state.
@@ -98,8 +98,8 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         SIGNAL iSwitchPortNumber : array_t(0 TO numports)(numports DOWNTO 0); -- korrekte def?
 
         SIGNAL requestOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
-        SIGNAL destinationPort : array_(0 TO numports)(numports DOWNTO 0);
-        SIGNAL sourcePortOut : array_t(0 TO numports)(numports DOWNTO 0);
+        SIGNAL destinationPort : array_t(0 TO numports)(7 DOWNTO 0);
+        SIGNAL sourcePortOut : array_t(0 TO numports)(blen DOWNTO 0);
         SIGNAL granted : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL iReadyIn : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL dataOut : array_t(0 TO numports)(8 DOWNTO 0); -- korrekte def?
@@ -153,7 +153,15 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         -- TimeCodes & Register.
         SIGNAL autoTimeCodeValue : STD_LOGIC_VECTOR(7 DOWNTO 0);
         SIGNAL autoTimeCodeCycleTime : STD_LOGIC_VECTOR(31 DOWNTO 0);
+        
+        -- Eigene Signale
+        SIGNAL s_running : STD_LOGIC_VECTOR(numports DOWNTO 0);
     BEGIN
+        -- Drive outputs.
+        running <= s_running;
+        iLinkUp <= s_running;
+    
+    
         -- Crossbar Switch.
         arb : spwrouterarb
         GENERIC MAP(
@@ -171,9 +179,9 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
 
         -- The destination PortNo regarding to the source PortNo.
         destPort : FOR i IN 0 TO numports GENERATE
-            FOR j IN 0 TO numports LOOP
-                iSelectDestinationPort(i, j) <= routingSwitch(j, i);
-            END LOOP;
+            destPortI : FOR j IN 0 TO numports GENERATE
+                iSelectDestinationPort(i)(j) <= routingSwitch(j)(i);
+            END GENERATE;
         END GENERATE destport; -- vorläufig check
 
 
@@ -184,75 +192,75 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
 
 
         spx : FOR i IN 0 TO numports GENERATE
-            iReadyIn(i) <= select7x1(iSelectDestinationPort(i), readyOut);
-            iRequestIn(i) <= select7x1(iSwitchPortNumber(i), requestOut);
+            iReadyIn(i) <= function_pkg.select7x1(iSelectDestinationPort(i), readyOut);
+            iRequestIn(i) <= function_pkg.select7x1(iSwitchPortNumber(i), requestOut);
             --iSourcePortIn(i) <= select7x1xVector8(iSwitchPortNumber(i), sourcePortOut); -- wohl nur für RMAP nötig
-            iDataIn(i) <= select7x1xVector9(iSwitchPortNumber(i), dataOut);
-            iStrobeIn(i) <= select7x1(iSwitchPortNumber(i), strobeOut);
+            iDataIn(i) <= function_pkg.select7x1xVector9(iSwitchPortNumber(i), dataOut);
+            iStrobeIn(i) <= function_pkg.select7x1(iSwitchPortNumber(i), strobeOut);
         END GENERATE spx;
 
 
         -- SpaceWirePort LinkUP Signal. (entfällt)
         -- Internal Configuration Port.
-        port0 : spwrouterport
-        GENERIC MAP(
-            numports => numports,
-            blen => blen,
-            pnum => 0,
-            sysfreq => sysfreq,
-            txclkfreq => txclkfreq,
-            rximpl => rx_impl(0),
-            tximpl => tx_impl(0)
-            -- Generics that are not listed here have default values!
-        )
-        PORT MAP(
-            clk => clk,
-            rxclk => rxclk,
-            txclk => txclk,
-            rst => rst,
-            autostart => '1',
-            linkstart => OPEN,
-            linkdis => '0',
-            txdivcnt => (OTHERS => '0'),
-            tick_in => OPEN,
-            time_in => OPEN,
-            txdata => iDataIn(0),
-            tick_out => OPEN,
-            time_out => OPEN,
-            rxdata => dataOut(0),
-            started => started(0),
-            connecting => connecting(0),
-            running => (running(0), iLinkUp(0)),
-            errdisc => errdisc(0),
-            errparr => errparr(0),
-            erresc => erresc(0),
-            errcred => errcred(0),
-            linkUp => iLinkUp,
-            requestOut => requestOut(0),
-            destinationPortOut => destinationPortOut(0),
-            sourcePortOut => sourcePortOut(0),
-            grantedIn => granted(0),
-            strobeOut => strobeOut(0),
-            readyIn => iReadyIn(0),
-            requestIn => iRequestIn(0),
-            strobeIn => iStrobeIn(0),
-            readyOut => readyOut(0),
-            busMasterAddressOut => busMasterAddressOut(0),
-            busMasterDataIn => busSlaveDataOut,
-            busMasterDataOut => busMasterDataOut(0),
-            busMasterByteEnableOut => busMasterByteEnableOut(0),
-            busMasterWriteEnableOut => busMasterWriteEnableOut(0),
-            busMasterStrobeOut => busMasterStrobeOut(0),
-            busMasterRequestOut => busMasterRequestOut(0),
-            busMasterAcknowledgeIn => busMasterAcknowledgeIn(0),
-            spw_di => spw_di(0),
-            spw_si => spw_si(0),
-            spw_do => spw_do(0),
-            spw_so => spw_so(0)
-        );
+--        port0 : spwrouterport
+--        GENERIC MAP(
+--            numports => numports,
+--            blen => blen,
+--            pnum => 0,
+--            sysfreq => sysfreq,
+--            txclkfreq => txclkfreq,
+--            rximpl => rx_impl(0),
+--            tximpl => tx_impl(0)
+--            -- Generics that are not listed here have default values!
+--        )
+--        PORT MAP(
+--            clk => clk,
+--            rxclk => rxclk,
+--            txclk => txclk,
+--            rst => rst,
+--            autostart => '1',
+--            linkstart => '1',
+--            linkdis => '0',
+--            txdivcnt => (OTHERS => '0'),
+--            tick_in => '0',
+--            time_in => OPEN,
+--            txdata => iDataIn(0),
+--            tick_out => OPEN,
+--            time_out => OPEN,
+--            rxdata => dataOut(0),
+--            started => started(0),
+--            connecting => connecting(0),
+--            running => s_running(0),
+--            errdisc => errdisc(0),
+--            errpar => errpar(0),
+--            erresc => erresc(0),
+--            errcred => errcred(0),
+--            linkUp => iLinkUp,
+--            requestOut => requestOut(0),
+--            destinationPortOut => destinationPort(0),
+--            sourcePortOut => sourcePortOut(0),
+--            grantedIn => granted(0),
+--            strobeOut => strobeOut(0),
+--            readyIn => iReadyIn(0),
+--            requestIn => iRequestIn(0),
+--            strobeIn => iStrobeIn(0),
+--            readyOut => readyOut(0),
+--            busMasterAddressOut => busMasterAddressOut(0),
+--            busMasterDataIn => busSlaveDataOut,
+--            busMasterDataOut => busMasterDataOut(0),
+--            busMasterByteEnableOut => busMasterByteEnableOut(0),
+--            busMasterWriteEnableOut => busMasterWriteEnableOut(0),
+--            busMasterStrobeOut => busMasterStrobeOut(0),
+--            busMasterRequestOut => busMasterRequestOut(0),
+--            busMasterAcknowledgeIn => busMasterAcknowledgeIn(0),
+--            spw_di => spw_di(0),
+--            spw_si => spw_si(0),
+--            spw_do => spw_do(0),
+--            spw_so => spw_so(0)
+--        );
 
         spwports : FOR i IN 1 TO numports GENERATE
-            spwport : GENERIC MAP(
+            spwport : spwrouterport GENERIC MAP(
                 numports => numports,
                 blen => blen,
                 pnum => 0,
@@ -268,7 +276,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 txclk => txclk,
                 rst => rst,
                 autostart => '1',
-                linkstart => OPEN,
+                linkstart => '1',
                 linkdis => '0',
                 txdivcnt => (OTHERS => '0'),
                 tick_in => tick_in(i),
@@ -279,14 +287,14 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 rxdata => dataOut(i),
                 started => started(i),
                 connecting => connecting(i),
-                running => (running(i), iLinkUp(i)),
+                running => s_running(i),
                 errdisc => errdisc(i),
-                errparr => errparr(i),
+                errpar => errpar(i),
                 erresc => erresc(i),
                 errcred => errcred(i),
                 linkUp => iLinkUp,
                 requestOut => requestOut(i),
-                destinationPortOut => destinationPortOut(i),
+                destinationPortOut => destinationPort(i),
                 sourcePortOut => sourcePortOut(i),
                 grantedIn => granted(i),
                 strobeOut => strobeOut(i),
@@ -326,7 +334,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             proc => iBusSlaveAcknowledgeOut,
             strobe => iBusSlaveStrobeIn,
             cycle => iBusSlaveCycleIn,
-            portstatus = >, -- TODO!
+            portstatus => (others => (others => '0')), -- TODO!
             receiveTimeCode => routerTimeCode,
             autoTimeCodeValue => autoTimeCodeValue,
             autoTimeCodeCycleTime => autoTimeCodeCycleTime
@@ -352,7 +360,9 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         BEGIN
             IF rising_edge(clk) THEN
                 FOR i IN 0 TO numports LOOP
-                    varB := OR busMasterRequestOut(i) = '1';
+                    if busMasterRequestOut(i) = '1' then
+                        varB := '1';
+                    end if;
                 END LOOP;
 
                 IF varB = '1' THEN
