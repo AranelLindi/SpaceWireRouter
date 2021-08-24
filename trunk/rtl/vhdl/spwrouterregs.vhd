@@ -75,7 +75,7 @@ ENTITY spwrouterregs IS
         receiveTimeCode : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
 
         -- AutoTimeCode value register.
-        autoTimeCodeValue : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        autoTimeCodeValue : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
 
         -- AutoTimeCodeCycleTime register.
         autoTimeCodeCycleTime : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
@@ -117,13 +117,13 @@ ARCHITECTURE spwrouterregs_arch OF spwrouterregs IS
     --signal s_table_10 : std_logic; -- 0x0000_1000
 
     -- Addressing signals for table. (Used for read/write)
-    SIGNAL s_addr_table4 : STD_LOGIC_VECTOR(abits_table4 - 1 DOWNTO 0) := (OTHERS => '0');
-    SIGNAL s_addr_table5 : STD_LOGIC_VECTOR(abits_table5 - 1 DOWNTO 0) := (OTHERS => '0');
-    SIGNAL s_addr_table6 : STD_LOGIC_VECTOR(abits_table6 - 1 DOWNTO 0) := (OTHERS => '0');
-    --SIGNAL s_addr_table7 : STD_LOGIC_VECTOR(abits_table7 - 1 DOWNTO 0) := (OTHERS => '0');
-    --SIGNAL s_addr_table8 : STD_LOGIC_VECTOR(abits_table8 - 1 DOWNTO 0) := (OTHERS => '0');
-    --SIGNAL s_addr_table9 : STD_LOGIC_VECTOR(abits_table9 - 1 DOWNTO 0) := (OTHERS => '0');
-    --SIGNAL s_addr_table10 : STD_LOGIC_VECTOR(abits_table10 - 1 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL s_addr_table4 : STD_LOGIC_VECTOR(abits_table4 - 1 DOWNTO 0);
+    SIGNAL s_addr_table5 : STD_LOGIC_VECTOR(abits_table5 - 1 DOWNTO 0);
+    SIGNAL s_addr_table6 : STD_LOGIC_VECTOR(abits_table6 - 1 DOWNTO 0);
+    --SIGNAL s_addr_table7 : STD_LOGIC_VECTOR(abits_table7 - 1 DOWNTO 0);
+    --SIGNAL s_addr_table8 : STD_LOGIC_VECTOR(abits_table8 - 1 DOWNTO 0);
+    --SIGNAL s_addr_table9 : STD_LOGIC_VECTOR(abits_table9 - 1 DOWNTO 0);
+    --SIGNAL s_addr_table10 : STD_LOGIC_VECTOR(abits_table10 - 1 DOWNTO 0);
 
     -- Select signals for one ROM table entry.
     -- Cover range from 0 to 32 (0x00 to 0x80). Every field contains four bytes.
@@ -161,7 +161,7 @@ ARCHITECTURE spwrouterregs_arch OF spwrouterregs IS
     SIGNAL s_procRoutingTable : STD_LOGIC;
 
     -- TimeCode
-    SIGNAL s_autoTimeCodeValue : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    --SIGNAL s_autoTimeCodeValue : STD_LOGIC_VECTOR(7 DOWNTO 0);
     SIGNAL s_autoTimeCodeCycleTime : STD_LOGIC_VECTOR (31 DOWNTO 0);
 
     -- Intermediate signals.
@@ -173,7 +173,7 @@ BEGIN
     readData <= s_readData;
     s_strobeRoutingTable <= cycle AND strobe AND s_selectRoutingTable;
     autoTimeCodeCycleTime <= s_autoTimeCodeCycleTime;
-    autoTimeCodeValue <= s_autoTimeCodeValue;
+    s_autoTimeCodeValue <= autoTimeCodeValue;
 
     -- Decides what data was requested and writes it in general output port.
     s_readData <= s_dataRoutingTable WHEN s_selectRoutingTable = '1' ELSE
@@ -270,12 +270,12 @@ BEGIN
             s_proc_out <= '0';
             s_DataOutBuffer <= (OTHERS => '0');
             s_DataInBuffer <= (OTHERS => '0');
-            s_read_table4 <= (OTHERS => '0');
-            s_read_table5 <= (OTHERS => '0');
-            s_read_table6 <= (OTHERS => '0');
-            s_write_table4 <= (OTHERS => '0');
-            s_write_table5 <= (OTHERS => '0');
-            s_write_table6 <= (OTHERS => '0');
+            --s_read_table4 <= (OTHERS => '0'); -- ausgeblendet, da im original code hier auch kein reset der tabellenzugehörigkeits variablen (select...) stattfindet!
+            --s_read_table5 <= (OTHERS => '0');
+            --s_read_table6 <= (OTHERS => '0');
+            --s_write_table4 <= (OTHERS => '0');
+            --s_write_table5 <= (OTHERS => '0');
+            --s_write_table6 <= (OTHERS => '0');
             s_autoTimeCodeCycleTime <= x"00000000";
             s_autoTimeCodeValue <= (OTHERS => '0');
             -- TODO: Built-in async reset for spwrams!

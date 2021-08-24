@@ -55,10 +55,10 @@ ENTITY spwroutertable IS
         rdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0); -- readData
 
         -- High if a read or write operation is in progress.
-        proc : OUT STD_LOGIC; -- acknowledge
+        proc : OUT STD_LOGIC -- acknowledge
 
         -- Debug: Output state
-        instate : OUT spwroutertablestates
+        --instate : OUT spwroutertablestates
     );
 END spwroutertable;
 

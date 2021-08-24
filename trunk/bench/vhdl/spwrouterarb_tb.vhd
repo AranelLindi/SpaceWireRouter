@@ -36,10 +36,10 @@ ARCHITECTURE spwrouterarb_tb_arch OF spwrouterarb_tb IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            dest : IN array_t(numports DOWNTO 0)(numports DOWNTO 0);
+            dest : IN array_t(0 TO numports)(7 DOWNTO 0);
             req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-            rout : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0)
+            rout : OUT array_t(0 TO numports)(numports DOWNTO 0)
         );
     END COMPONENT;
 
@@ -55,7 +55,7 @@ ARCHITECTURE spwrouterarb_tb_arch OF spwrouterarb_tb IS
     SIGNAL rst : STD_LOGIC := '0';
 
     -- Destination of port x.
-    SIGNAL dest : array_t(numports DOWNTO 0)(numports DOWNTO 0) := (1 => (1 => '1'), 2 => (1 => '1'), OTHERS => (OTHERS => '0')); -- (1,1) = '1', (2, 1) = '1'), (others => '0')
+    SIGNAL dest : array_t(0 TO numports)(7 DOWNTO 0);-- := (1 => (1 => '1'), 2 => (1 => '1'), OTHERS => (OTHERS => '0')); -- (1,1) = '1', (2, 1) = '1'), (others => '0')
 
     -- Request of port x.
     SIGNAL req : STD_LOGIC_VECTOR(numports DOWNTO 0) := (numports => '1', OTHERS => '0');
@@ -64,7 +64,7 @@ ARCHITECTURE spwrouterarb_tb_arch OF spwrouterarb_tb IS
     SIGNAL grnt : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
     -- Routing switch matrix.
-    SIGNAL rout : array_t(numports DOWNTO 0)(numports DOWNTO 0);
+    SIGNAL rout : array_t(0 TO numports)(numports DOWNTO 0);
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
     SIGNAL stop_the_clock : BOOLEAN;

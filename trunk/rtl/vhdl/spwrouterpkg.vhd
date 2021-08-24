@@ -163,7 +163,7 @@ PACKAGE spwrouterpkg IS
             cycle : IN STD_LOGIC;
             portstatus : IN array_t(0 TO 31)(31 DOWNTO 0); -- hier ersten Index umgedreht
             receiveTimecode : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-            autoTimeCodeValue : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+            autoTimeCodeValue : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
             autoTimeCodeCycleTime : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
     END COMPONENT;
