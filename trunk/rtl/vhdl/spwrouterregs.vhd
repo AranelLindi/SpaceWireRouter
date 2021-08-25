@@ -161,7 +161,7 @@ ARCHITECTURE spwrouterregs_arch OF spwrouterregs IS
     SIGNAL s_procRoutingTable : STD_LOGIC;
 
     -- TimeCode
-    --SIGNAL s_autoTimeCodeValue : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL s_autoTimeCodeValue : STD_LOGIC_VECTOR(7 DOWNTO 0);
     SIGNAL s_autoTimeCodeCycleTime : STD_LOGIC_VECTOR (31 DOWNTO 0);
 
     -- Intermediate signals.

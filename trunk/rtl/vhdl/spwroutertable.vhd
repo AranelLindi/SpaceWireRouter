@@ -84,7 +84,7 @@ BEGIN
     rdata <= s_rdata;
 
     -- Debug
-    instate <= state;
+    --instate <= state;
 
     -- Creates 32x256 routing table in ROM.
     -- (Synthesizer for Spartan3 infers to use ROM Block)
