@@ -30,15 +30,15 @@ architecture spwrouter_tb_arch of spwrouter_tb is
       GENERIC (
           numports : INTEGER RANGE 0 TO 31;
           sysfreq : real;
-          txclkfreq : real
+          txclkfreq : real;
+          rx_impl : rximpl_array(numports DOWNTO 0);
+          tx_impl : tximpl_array(numports DOWNTO 0)
       );
       PORT (
           clk : IN STD_LOGIC;
           rxclk : IN STD_LOGIC;
           txclk : IN STD_LOGIC;
           rst : IN STD_LOGIC;
-          rx_impl : IN rximpl_array(numports DOWNTO 0);
-          tx_impl : IN tximpl_array(numports DOWNTO 0);
           started : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
           connecting : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
           running : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
@@ -53,6 +53,8 @@ architecture spwrouter_tb_arch of spwrouter_tb is
       );
   end component;
 
+  constant numports : INTEGER RANGE 0 TO 31 := 3; 
+ 
   signal clk: STD_LOGIC;
   signal rxclk: STD_LOGIC;
   signal txclk: STD_LOGIC;
@@ -71,21 +73,21 @@ architecture spwrouter_tb_arch of spwrouter_tb is
   signal spw_do: STD_LOGIC_VECTOR(numports DOWNTO 0);
   signal spw_so: STD_LOGIC_VECTOR(numports DOWNTO 0) ;
 
-  constant clock_period: time := 10 ns;
+  constant clock_period: time := 100 ns; -- 10 MHz
   signal stop_the_clock: boolean;
 
 begin
 
-  -- Insert values for generic parameters !!
-  uut: spwrouter generic map ( numports   => ,
-                               sysfreq    => ,
-                               txclkfreq  =>  )
+  -- design under test.
+  dut: spwrouter generic map ( numports   => numports,
+                               sysfreq    => 10.0e6,
+                               txclkfreq  => 10.0e6,
+			       rx_impl => (others => impl_fast),
+                               tx_impl => (others => impl_fast))
                     port map ( clk        => clk,
                                rxclk      => rxclk,
                                txclk      => txclk,
                                rst        => rst,
-                               rx_impl    => rx_impl,
-                               tx_impl    => tx_impl,
                                started    => started,
                                connecting => connecting,
                                running    => running,
@@ -98,15 +100,37 @@ begin
                                spw_do     => spw_do,
                                spw_so     => spw_so );
 
+
+	spw_di <= (others => '0');
+
+  process(clk)
+  	variable strobe_sw: std_logic;
+  begin
+	if rising_edge(clk) then
+		if strobe_sw = '1' then
+			spw_si <= (others => ('0' xor strobe_sw));
+		else
+			spw_si <= (others => '0');
+		end if;
+		strobe_sw := not strobe_sw;
+	end if;
+	
+  end process;
+
+
+
+
   stimulus: process
   begin
-  
+  	rst <= '1';
+	wait for 1 us;
+	rst <= '0';
     -- Put initialisation code here
 
 
     -- Put test bench stimulus code here
 
-    stop_the_clock <= true;
+--    stop_the_clock <= true;
     wait;
   end process;
 

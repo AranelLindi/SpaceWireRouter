@@ -34,7 +34,7 @@ ENTITY spwrouterarb IS
         -- Asynchronous reset.
         rst : IN STD_LOGIC;
 
-        -- Destination of port x.
+        -- Destination of port x (0-254 are always addressable, therefore 8 bits are necessary!)
         dest : IN array_t(0 TO numports)(7 DOWNTO 0);
 
         -- Request of port x.
@@ -56,13 +56,13 @@ ARCHITECTURE spwrouterarb_arch OF spwrouterarb IS
     SIGNAL s_routing : array_t(0 TO numports)(numports DOWNTO 0); -- hängt mit out port zusammen! siehe oben
 
     -- Occupied port x.
-    SIGNAL s_occupied : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
+    SIGNAL s_occupied : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
     -- Requests to port x.
     SIGNAL s_request : matrix_t(numports DOWNTO 0, numports DOWNTO 0); -- potenzielle fehlerquelle!
 
     -- Granted to port x.
-    SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0'); -- initialisierung in ursprungscode nicht vorgehsehen! evtl fehlerquelle!
+    SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0); -- initialisierung in ursprungscode nicht vorgehsehen! evtl fehlerquelle!
 BEGIN
     -- Drive outputs.
     grnt <= s_granted;
@@ -106,17 +106,13 @@ BEGIN
     END GENERATE spwrouterarbiter_roundrobin;
 
     -- Connection enabling signal
-    outerloopII : FOR i IN 0 TO numports GENERATE
-        innerloopII : FOR j IN 0 TO numports GENERATE
-            SIGNAL s_routing_vec : STD_LOGIC_VECTOR(numports DOWNTO 0);
-        BEGIN
+    rowloop : FOR i IN 0 TO numports GENERATE
+	 SIGNAL s_Test : std_logic_vector(numports downto 0);
+	BEGIN
 
-            -- Convert matrix line into vector.
-            Conv : FOR k IN numports DOWNTO 0 GENERATE
-                s_routing_vec(k) <= s_routing(j)(i); -- prüfen ob hier aus Spaltenvektoren, Reihenvektoren wurden! -- potenzielle Fehlerquelle!
-            END GENERATE;
-
-            s_granted(i) <= OR s_routing_vec; -- vorher: s_routing(j)(i); -- potenzielle Fehlerquelle! SOLL: Immer spaltenweise nach unten!
-        END GENERATE;
-    END GENERATE;
+        columnloop : FOR j IN numports DOWNTO 0 GENERATE
+		s_Test(j) <= s_routing(j)(i);
+        END GENERATE columnloop;
+	s_granted(i) <= OR s_Test;
+    END GENERATE rowloop;
 END ARCHITECTURE spwrouterarb_arch;

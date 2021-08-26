@@ -239,7 +239,6 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
     SIGNAL iReadyOut : STD_LOGIC;
     SIGNAL iRequestOut : STD_LOGIC;
     SIGNAL iDestinationPortOut : STD_LOGIC_VECTOR(7 DOWNTO 0);
-    SIGNAL s_validport : STD_LOGIC; -- für boolsche or operationen
     SIGNAL s_reqports : STD_LOGIC;
     SIGNAL s_txrdy : STD_LOGIC;
 BEGIN
@@ -325,6 +324,8 @@ BEGIN
     -- Finite state machine.
     PROCESS (clk, rst)
         -- HIER EVENTUELL VARIABLE VERWENDEN UM SCHWIERIGKEITEN BEI DER VERWENDUNG VON HILFSSIGNALE (AUSWERTUNG BOOLSCHER FUNKTIONEN) ZU HABEN!
+
+	VARIABLE var_validport : STD_LOGIC; -- für boolsche or operationen
     BEGIN
         IF (rst = '1') THEN -- reset
             state <= S_Idle;
@@ -337,6 +338,9 @@ BEGIN
             iRoutingTableRequest <= '0';
 
         ELSIF rising_edge(clk) THEN
+	    -- reset variable for new iteration.
+	    var_validport := '0';
+
             CASE state IS
                 WHEN S_Idle =>
                     -- If receive buffer is not empty, read data from the buffer.
@@ -385,11 +389,11 @@ BEGIN
                     -- Transmit request to destination port.
                     FOR i IN 1 TO numports LOOP
                         if (linkUp(i) = '1' AND iDestinationPortOut(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(i, blen + 1))) then
-                            s_validport <= '1'; -- potenzielle Fehlerquelle mit blen+1 !! Im Original Code werden hier 5 Bits (4 downto 0) abgefragt. falls blen == 4 ist, muss folglich blen+1 für 5 gelten!
+                            var_validport := '1'; -- potenzielle Fehlerquelle mit blen+1 !! Im Original Code werden hier 5 Bits (4 downto 0) abgefragt. falls blen == 4 ist, muss folglich blen+1 für 5 gelten!
                         end if;
                     END LOOP;
 
-                    IF ((iDestinationPortOut(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(0, blen + 1))) OR (s_validport = '1')) THEN
+                    IF ((iDestinationPortOut(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(0, blen + 1))) OR (var_validport = '1')) THEN
                         iRequestOut <= '1';
                         state <= S_Data0;
 

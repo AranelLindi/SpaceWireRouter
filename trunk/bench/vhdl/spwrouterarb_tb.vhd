@@ -46,19 +46,19 @@ ARCHITECTURE spwrouterarb_tb_arch OF spwrouterarb_tb IS
     -- TODO: Initial values...
 
     -- Number of SpaceWire ports.
-    CONSTANT numports : INTEGER RANGE 0 TO 31 := 5;
+    CONSTANT numports : INTEGER RANGE 0 TO 31 := 2;
 
     -- System clock.
     SIGNAL clk : STD_LOGIC;
 
     -- Asynchronous reset.
-    SIGNAL rst : STD_LOGIC := '0';
+    SIGNAL rst : STD_LOGIC;
 
     -- Destination of port x.
     SIGNAL dest : array_t(0 TO numports)(7 DOWNTO 0);-- := (1 => (1 => '1'), 2 => (1 => '1'), OTHERS => (OTHERS => '0')); -- (1,1) = '1', (2, 1) = '1'), (others => '0')
 
     -- Request of port x.
-    SIGNAL req : STD_LOGIC_VECTOR(numports DOWNTO 0) := (numports => '1', OTHERS => '0');
+    SIGNAL req : STD_LOGIC_VECTOR(numports DOWNTO 0);-- := (numports => '1', OTHERS => '0');
 
     -- Granted to port x.
     SIGNAL grnt : STD_LOGIC_VECTOR(numports DOWNTO 0);
@@ -86,21 +86,38 @@ BEGIN
         grnt => grnt,
         rout => rout);
 
-    -- Produce reset.
-    reset : PROCESS
-    BEGIN
-        -- TODO: Change counter values.
-        IF ((counter = 12 OR counter = 28) AND sw_rst = true) THEN
-            rst <= '1' AFTER 10 * clock_period;
-        END IF;
-    END PROCESS;
-
     -- Set simulation time.
     stimulus : PROCESS
     BEGIN
-        WAIT FOR 10 sec;
+        rst <= '1';
 
-        WAIT; -- wait forever.
+	wait for clock_period;
+
+	rst <= '0';
+
+	dest <= (1 => (std_logic_vector(to_unsigned(2, 8))), others => (others => '0'));
+	req <= (1 => '1', others => '0');
+
+	wait for 2 * clock_period;
+
+	dest <= (0 => (std_logic_vector(to_unsigned(1, 8))), 2 => (std_logic_vector(to_unsigned(1, 8))), others => (others => '0'));
+	req <= (0 => '1', 2 => '1', others => '0');
+
+	wait for 2 * clock_period;
+
+	req <= (others => '0');
+	
+	wait for 2 * clock_period;
+
+	dest <= (others => (others => '1'));
+	req <= (others => '1');
+
+	wait for 3 * clock_period;
+
+	dest <= (others => (others => '0'));
+	req <= (others => '0');
+
+	wait;
     END PROCESS;
 
     -- Creates clock and controls counter.
@@ -108,11 +125,6 @@ BEGIN
     BEGIN
         WHILE NOT stop_the_clock LOOP
             clk <= '0', '1' AFTER clock_period / 2;
-
-            IF counter = 100 THEN
-                counter <= 0;
-            END IF;
-            counter <= counter + 1;
             WAIT FOR clock_period;
         END LOOP;
         WAIT;
