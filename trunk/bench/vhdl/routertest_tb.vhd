@@ -15,132 +15,125 @@
 -- Revision:
 ----------------------------------------------------------------------------------
 
-library IEEE;
-use IEEE.Std_logic_1164.all;
-use IEEE.Numeric_Std.all;
-use work.spwpkg.all;
-use work.spwrouterpkg.all;
+LIBRARY IEEE;
+USE IEEE.Std_logic_1164.ALL;
+USE IEEE.Numeric_Std.ALL;
+USE work.spwpkg.ALL;
+USE work.spwrouterpkg.ALL;
 
-entity spwrouter_tb is
-end;
+ENTITY routertest_tb IS
+END;
 
-architecture spwrouter_tb_arch of spwrouter_tb is
+ARCHITECTURE routertest_tb_arch OF routertest_tb IS
+	CONSTANT numports : INTEGER RANGE 0 TO 31 := 2;
 
-  component spwrouter
-      GENERIC (
-          numports : INTEGER RANGE 0 TO 31;
-          sysfreq : real;
-          txclkfreq : real;
-          rx_impl : rximpl_array(numports DOWNTO 0);
-          tx_impl : tximpl_array(numports DOWNTO 0)
-      );
-      PORT (
-          clk : IN STD_LOGIC;
-          rxclk : IN STD_LOGIC;
-          txclk : IN STD_LOGIC;
-          rst : IN STD_LOGIC;
-          started : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-          connecting : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-          running : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-          errdisc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-          errpar : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-          erresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-          errcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-          spw_di : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-          spw_si : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-          spw_do : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-          spw_so : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
-      );
-  end component;
+	COMPONENT routertest
+		GENERIC (
+			numports : INTEGER RANGE 0 TO 31;
+			sysfreq : real;
+			txclkfreq : real;
+			tickdiv : INTEGER RANGE 12 TO 24 := 20;
+			rx_impl : IN rximpl_array(numports DOWNTO 0);
+			tx_impl : IN tximpl_array(numports DOWNTO 0)
+		);
+		PORT (
+			clk : IN STD_LOGIC;
+			rst : IN STD_LOGIC;
+			stnull: in std_logic_vector(numports downto 0);
+            stfct : in std_logic_vector(numports downto 0);
+            txen: in std_logic_vector(numports downto 0);
+            fct_in : in std_logic_vector(numports downto 0);
+            txwrite: in std_logic_vector(numports downto 0);
+            txflag: in std_logic_vector(numports downto 0);        -- Requests transmission of timecode.
+            tick_in : in std_logic_vector(numports downto 0);
+            ctrl_in : in std_logic_vector(1 downto 0); -- gilt für alle Ports gleich!
+            time_in : in std_logic_vector(5 downto 0);
+			started : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+			connecting : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+			running : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+			errpar : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+			erresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+			errcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+			spw_di : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+			spw_si : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+			spw_do : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+			spw_so : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+		);
+	END COMPONENT;
 
-  constant numports : INTEGER RANGE 0 TO 31 := 3; 
- 
-  signal clk: STD_LOGIC;
-  signal rxclk: STD_LOGIC;
-  signal txclk: STD_LOGIC;
-  signal rst: STD_LOGIC;
-  signal rx_impl: rximpl_array(numports DOWNTO 0);
-  signal tx_impl: tximpl_array(numports DOWNTO 0);
-  signal started: STD_LOGIC_VECTOR(numports DOWNTO 0);
-  signal connecting: STD_LOGIC_VECTOR(numports DOWNTO 0);
-  signal running: STD_LOGIC_VECTOR(numports DOWNTO 0);
-  signal errdisc: STD_LOGIC_VECTOR(numports DOWNTO 0);
-  signal errpar: STD_LOGIC_VECTOR(numports DOWNTO 0);
-  signal erresc: STD_LOGIC_VECTOR(numports DOWNTO 0);
-  signal errcred: STD_LOGIC_VECTOR(numports DOWNTO 0);
-  signal spw_di: STD_LOGIC_VECTOR(numports DOWNTO 0);
-  signal spw_si: STD_LOGIC_VECTOR(numports DOWNTO 0);
-  signal spw_do: STD_LOGIC_VECTOR(numports DOWNTO 0);
-  signal spw_so: STD_LOGIC_VECTOR(numports DOWNTO 0) ;
-
-  constant clock_period: time := 100 ns; -- 10 MHz
-  signal stop_the_clock: boolean;
-
-begin
-
-  -- design under test.
-  dut: spwrouter generic map ( numports   => numports,
-                               sysfreq    => 10.0e6,
-                               txclkfreq  => 10.0e6,
-			       rx_impl => (others => impl_fast),
-                               tx_impl => (others => impl_fast))
-                    port map ( clk        => clk,
-                               rxclk      => rxclk,
-                               txclk      => txclk,
-                               rst        => rst,
-                               started    => started,
-                               connecting => connecting,
-                               running    => running,
-                               errdisc    => errdisc,
-                               errpar     => errpar,
-                               erresc     => erresc,
-                               errcred    => errcred,
-                               spw_di     => spw_di,
-                               spw_si     => spw_si,
-                               spw_do     => spw_do,
-                               spw_so     => spw_so );
-
-
-	spw_di <= (others => '0');
-
-  process(clk)
-  	variable strobe_sw: std_logic;
-  begin
-	if rising_edge(clk) then
-		if strobe_sw = '1' then
-			spw_si <= (others => ('0' xor strobe_sw));
-		else
-			spw_si <= (others => '0');
-		end if;
-		strobe_sw := not strobe_sw;
-	end if;
+	SIGNAL clk : STD_LOGIC;
+	SIGNAL rst : STD_LOGIC;
+	CONSTANT rx_impl : rximpl_array(numports DOWNTO 0) := (OTHERS => impl_generic); -- impl_generic : data freq < 2 * clk freq !!
+	CONSTANT tx_impl : tximpl_array(numports DOWNTO 0) := (OTHERS => impl_generic);
+	SIGNAL started : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL connecting : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL running : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL errpar : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL erresc : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL errcred : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL spw_di : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL spw_si : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL spw_do : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL spw_so : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	
-  end process;
+    signal s_stnull: std_logic_vector(numports downto 0);
+    signal s_stfct : std_logic_vector(numports downto 0);
+    signal s_txen: std_logic_vector(numports downto 0);
+    signal s_fct_in : std_logic_vector(numports downto 0);
+    signal s_txwrite: std_logic_vector(numports downto 0);
+    signal s_txflag: std_logic_vector(numports downto 0);
+    signal s_tick_in : std_logic_vector(numports downto 0);
+    signal s_ctrl_in : std_logic_vector(1 downto 0); -- gilt für alle Ports gleich!
+    signal s_time_in : std_logic_vector(5 downto 0);
 
+	CONSTANT clock_period : TIME := 10 ns; -- 100 MHz
+	SIGNAL stop_the_clock : BOOLEAN;
+BEGIN
 
+	-- design under test.
+	dut : routertest GENERIC MAP(
+		numports => numports,
+		sysfreq => 100.0e6,
+		txclkfreq => 100.0e6,
+		rx_impl => rx_impl,
+		tx_impl => tx_impl
+	)
+	PORT MAP(
+		clk => clk,
+		rst => rst,
+		stnull => s_stnull,
+		stfct => s_stfct,
+		txen => s_txen,
+		fct_in => s_fct_in,
+		txwrite => s_txwrite,
+		txflag => s_txflag,
+		tick_in => s_tick_in,
+		ctrl_in => s_ctrl_in,
+		time_in => s_time_in,
+		started => started,
+		connecting => connecting,
+		running => running,
+		errpar => errpar,
+		erresc => erresc,
+		errcred => errcred,
+		spw_di => spw_di,
+		spw_si => spw_si,
+		spw_do => spw_do,
+		spw_so => spw_so
+	);
 
+    stimuli : process
+    begin
+        -- Hier muss rein, welcher Port Daten senden soll, alle anderen senden dann Nulls.
+        -- So lange hier nichts drin steht, senden alle Ports automatisch Nullen (noch prüfen!)
+    end process;
 
-  stimulus: process
-  begin
-  	rst <= '1';
-	wait for 1 us;
-	rst <= '0';
-    -- Put initialisation code here
-
-
-    -- Put test bench stimulus code here
-
---    stop_the_clock <= true;
-    wait;
-  end process;
-
-  clocking: process
-  begin
-    while not stop_the_clock loop
-      clk <= '0', '1' after clock_period / 2;
-      wait for clock_period;
-    end loop;
-    wait;
-  end process;
-
-end spwrouter_tb_arch;
+	clocking : PROCESS
+	BEGIN
+		WHILE NOT stop_the_clock LOOP
+			clk <= '0', '1' AFTER clock_period / 2;
+			WAIT FOR clock_period;
+		END LOOP;
+		WAIT;
+	END PROCESS;
+END routertest_tb_arch;
