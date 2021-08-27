@@ -18,7 +18,7 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
---USE work.spwrouterpkg.ALL;
+USE work.spwrouterpkg.ALL;
 USE work.spwpkg.ALL;
 
 ENTITY spwrouterport IS
@@ -197,6 +197,13 @@ ENTITY spwrouterport IS
         -- 
         busMasterAcknowledgeIn : IN STD_LOGIC; -- busMasterAcknowledgeIn
 
+	-- Zeigt an ob der Receiver ein Packet empfangen hat, nur als Debug-port verwenden (quasi einfach iReceiveFIFOReadEnable als Ausgang)
+	gotData: OUT STD_LOGIC;
+
+        sentData: OUT STD_LOGIC; -- Debug
+
+	fsmstate : OUT spwrouterportstates; -- Debug
+
         -- SpaceWire data in.
         spw_di : IN STD_LOGIC; -- check
 
@@ -212,25 +219,6 @@ ENTITY spwrouterport IS
 END spwrouterport;
 
 ARCHITECTURE spwrouterport_arch OF spwrouterport IS
-    -- Finite state machine used in spwstream container.
-    TYPE spwrouterportstates IS (
-        S_Idle,
-        S_Dest0,
-        S_Dest1,
-        S_Dest2,
-        S_RT0,
-        S_RT1,
-        S_RT2,
-        S_Data0,
-        S_Data1,
-        S_Data2,
-        S_Data3,
-        S_Dummy0,
-        S_Dummy1,
-        S_Dummy2
-    ); -- 14
-
-
     -- Finite state machine states.
     SIGNAL state : spwrouterportstates := S_Idle; -- check 
 
@@ -273,6 +261,11 @@ BEGIN
     busMasterWriteEnableOut <= '0';
     busMasterByteEnableOut <= (OTHERS => '1');
     busMasterDataOut <= (OTHERS => '0');
+
+    -- Debug
+    gotData <= iReceiveFIFOReadEnable; -- rxread
+    sentData <= iTransmitFIFOWriteEnable; -- txwrite
+    fsmstate <= state;
 
     -- Intermediate steps.
     iTransmitFIFOWriteEnable <= strobeIn WHEN requestIn = '1' ELSE

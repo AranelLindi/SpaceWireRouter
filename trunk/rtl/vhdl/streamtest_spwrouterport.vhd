@@ -19,6 +19,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
 USE work.spwpkg.ALL;
+use work.spwrouterpkg.all;
 
 ENTITY streamtest_spwrouterport IS
     GENERIC (
@@ -104,11 +105,17 @@ ENTITY streamtest_spwrouterport IS
         -- High when taking a byte from the receive FIFO.
         gotdata : OUT STD_LOGIC;
 
+	-- High when data is sent.
+	sentData: OUT STD_LOGIC;
+
         -- Incorrect or unexpected data received (sticky).
         dataerror : OUT STD_LOGIC;
 
         -- Incorrect or unexpected time code received (sticky).
         tickerror : OUT STD_LOGIC;
+
+	-- FSM state in port.
+	fsmstate : OUT spwrouterportstates;
 
         -- SpaceWire signals.
         spw_di : IN STD_LOGIC;
@@ -267,6 +274,9 @@ ARCHITECTURE streamtest_spwrouterport_arch OF streamtest_spwrouterport IS
             busMasterStrobeOut : OUT STD_LOGIC;
             busMasterRequestOut : OUT STD_LOGIC;
             busMasterAcknowledgeIn: IN STD_LOGIC;
+	    gotData: OUT STD_LOGIC;
+	    sentData : OUT STD_LOGIC;
+	    fsmstate: OUT spwrouterportstates;
             spw_di : IN STD_LOGIC;
             spw_si : IN STD_LOGIC;
             spw_do : OUT STD_LOGIC;
@@ -278,12 +288,17 @@ ARCHITECTURE streamtest_spwrouterport_arch OF streamtest_spwrouterport IS
     signal s_ready: std_ulogic;
     signal s_strobe: std_ulogic;
     signal s_linkUp: std_logic_vector(numports downto 0);
+
+    signal s_gotData: std_ulogic;
+    signal s_sentData: std_ulogic;
+
+    signal s_fsmstate: spwrouterportstates;
 BEGIN
 
     s_linkUp(pnum) <= s_running;
 
     -- spwstream instance
-    spwstream_inst : spwrouterport
+    spwstream_spwrouterport_inst : spwrouterport
     GENERIC MAP(
         numports => numports,
         blen => blen,
@@ -338,9 +353,9 @@ BEGIN
         sourcePortOut => open,
         grantedIn => '1',
         strobeOut => s_strobe,
-        readyIn => s_ready,
-        requestIn => s_request,
-        strobeIn => s_strobe,
+        readyIn => '1',
+        requestIn => '1',
+        strobeIn => '1',
         readyOut => s_ready,
         busMasterAddressOut => open,
         busMasterDataIn => (others => '0'),
@@ -349,6 +364,9 @@ BEGIN
         busMasterStrobeOut => open,
         busMasterRequestOut => open,
         busMasterAcknowledgeIn => '1', -- nicht sicher ob 1 oder 0 !
+	gotData => s_gotData,
+	sentData => s_sentData,
+	fsmstate => s_fsmstate,
         spw_di => spw_di,
         spw_si => spw_si,
         spw_do => spw_do,
@@ -360,6 +378,9 @@ BEGIN
     gotdata <= r.gotdata;
     dataerror <= r.dataerror;
     tickerror <= r.tickerror;
+
+    sentData <= s_sentData;
+    s_txrdy <= '1';
 
     PROCESS (r, rst, senddata, sendtick, s_txrdy, s_tickout, s_timeout, s_rxvalid, s_rxflag, s_rxdata, s_running) IS
         VARIABLE v : regs_type;
@@ -428,7 +449,8 @@ BEGIN
         END CASE;
 
         -- Blink light when receiving data.
-        v.gotdata := s_rxvalid AND r.rxread;
+        --v.gotdata := s_rxvalid AND r.rxread;
+	v.gotdata := s_gotData;
 
         -- Detect missing timecodes.
         IF r.tick_in = '1' AND r.rx_expecttick = '1' THEN

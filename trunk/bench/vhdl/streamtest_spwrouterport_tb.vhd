@@ -20,6 +20,7 @@ USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
 USE std.textio.ALL;
 USE work.spwpkg.ALL;
+use work.spwrouterpkg.all;
 
 ENTITY streamtest_spwrouterport_tb IS
 END ENTITY;
@@ -60,8 +61,10 @@ ARCHITECTURE streamtest_spwrouterport_tb_arch OF streamtest_spwrouterport_tb IS
             linkrun : OUT STD_LOGIC;
             linkerror : OUT STD_LOGIC;
             gotdata : OUT STD_LOGIC;
+	    sentData: OUT STD_LOGIC;
             dataerror : OUT STD_LOGIC;
             tickerror : OUT STD_LOGIC;
+	    fsmstate : OUT spwrouterportstates;
             spw_di : IN STD_LOGIC;
             spw_si : IN STD_LOGIC;
             spw_do : OUT STD_LOGIC;
@@ -81,13 +84,14 @@ ARCHITECTURE streamtest_spwrouterport_tb_arch OF streamtest_spwrouterport_tb IS
     SIGNAL s_linkrun : STD_LOGIC;
     SIGNAL s_linkerror : STD_LOGIC;
     SIGNAL s_gotdata : STD_LOGIC;
+    SIGNAL s_sentData: STD_LOGIC; -- added SL
     SIGNAL s_dataerror : STD_LOGIC;
     SIGNAL s_tickerror : STD_LOGIC;
+    SIGNAL s_fsmstate: spwrouterportstates;
     SIGNAL s_spwdi : STD_LOGIC;
     SIGNAL s_spwsi : STD_LOGIC;
     SIGNAL s_spwdo : STD_LOGIC;
     SIGNAL s_spwso : STD_LOGIC;
-
 BEGIN
 
     -- streamtest instance
@@ -121,8 +125,10 @@ BEGIN
         linkrun => s_linkrun,
         linkerror => s_linkerror,
         gotdata => s_gotdata,
+	sentData => s_sentData,
         dataerror => s_dataerror,
         tickerror => s_tickerror,
+	fsmstate => s_fsmstate,
         spw_di => s_spwdi,
         spw_si => s_spwsi,
         spw_do => s_spwdo,

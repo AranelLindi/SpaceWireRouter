@@ -77,35 +77,35 @@ ENTITY routertest IS
         -- TimeCode counter value.
         time_in : in std_logic_vector(5 downto 0);
         
-		-- Corresponding bit is High if the port is in started state.
-		started : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+	-- Corresponding bit is High if the port is in started state.
+	started : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-		-- Corresponding bit is High if the port is in connecting state.
-		connecting : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+	-- Corresponding bit is High if the port is in connecting state.
+	connecting : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-		-- Corresponding bit is High if the port is in running state.
-		running : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+	-- Corresponding bit is High if the port is in running state.
+	running : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-		-- High if the corresponding port has a disconnect error.
-		errpar : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+	-- High if the corresponding port has a disconnect error.
+	errpar : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-		-- High if the corresponding port detected an invalid escape sequence.
-		erresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+	-- High if the corresponding port detected an invalid escape sequence.
+	erresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-		-- High if the corresponding port detected a credit error.
-		errcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+	-- High if the corresponding port detected a credit error.
+	errcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-		-- Data In signals from SpaceWire bus.
-		spw_di : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+	-- Data In signals from SpaceWire bus.
+	spw_di : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-		-- Strobe In signals from SpaceWire bus.
-		spw_si : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+	-- Strobe In signals from SpaceWire bus.
+	spw_si : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-		-- Data Out signals from SpaceWire bus.
-		spw_do : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+	-- Data Out signals from SpaceWire bus.
+	spw_do : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-		-- Strobe Out signals from SpaceWire bus.
-		spw_so : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+	-- Strobe Out signals from SpaceWire bus.
+	spw_so : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
 	);
 END routertest;
 
@@ -198,7 +198,7 @@ BEGIN
 --        xmit_arr(i).txwrite <= txwrite(i);
 --        xmit_arr(i).txflag <= txflag(i);
 --        seed <= lfsr16(seed);
---        xmit_arr(i).txdata <= seed(15 downto 7);
+--        xmit_arr(i).txdata <= seed(15 downto 8);
 --    end generate;
 
 
