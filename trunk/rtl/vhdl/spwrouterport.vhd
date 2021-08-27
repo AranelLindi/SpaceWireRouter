@@ -18,7 +18,7 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
-USE work.spwrouterpkg.ALL;
+--USE work.spwrouterpkg.ALL;
 USE work.spwpkg.ALL;
 
 ENTITY spwrouterport IS
@@ -212,6 +212,25 @@ ENTITY spwrouterport IS
 END spwrouterport;
 
 ARCHITECTURE spwrouterport_arch OF spwrouterport IS
+    -- Finite state machine used in spwstream container.
+    TYPE spwrouterportstates IS (
+        S_Idle,
+        S_Dest0,
+        S_Dest1,
+        S_Dest2,
+        S_RT0,
+        S_RT1,
+        S_RT2,
+        S_Data0,
+        S_Data1,
+        S_Data2,
+        S_Data3,
+        S_Dummy0,
+        S_Dummy1,
+        S_Dummy2
+    ); -- 14
+
+
     -- Finite state machine states.
     SIGNAL state : spwrouterportstates := S_Idle; -- check 
 
