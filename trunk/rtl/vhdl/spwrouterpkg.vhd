@@ -237,7 +237,7 @@ PACKAGE spwrouterpkg IS
             busMasterRequestOut : OUT STD_LOGIC;
             busMasterAcknowledgeIn: IN STD_LOGIC;
 	    gotData : OUT STD_LOGIC;
-	    sendData : OUT STD_LOGIC;
+	    sentData : OUT STD_LOGIC;
 	    fsmstate: OUT spwrouterportstates;
             spw_di : IN STD_LOGIC;
             spw_si : IN STD_LOGIC;

@@ -263,7 +263,7 @@ BEGIN
     busMasterDataOut <= (OTHERS => '0');
 
     -- Debug
-    gotData <= iReceiveFIFOReadEnable; -- rxread
+    gotData <= iReceiveFIFOReady; -- (rxvalid) vorher: iReceiveFIFOReadEnable; -- rxread
     sentData <= iTransmitFIFOWriteEnable; -- txwrite
     fsmstate <= state;
 

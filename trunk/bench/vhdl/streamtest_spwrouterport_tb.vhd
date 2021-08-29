@@ -38,7 +38,7 @@ ARCHITECTURE streamtest_spwrouterport_tb_arch OF streamtest_spwrouterport_tb IS
             sysfreq : real;
             txclkfreq : real;
             tickdiv : INTEGER RANGE 12 TO 24 := 20;
-            rximpl : spw_implementation_type_rec := impl_generic;
+            rximpl : spw_implementation_type_rec := impl_fast;
             rxchunk : INTEGER RANGE 1 TO 4 := 1;
             tximpl : spw_implementation_type_xmit := impl_generic;
             rxfifosize_bits : INTEGER RANGE 6 TO 14 := 11;
@@ -103,7 +103,7 @@ BEGIN
         sysfreq => sys_clock_freq,
         txclkfreq => sys_clock_freq,
         tickdiv => 16,
-        rximpl => impl_generic,
+        rximpl => impl_fast,
         rxchunk => 1,
         tximpl => impl_generic,
         rxfifosize_bits => 9,
