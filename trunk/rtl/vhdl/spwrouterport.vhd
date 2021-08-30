@@ -197,12 +197,16 @@ ENTITY spwrouterport IS
         -- 
         busMasterAcknowledgeIn : IN STD_LOGIC; -- busMasterAcknowledgeIn
 
-	-- Zeigt an ob der Receiver ein Packet empfangen hat, nur als Debug-port verwenden (quasi einfach iReceiveFIFOReadEnable als Ausgang)
-	gotData: OUT STD_LOGIC;
+        -- pragma synthesis_off
+	    -- Zeigt an ob der Receiver ein Packet empfangen hat, nur als Debug-port verwenden (quasi einfach iReceiveFIFOReadEnable als Ausgang)
+	    gotData: OUT STD_LOGIC;
 
         sentData: OUT STD_LOGIC; -- Debug
 
-	fsmstate : OUT spwrouterportstates; -- Debug
+	    fsmstate : OUT spwrouterportstates; -- Debug
+
+        debugdataout : out std_logic_vector(8 downto 0); -- debug
+        -- pragma synthesis_on
 
         -- SpaceWire data in.
         spw_di : IN STD_LOGIC; -- check
@@ -227,7 +231,7 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
 
     -- Routing Tabelle
     -- De facto logical port number (32-254).
-    SIGNAL iRoutingTableAddress : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL iRoutingTableAddress : STD_LOGIC_VECTOR(7 DOWNTO 0) := (others => '0');
     -- Anfrage an Routing Tabelle.
     SIGNAL iRoutingTableRequest : STD_LOGIC;
 
@@ -239,15 +243,17 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
     -- Reception-specific signals.
     SIGNAL iReceiveFIFOReadEnable : STD_LOGIC; -- rxread
     SIGNAL iReceiveFIFOReady : STD_LOGIC; -- rxvalid
-    SIGNAL receiveFIFODataOut : STD_LOGIC_VECTOR(8 DOWNTO 0); -- rxdata
+    SIGNAL receiveFIFODataOut : STD_LOGIC_VECTOR(8 DOWNTO 0) := (others => '0'); -- rxdata -- testweise initialisiert!
 
     -- Intermediate signals (werden nur an Ausgänge unter 'Drive outputs' drangehängt)
     SIGNAL iStrobeOut : STD_LOGIC;
     SIGNAL iReadyOut : STD_LOGIC;
     SIGNAL iRequestOut : STD_LOGIC;
     SIGNAL iDestinationPortOut : STD_LOGIC_VECTOR(7 DOWNTO 0);
-    SIGNAL s_reqports : STD_LOGIC;
     SIGNAL s_txrdy : STD_LOGIC;
+
+    signal s_rxflag : STD_LOGIC; -- speichert das Flag eines packets zwischen
+    signal s_rxdata: std_logic_vector(7 downto 0); -- dito
 BEGIN
     -- Drive outputs
     sourcePortOut <= STD_LOGIC_VECTOR(to_unsigned(pnum, sourcePortOut'length));
@@ -263,9 +269,13 @@ BEGIN
     busMasterDataOut <= (OTHERS => '0');
 
     -- Debug
+    -- pragma synthesis_off
     gotData <= iReceiveFIFOReady; -- (rxvalid) vorher: iReceiveFIFOReadEnable; -- rxread
     sentData <= iTransmitFIFOWriteEnable; -- txwrite
     fsmstate <= state;
+    debugdataout(7 downto 0) <= s_rxdata; --receiveFIFODataOut(7 downto 0); -- nur zu debugzwecken
+    debugdataout(8) <= s_rxflag;
+    -- pragma synthesis_on
 
     -- Intermediate steps.
     iTransmitFIFOWriteEnable <= strobeIn WHEN requestIn = '1' ELSE
@@ -309,8 +319,8 @@ BEGIN
         time_out => time_out(5 DOWNTO 0), -- check
         rxvalid => iReceiveFIFOReady, -- check
         rxhalff => OPEN, -- check
-        rxflag => receiveFIFODataOut(8), -- check
-        rxdata => receiveFIFODataOut(7 DOWNTO 0), -- check
+        rxflag => s_rxflag, -- check -- vorher: receiveFIFODatOut(8)
+        rxdata => s_rxdata, -- check
         rxread => iReceiveFIFOReadEnable, -- check
         started => started, -- check
         connecting => connecting, -- check
@@ -336,8 +346,8 @@ BEGIN
     -- Finite state machine.
     PROCESS (clk, rst)
         -- HIER EVENTUELL VARIABLE VERWENDEN UM SCHWIERIGKEITEN BEI DER VERWENDUNG VON HILFSSIGNALE (AUSWERTUNG BOOLSCHER FUNKTIONEN) ZU HABEN!
-
-	VARIABLE var_validport : STD_LOGIC; -- für boolsche or operationen
+	    VARIABLE v_validport : STD_LOGIC; -- S_Dest2; für boolsche or operationen
+        variable v_reqports : STD_LOGIC; -- S_RT1
     BEGIN
         IF (rst = '1') THEN -- reset
             state <= S_Idle;
@@ -348,16 +358,16 @@ BEGIN
             iStrobeOut <= '0';
             iRoutingTableAddress <= (OTHERS => '0');
             iRoutingTableRequest <= '0';
-
+            receiveFIFODataOut <= (others => '0');
+            
         ELSIF rising_edge(clk) THEN
-	    -- reset variable for new iteration.
-	    var_validport := '0';
-
             CASE state IS
                 WHEN S_Idle =>
                     -- If receive buffer is not empty, read data from the buffer.
                     IF (iReceiveFIFOReady = '1') THEN
                         iReceiveFIFOReadEnable <= '1'; -- rxread
+                        --receiveFIFODataOut(8) <= s_rxflag; -- Flag per Handshake übernehmen
+                        --debugdataout(8) <= s_rxflag; -- debug
                         state <= S_Dest0;
 
                     END IF;
@@ -366,12 +376,15 @@ BEGIN
 
                 WHEN S_Dest0 =>
                     -- Wait to read data from buffer.
+                    receiveFIFODataOut(8) <= s_rxflag; -- per Handshake übernehmen
+                    receiveFIFODataOut(7 downto 0) <= s_rxdata;
                     iReceiveFIFOReadEnable <= '0'; -- rxread
                     state <= S_Dest1;
 
                 WHEN S_Dest1 =>
                     -- Confirm first data logical address or physical port address.
-                    IF (receiveFIFODataOut(8) = '0') THEN
+                    
+                    IF (receiveFIFODataOut(8) = '0') THEN -- vorher: receiveFIFODataOut(8)
                         IF (receiveFIFODataOut(7 DOWNTO 5) = "000") THEN
                             -- Physical port addressed.
                             iDestinationPortOut <= receiveFIFODataOut(7 DOWNTO 0); -- enthält die Portnummer als erstes Byte eines Pakets!!
@@ -385,7 +398,7 @@ BEGIN
 
                             END IF;
                         ELSE
-                            -- Logical port is addressed. Routing table is used.
+                            -- Logical port is addressed. Send request to routing table to get port assignment.
                             iRoutingTableAddress <= receiveFIFODataOut(7 DOWNTO 0);
                             iRoutingTableRequest <= '1';
                             state <= S_RT0;
@@ -398,14 +411,17 @@ BEGIN
                     END IF;
 
                 WHEN S_Dest2 =>
+	                -- Reset variable for new iteration.
+	                v_validport := '0';
+
                     -- Transmit request to destination port.
                     FOR i IN 1 TO numports LOOP
                         if (linkUp(i) = '1' AND iDestinationPortOut(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(i, blen + 1))) then
-                            var_validport := '1'; -- potenzielle Fehlerquelle mit blen+1 !! Im Original Code werden hier 5 Bits (4 downto 0) abgefragt. falls blen == 4 ist, muss folglich blen+1 für 5 gelten!
+                            v_validport := '1'; -- potenzielle Fehlerquelle mit blen+1 !! Im Original Code werden hier 5 Bits (4 downto 0) abgefragt. falls blen == 4 ist, muss folglich blen+1 für 5 gelten!
                         end if;
                     END LOOP;
 
-                    IF ((iDestinationPortOut(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(0, blen + 1))) OR (var_validport = '1')) THEN
+                    IF ((iDestinationPortOut(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(0, blen + 1))) OR (v_validport = '1')) THEN
                         iRequestOut <= '1';
                         state <= S_Data0;
 
@@ -416,7 +432,7 @@ BEGIN
                     END IF;
 
                 WHEN S_RT0 =>
-                    -- Wait acknowledge.
+                    -- Wait acknowledge. (Hat wohl was damit zu tun, dass die gewünschte Information von der RT eingetroffen ist)
                     IF (busMasterAcknowledgeIn = '1') THEN
                         state <= S_RT1; -- RT == Routing table
 
@@ -426,12 +442,16 @@ BEGIN
                     -- Logical addressing: Request to data which is read from routing table.
                     iRoutingTableRequest <= '0';
 
+                    -- Reset variable for new iteration.
+                    v_reqports := '0';
+
                     -- Wird benötigt um festzustellen ob kein Port ausgewählt wurde!
-                    FOR i IN 0 TO numports LOOP
-                        if (linkUp(i) = '1' AND busMasterDataIn(i) = '1') then
-                            s_reqports <= '1';
-                        end if;
-                    END LOOP;
+                    -- Geht alle Ports 
+                    --FOR i IN 0 TO numports LOOP
+                    --    if (linkUp(i) = '1' AND busMasterDataIn(i) = '1') then
+                            
+                    --    end if;
+                    --END LOOP;
 
                     -- Wichtig! Hier auch wieder umgedrehte Prioritäten!
                     FOR i IN numports DOWNTO 0 LOOP
@@ -440,11 +460,14 @@ BEGIN
                             iRequestOut <= '1';
                             state <= S_RT2;
 
+                            -- Variable to compare in same cycle whether a port can be selected at all.
+                            v_reqports := '1';
+
                         END IF;
                     END LOOP;
 
                     -- Kann sein, dass das so nicht funktioniert: Signale bekommen ihren Wert erst bei Prozessende! Daher kann es sein, dass s_reqports zu beginn stets 0 ist!!
-                    IF (s_reqports = '0') THEN -- discard invalid addressed packet if none if statement before was executed.
+                    IF (v_reqports = '0') THEN -- discard invalid addressed packet if none if statement before was executed.
                         state <= S_Dummy0;
 
                     END IF;
@@ -469,6 +492,10 @@ BEGIN
                 WHEN S_Data1 =>
                     -- Wait to read from data receive buffer.
                     iStrobeOut <= '0';
+
+                    receiveFIFODataOut(8) <= s_rxflag; -- per Handshake übernehmen
+                    receiveFIFODataOut(7 downto 0) <= s_rxdata;
+
                     iReceiveFIFOReadEnable <= '0';
                     state <= S_Data2;
 
@@ -477,14 +504,17 @@ BEGIN
                     IF (readyIn = '1') THEN
                         iStrobeOut <= '1';
                         iDataOut <= receiveFIFODataOut;
-                        IF (receiveFIFODataOut(8) = '1') THEN
+                        IF (receiveFIFODataOut(8) = '1') THEN -- vorher receiveFIFODataOut(8)
+                            -- EOP/EEP, packet is finished.
                             state <= S_Data3;
 
                         ELSIF (grantedIn = '1' AND iReceiveFIFOReady = '1') THEN
+                            -- Continue reading bytes according to this packet.
                             iReceiveFIFOReadEnable <= '1';
                             state <= S_Data1;
 
                         ELSE
+                            -- None further byte available yet, wait for it or an EOP/EEP.
                             state <= S_Data0;
 
                         END IF;
@@ -497,6 +527,7 @@ BEGIN
                     state <= S_Idle;
 
                 WHEN S_Dummy0 =>
+                    -- Dummie-states are there to throw away packets that cannot be delivered.
                     -- dummy read (may block forever)
                     iRequestOut <= '0';
 
@@ -508,12 +539,16 @@ BEGIN
 
                 WHEN S_Dummy1 =>
                     -- Wait to read data from receive buffer.
+
+                    receiveFIFODataOut(8) <= s_rxflag; -- per Handshake übernehmen
+                    receiveFIFODataOut(7 downto 0) <= s_rxdata;
+
                     iReceiveFIFOReadEnable <= '0';
                     state <= S_Dummy2;
 
                 WHEN S_Dummy2 =>
                     -- Read data from receive buffer until the control flag.
-                    IF (receiveFIFODataOut(8) = '1') THEN
+                    IF (receiveFIFODataOut(8) = '1') THEN -- vorher: receiveFIFODataOut(8)
                         state <= S_Idle;
 
                     ELSE
