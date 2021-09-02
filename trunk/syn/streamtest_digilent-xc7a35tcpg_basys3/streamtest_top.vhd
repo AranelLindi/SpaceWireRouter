@@ -1,3 +1,23 @@
+----------------------------------------------------------------------------------
+-- Company: University of Wuerzburg, Germany
+-- Engineer: Stefan Lindoerfer
+-- 
+-- Create Date: 02.09.2021 22:36
+-- Design Name: Board implementation of streamtest
+-- Module Name: streamtest_top
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Target Devices: Digilent Basys 3
+-- Tool Versions: 
+-- Description: 
+-- 
+-- Dependencies: SpaceWireIP Light Core; Basys3.xdc 
+-- 
+-- Revision:
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
+
+
 --
 --  Test of spwstream on Digilent XC3S200 board.
 --  60 MHz system clock, 200 MHz receive clock and transmit clock.
@@ -20,15 +40,12 @@
 --  Switch 3 = send data and time codes
 --  Switch 4-7 = bits 0-3 of tx bit rate scale factor
 --
---  SpaceWire signals on A2 expansion connector:
---    Data In    pos,neg  =  B5,C5  =  pin 19,6
---    Strobe In  pos,neg  =  D6,E6  =  pin 7,4
---    Data Out   pos,neg  =  B6,C6  =  pin 21,8
---    Strobe Out pos,neg  =  D7,E7  =  pin 11,9
+--  SpaceWire signals on JB/JB Pmod:
+--    Data In    =  JC1  =  pin K17
+--    Strobe In  =  JC2  =  pin M18
+--    Data Out   =  JB1  =  pin A14
+--    Strobe Out =  JB2  =  pin A16
 --
---  Note: these are not true LVDS signals; they are configured as LVDS25
---  but powered from 3.3V instead of 2.5V, not differentially routed and
---  not properly terminated.
 --
 --  The SpaceWire port should be looped back to itself with wires from
 --  outputs to corresponding inputs.
@@ -47,23 +64,24 @@ entity streamtest_top is
         button:     in  std_logic_vector(3 downto 0);
         switch:     in  std_logic_vector(7 downto 0);
         led:        out std_logic_vector(7 downto 0);
-        spw_di_p:   in  std_logic;
-        spw_di_n:   in  std_logic;
-        spw_si_p:   in  std_logic;
-        spw_si_n:   in  std_logic;
-        spw_do_p:   out std_logic;
-        spw_do_n:   out std_logic;
-        spw_so_p:   out std_logic;
-        spw_so_n:   out std_logic );
+        spw_di:   in  std_logic;
+        --spw_di_n:   in  std_logic;
+        spw_si:   in  std_logic;
+        --spw_si_n:   in  std_logic;
+        spw_do:   out std_logic;
+        --spw_do_n:   out std_logic;
+        spw_so:   out std_logic
+        --spw_so_n:   out std_logic 
+        );
 
 end entity streamtest_top;
 
 architecture streamtest_top_arch of streamtest_top is
 
     -- Clock generation.
-    signal boardclk:        std_logic;
-    signal sysclk:          std_logic;
-    signal fastclk:         std_logic;
+    --signal boardclk:        std_logic;
+    --signal sysclk:          std_logic;
+    --signal fastclk:         std_logic;
 
     -- Synchronize buttons
     signal s_resetbtn:      std_logic := '0';
@@ -92,9 +110,9 @@ architecture streamtest_top_arch of streamtest_top is
     signal s_spwso:         std_logic;
 
     -- Make clock nets visible to UCF file.
-    attribute KEEP: string;
-    attribute KEEP of sysclk: signal is "SOFT";
-    attribute KEEP of fastclk: signal is "SOFT";
+    --attribute KEEP: string;
+    --attribute KEEP of sysclk: signal is "SOFT";
+    --attribute KEEP of fastclk: signal is "SOFT";
 
     component streamtest is
         generic (
@@ -133,59 +151,59 @@ architecture streamtest_top_arch of streamtest_top is
 begin
 
     -- Buffer incoming clock.
-    bufg0: BUFG port map ( I => clk50, O => boardclk );
+    --bufg0: BUFG port map ( I => clk50, O => boardclk );
 
     -- Generate 60 MHz system clock.
-    dcm0: DCM
-        generic map (
-            CLKFX_DIVIDE        => 5,
-            CLKFX_MULTIPLY      => 6,
-            CLK_FEEDBACK      => "NONE",
-            CLKIN_DIVIDE_BY_2   => false,
-            CLKIN_PERIOD        => 20.0,
-            CLKOUT_PHASE_SHIFT  => "NONE",
-            DESKEW_ADJUST       => "SYSTEM_SYNCHRONOUS",
-            DFS_FREQUENCY_MODE  => "LOW",
-            DUTY_CYCLE_CORRECTION => true,
-            STARTUP_WAIT        => true )
-        port map (
-            CLKIN       => boardclk,
-            RST         => '0',
-            CLKFX       => sysclk );
+--    dcm0: DCM
+--        generic map (
+--            CLKFX_DIVIDE        => 1,
+--            CLKFX_MULTIPLY      => 2,
+--            CLK_FEEDBACK      => "NONE",
+--            CLKIN_DIVIDE_BY_2   => false,
+--            CLKIN_PERIOD        => 20.0,
+--            CLKOUT_PHASE_SHIFT  => "NONE",
+--            DESKEW_ADJUST       => "SYSTEM_SYNCHRONOUS",
+--            DFS_FREQUENCY_MODE  => "LOW",
+--            DUTY_CYCLE_CORRECTION => true,
+--            STARTUP_WAIT        => true )
+--        port map (
+--            CLKIN       => boardclk,
+--            RST         => '0',
+--            CLKFX       => sysclk );
 
-    -- Generate 200 MHz fast clock.
-    dcm1: DCM
-        generic map (
-            CLKFX_DIVIDE        => 1,
-            CLKFX_MULTIPLY      => 4,
-            CLK_FEEDBACK        => "NONE",
-            CLKIN_DIVIDE_BY_2   => false,
-            CLKIN_PERIOD        => 20.0,
-            CLKOUT_PHASE_SHIFT  => "NONE",
-            DESKEW_ADJUST       => "SYSTEM_SYNCHRONOUS",
-            DFS_FREQUENCY_MODE  => "LOW",
-            DUTY_CYCLE_CORRECTION => true,
-            STARTUP_WAIT        => true )
-        port map (
-            CLKIN       => boardclk,
-            RST         => '0',
-            CLKFX       => fastclk );
+--    -- Generate 20 MHz fast clock.
+--    dcm1: DCM
+--        generic map (
+--            CLKFX_DIVIDE        => 1,
+--            CLKFX_MULTIPLY      => 2,
+--            CLK_FEEDBACK        => "NONE",
+--            CLKIN_DIVIDE_BY_2   => false,
+--            CLKIN_PERIOD        => 20.0,
+--            CLKOUT_PHASE_SHIFT  => "NONE",
+--            DESKEW_ADJUST       => "SYSTEM_SYNCHRONOUS",
+--            DFS_FREQUENCY_MODE  => "LOW",
+--            DUTY_CYCLE_CORRECTION => true,
+--            STARTUP_WAIT        => true )
+--        port map (
+--            CLKIN       => boardclk,
+--            RST         => '0',
+--            CLKFX       => fastclk );
 
     -- Streamtest instance
     streamtest_inst: streamtest
         generic map (
-            sysfreq     => 60.0e6,
-            txclkfreq   => 200.0e6,
+            sysfreq     => 10.0e6,
+            txclkfreq   => 10.0e6,
             tickdiv     => 22,
             rximpl      => impl_fast,
-            rxchunk     => 4,
+            rxchunk     => 1,
             tximpl      => impl_fast,
             rxfifosize_bits => 11,
             txfifosize_bits => 10 )
         port map (
-            clk         => sysclk,
-            rxclk       => fastclk,
-            txclk       => fastclk,
+            clk         => clk50,
+            rxclk       => clk50,
+            txclk       => clk50,
             rst         => s_rst,
             linkstart   => s_linkstart,
             autostart   => s_autostart,
@@ -200,28 +218,28 @@ begin
             gotdata     => s_gotdata,
             dataerror   => s_dataerror,
             tickerror   => s_tickerror,
-            spw_di      => s_spwdi,
-            spw_si      => s_spwsi,
-            spw_do      => s_spwdo,
-            spw_so      => s_spwso );
+            spw_di      => spw_di,
+            spw_si      => spw_si,
+            spw_do      => spw_do,
+            spw_so      => spw_so );
 
     -- LVDS buffers
-    spwdi_pad: IBUFDS
-        generic map ( IOSTANDARD => "LVDS_25" )
-        port map ( O => s_spwdi, I => spw_di_p, IB => spw_di_n );
-    spwsi_pad: IBUFDS
-        generic map ( IOSTANDARD => "LVDS_25" )
-        port map ( O => s_spwsi, I => spw_si_p, IB => spw_si_n );
-    spwdo_pad: OBUFDS
-        generic map ( IOSTANDARD => "LVDS_25" )
-        port map ( O => spw_do_p, OB => spw_do_n, I => s_spwdo );
-    spwso_pad: OBUFDS
-        generic map ( IOSTANDARD => "LVDS_25" )
-        port map ( O => spw_so_p, OB => spw_so_n, I => s_spwso );
+--    spwdi_pad: IBUFDS
+--        generic map ( IOSTANDARD => "LVDS_25" )
+--        port map ( O => s_spwdi, I => spw_di_p, IB => spw_di_n );
+--    spwsi_pad: IBUFDS
+--        generic map ( IOSTANDARD => "LVDS_25" )
+--        port map ( O => s_spwsi, I => spw_si_p, IB => spw_si_n );
+--    spwdo_pad: OBUFDS
+--        generic map ( IOSTANDARD => "LVDS_25" )
+--        port map ( O => spw_do_p, OB => spw_do_n, I => s_spwdo );
+--    spwso_pad: OBUFDS
+--        generic map ( IOSTANDARD => "LVDS_25" )
+--        port map ( O => spw_so_p, OB => spw_so_n, I => s_spwso );
 
-    process (sysclk) is
+    process (clk50) is
     begin
-        if rising_edge(sysclk) then
+        if rising_edge(clk50) then
 
             -- Synchronize buttons
             s_resetbtn  <= button(0);

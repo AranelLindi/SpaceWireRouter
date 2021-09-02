@@ -33,9 +33,9 @@ USE work.spwpkg.ALL;
 USE work.spwrouterpkg.ALL;
 
 ENTITY spwrouterport_tb IS
-END;
+END spwrouterport_tb;
 
-ARCHITECTURE bench OF spwrouterport_tb IS
+ARCHITECTURE spwrouterport_tb_arch OF spwrouterport_tb IS
 	-- Generic constants.
 
 	CONSTANT numports : INTEGER RANGE 0 TO 31 := 0;
@@ -486,4 +486,4 @@ BEGIN
 		clk <= '0', '1' AFTER clock_period / 2;
 		WAIT FOR clock_period;
 	END PROCESS;
-END;
+END spwrouterport_tb_arch;
