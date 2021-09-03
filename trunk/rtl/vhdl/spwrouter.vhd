@@ -73,6 +73,16 @@ ENTITY spwrouter IS
         -- High if the corresponding port detected a credit error.
         errcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
+
+        -- Debug ports ON
+        gotData : OUT std_logic_vector(numports downto 0);
+        sentData: out std_logic_vector(numports downto 0);
+        fsmstate: out fsmarr(numports downto 0);
+        debugdataout: out array_t(numports downto 0)(8 downto 0);
+        -- Debug ports OFF
+
+
+
         -- Data In signals from SpaceWire bus.
         spw_di : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
 
@@ -94,23 +104,23 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         -- Necessary number of bits to represent numport-ports.
         CONSTANT blen : INTEGER RANGE 0 TO 4 := INTEGER(ceil(log2(real(numports))));
 
-        SIGNAL iSelectDestinationPort : array_t(0 TO numports)(numports DOWNTO 0); -- korrekte definition?
-        SIGNAL iSwitchPortNumber : array_t(0 TO numports)(numports DOWNTO 0); -- korrekte def?
+        SIGNAL iSelectDestinationPort : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- korrekte definition?
+        SIGNAL iSwitchPortNumber : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- korrekte def?
 
         SIGNAL requestOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
-        SIGNAL destinationPort : array_t(0 TO numports)(7 DOWNTO 0);
-        SIGNAL sourcePortOut : array_t(0 TO numports)(blen DOWNTO 0);
+        SIGNAL destinationPort : array_t(numports DOWNTO 0)(7 DOWNTO 0);
+        SIGNAL sourcePortOut : array_t(numports DOWNTO 0)(blen DOWNTO 0);
         SIGNAL granted : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL iReadyIn : STD_LOGIC_VECTOR(numports DOWNTO 0);
-        SIGNAL dataOut : array_t(0 TO numports)(8 DOWNTO 0); -- korrekte def?
+        SIGNAL dataOut : array_t(numports DOWNTO 0)(8 DOWNTO 0); -- korrekte def?
         SIGNAL strobeOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL iRequestIn : STD_LOGIC_VECTOR(numports DOWNTO 0);
-        --signal iSourcePortIn : array_t(0 to numports)(numports downto 0); -- korrekte def?
-        SIGNAL iDataIn : array_t(0 TO numports)(8 DOWNTO 0);
+        --signal iSourcePortIn : array_t(numports DOWNTO 0)(numports downto 0); -- korrekte def?
+        SIGNAL iDataIn : array_t(numports DOWNTO 0)(8 DOWNTO 0);
         SIGNAL iStrobeIn : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL readyOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-        SIGNAL routingSwitch : array_t(0 TO numports)(numports DOWNTO 0);
+        SIGNAL routingSwitch : array_t(numports DOWNTO 0)(numports DOWNTO 0);
 
         SIGNAL routerTimeCode : STD_LOGIC_VECTOR(7 DOWNTO 0); -- nötig?
         --signal transmitTimeCodeEnable: std_logic_vector(6 downto 0); -- nötig?
@@ -118,15 +128,15 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         --signal timeOutEnable: std_logic; -- nötig?
 
         -- Bus System I.
-        SIGNAL busMasterAddressOut : array_t(0 TO numports)(31 DOWNTO 0); -- korrekte def?
-        SIGNAL busMasterDataOut : array_t(0 TO numports)(31 DOWNTO 0); -- korrekte def?
-        SIGNAL busMasterByteEnableOut : array_t(0 TO numports)(3 DOWNTO 0); -- korrekte def?
+        SIGNAL busMasterAddressOut : array_t(numports DOWNTO 0)(31 DOWNTO 0); -- korrekte def?
+        SIGNAL busMasterDataOut : array_t(numports DOWNTO 0)(31 DOWNTO 0); -- korrekte def?
+        SIGNAL busMasterByteEnableOut : array_t(numports DOWNTO 0)(3 DOWNTO 0); -- korrekte def?
         SIGNAL busMasterWriteEnableOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL busMasterRequestOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL busMasterGranted : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL busMasterAcknowledgeIn : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL busMasterStrobeOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
-        --signal busMasterOriginalPortOut: array_t(0 to numports)(numports downto 0); -- korrekte def?
+        --signal busMasterOriginalPortOut: array_t(numports DOWNTO 0)(numports downto 0); -- korrekte def?
 
         -- Bus System II.
         SIGNAL iBusSlaveCycleIn : STD_LOGIC;
@@ -263,7 +273,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             spwport : spwrouterport GENERIC MAP(
                 numports => numports,
                 blen => blen,
-                pnum => 0,
+                pnum => i,
                 sysfreq => sysfreq,
                 txclkfreq => txclkfreq,
                 rximpl => rx_impl(i),
@@ -310,6 +320,10 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 busMasterStrobeOut => busMasterStrobeOut(i),
                 busMasterRequestOut => busMasterRequestOut(i),
                 busMasterAcknowledgeIn => busMasterAcknowledgeIn(i),
+                gotData => gotData(i), -- Debugport
+                sentData => sentData(i), -- Debugport
+                fsmstate => fsmstate(i), -- Debugport
+                debugdataout => debugdataout(i), -- Debugport
                 spw_di => spw_di(i),
                 spw_si => spw_si(i),
                 spw_do => spw_do(i),

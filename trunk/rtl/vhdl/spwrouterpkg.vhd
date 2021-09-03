@@ -22,15 +22,6 @@ USE work.spwpkg.ALL;
 
 PACKAGE spwrouterpkg IS
     -- Type declarations:
-
-    -- Pre-defined arrays for implementation types (front-end of receiver/transmitter)
-    TYPE rximpl_array IS ARRAY (NATURAL RANGE <>) OF spw_implementation_type_rec;
-    TYPE tximpl_array IS ARRAY (NATURAL RANGE <>) OF spw_implementation_type_xmit;
-
-    -- General used types.
-    TYPE array_t IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR;
-    TYPE matrix_t IS ARRAY(NATURAL RANGE <>, NATURAL RANGE <>) OF STD_LOGIC;
-
     -- Finite state machine used in router table.
     TYPE spwroutertablestates IS (
         S_Idle,
@@ -74,6 +65,19 @@ PACKAGE spwrouterpkg IS
         S_Dummy2
     ); -- 14
 
+    -- Pre-defined arrays for implementation types (front-end of receiver/transmitter)
+    TYPE rximpl_array IS ARRAY (NATURAL RANGE <>) OF spw_implementation_type_rec;
+    TYPE tximpl_array IS ARRAY (NATURAL RANGE <>) OF spw_implementation_type_xmit;
+
+    -- General used types.
+    TYPE array_t IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR;
+    TYPE matrix_t IS ARRAY(NATURAL RANGE <>, NATURAL RANGE <>) OF STD_LOGIC;
+
+
+    -- Debug type
+    TYPE fsmarr IS ARRAY(NATURAL RANGE <>) OF spwrouterportstates; -- Debug type
+
+
     -- Component declarations:
     -- Round Robin Arbiter (spwrouterarb_table.vhd)
     COMPONENT spwrouterarb_round IS
@@ -98,10 +102,10 @@ PACKAGE spwrouterpkg IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            dest : IN array_t(0 TO numports)(7 DOWNTO 0); -- hier ersten Index umgedreht
+            dest : IN array_t(numports DOWNTO 0)(7 DOWNTO 0); -- hier ersten Index umgedreht
             req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-            rout : OUT array_t(0 TO numports)(numports DOWNTO 0) -- hier ersten Index umgedreht
+            rout : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0) -- hier ersten Index umgedreht
         );
     END COMPONENT;
 
@@ -231,17 +235,17 @@ PACKAGE spwrouterpkg IS
             busMasterAddressOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             busMasterDataIn : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             busMasterDataOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            busMasterByteEnableOut: OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+            busMasterByteEnableOut : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
             busMasterWriteEnableOut : OUT STD_LOGIC;
             busMasterStrobeOut : OUT STD_LOGIC;
             busMasterRequestOut : OUT STD_LOGIC;
-            busMasterAcknowledgeIn: IN STD_LOGIC;
+            busMasterAcknowledgeIn : IN STD_LOGIC;
 
             -- pragma synthesis_off
-	        gotData : OUT STD_LOGIC; -- debug
-	        sentData : OUT STD_LOGIC; -- debug
-	        fsmstate: OUT spwrouterportstates; -- debug
-            debugdataout: OUT std_logic_vector(8 downto 0); -- debug
+            gotData : OUT STD_LOGIC; -- debug
+            sentData : OUT STD_LOGIC; -- debug
+            fsmstate : OUT spwrouterportstates; -- debug
+            debugdataout : OUT STD_LOGIC_VECTOR(8 DOWNTO 0); -- debug
             -- pragma synthesis_on
 
             spw_di : IN STD_LOGIC;
@@ -250,13 +254,13 @@ PACKAGE spwrouterpkg IS
             spw_so : OUT STD_LOGIC
         );
     END COMPONENT;
-    
+
     -- Router Entity
-    component spwrouter is
+    COMPONENT spwrouter IS
         GENERIC (
             numports : INTEGER RANGE 0 TO 31;
             sysfreq : real;
-            txclkfreq : real;            
+            txclkfreq : real;
             rx_impl : rximpl_array(numports DOWNTO 0);
             tx_impl : tximpl_array(numports DOWNTO 0)
         );
@@ -272,10 +276,14 @@ PACKAGE spwrouterpkg IS
             errpar : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
             erresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
             errcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+            sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+            fsmstate: out fsmarr(numports downto 0); -- Debugport
+            debugdataout : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
             spw_di : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             spw_si : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             spw_do : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
             spw_so : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
-            );
-    end component;
+        );
+    END COMPONENT;
 END PACKAGE;

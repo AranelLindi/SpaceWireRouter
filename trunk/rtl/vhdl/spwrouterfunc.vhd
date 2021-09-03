@@ -8,16 +8,16 @@ PACKAGE spwrouterfunc IS
         numports : INTEGER RANGE 0 TO 31
     );
 
-    FUNCTION select7x1(selectBit : STD_LOGIC_VECTOR(0 TO numports); bits : STD_LOGIC_VECTOR(0 TO numports)) RETURN STD_LOGIC;
-    FUNCTION select7x1xVector8(selectVector : STD_LOGIC_VECTOR(0 TO numports); bits : array_t(0 TO numports)(numports DOWNTO 0)) RETURN STD_LOGIC_VECTOR;
-    FUNCTION select7x1xVector9(selectVector : STD_LOGIC_VECTOR(0 TO numports); bits : array_t(0 TO numports)(8 DOWNTO 0)) RETURN STD_LOGIC_VECTOR;
+    FUNCTION select7x1(selectBit : STD_LOGIC_VECTOR(numports DOWNTO 0); bits : STD_LOGIC_VECTOR(numports DOWNTO 0)) RETURN STD_LOGIC;
+    FUNCTION select7x1xVector8(selectVector : STD_LOGIC_VECTOR(numports DOWNTO 0); bits : array_t(numports DOWNTO 0)(numports DOWNTO 0)) RETURN STD_LOGIC_VECTOR;
+    FUNCTION select7x1xVector9(selectVector : STD_LOGIC_VECTOR(numports DOWNTO 0); bits : array_t(numports DOWNTO 0)(8 DOWNTO 0)) RETURN STD_LOGIC_VECTOR;
 END PACKAGE;
 
 PACKAGE BODY spwrouterfunc IS
-    FUNCTION select7x1 (selectBit : STD_LOGIC_VECTOR(0 TO numports); bits : STD_LOGIC_VECTOR(0 TO numports)) RETURN STD_LOGIC IS
+    FUNCTION select7x1 (selectBit : STD_LOGIC_VECTOR(numports DOWNTO 0); bits : STD_LOGIC_VECTOR(numports DOWNTO 0)) RETURN STD_LOGIC IS
         variable cond : STD_LOGIC;
     BEGIN
-        --FOR i IN 0 TO numports LOOP
+        --FOR i IN numports DOWNTO 0 LOOP
             --cond := OR (selectBit(i) AND bits(i));
         --END LOOP;
 
@@ -26,7 +26,7 @@ PACKAGE BODY spwrouterfunc IS
         --RETURN cond;
     END select7x1;
 
-    FUNCTION select7x1xVector8(selectVector : IN STD_LOGIC_VECTOR(0 TO numports); bits : array_t(0 TO numports)(numports DOWNTO 0)) RETURN STD_LOGIC_VECTOR IS
+    FUNCTION select7x1xVector8(selectVector : IN STD_LOGIC_VECTOR(numports DOWNTO 0); bits : array_t(numports DOWNTO 0)(numports DOWNTO 0)) RETURN STD_LOGIC_VECTOR IS
     BEGIN
         FOR i IN numports DOWNTO 0 LOOP
             IF (selectVector = STD_LOGIC_VECTOR(to_unsigned(i, selectVector'length))) THEN
@@ -38,7 +38,7 @@ PACKAGE BODY spwrouterfunc IS
         RETURN STD_LOGIC_VECTOR(to_unsigned(0, numports)); -- länge passt wahrscheinlich nicht
     END select7x1xVector8;
 
-    function select7x1xVector9(selectVector : std_logic_vector(0 to numports); bits: array_t(0 to numports)(8 downto 0)) return std_logic_vector is
+    function select7x1xVector9(selectVector : std_logic_vector(numports DOWNTO 0); bits: array_t(numports DOWNTO 0)(8 downto 0)) return std_logic_vector is
     begin
         for i in numports downto 0 loop
             if (selectVector = std_logic_vector(to_unsigned(i, 9))) then

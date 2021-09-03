@@ -35,7 +35,7 @@ ENTITY spwrouterarb IS
         rst : IN STD_LOGIC;
 
         -- Destination of port x (0-254 are always addressable, therefore 8 bits are necessary!)
-        dest : IN array_t(0 TO numports)(7 DOWNTO 0);
+        dest : IN array_t(numports DOWNTO 0)(7 DOWNTO 0);
 
         -- Request of port x.
         req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
@@ -44,7 +44,7 @@ ENTITY spwrouterarb IS
         grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
         -- Routing switch matrix.
-        rout : OUT array_t(0 TO numports)(numports DOWNTO 0) -- Falls es hier probleme gibt, auf matrix wechseln!
+        rout : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0) -- Falls es hier probleme gibt, auf matrix wechseln!
     );
 END spwrouterarb;
 
@@ -53,7 +53,7 @@ ARCHITECTURE spwrouterarb_arch OF spwrouterarb IS
     CONSTANT blen : INTEGER RANGE 0 TO 4 := INTEGER(ceil(log2(real(numports))));
 
     -- Router switch matrix.
-    SIGNAL s_routing : array_t(0 TO numports)(numports DOWNTO 0); -- hängt mit out port zusammen! siehe oben
+    SIGNAL s_routing : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- hängt mit out port zusammen! siehe oben
 
     -- Occupied port x.
     SIGNAL s_occupied : STD_LOGIC_VECTOR(numports DOWNTO 0);

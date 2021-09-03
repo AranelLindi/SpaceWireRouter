@@ -2,24 +2,13 @@
 -- Company: University of Wuerzburg, Germany
 -- Engineer: Stefan Lindoerfer
 -- 
--- Create Date: 30.08.2021 23:11
--- Design Name: SpaceWire Router Port Testbench
--- Module Name: spwrouterport_tb
+-- Create Date: 03.09.2021 17:54
+-- Design Name: SpaceWire Router Testbench
+-- Module Name: spwroutertest
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
--- Description: Testbench for spwrouterport. It was created primarily to examine 
--- the finite state machine of the port/router-connection bus for its correct
--- functionality. (To test the port itself, run appropiate test benches
--- (e. g. streamtest_tb))
--- The fsm immediately gets all permits required from outside, so that the 
--- clock delay is not real, just the general behavior.
---
--- In general, only the behavior of single port is tested here. When assigning
--- addresses in packets you must therefore ensure that packets with port 
--- addresses between 1 and 31 are rejected. Also - due to the missing connection
--- to the routing table - forwarding (Port 32 - 254) is only possible if a port
--- is marked in busMasterData in.
+-- Description: 
 --
 -- Dependencies: spwpkg, spwrouterpkg
 -- 
@@ -32,494 +21,370 @@ USE IEEE.Numeric_Std.ALL;
 USE work.spwpkg.ALL;
 USE work.spwrouterpkg.ALL;
 
-ENTITY spwroutertest IS
-	generic (
-		-- Number of SpaceWire ports.
-		numports: integer range 0 to 31;
+ENTITY routertest IS
+	GENERIC (
+		numports : INTEGER RANGE 0 TO 31;
+		-- System clock frequency in Hz.
+		-- This must be set to the frequency of "clk". It is used to setup
+		-- counters for reset timing, disconnect timeout and to transmit
+		-- at 10 Mbit/s during the link handshake.
+		sysfreq : real;
 
-		-- Bit length to address all ports.
-		blen: integer range 0 to 4;
+		-- Transmit clock frequency in Hz (only if tximpl = impl_fast).
+		-- This must be set to the frequency of "txclk". It is used to
+		-- transmit at 10 Mbit/s during the link handshake.
+		txclkfreq : real := 0.0;
 
-		-- Number of this port.
-		pnum: integer range 0 to 31
+		-- Selection of a receiver front-end implementation.
+		rximpl : spw_implementation_type_rec;
+
+		-- Maximum number of bits received per system clock
+		-- (must be 1 in case of impl_generic).
+		rxchunk : INTEGER RANGE 1 TO 4 := 1;
+
+		-- Width of shift registers in clock recovery front-end; added: SL
+		WIDTH : INTEGER RANGE 1 TO 3 := 2;
+
+		-- Selection of a transmitter implementation.
+		tximpl : spw_implementation_type_xmit;
+
+		-- Size of the receive FIFO as the 2-logarithm of the number of bytes.
+		-- Must be at least 6 (64 bytes).
+		rxfifosize_bits : INTEGER RANGE 6 TO 14 := 11;
+
+		-- Size of the transmit FIFO as the 2-logarithm of the number of bytes.
+		txfifosize_bits : INTEGER RANGE 2 TO 14 := 11
 	);
-	port (
-		sendFCT: in std_logic; -- s_sendFCT
-		sendData: in std_logic; -- s_sendData
-		start: in std_logic; -- Aktiviert das Senden eines Paketes (nicht gleich mit sendData, das steuert nur das Pakete gesendet werden können)
-		address: in std_logic_vector(7 downto 0);
-		cargo: in std_logic_vector(7 downto 0);
-		fin: out std_logic; -- s_fin
+	PORT (
+		-- System clock.
+		clk : IN STD_LOGIC;
 
+		-- Receiver sample clock (only for impl_fast)
+		rxclk : IN STD_LOGIC;
+
+		-- Transmit clock (only for impl_fast)
+		txclk : IN STD_LOGIC;
+
+		-- Synchronous reset (active-high).
+		rst : IN STD_LOGIC;
+
+		-- Enables automatic link start on receipt of a NULL character.
+		autostart : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- Enables link start once the Ready state is reached.
+		-- Without autostart or linkstart, the link remains in state Ready.
+		linkstart : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- Do not start link (overrides linkstart and autostart) and/or
+		-- disconnect a running link.
+		linkdis : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- Scaling factor minus 1, used to scale the transmit base clock into
+		-- the transmission bit rate. The system clock (for impl_generic) or
+		-- the txclk (for impl_fast) is divided by (unsigned(txdivcnt) + 1).
+		-- Changing this signal will immediately change the transmission rate.
+		-- During link setup, the transmission rate is always 10 Mbit/s.
+		txdivcnt : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+
+		-- High for one clock cycle to request transmission of a TimeCode.
+		-- The request is registered inside the entity until it can be processed.
+		tick_in : IN STD_LOGIC_VECTOR(numports DOWNTO 1);
+
+		-- Control bits of the TimeCode to be sent. Must be valid while tick_in is high.
+		ctrl_in : IN array_t(numports DOWNTO 1)(1 DOWNTO 0);
+
+		-- Counter value of the TimeCode to be sent. Must be valid while tick_in is high.
+		time_in : IN array_t(numports DOWNTO 1)(5 DOWNTO 0);
+
+		-- Pulled high by the application to write an N-Char to the transmit
+		-- queue. If "txwrite" and "txrdy" are both high on the rising edge
+		-- of "clk", a character is added to the transmit queue.
+		-- This signal has no effect if "txrdy" is low.
+		txwrite : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- Control flag to be sent with the next N_Char.
+		-- Must be valid while txwrite is high.
+		txflag : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- Byte to be sent, or "00000000" for EOP or "00000001" for EEP.
+		-- Must be valid while txwrite is high.
+		txdata : IN array_t(numports DOWNTO 0)(7 DOWNTO 0);
+
+		-- High if the entity is ready to accept an N-Char for transmission.
+		txrdy : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- High if the transmission queue is at least half full.
+		txhalff : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- High for one clock cycle if a TimeCode was just received.
+		tick_out : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- Control bits of the last received TimeCode.
+		ctrl_out : OUT array_t(numports DOWNTO 1)(1 DOWNTO 0);
+
+		-- Counter value of the last received TimeCode.
+		time_out : OUT array_t(numports DOWNTO 1)(5 DOWNTO 0);
+
+		-- High if "rxflag" and "rxdata" contain valid data.
+		-- This signal is high unless the receive FIFO is empty.
+		rxvalid : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- High if the receive FIFO is at least half full.
+		rxhalff : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- High if the received character is EOP or EEP; low if the received
+		-- character is a data byte. Valid if "rxvalid" is high.
+		rxflag : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- Received byte, or "00000000" for EOP or "00000001" for EEP.
+		-- Valid if "rxvalid" is high.
+		rxdata : OUT array_t(numports DOWNTO 0)(7 DOWNTO 0);
+
+		-- Pulled high by the application to accept a received character.
+		-- If "rxvalid" and "rxread" are both high on the rising edge of "clk",
+		-- a character is removed from the receive FIFO and "rxvalid", "rxflag"
+		-- and "rxdata" are updated.
+		-- This signal has no effect if "rxvalid" is low.
+		rxread : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- High if the link state machine is currently in the Started state.
+		pstarted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+		rstarted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- High if the link state machine is currently in the Connecting state.
+		pconnecting : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+		rconnecting : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- High if the link state machine is currently in the Run state, indicating
+		-- that the link is fully operational. If none of started, connecting or running
+		-- is high, the link is in an initial state and the transmitter is not yet enabled.
+		prunning : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+		rrunning : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- Disconnect detected in state Run. Triggers a reset and reconnect of the link.
+		-- This indication is auto-clearing.
+		perrdisc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+		rerrdisc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- Parity error detected in state Run. Triggers a reset and reconnect of the link.
+		-- This indication is auto-clearing.
+		perrpar : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+		rerrpar : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- Invalid escape sequence detected in state Run. Triggers a reset and reconnect of
+		-- the link. This indication is auto-clearing.
+		perresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+		rerresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- Credit error detected. Triggers a reset and reconnect of the link.
+		-- This indication is auto-clearing.
+		perrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+		rerrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+
+		-- debug ports ON
+		gotData: out std_logic_vector(numports downto 0);
+		sentData: out std_logic_vector(numports downto 0);
+		fsmstate: out fsmarr(numports downto 0);
+		debugdataout : out array_t(numports downto 0)(8 downto 0);
+		-- debug ports OFF
+
+
+		-- Data In signal from SpaceWire bus.
+		spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- Strobe In signal from SpaceWire bus.
+		spw_s_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- Data Out signal to SpaceWire bus.
+		spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+		-- Strobe Out signal to SpaceWire bus.
+		spw_s_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
 	);
-END spwroutertest;
+END routertest;
 
-ARCHITECTURE spwrouterport_tb_arch OF spwrouterport_tb IS
-	-- Generic constants.
-	CONSTANT numports : INTEGER RANGE 0 TO 31 := 0;
-	CONSTANT blen : INTEGER RANGE 0 TO 4 := 0;
-	CONSTANT pnum : INTEGER RANGE 0 TO 31 := 0;
+ARCHITECTURE routertest_arch OF routertest IS
+	-- Kommt vom Router
+	SIGNAL s_spw_di : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_spw_si : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-	-- System clock.
-	SIGNAL clk : STD_LOGIC;
+	-- Geht zum Router
+	SIGNAL s_spw_do : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_spw_so : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-	-- Reset. (Important: It is necessary to perform a reset to initialize spwrouterport!)
-	SIGNAL rst : STD_LOGIC := '1';
+	-- Router Signale
+	SIGNAL s_rstarted : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_rconnecting : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_rrunning : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_rerrdisc : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_rerrpar : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_rerresc : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_rerrcred : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-	SIGNAL autostart : STD_LOGIC := '1';
-	SIGNAL linkstart : STD_LOGIC := '0';
-	SIGNAL linkdis : STD_LOGIC := '0';
-
-	SIGNAL txdivcnt : STD_LOGIC_VECTOR(7 DOWNTO 0) := "00000001";
-
-	-- Incoming Timecodes and requests.
-	SIGNAL tick_in : STD_LOGIC := '0';
-	SIGNAL time_in : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
-
-	-- Transmitting control flag (8) and data (7-0)
-	SIGNAL txdata : STD_LOGIC_VECTOR(8 DOWNTO 0) := (OTHERS => '0');
-
-	-- Outgoing Timecodes and requests.
-	SIGNAL tick_out : STD_LOGIC;
-	SIGNAL time_out : STD_LOGIC_VECTOR(7 DOWNTO 0);
-
-	-- Receiving control flag (8) and data (7-0).
-	SIGNAL rxdata : STD_LOGIC_VECTOR(8 DOWNTO 0) := (OTHERS => '0');
-
-	-- Status/Error signals of the port.
-	SIGNAL started : STD_LOGIC;
-	SIGNAL connecting : STD_LOGIC;
-	SIGNAL running : STD_LOGIC;
-	SIGNAL errdisc : STD_LOGIC;
-	SIGNAL errpar : STD_LOGIC;
-	SIGNAL erresc : STD_LOGIC;
-	SIGNAL errcred : STD_LOGIC;
-	SIGNAL linkUp : STD_LOGIC_VECTOR(numports DOWNTO 0) := (pnum => '1', OTHERS => '0'); -- bluff
-
-	SIGNAL requestOut : STD_LOGIC;
-	SIGNAL destinationPortOut : STD_LOGIC_VECTOR(7 DOWNTO 0);
-	SIGNAL sourcePortOut : STD_LOGIC_VECTOR(blen DOWNTO 0);
-	SIGNAL grantedIn : STD_LOGIC := '1';
-	SIGNAL strobeOut : STD_LOGIC;
-	SIGNAL readyIn : STD_LOGIC := '1';
-	SIGNAL requestIn : STD_LOGIC := '0'; -- Leave to zero to prevent uncontrolled transmitting
-	SIGNAL strobeIn : STD_LOGIC := '0';
-	SIGNAL readyOut : STD_LOGIC;
-
-	SIGNAL busMasterAddressOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
-	SIGNAL busMasterDataIn : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
-	SIGNAL busMasterDataOut : STD_LOGIC_VECTOR(31 DOWNTO 0);
-	SIGNAL busMasterByteEnableOut : STD_LOGIC_VECTOR(3 DOWNTO 0);
-	SIGNAL busMasterWriteEnableOut : STD_LOGIC;
-	SIGNAL busMasterStrobeOut : STD_LOGIC;
-	SIGNAL busMasterRequestOut : STD_LOGIC;
-	SIGNAL busMasterAcknowledgeIn : STD_LOGIC := '1';
-
-	-- Debug Ports
-	SIGNAL gotData : STD_LOGIC;
-	SIGNAL sentData : STD_LOGIC;
-	SIGNAL fsmstate : spwrouterportstates;
-	SIGNAL s_debugdataout : STD_LOGIC_VECTOR(8 DOWNTO 0);
-	SIGNAL debugdataout : STD_LOGIC_VECTOR(8 DOWNTO 0);
-
-	-- SpaceWire signals in/out
-	SIGNAL spw_di : STD_LOGIC;
-	SIGNAL spw_si : STD_LOGIC;
-	SIGNAL spw_do : STD_LOGIC;
-	SIGNAL spw_so : STD_LOGIC;
-
-	CONSTANT clock_period : TIME := 50 ns; -- 20 MHz
-	--constant data_clock_period: time := 100 ns; -- 10 MHz
-
-	-- Specifies which kind of data should be send to port receiver. (Idle = Nulls)
-	TYPE spwrouterport_tb_states IS (S_Idle, S_FCT, S_Data, S_Nothing);
-	SIGNAL state : spwrouterport_tb_states := S_Nothing;
-
-	-- Data and control flag that will send in S_Data state. 
-	SIGNAL s_txdata : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
-	SIGNAL s_txflag : STD_LOGIC := '0'; -- wichtig: steuert das flag (0 f�r data byte, 1 f�r eop/eep)
-
-	TYPE regs_type IS RECORD
-		-- tx clock.
-		txclken : STD_ULOGIC; -- high if a bit must be transmitted
-		txclkcnt : unsigned(7 DOWNTO 0);
-		-- output shift register.
-		bitshift : STD_LOGIC_VECTOR(12 DOWNTO 0);
-		bitcnt : unsigned(3 DOWNTO 0);
-		-- output signals.
-		out_data : STD_ULOGIC;
-		out_strobe : STD_ULOGIC;
-		-- parity flag.
-		parity : STD_ULOGIC;
-		-- pending time tick.
-		pend_tick : STD_ULOGIC;
-		pend_time : STD_LOGIC_VECTOR(7 DOWNTO 0);
-		-- transmitter mode.
-		allow_fct : STD_ULOGIC; -- allowed to send FCTs
-		allow_char : STD_ULOGIC; -- allowed to send data and time
-		sent_null : STD_ULOGIC; -- sent at least one NULL token
-		sent_fct : STD_ULOGIC; -- sent at least one FCT token
-	END RECORD;
-
-	-- Initial state.
-	CONSTANT regs_reset : regs_type := (
-		txclken => '0',
-		txclkcnt => "00000000",
-		bitshift => (OTHERS => '0'),
-		bitcnt => "0000",
-		out_data => '0',
-		out_strobe => '0',
-		parity => '0',
-		pend_tick => '0',
-		pend_time => (OTHERS => '0'),
-		allow_fct => '0',
-		allow_char => '0',
-		sent_null => '0',
-		sent_fct => '0');
-
-	SIGNAL r : regs_type := regs_reset;
-	SIGNAL rin : regs_type;
-
-	-- Die Staten des Ports.
-	TYPE testbenchstates IS (S_Rst, S_Started, S_Connecting, S_Running);
-	SIGNAL tbstate : testbenchstates := S_Rst;
-
-	TYPE runningstates IS (S_Null, S_FCT, S_Data, S_EOP);
-	SIGNAL rstate : runningstates := S_Null;
-	TYPE packetstate IS (S_Address, S_Cargo, S_EOP, S_Null);
-	SIGNAL pstate : packetstate := S_Address;
-
-	-- Zeigt an wann eine Übertragung (fast) abgeschlossen ist
-	SIGNAL s_fin : STD_LOGIC;
-
-	SIGNAL s_sendFCT : STD_LOGIC;
-	SIGNAL s_sendData : STD_LOGIC;
+	-- Port Signale
+	SIGNAL s_pstarted : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_pconnecting : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_prunning : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_perrdisc : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_perrpar : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_perresc : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_perrcred : STD_LOGIC_VECTOR(numports DOWNTO 0);
 BEGIN
+	-- Drive outputs.
+	-- Signals from router to ports.
+	spw_d_r2p <= s_spw_di;
+	spw_s_r2p <= s_spw_si;
+	-- Signals from ports to router.
+	spw_d_p2r <= s_spw_do;
+	spw_s_p2r <= s_spw_so;
 
-	-- Design under test.
-	dut : spwrouterport GENERIC MAP(
-		numports => numports,
-		blen => blen,
-		pnum => 0,
-		sysfreq => 20.0e6, -- prüfen ob frequenzen passen im hardwarebetrieb!
-		txclkfreq => 10.0e6,
-		rximpl => impl_generic,
-		rxchunk => 1,
-		WIDTH => 2,
-		tximpl => impl_generic,
-		rxfifosize_bits => 11,
-		txfifosize_bits => 11)
+	-- Status/errors for router and ports.
+	rstarted <= s_rstarted;
+	pstarted <= s_pstarted;
+	rconnecting <= s_rconnecting;
+	pconnecting <= s_pconnecting;
+	rrunning <= s_rrunning;
+	prunning <= s_prunning;
+	rerrdisc <= s_rerrdisc;
+	perrdisc <= s_perrdisc;
+	rerrpar <= s_rerrpar;
+	perrpar <= s_perrpar;
+	rerresc <= s_rerresc;
+	perresc <= s_perresc;
+	rerrcred <= s_rerrcred;
+	perrcred <= s_perrcred;
+
+	-- Port 0
+	ExternPort0 : spwstream
+	GENERIC MAP(
+		sysfreq => sysfreq,
+		txclkfreq => txclkfreq,
+		rximpl => rximpl,
+		rxchunk => rxchunk,
+		WIDTH => WIDTH,
+		tximpl => tximpl,
+		rxfifosize_bits => rxfifosize_bits,
+		txfifosize_bits => txfifosize_bits
+	)
 	PORT MAP(
 		clk => clk,
-		rxclk => clk, -- eigentlich offen
-		txclk => clk, -- eigentlich offen
+		rxclk => rxclk,
+		txclk => txclk,
 		rst => rst,
-		autostart => autostart,
-		linkstart => linkstart,
-		linkdis => linkdis,
+		autostart => autostart(0),
+		linkstart => linkstart(0),
+		linkdis => linkdis(0),
 		txdivcnt => txdivcnt,
-		tick_in => tick_in,
-		time_in => time_in,
-		txdata => txdata,
-		tick_out => tick_out,
-		time_out => time_out,
-		rxdata => rxdata,
-		started => started,
-		connecting => connecting,
-		running => running,
-		errdisc => errdisc,
-		errpar => errpar,
-		erresc => erresc,
-		errcred => errcred,
-		linkUp => linkUp,
-		requestOut => requestOut,
-		destinationPortOut => destinationPortOut,
-		sourcePortOut => sourcePortOut,
-		grantedIn => grantedIn,
-		strobeOut => strobeOut,
-		readyIn => readyIn,
-		requestIn => requestIn,
-		strobeIn => strobeIn,
-		readyOut => readyOut,
-		busMasterAddressOut => busMasterAddressOut,
-		busMasterDataIn => busMasterDataIn,
-		busMasterDataOut => busMasterDataOut,
-		busMasterByteEnableOut => busMasterByteEnableOut,
-		busMasterWriteEnableOut => busMasterWriteEnableOut,
-		busMasterStrobeOut => busMasterStrobeOut,
-		busMasterRequestOut => busMasterRequestOut,
-		busMasterAcknowledgeIn => busMasterAcknowledgeIn,
-		gotData => gotData,
-		sentData => sentData,
-		fsmstate => fsmstate,
-		debugdataout => s_debugdataout,
-		spw_di => spw_di,
-		spw_si => spw_si,
-		spw_do => spw_do,
-		spw_so => spw_so);
+		tick_in => '0',
+		ctrl_in => (OTHERS => '0'),
+		time_in => (OTHERS => '0'),
+		txwrite => txwrite(0),
+		txflag => txflag(0),
+		txdata => txdata(0),
+		txrdy => txrdy(0),
+		txhalff => txhalff(0),
+		tick_out => OPEN,
+		ctrl_out => OPEN,
+		time_out => OPEN,
+		rxvalid => rxvalid(0),
+		rxhalff => rxhalff(0),
+		rxflag => rxflag(0),
+		rxdata => rxdata(0),
+		rxread => rxread(0),
+		started => s_pstarted(0),
+		connecting => s_pconnecting(0),
+		running => s_prunning(0),
+		errdisc => s_perrdisc(0),
+		errpar => s_perrpar(0),
+		erresc => s_perrpar(0),
+		errcred => s_perrcred(0),
+		spw_di => s_spw_di(0), -- kommt vom router
+		spw_si => s_spw_si(0), -- kommt vom router
+		spw_do => s_spw_do(0), -- geht zum router
+		spw_so => s_spw_so(0) -- geht zum router
+	);
 
+	-- Port 1 to numports
+	ExternPortX : FOR i IN 1 TO numports GENERATE
+		ePortX : spwstream
+		GENERIC MAP(
+			sysfreq => sysfreq,
+			txclkfreq => txclkfreq,
+			rximpl => rximpl,
+			rxchunk => rxchunk,
+			tximpl => tximpl,
+			rxfifosize_bits => rxfifosize_bits,
+			txfifosize_bits => txfifosize_bits,
+			WIDTH => WIDTH
+		)
+		PORT MAP(
+			clk => clk,
+			rxclk => rxclk,
+			txclk => txclk,
+			rst => rst,
+			autostart => autostart(i),
+			linkstart => linkstart(i),
+			linkdis => linkdis(i),
+			txdivcnt => txdivcnt,
+			tick_in => tick_in(i),
+			ctrl_in => ctrl_in(i),
+			time_in => time_in(i),
+			txwrite => txwrite(i),
+			txflag => txflag(i),
+			txdata => txdata(i),
+			txrdy => txrdy(i),
+			txhalff => txhalff(i),
+			tick_out => tick_out(i),
+			ctrl_out => ctrl_out(i),
+			time_out => time_out(i),
+			rxvalid => rxvalid(i),
+			rxhalff => rxhalff(i),
+			rxflag => rxflag(i),
+			rxdata => rxdata(i),
+			rxread => rxread(i),
+			started => s_pstarted(i),
+			connecting => s_pconnecting(i),
+			running => s_prunning(i),
+			errdisc => s_perrdisc(i),
+			errpar => s_perrpar(i),
+			erresc => s_perresc(i),
+			errcred => s_perrcred(i),
+			spw_di => s_spw_di(i), -- Kommt vom Router
+			spw_si => s_spw_si(i),
+			spw_do => s_spw_do(i), -- Geht zum Router
+			spw_so => s_spw_so(i)
+		);
+	END GENERATE ExternPortX;
 
-	PROCESS (r, rst, txdivcnt, state, s_txflag, s_txdata)
-		VARIABLE v : regs_type;
-	BEGIN
-		v := r;
-
-		-- Generate tx clock.
-		IF r.txclkcnt = 0 THEN
-			v.txclkcnt := unsigned(txdivcnt);
-			v.txclken := '1';
-		ELSE
-			v.txclkcnt := r.txclkcnt - 1;
-			v.txclken := '0';
-		END IF;
-		IF state = S_Nothing THEN
-			-- Transmitter disabled; reset state.
-			v.bitcnt := "0000";
-			v.parity := '0';
-			v.pend_tick := '0';
-			v.allow_fct := '0';
-			v.allow_char := '0';
-			v.sent_null := '0';
-			v.sent_fct := '0';
-
-			-- Gentle reset of spacewire bus signals
-			IF r.txclken = '1' THEN
-				v.out_data := r.out_data AND r.out_strobe;
-				v.out_strobe := '0';
-			END IF;
-		ELSE
-			-- Transmitter enabled.
-
-			v.allow_fct := (NOT (started)) AND r.sent_null;
-			v.allow_char := (NOT (started)) AND r.sent_null AND (NOT (connecting)) AND r.sent_fct;
-
-			-- On tick of transmission clock, put next bit on the output
-			IF r.txclken = '1' THEN
-				IF r.bitcnt = 0 THEN
-					s_fin <= '0'; -- Ausgangssignal treiben (zeigt an, wann Senden des aktuellen Objekts abgeschlossen ist)
-
-					-- Need to start a new character.
-					IF (r.allow_char = '1') AND (r.pend_tick = '1') THEN -- s_sendTC
-						-- Send TimeCode.
-						v.out_data := r.parity;
-						v.bitshift(12 DOWNTO 5) := r.pend_time;
-						v.bitshift(4 DOWNTO 0) := "01111";
-						v.bitcnt := to_unsigned(13, v.bitcnt'length);
-						v.parity := '0';
-						v.pend_tick := '0';
-					ELSIF (r.allow_fct = '1') AND (s_sendFCT = '1') THEN -- vorher: state = S_FCT
-						-- Send FCT.
-						v.out_data := r.parity;
-						v.bitshift(2 DOWNTO 0) := "001";
-						v.bitcnt := to_unsigned(3, v.bitcnt'length);
-						v.parity := '1';
-						v.sent_fct := '1';
-					ELSIF (r.allow_char = '1') AND (s_sendData = '1') THEN -- vorher: state = S_Data
-						-- Send N-Char.
-						v.bitshift(0) := s_txflag;
-						v.parity := s_txflag;
-						IF s_txflag = '0' THEN
-							-- data byte
-							v.out_data := NOT r.parity;
-							v.bitshift(8 DOWNTO 1) := s_txdata;
-							v.bitcnt := to_unsigned(9, v.bitcnt'length);
-						ELSE
-							-- EOP or EEP
-							v.out_data := r.parity;
-							v.bitshift(1) := s_txdata(0);
-							v.bitshift(2) := NOT s_txdata(0);
-							v.bitcnt := to_unsigned(3, v.bitcnt'length);
-						END IF;
-					ELSE
-						-- Send null.
-						v.out_data := r.parity;
-						v.bitshift(6 DOWNTO 0) := "0010111";
-						v.bitcnt := to_unsigned(7, v.bitcnt'length);
-						v.parity := '0';
-						v.sent_null := '1';
-					END IF;
-				ELSE
-					IF r.bitcnt = 1 THEN
-						-- Wenn nur noch ein Zeichen gesendet werden muss, schon mal bereitmachen das nächste Objekt zu senden und dies mittels s_fin melden.
-						s_fin <= '1'; -- potenzielle Fehlerquelle: wenn empfangs- bzw. sendefrequenz gleich der Taktfrequenz des routers sind, könnte ich mir vorstellen, das 1 Zeichen vor abschluss zu wenig Zeit ist und dann mal das Signal abreißt bzw. Fehler verursacht. Prüfen!
-					END IF;
-
-					-- Shift next bit to the output.
-					v.out_data := r.bitshift(0);
-					v.parity := r.parity XOR r.bitshift(0);
-					v.bitshift(r.bitshift'high - 1 DOWNTO 0) := r.bitshift(r.bitshift'high DOWNTO 1);
-					v.bitcnt := r.bitcnt - 1;
-				END IF;
-
-				-- Data-Strobe encoding.
-				v.out_strobe := NOT (r.out_strobe XOR r.out_data XOR v.out_data);
-			END IF;
-
-			-- Store requests for time tick transmission.
-			IF tick_out = '1' THEN
-				v.pend_tick := '1';
-				v.pend_time := time_out;
-			END IF;
-
-		END IF;
-		-- Synchronous reset
-		IF rst = '1' THEN
-			v := regs_reset;
-		END IF;
-
-		-- Update registers.
-		rin <= v;
-	END PROCESS;
-
-	-- Synchronous process
-	PROCESS (clk) IS
-	BEGIN
-		IF rising_edge(clk) THEN
-			r <= rin;
-
-			-- Drive outputs.
-			spw_di <= r.out_data;
-			spw_si <= r.out_strobe;
-		END IF;
-	END PROCESS;
-
-	-- Combinatorial process that uses a debug port (s_fin)
-	-- to select next element to be sent. Also controls 
-	-- sending of data packets.
-	PROCESS (s_fin)
-		VARIABLE cnt : INTEGER RANGE 0 TO 20 := 0;
-	BEGIN
-		IF rising_edge(s_fin) THEN
-			CASE state IS
-				WHEN S_Idle =>
-					-- Nullen senden:
-					s_sendFCT <= '0';
-					s_sendData <= '0';
-
-				WHEN S_FCT =>
-					-- FCTs senden:
-					s_sendFCT <= '1';
-					s_sendData <= '0';
-
-				WHEN S_Data =>
-
-				-- Erst ab diesem Zustand, Steuerung von außen zulassen! Das heißt: Erst ab hier werden s_sendFCT und s_SendData von Ports getrieben, womit
-				-- der aufrufende Code die Kontrolle darüber hat was gesendet werden soll (Nullen, FCTs, Data)
-				-- Dazu: Einbauen das Benachrichtigung erhalten wird, wenn der aktuelle Auftrag gesendet wurde (evtl. s_fin nach außen treiben (Ausgangsport)),
-				-- damit wieder auf Nullen oder FCTs gewechselt werden kann.
-				-- Wichtig ist dabei aber: Das Input von s_sendFCT und s_sendData bereits mit Null initialisiert werden (womit Nullen gesendet werden)!
-					s_sendFCT <= sendFCT;
-					s_sendData <= sendData;
-
-					if start = '1' then
-						-- Hier dann die FSM durchgehen
-						case pstate is
-							when S_Address =>
-							when S_Cargo =>
-							when S_EOP =>
-							when S_Null =>
-						end case;
-					else
-						-- Nachdem Paket geschickt wurde evtl. ein FCT schicken?
-						pstate <= S_Address;
-					end if;
---					CASE pstate IS
---						WHEN S_Address =>
---							-- Init
---							s_sendFCT <= '0';
---							s_sendData <= '1';
---
---							s_txflag <= '0';
---							s_txdata <= "01000010"; -- TODO: Change destination port address here!
---							pstate <= S_Cargo;
---
---						WHEN S_Cargo =>
---							s_sendFCT <= '0';
---							s_sendData <= '1';
---
---							s_txflag <= '0';
---							s_txdata <= "11111111"; -- TODO: Change cargo here!
---							pstate <= S_EOP;
---
---						WHEN S_EOP =>
---							s_sendFCT <= '0';
---							s_sendData <= '1';
---
---							s_txflag <= '1';
---							s_txdata <= "00000000"; -- will translated into EOP
---							pstate <= S_Null;
---
---						WHEN S_Null =>
---							-- send nulls
---							s_sendFCT <= '0';
---							s_sendData <= '0';
---
---							-- Repeats sending of same packet.
---							IF cnt = 20 THEN
---								cnt := 0;
---								pstate <= S_Address;
---							ELSE
---								cnt := cnt + 1;
---							END IF;
---
---					END CASE;
-
-				WHEN S_Nothing => null;
-					-- send nothing
-			END CASE;
-		END IF;
-	END PROCESS;
-
-	-- Controls connection and maintenance to port.
-	Connection: PROCESS (clk)
-	BEGIN
-		IF rising_edge(clk) THEN
---			IF started = '1' THEN
---				tbstate <= S_Started;
---			END IF;
---
---			IF connecting = '1' THEN
---				tbstate <= S_Connecting;
---			END IF;
---
---			IF running = '1' THEN
---				tbstate <= S_Running;
---			END IF;
-
-			-- Im Falle von Reset oder von Fehlern zurücksetzen und erneut verbinden.
-			IF rst = '1' OR errdisc = '1' OR errpar = '1' OR erresc = '1' OR errcred = '1' THEN
-				tbstate <= S_Rst;
-			elsif running = '1' then
-				tbstate <= S_Running;
-			elsif connecting = '1' then
-				tbstate <= S_Connecting;
-			elsif started = '1' then
-				tbstate <= S_Started;
-			END IF;
-		END IF;
-	END PROCESS;
-
-	-- State of port.
-	portFSM: PROCESS (clk, s_fin)
-	BEGIN
-		IF rising_edge(clk) THEN
-			CASE tbstate IS
-				WHEN S_Rst =>
-					-- Send nulls
-					state <= S_Idle;
-
-				WHEN S_Started =>
-					-- Send nulls
-					state <= S_Idle;
-
-				WHEN S_Connecting =>
-					-- Send FCTs
-					state <= S_FCT;
-
-				WHEN S_Running =>
-					-- Ready to send data packets & timecodes.
-					state <= S_Data;
-			END CASE;
-		END IF;
-	END PROCESS;
-END spwrouterport_tb_arch;
+	-- SpaceWire router.
+	Router : spwrouter
+	GENERIC MAP(
+		numports => numports,
+		sysfreq => sysfreq,
+		txclkfreq => txclkfreq,
+		rx_impl => (OTHERS => rximpl),
+		tx_impl => (OTHERS => tximpl)
+	)
+	PORT MAP(
+		clk => clk,
+		rxclk => rxclk,
+		txclk => txclk,
+		rst => rst,
+		started => s_rstarted,
+		connecting => s_rconnecting,
+		running => s_rrunning,
+		errdisc => s_rerrdisc,
+		errpar => s_rerrpar,
+		erresc => s_rerresc,
+		errcred => s_rerrcred,
+		gotData => gotData, -- Debugport
+		sentData => sentData, -- Debugport
+		fsmstate => fsmstate, -- Debugport
+		debugdataout => debugdataout, -- Debugport
+		spw_di => s_spw_do,
+		spw_si => s_spw_so,
+		spw_do => s_spw_di,
+		spw_so => s_spw_si
+	);
+END routertest_arch;

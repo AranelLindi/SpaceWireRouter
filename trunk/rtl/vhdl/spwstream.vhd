@@ -42,7 +42,7 @@ entity spwstream is
         rxchunk:        integer range 1 to 4 := 1;
         
         -- Width of shift registers in clock recovery front-end; added: SL
-        WIDTH:       integer range 1 to 3 := 1;
+        WIDTH:       integer range 1 to 3 := 2;
 
         -- Selection of a transmitter implementation.
         tximpl:         spw_implementation_type_xmit := impl_generic;

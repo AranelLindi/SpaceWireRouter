@@ -269,13 +269,12 @@ BEGIN
     busMasterDataOut <= (OTHERS => '0');
 
     -- Debug
-    -- pragma synthesis_off
     gotData <= iReceiveFIFOReady; -- (rxvalid) vorher: iReceiveFIFOReadEnable; -- rxread
     sentData <= iTransmitFIFOWriteEnable; -- txwrite
     fsmstate <= state;
-    debugdataout(7 downto 0) <= s_rxdata; --receiveFIFODataOut(7 downto 0); -- nur zu debugzwecken
-    debugdataout(8) <= s_rxflag;
-    -- pragma synthesis_on
+    debugdataout(7 downto 0) <= txdata(7 downto 0);--s_rxdata; --receiveFIFODataOut(7 downto 0); -- nur zu debugzwecken
+    debugdataout(8) <= txdata(8);--s_rxflag;
+    
 
     -- Intermediate steps.
     iTransmitFIFOWriteEnable <= strobeIn WHEN requestIn = '1' ELSE
