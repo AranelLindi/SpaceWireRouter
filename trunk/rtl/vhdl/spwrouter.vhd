@@ -79,6 +79,20 @@ ENTITY spwrouter IS
         sentData: out std_logic_vector(numports downto 0);
         fsmstate: out fsmarr(numports downto 0);
         debugdataout: out array_t(numports downto 0)(8 downto 0);
+        dreadyIn : out std_logic_vector(numports downto 0);
+        drequestIn: out std_logic_vector(numports downto 0);
+        ddataIn : out array_t(numports downto 0)(8 downto 0);
+        dstrobeIn: out std_logic_vector(numports downto 0);
+        dreadyOut: out std_logic_vector(numports downto 0);
+        drequestOut: out std_logic_vector(numports downto 0);
+        ddataOut: out array_t(numports downto 0)(8 downto 0);
+        dstrobeOut: out std_logic_vector(numports downto 0);
+        dgranted: out std_logic_vector(numports downto 0);
+        dSwitchPortNumber: out array_t(numports downto 0)(numports downto 0);
+        dSelectDestinationPort: out array_t(numports downto 0)(numports downto 0);
+        droutingSwitch: out array_t(numports downto 0)(numports downto 0);
+        dsourcePortOut: out array_t(numports downto 0)(1 downto 0);
+        ddestinationPort: out array_t(numports downto 0)(7 downto 0);
         -- Debug ports OFF
 
 
@@ -166,10 +180,33 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         
         -- Eigene Signale
         SIGNAL s_running : STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+
+        -- Debug
+        signal s_fsm : fsmarr(numports downto 0);
     BEGIN
         -- Drive outputs.
         running <= s_running;
         iLinkUp <= s_running;
+
+
+        -- DEBUG
+        fsmstate <= s_fsm;
+        dreadyIn <= iReadyIn; --iReadyIn;
+        drequestIn <= iRequestIn; --iRequestIn;
+        ddataIn <= iDataIn; --iDataIn;
+        dstrobeIn <= iStrobeIn;--iStrobeIn;
+        dreadyOut <= readyOut;
+        drequestOut <= requestOut;
+        ddataOut <= dataOut;
+        dstrobeOut <= strobeOut;
+        dgranted <= granted;
+        dSwitchPortNumber <= iSwitchPortNumber;
+        dSelectDestinationPort <= iSelectDestinationPort;
+        droutingSwitch <= routingSwitch;
+        dsourcePortOut <= sourcePortOut;
+        ddestinationPort <= destinationPort;
+
     
     
         -- Crossbar Switch.
@@ -286,7 +323,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 txclk => txclk,
                 rst => rst,
                 autostart => '1',
-                linkstart => '0',
+                linkstart => '1',
                 linkdis => '0',
                 txdivcnt => "00000001",
                 tick_in => tick_in(i),
@@ -322,7 +359,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 busMasterAcknowledgeIn => busMasterAcknowledgeIn(i),
                 gotData => gotData(i), -- Debugport
                 sentData => sentData(i), -- Debugport
-                fsmstate => fsmstate(i), -- Debugport
+                fsmstate => s_fsm(i), -- Debugport
                 debugdataout => debugdataout(i), -- Debugport
                 spw_di => spw_di(i),
                 spw_si => spw_si(i),

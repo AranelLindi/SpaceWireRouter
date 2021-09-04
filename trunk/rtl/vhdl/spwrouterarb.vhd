@@ -71,13 +71,13 @@ BEGIN
     -- Route occupation signal
     occSig : FOR i IN 0 TO numports GENERATE
         -- unten: hier inner loop nur nötig wenn mit rout(i) nicht eine ganze Zeile angesprochen werden kann!! Operatoren sind so definiert, dass sie auch eine komplete Zeile verarbeiten!
-        s_occupied(i) <= OR rout(i); -- hoffentlich richtig addressiert
+        s_occupied(i) <= OR s_routing(i); -- hoffentlich richtig addressiert
     END GENERATE;
 
     -- Source port number which requests port as destination port.
     outererloop : FOR i IN 0 TO numports GENERATE
         innerloop : FOR j IN 0 TO numports GENERATE
-            s_request(i, j) <= '1' WHEN req(i) = '1' AND to_integer(unsigned(dest(i))) = j ELSE
+            s_request(j, i) <= '1' WHEN req(i) = '1' AND to_integer(unsigned(dest(i))) = j ELSE
             '0'; -- potenzielle fehlerquelle!
         END GENERATE;
     END GENERATE;
@@ -107,12 +107,12 @@ BEGIN
 
     -- Connection enabling signal
     rowloop : FOR i IN 0 TO numports GENERATE
-	 SIGNAL s_Test : std_logic_vector(numports downto 0);
+	 SIGNAL s_transform : std_logic_vector(numports downto 0);
 	BEGIN
 
         columnloop : FOR j IN numports DOWNTO 0 GENERATE
-		s_Test(j) <= s_routing(j)(i);
+		s_transform(j) <= s_routing(j)(i);
         END GENERATE columnloop;
-	s_granted(i) <= OR s_Test;
+	s_granted(i) <= OR s_transform;
     END GENERATE rowloop;
 END ARCHITECTURE spwrouterarb_arch;

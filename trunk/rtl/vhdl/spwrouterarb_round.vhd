@@ -74,7 +74,7 @@ BEGIN
 
         ELSIF rising_edge(clk) THEN
             -- Roll-out arbitration logic for every port.
-            arbitration : FOR i IN 0 TO numports LOOP
+            arbitration : FOR i IN numports DOWNTO 0 LOOP
                 IF (s_lstgrnt = STD_LOGIC_VECTOR(to_unsigned(i, s_lstgrnt'length))) THEN
 
                     -- Following ports in line (0..1..numports..0) are given prefered access to current

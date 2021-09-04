@@ -25,7 +25,7 @@ ENTITY routertest_tb IS
 END routertest_tb;
 
 ARCHITECTURE routertest_tb_arch OF routertest_tb IS
-	CONSTANT numports : INTEGER RANGE 0 TO 31 := 3;
+	CONSTANT numports : INTEGER RANGE 0 TO 31 := 2;
 	CONSTANT clock_period : TIME := 100 ns; -- 10 MHz
 	CONSTANT sysfreq : real := 10.0e6;
 	CONSTANT txclkfreq : real := 10.0e6;
@@ -95,6 +95,20 @@ ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 			sentData: out std_logic_vector(numports downto 0); -- Debugport
 			fsmstate: out fsmarr(numports downto 0); -- Debugport
 			debugdataout: out array_t(numports downto 0)(8 downto 0); -- Debugport
+			dreadyIn : out std_logic_vector(numports downto 0); -- Debugport
+            drequestIn: out std_logic_vector(numports downto 0); -- Debugport
+            ddataIn : out array_t(numports downto 0)(8 downto 0); -- Debugport
+            dstrobeIn : out std_logic_vector(numports downto 0); -- Debugport
+			dreadyOut: out std_logic_vector(numports downto 0); -- Debugport
+			drequestOut: out std_logic_vector(numports downto 0); -- Debugport
+			ddataOut: out array_t(numports downto 0)(8 downto 0); -- Debugport
+			dstrobeOut: out std_logic_vector(numports downto 0); -- Debugport
+			dgranted: out std_logic_vector(numports downto 0); -- Debugport
+			dSwitchPortNumber: out array_t(numports downto 0)(numports downto 0); -- Debugport
+            dSelectDestinationPort: out array_t(numports downto 0)(numports downto 0); -- Debugport
+            droutingSwitch: out array_t(numports downto 0)(numports downto 0); -- Debugport
+            dsourcePortOut: out array_t(numports downto 0)(1 downto 0); -- Debugport
+            ddestinationPort: out array_t(numports downto 0)(7 downto 0); -- Debugport
 			spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			spw_s_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
@@ -144,6 +158,16 @@ ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 	signal sentData: std_logic_vector(numports downto 0); -- Debugport
 	signal fsmstate: fsmarr(numports downto 0); -- Debugport
 	signal debugdataout : array_t(numports downto 0)(8 downto 0); -- Debugport
+	signal dreadyIn : std_logic_vector(numports downto 0); -- Debugport
+	signal drequestIn: std_logic_vector(numports downto 0); -- Debugport
+	signal ddataIn : array_t(numports downto 0)(8 downto 0); -- Debugport
+	signal dstrobeIn : std_logic_vector(numports downto 0); -- Debugport
+	signal dgranted: std_logic_vector(numports downto 0); -- Debugport
+	signal dSwitchPortNumber: array_t(numports downto 0)(numports downto 0); -- Debugport
+	signal dSelectDestinationPort: array_t(numports downto 0)(numports downto 0); -- Debugport
+	signal droutingSwitch: array_t(numports downto 0)(numports downto 0); -- Debugport
+	signal dsourcePortOut: array_t(numports downto 0)(1 downto 0); -- Debugport
+	signal ddestinationPort: array_t(numports downto 0)(7 downto 0); -- Debugport
 	SIGNAL spw_d_r2p : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
 	SIGNAL spw_s_r2p : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
 	SIGNAL spw_d_p2r : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
@@ -151,7 +175,21 @@ ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 
 	TYPE packetstates IS (S_Address, S_Cargo, S_EOP, S_Null);
 	SIGNAL pstate : packetstates := S_Address;
+
+	-- Debug
+	signal s_fsmstate: fsmarr(numports downto 0);
+	signal s_dreadyOut: std_logic_vector(numports downto 0);
+	signal s_drequestOut: std_logic_vector(numports downto 0);
+	signal s_ddataOut: array_t(numports downto 0)(8 downto 0);
+	signal s_dstrobeOut: std_logic_vector(numports downto 0);
+	signal s_granted: std_logic_vector(numports downto 0);
 BEGIN
+	fsmstate <= s_fsmstate;
+
+
+	-- Debug
+	dgranted <= s_granted;
+
 
 	spwroutertest : routertest
 	GENERIC MAP(
@@ -207,6 +245,21 @@ BEGIN
 		gotData => gotData, -- Debugport
 		sentData => sentData, -- Debugport
 		debugdataout => debugdataout, -- Debugport
+		dreadyIn => dreadyIn, -- Debugport
+		drequestIn => drequestIn, -- Debugport
+		ddataIn => ddataIn, -- Debugport
+		dstrobeIn => dstrobeIn, -- Debugport
+		dreadyOut => s_dreadyOut, -- Debugport
+		drequestOut => s_drequestOut, -- Debugport
+		ddataOut => s_ddataOut, -- Debugport
+		dstrobeOut => s_dstrobeOut, -- Debugport
+		fsmstate => s_fsmstate, -- Debugport
+		dgranted => s_granted, -- Debugport
+		dSwitchPortNumber => dSwitchPortNumber, -- Debugport
+		dSelectDestinationPort => dSelectDestinationPort, -- Debugport
+		droutingSwitch => droutingSwitch, -- Debugport
+		dsourcePortOut => dsourcePortOut, -- Debugport
+		ddestinationPort => ddestinationPort, -- Debugport
 		spw_d_r2p => spw_d_r2p,
 		spw_s_r2p => spw_s_r2p,
 		spw_d_p2r => spw_d_p2r,
@@ -228,7 +281,7 @@ BEGIN
 			IF rrunning(1) = '1' AND prunning(1) = '1' THEN
 				CASE pstate IS
 					WHEN S_Address =>
-						txdata(1) <= "00000010";
+						txdata(1) <= "00000010"; -- 2
 						txflag(1) <= '0';
 						txwrite(1) <= '1';
 

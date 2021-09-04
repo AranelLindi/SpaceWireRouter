@@ -187,6 +187,20 @@ ENTITY routertest IS
 		sentData: out std_logic_vector(numports downto 0);
 		fsmstate: out fsmarr(numports downto 0);
 		debugdataout : out array_t(numports downto 0)(8 downto 0);
+		dreadyIn : out std_logic_vector(numports downto 0);
+		drequestIn: out std_logic_vector(numports downto 0);
+		ddataIn: out array_t(numports downto 0)(8 downto 0);
+		dstrobeIn: out std_logic_vector(numports downto 0);
+		dreadyOut: out std_logic_vector(numports downto 0);
+		drequestOut: out std_logic_vector(numports downto 0);
+		ddataOut : out array_t(numports downto 0)(8 downto 0);
+		dstrobeOut: out std_logic_vector(numports downto 0);
+		dgranted: out std_logic_vector(numports downto 0);
+		dSwitchPortNumber: out array_t(numports downto 0)(numports downto 0); -- Debugport
+		dSelectDestinationPort: out array_t(numports downto 0)(numports downto 0); -- Debugport
+		droutingSwitch: out array_t(numports downto 0)(numports downto 0); -- Debugport
+		dsourcePortOut: out array_t(numports downto 0)(1 downto 0); -- Debugport
+		ddestinationPort: out array_t(numports downto 0)(7 downto 0); -- Debugport
 		-- debug ports OFF
 
 
@@ -230,6 +244,15 @@ ARCHITECTURE routertest_arch OF routertest IS
 	SIGNAL s_perrpar : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	SIGNAL s_perresc : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	SIGNAL s_perrcred : STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+
+	-- Debug
+	signal s_fsmstate: fsmarr(numports downto 0);
+	signal s_dreadyOut: std_logic_vector(numports downto 0);
+	signal s_drequestOut: std_logic_vector(numports downto 0);
+	signal s_ddataOut: array_t(numports downto 0)(8 downto 0);
+	signal s_dstrobeOut: std_logic_vector(numports downto 0);
+	signal s_granted: std_logic_vector(numports downto 0);
 BEGIN
 	-- Drive outputs.
 	-- Signals from router to ports.
@@ -254,6 +277,14 @@ BEGIN
 	perresc <= s_perresc;
 	rerrcred <= s_rerrcred;
 	perrcred <= s_perrcred;
+
+	-- Debug
+	fsmstate <= s_fsmstate;
+	dreadyOut <= s_dreadyOut;
+	drequestOut <= s_drequestOut;
+	ddataOut <= s_ddataOut;
+	dstrobeOut <= s_dstrobeOut;
+	dgranted <= s_granted;
 
 	-- Port 0
 	ExternPort0 : spwstream
@@ -380,8 +411,22 @@ BEGIN
 		errcred => s_rerrcred,
 		gotData => gotData, -- Debugport
 		sentData => sentData, -- Debugport
-		fsmstate => fsmstate, -- Debugport
+		fsmstate => s_fsmstate, -- Debugport
 		debugdataout => debugdataout, -- Debugport
+		dreadyIn => dreadyIn, -- Debugport
+		drequestIn => drequestIn, -- Debugport
+		ddataIn => ddataIn, -- Debugport
+		dstrobeIn => dstrobeIn, -- Debugport
+		dreadyOut => s_dreadyOut, -- Debugport
+		drequestOut => s_drequestOut, -- Debugport
+		ddataOut => s_ddataOut, -- Debugport
+		dstrobeOut => s_dstrobeOut, -- Debugport
+		dgranted => s_granted, -- Debugport
+		dSwitchPortNumber => dSwitchPortNumber, -- Debugport
+		dSelectDestinationPort => dSelectDestinationPort, -- Debugport
+		droutingSwitch => droutingSwitch, -- Debugport
+		dsourcePortOut => dsourcePortOut, -- Debugport
+		ddestinationPort => ddestinationPort, -- Debugport
 		spw_di => s_spw_do,
 		spw_si => s_spw_so,
 		spw_do => s_spw_di,

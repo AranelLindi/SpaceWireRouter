@@ -241,12 +241,12 @@ PACKAGE spwrouterpkg IS
             busMasterRequestOut : OUT STD_LOGIC;
             busMasterAcknowledgeIn : IN STD_LOGIC;
 
-            -- pragma synthesis_off
+            -- //pragma synthesis_off
             gotData : OUT STD_LOGIC; -- debug
             sentData : OUT STD_LOGIC; -- debug
             fsmstate : OUT spwrouterportstates; -- debug
             debugdataout : OUT STD_LOGIC_VECTOR(8 DOWNTO 0); -- debug
-            -- pragma synthesis_on
+            -- //pragma synthesis_on
 
             spw_di : IN STD_LOGIC;
             spw_si : IN STD_LOGIC;
@@ -280,6 +280,20 @@ PACKAGE spwrouterpkg IS
             sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
             fsmstate: out fsmarr(numports downto 0); -- Debugport
             debugdataout : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
+            dreadyIn : out std_logic_vector(numports downto 0); -- Debugport
+            drequestIn: out std_logic_vector(numports downto 0); -- Debugport
+            ddataIn : out array_t(numports downto 0)(8 downto 0); -- Debugport
+            dstrobeIn : out std_logic_vector(numports downto 0); -- Debugport
+            dreadyOut: out std_logic_vector(numports downto 0); -- Debugport
+            drequestOut: out std_logic_vector(numports downto 0); -- Debugport
+            ddataOut: out array_t(numports downto 0)(8 downto 0); -- Debugport
+            dstrobeOut: out std_logic_vector(numports downto 0); -- Debugport
+            dgranted: out std_logic_vector(numports downto 0); -- Debugport
+            dSwitchPortNumber: out array_t(numports downto 0)(numports downto 0); -- Debugport
+            dSelectDestinationPort: out array_t(numports downto 0)(numports downto 0); -- Debugport
+            droutingSwitch: out array_t(numports downto 0)(numports downto 0); -- Debugport
+            dsourcePortOut: out array_t(numports downto 0)(1 downto 0); -- Debugport
+            ddestinationPort: out array_t(numports downto 0)(7 downto 0); -- Debugport
             spw_di : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             spw_si : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             spw_do : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);

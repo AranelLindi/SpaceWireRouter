@@ -224,14 +224,14 @@ END spwrouterport;
 
 ARCHITECTURE spwrouterport_arch OF spwrouterport IS
     -- Finite state machine states.
-    SIGNAL state : spwrouterportstates := S_Idle; -- check 
+    SIGNAL state : spwrouterportstates;-- := S_Idle; -- check 
 
     -- Contains paket cargo only (none port addresses) -- Enthält nur Datenbytes, nicht das erste Byte das die Zielportadresse darstellt
     SIGNAL iDataOut : STD_LOGIC_VECTOR(8 DOWNTO 0);
 
     -- Routing Tabelle
     -- De facto logical port number (32-254).
-    SIGNAL iRoutingTableAddress : STD_LOGIC_VECTOR(7 DOWNTO 0) := (others => '0');
+    SIGNAL iRoutingTableAddress : STD_LOGIC_VECTOR(7 DOWNTO 0);-- := (others => '0');
     -- Anfrage an Routing Tabelle.
     SIGNAL iRoutingTableRequest : STD_LOGIC;
 
@@ -243,7 +243,7 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
     -- Reception-specific signals.
     SIGNAL iReceiveFIFOReadEnable : STD_LOGIC; -- rxread
     SIGNAL iReceiveFIFOReady : STD_LOGIC; -- rxvalid
-    SIGNAL receiveFIFODataOut : STD_LOGIC_VECTOR(8 DOWNTO 0) := (others => '0'); -- rxdata -- testweise initialisiert!
+    SIGNAL receiveFIFODataOut : STD_LOGIC_VECTOR(8 DOWNTO 0);-- := (others => '0'); -- rxdata -- testweise initialisiert!
 
     -- Intermediate signals (werden nur an Ausgänge unter 'Drive outputs' drangehängt)
     SIGNAL iStrobeOut : STD_LOGIC;
@@ -272,8 +272,8 @@ BEGIN
     gotData <= iReceiveFIFOReady; -- (rxvalid) vorher: iReceiveFIFOReadEnable; -- rxread
     sentData <= iTransmitFIFOWriteEnable; -- txwrite
     fsmstate <= state;
-    debugdataout(7 downto 0) <= txdata(7 downto 0);--s_rxdata; --receiveFIFODataOut(7 downto 0); -- nur zu debugzwecken
-    debugdataout(8) <= txdata(8);--s_rxflag;
+    debugdataout(7 downto 0) <= s_rxdata; --receiveFIFODataOut(7 downto 0); -- nur zu debugzwecken
+    debugdataout(8) <= s_rxflag;
     
 
     -- Intermediate steps.
@@ -388,7 +388,7 @@ BEGIN
                             -- Physical port addressed.
                             iDestinationPortOut <= receiveFIFODataOut(7 DOWNTO 0); -- enthält die Portnummer als erstes Byte eines Pakets!!
 
-                            IF (receiveFIFODataOut(7 DOWNTO 0) > STD_LOGIC_VECTOR(to_unsigned(numports, receiveFIFODataOut'length))) THEN
+                            IF (unsigned(receiveFIFODataOut(7 DOWNTO 0)) > numports) THEN
                                 -- Discard invalid addressed packet. (destination port does not exist)
                                 state <= S_Dummy0;
 
@@ -503,7 +503,7 @@ BEGIN
                     IF (readyIn = '1') THEN
                         iStrobeOut <= '1';
                         iDataOut <= receiveFIFODataOut;
-                        IF (receiveFIFODataOut(8) = '1') THEN -- vorher receiveFIFODataOut(8)
+                        IF (receiveFIFODataOut(8) = '1') THEN
                             -- EOP/EEP, packet is finished.
                             state <= S_Data3;
 
@@ -555,8 +555,8 @@ BEGIN
 
                     END IF;
 
-                WHEN OTHERS => -- Because of unused state problem.
-                    state <= S_Idle;
+                --WHEN OTHERS => -- Because of unused state problem.
+                --    state <= S_Idle;
             END CASE;
         END IF;
     END PROCESS;

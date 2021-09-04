@@ -95,27 +95,30 @@ BEGIN
 
 	rst <= '0';
 
-	dest <= (1 => (std_logic_vector(to_unsigned(2, 8))), others => (others => '0'));
+	dest <= (1 => (1 => '1', others => '0'), others => (others => '0'));
 	req <= (1 => '1', others => '0');
 
-	wait for 2 * clock_period;
+--	dest <= (1 => (std_logic_vector(to_unsigned(2, 8))), others => (others => '0'));
+--	req <= (1 => '1', others => '0');
 
-	dest <= (0 => (std_logic_vector(to_unsigned(1, 8))), 2 => (std_logic_vector(to_unsigned(1, 8))), others => (others => '0'));
-	req <= (0 => '1', 2 => '1', others => '0');
+--	wait for 2 * clock_period;
 
-	wait for 2 * clock_period;
+--	dest <= (0 => (std_logic_vector(to_unsigned(1, 8))), 2 => (std_logic_vector(to_unsigned(1, 8))), others => (others => '0'));
+--	req <= (0 => '1', 2 => '1', others => '0');
 
-	req <= (others => '0');
+--	wait for 2 * clock_period;
+
+--	req <= (others => '0');
 	
-	wait for 2 * clock_period;
+--	wait for 2 * clock_period;
 
-	dest <= (others => (others => '1'));
-	req <= (others => '1');
+--	dest <= (others => (others => '1'));
+--	req <= (others => '1');
 
-	wait for 3 * clock_period;
+--	wait for 3 * clock_period;
 
-	dest <= (others => (others => '0'));
-	req <= (others => '0');
+--	dest <= (others => (others => '0'));
+--	req <= (others => '0');
 
 	wait;
     END PROCESS;
