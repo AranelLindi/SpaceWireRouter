@@ -155,8 +155,6 @@ PACKAGE spwrouterpkg IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            --txclk : IN STD_LOGIC;
-            --rxclk : IN STD_LOGIC;
             writeData : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             readData : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             readwrite : IN STD_LOGIC;

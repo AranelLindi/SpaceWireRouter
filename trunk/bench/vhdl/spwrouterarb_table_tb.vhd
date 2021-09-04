@@ -31,8 +31,8 @@ ARCHITECTURE spwrouterarb_table_tb_arch OF spwrouterarb_table_tb IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            req : IN STD_LOGIC_VECTOR((numports + 1) DOWNTO 0);
-            grnt : OUT STD_LOGIC_VECTOR((numports + 1) DOWNTO 0)
+            req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
         );
     END COMPONENT;
 
@@ -45,18 +45,16 @@ ARCHITECTURE spwrouterarb_table_tb_arch OF spwrouterarb_table_tb IS
     SIGNAL clk : STD_LOGIC;
 
     -- Asynchronous reset.
-    SIGNAL rst : STD_LOGIC := '0'; -- Caution! It may be necessary to set rst at beginning to high for short period of time. 
+    SIGNAL rst : STD_LOGIC := '1'; -- Caution! It may be necessary to set rst at beginning to high for short period of time. 
 
     -- Requests from all ports. (Bit corresponds to port)
-    SIGNAL req : STD_LOGIC_VECTOR((numports + 1) DOWNTO 0) := (OTHERS => '0'); -- No access request was made from any port.
+    SIGNAL req : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0'); -- No access request was made from any port.
 
     -- Contains which port gets access.
-    SIGNAL grnt : STD_LOGIC_VECTOR((numports + 1) DOWNTO 0);
+    SIGNAL grnt : STD_LOGIC_VECTOR(numports DOWNTO 0);
     
-    
-    -- Clock period. (100 MHz)
-    CONSTANT clock_period : TIME := 10 ns;
-    SIGNAL stop_the_clock : BOOLEAN;
+    -- Clock period. (10 MHz)
+    CONSTANT clock_period : TIME := 100 ns;
 BEGIN
 
     -- Design under test.
@@ -70,45 +68,40 @@ BEGIN
     -- Simulation.
     stimulus : PROCESS
     BEGIN
-        rst <= '1'; -- Reset to initialize signals in dut.
-        
-        WAIT FOR clock_period/4;
-        
-        -- Set initial values for simulation.
-        rst <= '0';
-        req <= (others => '0'); -- No port wants access.
-        
-        WAIT FOR clock_period;
-        
-        req <= (0 => '1', others => '0'); -- Port0 requieres access.
-        
-        WAIT FOR clock_period;
-        
-        req <= (1 => '1', 2 => '1', others => '0'); -- More ports wants access, watch control logic.
-        
-        WAIT FOR clock_period;
-        
-        req <= (others => '1'); -- All ports ask for access. No change should take place.
-        
-        WAIT FOR clock_period;
-        
-        req <= (2 => '1', others => '0'); -- Port2 wants access, system should grant it.
-        
-        --rst <= '1';        
-    
         WAIT FOR clock_period;
 
-        stop_the_clock <= true;
+        -- Set initial values for simulation.
+        rst <= '0';
+        req <= (OTHERS => '0'); -- No port wants access.
+
+        WAIT FOR clock_period;
+
+        req <= (1 => '1', OTHERS => '0'); -- Port0 requieres access.
+
+        WAIT FOR clock_period;
+
+        req <= (1 => '1', 2 => '1', OTHERS => '0'); -- More ports wants access, watch control logic.
+
+        WAIT FOR clock_period;
+
+        req <= (OTHERS => '1'); -- All ports ask for access. No change should take place.
+
+        WAIT FOR clock_period;
+
+        req <= (2 => '1', OTHERS => '0'); -- Port2 wants access, system should grant it.
+
+        --rst <= '1';        
+
+        --WAIT FOR clock_period;
+
+        --stop_the_clock <= true;
         WAIT;
     END PROCESS;
 
     -- Creates clock.
     clocking : PROCESS
     BEGIN
-        WHILE NOT stop_the_clock LOOP
-            clk <= '0', '1' AFTER clock_period / 2;
-            WAIT FOR clock_period;
-        END LOOP;
-        WAIT;
+        clk <= '0', '1' AFTER clock_period / 2;
+        WAIT FOR clock_period;
     END PROCESS;
 END spwrouterarb_table_tb_arch;

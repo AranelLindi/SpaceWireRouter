@@ -192,10 +192,10 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
 
         -- DEBUG
         fsmstate <= s_fsm;
-        dreadyIn <= iReadyIn; --iReadyIn;
-        drequestIn <= iRequestIn; --iRequestIn;
-        ddataIn <= iDataIn; --iDataIn;
-        dstrobeIn <= iStrobeIn;--iStrobeIn;
+        dreadyIn <= iReadyIn;
+        drequestIn <= iRequestIn;
+        ddataIn <= iDataIn;
+        dstrobeIn <= iStrobeIn;
         dreadyOut <= readyOut;
         drequestOut <= requestOut;
         ddataOut <= dataOut;
@@ -221,15 +221,15 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             req => requestOut,
             grnt => granted,
             rout => routingSwitch
-        );
+        ); -- passt alles, auch bereits getestet!
 
 
         -- The destination PortNo regarding to the source PortNo.
         destPort : FOR i IN 0 TO numports GENERATE
             destPortI : FOR j IN 0 TO numports GENERATE
                 iSelectDestinationPort(i)(j) <= routingSwitch(j)(i);
-            END GENERATE;
-        END GENERATE destport; -- vorläufig check
+            END GENERATE destPortI;
+        END GENERATE destPort; -- vorläufig check
 
 
         -- The source to the destination PortNo PortNo.
@@ -248,6 +248,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
 
 
         -- SpaceWirePort LinkUP Signal. (entfällt)
+
         -- Internal Configuration Port.
 --        port0 : spwrouterport
 --        GENERIC MAP(
@@ -407,20 +408,24 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
 
         -- Timing adjustment. BusSlaveAccessSelector
         PROCESS (clk)
-            VARIABLE varB : STD_LOGIC := '0';
+            --VARIABLE varB : STD_LOGIC := '0';
         BEGIN
             IF rising_edge(clk) THEN
-                FOR i IN 0 TO numports LOOP
-                    if busMasterRequestOut(i) = '1' then
-                        varB := '1';
-                    end if;
-                END LOOP;
 
-                IF varB = '1' THEN
-                    iBusSlaveCycleIn <= '1';
-                ELSE
-                    iBusSlaveCycleIn <= '0';
-                END IF;
+                --FOR i IN 0 TO numports LOOP
+                --    if busMasterRequestOut(i) = '1' then
+                --        varB := '1';
+                --    end if;
+                --END LOOP;
+
+                --IF varB = '1' THEN
+                --    iBusSlaveCycleIn <= '1';
+                --ELSE
+                --    iBusSlaveCycleIn <= '0';
+                --END IF;
+                iBusSlaveCycleIn <= or busMasterRequestOut; -- ist doch das gleiche wie oben oder?
+
+
                 -- Wieder umgedrehte Prioriät (im Vergleich zum Originalcode)
 
                 FOR i IN numports DOWNTO 1 LOOP
@@ -431,7 +436,8 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                         iBusSlaveWriteEnableIn <= busMasterWriteEnableOut(i);
                         iBusSlaveOriginalPortIn <= x"ff";
                         iBusSlaveDataIn <= (OTHERS => '0');
-                        busMasterAcknowledgeIn <= (i => iBusSlaveAcknowledgeOut, OTHERS => '0');
+                        busMasterAcknowledgeIn <= (others => '0');
+                        busMasterAcknowledgeIn(i) <= iBusSlaveAcknowledgeOut;
                     END IF;
                 END LOOP;
                 -- Port0 ist Spezialfall, daher außerhalb der For-Loop!
@@ -442,7 +448,8 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                     iBusSlaveWriteEnableIn <= busMasterWriteEnableOut(0);
                     --iBusSlaveOriginalPortIn <= busMasterOriginalPortOut(0); -- wohl nur für RMAP nötig
                     iBusSlaveDataIn <= busMasterDataOut(0);
-                    busMasterAcknowledgeIn <= (0 => iBusSlaveAcknowledgeOut, OTHERS => '0');
+                    busMasterAcknowledgeIn <= (others => '0');
+                    busMasterAcknowledgeIn(0) <= iBusSlaveAcknowledgeOut;
                 END IF;
 
                 busSlaveDataOut <= ibusMasterDataOut;

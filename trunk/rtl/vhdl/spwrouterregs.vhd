@@ -34,12 +34,6 @@ ENTITY spwrouterregs IS
         -- Asynchronous reset.
         rst : IN STD_LOGIC;
 
-        -- Transmit clock.
-        --txclk : IN STD_LOGIC;
-
-        -- Receiver clock.
-        --rxclk : IN STD_LOGIC;
-
         -- Data to write into register. (Everything that has no own writing port)
         writeData : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
@@ -181,8 +175,8 @@ BEGIN
 
     -- Address decoding and table selection.
     -- Routing table: logic addressing with ports 32 to 254 (saved in routing table)
-    s_selectRoutingTable <= '1' WHEN (addr(13 DOWNTO 2) > "000000011111" AND addr(13 DOWNTO 2) < "000100000000") ELSE
-        '0';
+    --s_selectRoutingTable <= '1' WHEN (addr(13 DOWNTO 2) > "000000011111" AND addr(13 DOWNTO 2) < "000100000000") ELSE '0';
+    s_selectRoutingTable <= '1' when to_integer(unsigned(addr(13 downto 2))) > 31 and to_integer(unsigned(addr(13 downto 2))) < 256 Else '0';
 
     -- ROM table (defines memory address).
     s_table_4 <= '1' WHEN addr(13 DOWNTO 8) = "000100" ELSE

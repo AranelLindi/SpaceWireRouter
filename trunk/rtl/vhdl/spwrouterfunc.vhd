@@ -26,6 +26,7 @@ PACKAGE BODY spwrouterfunc IS
         --RETURN cond;
     END select7x1;
 
+    -- wird nicht benötigt
     FUNCTION select7x1xVector8(selectVector : IN STD_LOGIC_VECTOR(numports DOWNTO 0); bits : array_t(numports DOWNTO 0)(numports DOWNTO 0)) RETURN STD_LOGIC_VECTOR IS
     BEGIN
         FOR i IN numports DOWNTO 0 LOOP
@@ -39,15 +40,20 @@ PACKAGE BODY spwrouterfunc IS
     END select7x1xVector8;
 
     function select7x1xVector9(selectVector : std_logic_vector(numports DOWNTO 0); bits: array_t(numports DOWNTO 0)(8 downto 0)) return std_logic_vector is
+        variable selected: boolean := false;
+        constant cnull : std_logic_vector(8 downto 0) := (others => '0');
     begin
         for i in numports downto 0 loop
-            if (selectVector = std_logic_vector(to_unsigned(i, 9))) then
+            if (selectVector(i) = '1') then
+                selected := true;
                 return bits(i);
             end if;
         end loop;
 
         -- else case
-        return std_logic_vector(to_unsigned(0, 9)); -- länge passt wahrscheinlich nicht; nach Änderung +1 mal schauen!
+        if selected = false then
+            return cnull;
+        end if;
     end select7x1xVector9;
 END PACKAGE BODY;
 

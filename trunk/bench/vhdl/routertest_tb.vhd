@@ -2,9 +2,9 @@
 -- Company: University of Wuerzburg, Germany
 -- Engineer: Stefan Lindoerfer
 -- 
--- Create Date: 22.08.2021 23:28
+-- Create Date: 04.09.2021 21:35
 -- Design Name: SpaceWire Router Testbench
--- Module Name: spwrouter_tb
+-- Module Name: routertest_tb
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
@@ -25,17 +25,19 @@ ENTITY routertest_tb IS
 END routertest_tb;
 
 ARCHITECTURE routertest_tb_arch OF routertest_tb IS
+	-- TODO: Set router settings. (Predefined simulation procedures requires three ports (port0 is unused)!)
 	CONSTANT numports : INTEGER RANGE 0 TO 31 := 2;
 	CONSTANT clock_period : TIME := 100 ns; -- 10 MHz
 	CONSTANT sysfreq : real := 10.0e6;
 	CONSTANT txclkfreq : real := 10.0e6;
 
+	-- Fast front-ends are necessary to transmit and receive on same frequence.
 	CONSTANT rximpl : spw_implementation_type_rec := impl_fast;
 	CONSTANT tximpl : spw_implementation_type_xmit := impl_fast;
 
 	CONSTANT rxchunk : INTEGER RANGE 1 TO 4 := 1;
 
-	CONSTANT WIDTH : INTEGER RANGE 1 TO 3 := 2;
+	CONSTANT WIDTH : INTEGER RANGE 1 TO 3 := 2; -- not used
 
 	CONSTANT rxfifosize_bits : INTEGER RANGE 6 TO 14 := 11;
 	CONSTANT txfifosize_bits : INTEGER RANGE 2 TO 14 := 11;
@@ -91,28 +93,28 @@ ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 			rerresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			perrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			rerrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			gotData: out std_logic_vector(numports downto 0); -- Debugport
-			sentData: out std_logic_vector(numports downto 0); -- Debugport
-			fsmstate: out fsmarr(numports downto 0); -- Debugport
-			debugdataout: out array_t(numports downto 0)(8 downto 0); -- Debugport
-			dreadyIn : out std_logic_vector(numports downto 0); -- Debugport
-            drequestIn: out std_logic_vector(numports downto 0); -- Debugport
-            ddataIn : out array_t(numports downto 0)(8 downto 0); -- Debugport
-            dstrobeIn : out std_logic_vector(numports downto 0); -- Debugport
-			dreadyOut: out std_logic_vector(numports downto 0); -- Debugport
-			drequestOut: out std_logic_vector(numports downto 0); -- Debugport
-			ddataOut: out array_t(numports downto 0)(8 downto 0); -- Debugport
-			dstrobeOut: out std_logic_vector(numports downto 0); -- Debugport
-			dgranted: out std_logic_vector(numports downto 0); -- Debugport
-			dSwitchPortNumber: out array_t(numports downto 0)(numports downto 0); -- Debugport
-            dSelectDestinationPort: out array_t(numports downto 0)(numports downto 0); -- Debugport
-            droutingSwitch: out array_t(numports downto 0)(numports downto 0); -- Debugport
-            dsourcePortOut: out array_t(numports downto 0)(1 downto 0); -- Debugport
-            ddestinationPort: out array_t(numports downto 0)(7 downto 0); -- Debugport
-			spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			spw_s_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			spw_s_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+			gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			fsmstate : OUT fsmarr(numports DOWNTO 0); -- Debugport
+			debugdataout : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
+			dreadyIn : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			drequestIn : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			ddataIn : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
+			dstrobeIn : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			dreadyOut : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			drequestOut : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			ddataOut : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
+			dstrobeOut : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			dgranted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			dSwitchPortNumber : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
+			dSelectDestinationPort : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
+			droutingSwitch : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
+			dsourcePortOut : OUT array_t(numports DOWNTO 0)(1 DOWNTO 0); -- Debugport
+			ddestinationPort : OUT array_t(numports DOWNTO 0)(7 DOWNTO 0); -- Debugport
+			spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Data signal from router to external ports
+			spw_s_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Strobe signal from router to external ports
+			spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Data signal from external ports to router
+			spw_s_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0) -- Strobe signal from external ports to router
 		);
 	END COMPONENT;
 
@@ -154,20 +156,20 @@ ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 	SIGNAL rerresc : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	SIGNAL perrcred : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	SIGNAL rerrcred : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	signal gotData : std_logic_vector(numports downto 0); -- Debugport
-	signal sentData: std_logic_vector(numports downto 0); -- Debugport
-	signal fsmstate: fsmarr(numports downto 0); -- Debugport
-	signal debugdataout : array_t(numports downto 0)(8 downto 0); -- Debugport
-	signal dreadyIn : std_logic_vector(numports downto 0); -- Debugport
-	signal drequestIn: std_logic_vector(numports downto 0); -- Debugport
-	signal ddataIn : array_t(numports downto 0)(8 downto 0); -- Debugport
-	signal dstrobeIn : std_logic_vector(numports downto 0); -- Debugport
-	signal dgranted: std_logic_vector(numports downto 0); -- Debugport
-	signal dSwitchPortNumber: array_t(numports downto 0)(numports downto 0); -- Debugport
-	signal dSelectDestinationPort: array_t(numports downto 0)(numports downto 0); -- Debugport
-	signal droutingSwitch: array_t(numports downto 0)(numports downto 0); -- Debugport
-	signal dsourcePortOut: array_t(numports downto 0)(1 downto 0); -- Debugport
-	signal ddestinationPort: array_t(numports downto 0)(7 downto 0); -- Debugport
+	SIGNAL gotData : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+	SIGNAL sentData : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+	SIGNAL fsmstate : fsmarr(numports DOWNTO 0); -- Debugport
+	SIGNAL debugdataout : array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
+	SIGNAL dreadyIn : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+	SIGNAL drequestIn : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+	SIGNAL ddataIn : array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
+	SIGNAL dstrobeIn : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+	SIGNAL dgranted : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+	SIGNAL dSwitchPortNumber : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
+	SIGNAL dSelectDestinationPort : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
+	SIGNAL droutingSwitch : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
+	SIGNAL dsourcePortOut : array_t(numports DOWNTO 0)(1 DOWNTO 0); -- Debugport
+	SIGNAL ddestinationPort : array_t(numports DOWNTO 0)(7 DOWNTO 0); -- Debugport
 	SIGNAL spw_d_r2p : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
 	SIGNAL spw_s_r2p : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
 	SIGNAL spw_d_p2r : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
@@ -176,21 +178,21 @@ ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 	TYPE packetstates IS (S_Address, S_Cargo, S_EOP, S_Null);
 	SIGNAL pstate : packetstates := S_Address;
 
+	-- Controls simulation event defined in sim-process.
+	SIGNAL proc : integer range 0 to 10 := 0;
+	signal s_fin: std_logic;
+
 	-- Debug
-	signal s_fsmstate: fsmarr(numports downto 0);
-	signal s_dreadyOut: std_logic_vector(numports downto 0);
-	signal s_drequestOut: std_logic_vector(numports downto 0);
-	signal s_ddataOut: array_t(numports downto 0)(8 downto 0);
-	signal s_dstrobeOut: std_logic_vector(numports downto 0);
-	signal s_granted: std_logic_vector(numports downto 0);
+	SIGNAL s_fsmstate : fsmarr(numports DOWNTO 0);
+	SIGNAL s_dreadyOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_drequestOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_ddataOut : array_t(numports DOWNTO 0)(8 DOWNTO 0);
+	SIGNAL s_dstrobeOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0);
 BEGIN
 	fsmstate <= s_fsmstate;
-
-
 	-- Debug
 	dgranted <= s_granted;
-
-
 	spwroutertest : routertest
 	GENERIC MAP(
 		numports => numports,
@@ -260,62 +262,200 @@ BEGIN
 		droutingSwitch => droutingSwitch, -- Debugport
 		dsourcePortOut => dsourcePortOut, -- Debugport
 		ddestinationPort => ddestinationPort, -- Debugport
-		spw_d_r2p => spw_d_r2p,
-		spw_s_r2p => spw_s_r2p,
-		spw_d_p2r => spw_d_p2r,
-		spw_s_p2r => spw_s_p2r
+		spw_d_r2p => spw_d_r2p, -- Data signals from router to extern ports
+		spw_s_r2p => spw_s_r2p, -- Strobe signals from router to extern ports
+		spw_d_p2r => spw_d_p2r, -- Data signals from extern ports to router
+		spw_s_p2r => spw_s_p2r -- Strobe signals from extern ports to router
 	);
 
-	stimulus : PROCESS
-		VARIABLE sent : BOOLEAN := false;
+	-- Performs initialize reset.
+	reset : PROCESS
 	BEGIN
-		-- Put initialisation code here
 		WAIT FOR clock_period;
 		rst <= '0';
 		WAIT;
 	END PROCESS;
 
-	PROCESS (clk)
+
+	control: process
+	begin
+		WAIT FOR clock_period;
+
+		-- TODO: Put simulation instructions here...
+		
+		proc <= 1; -- sending one packet (physical addressing)
+		wait until s_fin = '1';
+		
+		proc <= 0; -- resets pstate and s_fin
+		
+		wait for 10 us;
+		
+		proc <= 2; -- sending two packets (physical addressing)
+		wait until s_fin = '1';
+		
+		proc <= 0; -- resets pstate and s_fin
+
+		wait for 10 us;
+
+		proc <= 3; -- sending one packet (logical addressing)
+		wait until s_fin = '1';
+
+		proc <= 0;
+		
+		wait;
+	end process;
+
+
+	sim: PROCESS (clk)
 	BEGIN
 		IF rising_edge(clk) THEN
-			IF rrunning(1) = '1' AND prunning(1) = '1' THEN
-				CASE pstate IS
-					WHEN S_Address =>
-						txdata(1) <= "00000010"; -- 2
-						txflag(1) <= '0';
-						txwrite(1) <= '1';
+			-- Controls what should be simulated next. Further events can easily
+			-- be implemented below (above 'what others'-case!)
+			CASE proc IS
+				when 0 => pstate <= S_Address;
+					s_fin <= '0';
 
-						pstate <= S_Cargo;
+				WHEN 1 =>
+					-- Sends a single packet on port1 to router, it should leave router on port2.
+					
+					IF rrunning(1) = '1' AND prunning(1) = '1' THEN
+						CASE pstate IS
+							WHEN S_Address =>
+								txdata(1) <= "00000010"; -- 2 (destination port)
+								txflag(1) <= '0';
+								txwrite(1) <= '1';
 
-					WHEN S_Cargo =>
-						txdata(1) <= "00000000";
-						txflag(1) <= '0';
-						txwrite(1) <= '1';
+								pstate <= S_Cargo;
 
-						pstate <= S_EOP;
+							WHEN S_Cargo =>
+								txdata(1) <= "00000000"; -- easier to locate in timing diagram
+								txflag(1) <= '0';
+								txwrite(1) <= '1';
 
-					WHEN S_EOP =>
-						txdata(1) <= "00000000";
-						txflag(1) <= '1';
-						txwrite(1) <= '1';
+								pstate <= S_EOP;
 
-						pstate <= S_Null;
+							WHEN S_EOP =>
+								txdata(1) <= "00000000"; -- cargo=0x00 and txflag='1' corresponds to an EOP
+								txflag(1) <= '1';
+								txwrite(1) <= '1';
 
-					WHEN S_Null =>
-						txdata(1) <= (OTHERS => '0');
-						txflag(1) <= '0';
-						txwrite(1) <= '0';
+								pstate <= S_Null;
 
-				END CASE;
-			END IF;
+							WHEN S_Null =>
+								txdata(1) <= (OTHERS => '0');
+								txflag(1) <= '0';
+								txwrite(1) <= '0'; -- Withdraw permission to send; sends then nulls automatically
+								
+								s_fin <= '1';
+
+						END CASE;
+					END IF;
+
+				WHEN 2 =>
+					-- Sends two packets from to ports that should both leave the other port.
+
+					if (rrunning(1) = '1' and prunning(1) = '1') and (rrunning(2) = '1' and prunning(2) = '1') then
+						case pstate is
+							when S_Address =>
+								-- Packet 1
+								txdata(1) <= "00000010"; -- 2 (destination port)
+								txflag(1) <= '0';
+								txwrite(1) <= '1';
+
+								-- Packet 2
+								txdata(2) <= "00000001"; -- 1 (destination port)
+								txflag(2) <= '0';
+								txwrite(2) <= '1';
+
+								pstate <= S_Cargo;
+
+							when S_Cargo =>
+								-- Packet 1
+								txdata(1) <= "00000000";
+								txflag(1) <= '0';
+								txwrite(1) <= '1';
+
+								-- Packet 2
+								txdata(2) <= "11111111";
+								txflag(2) <= '0';
+								txwrite(2) <= '1';
+
+								pstate <= S_EOP;
+
+							when S_EOP =>
+								-- Packet 1
+								txdata(1) <= "00000000";
+								txflag(1) <= '1';
+								txwrite(1) <= '1';
+
+								-- Packet 2
+								txdata(2) <= "00000000";
+								txflag(2) <= '1';
+								txwrite(2) <= '1';
+
+								pstate <= S_Null;
+
+							when S_Null =>
+								-- Port 1
+								txdata(1) <= (others => '0');
+								txflag(1) <= '0';
+								txwrite(1) <= '0';
+
+								-- Port 2
+								txdata(2) <= (others => '0');
+								txflag(2) <= '0';
+								txwrite(2) <= '0';
+
+								s_fin <= '1';
+
+						end case;
+					end if;
+
+				when 3 => 
+					-- Sends one packet to logical port.
+					if rrunning(1) ='1' and prunning(1) = '1' then
+						case pstate is
+							when S_Address =>
+								txdata(1) <= "01010101"; -- 85
+								txflag(1) <= '0';
+								txwrite(1) <= '1';
+
+								pstate <= S_Cargo;
+
+							when S_Cargo =>
+								txdata(1) <= "01010101";
+								txflag(1) <= '0';
+								txwrite(1) <= '1';
+
+								pstate <= S_EOP;
+
+							when S_EOP =>
+								txdata(1) <= "00000000";
+								txflag(1) <= '1';
+								txwrite(1) <= '1';
+
+								pstate <= S_Null;
+
+
+							when S_Null =>
+								txdata(1) <= (others => '0');
+								txflag(1) <= '0';
+								txwrite(1) <= '0';
+
+								s_fin <= '1';
+						end case;
+					end if;
+
+				WHEN OTHERS => NULL;
+
+			END CASE;
 		END IF;
 	END PROCESS;
+
+	-- Creates clock.
 	clocking : PROCESS
 	BEGIN
-		--WHILE NOT stop_the_clock LOOP
 		clk <= '0', '1' AFTER clock_period / 2;
 		WAIT FOR clock_period;
-		--END LOOP;
-		--WAIT;
 	END PROCESS;
 END routertest_tb_arch;
