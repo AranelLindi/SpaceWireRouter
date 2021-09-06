@@ -87,14 +87,12 @@
       <File Path="$PPRDIR/trunk/rtl/vhdl/spwrouterpkg.vhd">
         <FileInfo SFType="VHDL2008">
           <Attr Name="Library" Val="xil_defaultlib"/>
-          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PPRDIR/trunk/rtl/vhdl/spwrouterfunc.vhd">
         <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -149,6 +147,7 @@
       </File>
       <File Path="$PPRDIR/trunk/rtl/vhdl/streamtest.vhd">
         <FileInfo SFType="VHDL2008">
+          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -167,56 +166,48 @@
       </File>
       <File Path="$PPRDIR/trunk/rtl/vhdl/spwrouterarb_round.vhd">
         <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PPRDIR/trunk/rtl/vhdl/spwrouterarb.vhd">
         <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PPRDIR/trunk/rtl/vhdl/spwrouterarb_table.vhd">
         <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PPRDIR/trunk/rtl/vhdl/spwrouterregs.vhd">
         <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PPRDIR/trunk/rtl/vhdl/spwroutertable.vhd">
         <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PPRDIR/trunk/rtl/vhdl/spwroutertcc.vhd">
         <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PPRDIR/trunk/rtl/vhdl/spwrouterport.vhd">
         <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PPRDIR/trunk/rtl/vhdl/spwrouter.vhd">
         <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -230,19 +221,32 @@
       </File>
       <File Path="$PPRDIR/trunk/rtl/vhdl/routertest.vhd">
         <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/trunk/rtl/vhdl/streamtest_spwrouterport.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
+      <File Path="$PPRDIR/trunk/syn/streamtest_digilent-xc7a35tcpg_basys3/uart/uart_rx.vhd">
+        <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/syn/streamtest_digilent-xc7a35tcpg_basys3/uart/uart_tx.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
         </FileInfo>
       </File>
       <File Path="$PPRDIR/trunk/syn/streamtest_digilent-xc7a35tcpg_basys3/streamtest_top.vhd">
+        <FileInfo>
+          <Attr Name="UserDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/syn/streamtest_digilent-xc7a35tcpg_basys3/routertest_top_single.vhd">
+        <FileInfo SFType="VHDL2008">
+          <Attr Name="UsedIn" Val="synthesis"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/bench/vhdl/routertest_top_single_tb_pkg.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -250,19 +254,25 @@
       </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="streamtest_top"/>
+        <Option Name="TopModule" Val="routertest_top_single"/>
       </Config>
     </FileSet>
     <FileSet Name="DigilentBasys3" Type="Constrs" RelSrcDir="$PSRCDIR/DigilentBasys3" RelGenDir="$PGENDIR/DigilentBasys3">
       <Filter Type="Constrs"/>
-      <File Path="$PPRDIR/trunk/syn/streamtest_digilent-xc7a35tcpg_basys3/Basys3.xdc">
+      <File Path="$PPRDIR/trunk/syn/streamtest_digilent-xc7a35tcpg_basys3/streamtest.xdc">
+        <FileInfo>
+          <Attr Name="UserDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/syn/streamtest_digilent-xc7a35tcpg_basys3/routertest_top_single.xdc">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
       </File>
       <Config>
-        <Option Name="TargetConstrsFile" Val="$PPRDIR/trunk/syn/streamtest_digilent-xc7a35tcpg_basys3/Basys3.xdc"/>
         <Option Name="ConstrsType" Val="XDC"/>
       </Config>
     </FileSet>
@@ -375,9 +385,8 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/trunk/bench/vhdl/streamtest_spwrouterport_tb.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
+      <File Path="$PSRCDIR/RouterSim/new/impltestbench.vhd">
+        <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -398,13 +407,6 @@
       </Config>
     </FileSet>
     <FileSet Name="constrs_pintest" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_pintest" RelGenDir="$PGENDIR/constrs_pintest">
-      <File Path="$PSRCDIR/constrs_pintest/streamtest_digilent_constr.xdc">
-        <FileInfo>
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-        </FileInfo>
-      </File>
       <Config>
         <Option Name="ConstrsType" Val="XDC"/>
       </Config>

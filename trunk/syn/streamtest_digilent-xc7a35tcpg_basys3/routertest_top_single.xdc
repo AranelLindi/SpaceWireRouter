@@ -29,9 +29,9 @@ set_property PACKAGE_PIN W18 [get_ports {prunning[1]}]
 	set_property IOSTANDARD LVCMOS33 [get_ports {prunning[1]}]
 set_property PACKAGE_PIN U15 [get_ports {prunning[2]}]					
 	set_property IOSTANDARD LVCMOS33 [get_ports {prunning[2]}]
-#set_property PACKAGE_PIN U14 [get_ports {led[6]}] # unused					
-	#set_property IOSTANDARD LVCMOS33 [get_ports {led[6]}]
-set_property PACKAGE_PIN V14 [get_ports {rxhalff[1]}] # Only 1st and 2nd port; port0 is designed only for configuration purposes					
+set_property PACKAGE_PIN U14 [get_ports {rxhalff[0]}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {rxhalff[0]}]
+set_property PACKAGE_PIN V14 [get_ports {rxhalff[1]}]				
 	set_property IOSTANDARD LVCMOS33 [get_ports {rxhalff[1]}]
 set_property PACKAGE_PIN V13 [get_ports {rxhalff[2]}]					
 	set_property IOSTANDARD LVCMOS33 [get_ports {rxhalff[2]}]
@@ -62,8 +62,3 @@ set_property PACKAGE_PIN B18 [get_ports rxstream]
 	set_property IOSTANDARD LVCMOS33 [get_ports rxstream]
 set_property PACKAGE_PIN A18 [get_ports txstream]						
 	set_property IOSTANDARD LVCMOS33 [get_ports txstream]
-
-
-## Configuration options, can be used for all designs
-set_property CONFIG_VOLTAGE 3.3 [current_design]
-set_property CFGBVS VCCO [current_design]

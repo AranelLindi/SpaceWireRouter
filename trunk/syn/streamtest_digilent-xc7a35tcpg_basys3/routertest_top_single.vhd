@@ -22,17 +22,9 @@ USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 USE work.spwpkg.ALL;
 USE work.spwrouterpkg.ALL;
+USE work.routertest_top_single_tb_pkg.ALL;
 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
-ENTITY routertest_top IS
+ENTITY routertest_top_single IS
 	PORT (
 		-- System clock.
 		clk : IN STD_LOGIC;
@@ -68,11 +60,22 @@ ENTITY routertest_top IS
 		rerror : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 
 		-- High if corresponding external port has reported an error.
-		perror : OUT STD_LOGIC_VECTOR(2 DOWNTO 0)
-	);
-END routertest_top;
+		perror : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 
-ARCHITECTURE routertest_top_arch OF routertest_top IS
+		-- Debugports
+		dincstate : OUT incstates;
+		doutstate : OUT outstates;
+		rxvalid : OUT STD_LOGIC;
+		txwrite : OUT STD_LOGIC;
+		prxvalid : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+		txinact : OUT STD_LOGIC;
+		spw_d_p2r : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+		spw_d_r2p : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+		uart_txdata: out std_logic_vector(7 downto 0)
+	);
+END routertest_top_single;
+
+ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 	--constant numports : integer range 0 to 31 := 2;
 
 	-- Uart receiver module.
@@ -174,23 +177,23 @@ ARCHITECTURE routertest_top_arch OF routertest_top IS
 			--dsourcePortOut : OUT array_t(numports DOWNTO 0)(1 DOWNTO 0);
 			--ddestinationPort : OUT array_t(numports DOWNTO 0)(7 DOWNTO 0);
 			spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			spw_s_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			spw_s_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+			--spw_s_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+			spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+			--spw_s_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
 		);
 	END COMPONENT;
 
 	-- Uart receiver.
-	SIGNAL s_uart_rxstream : STD_LOGIC;
-	SIGNAL s_uart_rxvalid : STD_LOGIC;
-	SIGNAL s_uart_rxdata : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	--SIGNAL s_uart_rxstream : STD_LOGIC;
+	SIGNAL s_uart_rxvalid : STD_LOGIC := '0';
+	SIGNAL s_uart_rxdata : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
 
 	-- Uart transmitter.
-	SIGNAL s_uart_txwrite : STD_LOGIC;
-	SIGNAL s_uart_txdata : STD_LOGIC_VECTOR(7 DOWNTO 0);
-	SIGNAL s_uart_txactive : STD_LOGIC;
-	SIGNAL s_uart_txstream : STD_LOGIC;
-	SIGNAL s_uart_txdone : STD_LOGIC;
+	SIGNAL s_uart_txwrite : STD_LOGIC := '0';
+	SIGNAL s_uart_txdata : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
+	SIGNAL s_uart_txactive : STD_LOGIC := '0';
+	--SIGNAL s_uart_txstream : STD_LOGIC;
+	SIGNAL s_uart_txdone : STD_LOGIC := '0';
 
 	-- Routertest.
 	SIGNAL s_rst : STD_LOGIC := '1';
@@ -247,17 +250,22 @@ ARCHITECTURE routertest_top_arch OF routertest_top IS
 	--SIGNAL dsourcePortOut : array_t(2 DOWNTO 0)(1 DOWNTO 0);
 	--SIGNAL ddestinationPort : array_t(2 DOWNTO 0)(7 DOWNTO 0);
 	SIGNAL s_spw_d_r2p : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	SIGNAL s_spw_s_r2p : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	--SIGNAL s_spw_s_r2p : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL s_spw_d_p2r : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	SIGNAL s_spw_s_p2r : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	--SIGNAL s_spw_s_p2r : STD_LOGIC_VECTOR(2 DOWNTO 0);
 
 	-- States for incoming packets from uart to external spacewire ports.
-	TYPE incstates IS (S_Idle, S_Wait, S_Cargo, S_EOP, S_Fin);
+	--TYPE incstates IS (S_Idle, S_Cargo, S_TransmitAddress, S_Write1, S_Wait1, S_TransmitCargo, S_Write2, S_Wait2, S_TransmitEOP, S_Write3, S_Fin);
 	SIGNAL incstate : incstates := S_Idle;
 
 	-- States for outgoing packets from external spacewire ports to uart.
-	TYPE outstates IS (S_Idle, S_SendNo, S_Wait1, S_Data, S_Wait2);
+	--TYPE outstates IS (S_Idle, S_Wait1, S_Wait2, S_Data, S_Wait3);
 	SIGNAL outstate : outstates := S_Idle;
+
+	-- Debug
+	--type states is (S_Idle, S_Send, S_End);
+	--signal state : states := S_Idle;
+	
 BEGIN
 	-- Drive outputs
 	rxhalff <= s_rxhalff; -- half receive fifo (spacewire -> uart) is full
@@ -269,16 +277,33 @@ BEGIN
 	rerror <= s_rerrdisc OR s_rerrpar OR s_rerresc OR s_rerrcred; -- error router ports
 
 	-- Uart serial streams.
-	txstream <= s_uart_txstream;
-	s_uart_rxstream <= rxstream;
+	--txstream <= s_uart_txstream;
+	--s_uart_rxstream <= rxstream;
+
+	s_rst <= rst;
+	-- Debugports
+	dincstate <= incstate;
+	doutstate <= outstate;
+	prxvalid <= s_rxvalid;
+	rxvalid <= s_uart_rxvalid;
+	txwrite <= s_uart_txwrite;
+	txinact <= s_uart_txactive;
+
+	spw_d_r2p <= s_spw_d_r2p;
+	spw_d_p2r <= s_spw_d_p2r;
+
+	uart_txdata <= s_uart_txdata;
+
+
 	UartReceiver : uart_rx
 	GENERIC MAP(
 		clk_cycles_per_bit => 87 -- Value for 10 MHz clock frequency and 115200 baud rate
 	)
 	PORT MAP(
 		clk => clk,
-		rxstream => s_uart_rxstream,
-		rxvalid => s_uart_rxvalid
+		rxstream => rxstream,
+		rxvalid => s_uart_rxvalid,
+		rxdata => s_uart_rxdata
 	);
 
 	UartTransmitter : uart_tx
@@ -290,7 +315,7 @@ BEGIN
 		txwrite => s_uart_txwrite,
 		txdata => s_uart_txdata,
 		txactive => s_uart_txactive,
-		txstream => s_uart_txstream,
+		txstream => txstream,
 		txdone => s_uart_txdone
 	);
 
@@ -310,7 +335,7 @@ BEGIN
 		clk => clk,
 		rxclk => clk,
 		txclk => clk,
-		rst => s_rst,
+		rst => rst,
 		autostart => c_autostart,
 		linkstart => c_linkstart,
 		linkdis => c_linkdis,
@@ -363,69 +388,90 @@ BEGIN
 		--droutingSwitch => droutingSwitch,
 		--dsourcePortOut => dsourcePortOut,
 		--ddestinationPort => ddestinationPort,
-		spw_d_r2p => OPEN, --s_spw_d_r2p, -- Signale werden für Hardwareimplementierung nicht benötigt, sind eher für Simulation interessant zur Nachverfolgung
-		spw_s_r2p => OPEN, --s_spw_s_r2p,
-		spw_d_p2r => OPEN, --s_spw_d_p2r,
-		spw_s_p2r => OPEN --s_spw_s_p2r
+		spw_d_r2p => s_spw_d_r2p, -- Signale werden für Hardwareimplementierung nicht benötigt, sind eher für Simulation interessant zur Nachverfolgung
+		--spw_s_r2p => open, --s_spw_s_r2p,
+		spw_d_p2r => s_spw_d_p2r
+		--spw_s_p2r => open --s_spw_s_p2r
 	);
 
 	-- Controls convertion from uart signals into spacewire.
 	IncomingFSM : PROCESS (clk)
 		-- External port that shall send next packet.
-		VARIABLE addrport : INTEGER RANGE 0 TO 2;
+		VARIABLE addrport : INTEGER RANGE 0 TO 2 := 0;
+		--variable newpacket : boolean := false;
+		VARIABLE data : STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
 	BEGIN
 		IF rising_edge(clk) THEN
 			CASE incstate IS
 				WHEN S_Idle =>
-					-- Watch if receiver has got new byte to send...
-					IF s_uart_rxvalid = '1' THEN
-						-- Select Port which should used for transmitting.
-						-- Is updated only in idle mode.
-						addrport := to_integer(unsigned(selectport));
-
-						-- Check if addressed port is ready to accept data bytes.
-						IF s_txrdy(addrport) = '1' THEN
-							s_txdata(addrport) <= s_uart_rxdata;
-							s_txflag(addrport) <= '0';
-							s_txwrite(addrport) <= '1';
-
-							incstate <= S_Wait;
-						END IF;
-					END IF;
-
-				WHEN S_Wait =>
-					s_txwrite(addrport) <= '0';
+					addrport := to_integer(unsigned(selectport));
 
 					IF s_uart_rxvalid = '1' THEN
-						-- Next byte waits in uart receiver
+						data(15 DOWNTO 8) := s_uart_rxdata;
+
 						incstate <= S_Cargo;
 					END IF;
 
 				WHEN S_Cargo =>
-					-- Secured here: new byte is available (see S_Wait)!
+					IF s_uart_rxvalid = '1' THEN
+						data(7 DOWNTO 0) := s_uart_rxdata;
 
+						incstate <= S_TransmitAddress;
+					END IF;
+
+				WHEN S_TransmitAddress =>
 					IF s_txrdy(addrport) = '1' THEN
-						s_txdata(addrport) <= s_uart_rxdata;
+						s_txdata(addrport) <= data(15 DOWNTO 8);
 						s_txflag(addrport) <= '0';
-						s_txwrite(addrport) <= '1';
 
-						incstate <= S_EOP;
+						incstate <= S_Write1;
 					END IF;
 
-				WHEN S_EOP =>
-					IF s_txrdy(addrport) = '1' THEN
-						s_txdata(addrport) <= (OTHERS => '0'); -- EOP
-						s_txflag(addrport) <= '1';
-						s_txwrite(addrport) <= '1';
+				WHEN S_Write1 =>
+					s_txwrite(addrport) <= '1';
 
-						incstate <= S_Fin;
-					END IF;
+					incstate <= S_Wait1;
 
-				WHEN S_Fin =>
-					-- Withdraw uart transmit permission & reset.
+				WHEN S_Wait1 =>
 					s_txwrite(addrport) <= '0';
 
+					incstate <= S_TransmitCargo;
+
+				WHEN S_TransmitCargo =>
+					IF s_txrdy(addrport) = '1' THEN
+						s_txdata(addrport) <= data(7 DOWNTO 0);
+						-- flag stays at zero.
+
+						incstate <= S_Write2;
+					END IF;
+				WHEN S_Write2 =>
+					s_txwrite(addrport) <= '1';
+
+					incstate <= S_Wait2;
+
+				WHEN S_Wait2 =>
+					s_txwrite(addrport) <= '0';
+
+					incstate <= S_TransmitEOP;
+
+				WHEN S_TransmitEOP =>
+					IF s_txrdy(addrport) = '1' THEN
+						s_txdata(addrport) <= "00000000"; -- EOP
+						s_txflag(addrport) <= '1';
+
+						incstate <= S_Write3;
+					END IF;
+				WHEN S_Write3 =>
+					s_txwrite(addrport) <= '1';
+
+					incstate <= S_Fin;
+
+				WHEN S_Fin =>
+					s_txwrite(addrport) <= '0';
+					data := (OTHERS => '0');
+
 					incstate <= S_Idle;
+
 			END CASE;
 		END IF;
 	END PROCESS;
@@ -434,54 +480,69 @@ BEGIN
 	OutgoingFSM : PROCESS (clk)
 		-- Extern port that is allowed to send the next packet over uart.
 		VARIABLE addrport : INTEGER RANGE 0 TO 2 := 0;
+
+		VARIABLE data : STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
 	BEGIN
 		IF rising_edge(clk) THEN
 			CASE outstate IS
 				WHEN S_Idle =>
-					-- Wait until a port has a new packet to deliver.
-					IF s_rxvalid(addrport) = '1' THEN
-						-- Packet available to send over uart.
-						outstate <= S_SendNo;
-					END IF;
-
-					-- Select next port which is to check for new packet.
-					IF addrport = 2 THEN
+					if addrport = 2 then
 						addrport := 0;
-					ELSE
+					else
 						addrport := addrport + 1;
-					END IF;
+					end if;
 
-				WHEN S_SendNo =>
-					-- Send number of current activated port over uart for user.
-					IF s_uart_txactive = '0' THEN
-						s_uart_txdata <= STD_LOGIC_VECTOR(to_unsigned(addrport, s_uart_txdata'length));
-						s_uart_txwrite <= '1';
+					if s_rxvalid(addrport) = '1' then
+						data(15 downto 8) := std_logic_vector(to_unsigned(addrport, 8));
+
+						s_rxread(addrport) <= '1';
 
 						outstate <= S_Wait1;
-					END IF;
+					end if;
 
-				WHEN S_Wait1 =>
-					-- Withdraw uart transmit permission
-					s_uart_txwrite <= '0';
-
-					outstate <= S_Data;
-
-				WHEN S_Data =>
-					-- Check if uart transmitter is in idle mode and cargo byte is available in port.
-					IF s_uart_txactive = '0' AND s_rxvalid(addrport) = '1' THEN
-						s_rxread(addrport) <= '1';
-						s_uart_txdata <= s_rxdata(addrport); -- Mögliche Fehlerquelle! (Signalzuweisung)
-						s_uart_txwrite <= '1';
-					END IF;
+				when S_Wait1 =>
+					data(7 downto 0) := s_rxdata(addrport);
+					s_rxread(addrport) <= '0';
 
 					outstate <= S_Wait2;
 
-				WHEN S_Wait2 =>
-					-- Withdraw uart transmit permission and go in idle mode.
+				when S_Wait2 =>
+					if s_uart_txactive = '0' then
+						s_uart_txdata <= data(15 downto 8);
+						
+						outstate <= S_Data;
+					end if;
+
+				when S_Data =>
+					s_uart_txwrite <= '1';
+
+					outstate <= S_Wait3;
+
+				when S_Wait3 =>
 					s_uart_txwrite <= '0';
+
+					outstate <= S_Wait4;
+
+				when S_Wait4 =>
+					if s_uart_txactive = '0' then
+						s_uart_txdata <= data(7 downto 0);
+
+						outstate <= S_Wait5;
+					end if;
+
+				when S_Wait5 =>
+					s_uart_txwrite <= '1';
+
+					outstate <= S_Wait6;
+
+				when S_Wait6 =>
+					s_uart_txwrite <= '0';
+
+					s_uart_txdata <= (others => '0');
+					data := (others => '0');
 
 					outstate <= S_Idle;
 			END CASE;
 		END IF;
 	END PROCESS;
-END routertest_top_arch;
+END routertest_top_single_arch;

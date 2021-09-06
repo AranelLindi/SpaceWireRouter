@@ -197,7 +197,7 @@ ENTITY spwrouterport IS
         -- 
         busMasterAcknowledgeIn : IN STD_LOGIC; -- busMasterAcknowledgeIn
 
-        -- pragma synthesis_off
+        -- //pragma synthesis_off
 	    -- Zeigt an ob der Receiver ein Packet empfangen hat, nur als Debug-port verwenden (quasi einfach iReceiveFIFOReadEnable als Ausgang)
 	    gotData: OUT STD_LOGIC;
 
@@ -206,7 +206,7 @@ ENTITY spwrouterport IS
 	    fsmstate : OUT spwrouterportstates; -- Debug
 
         debugdataout : out std_logic_vector(8 downto 0); -- debug
-        -- pragma synthesis_on
+        -- //pragma synthesis_on
 
         -- SpaceWire data in.
         spw_di : IN STD_LOGIC; -- check
