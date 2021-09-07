@@ -119,6 +119,9 @@ BEGIN
 		wait for c_bit_period;
 
 		uart_write_byte("00000001", rxstream);
+
+		wait for c_bit_period; -- zu testzwecken mal einblenden um zu schauen was bei etwas abstand passiert
+
 		uart_write_byte("10111111", rxstream);
 		--uart_write_byte("10000001", rxstream);
 
