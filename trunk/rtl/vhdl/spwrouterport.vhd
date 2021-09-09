@@ -270,7 +270,7 @@ BEGIN
 
     -- Debug
     gotData <= iReceiveFIFOReady; -- (rxvalid) vorher: iReceiveFIFOReadEnable; -- rxread
-    sentData <= iTransmitFIFOWriteEnable; -- txwrite
+    sentData <= busMasterStrobeOut;--iTransmitFIFOWriteEnable; -- txwrite
     fsmstate <= state;
     debugdataout(7 downto 0) <= s_rxdata; --receiveFIFODataOut(7 downto 0); -- nur zu debugzwecken
     debugdataout(8) <= s_rxflag;

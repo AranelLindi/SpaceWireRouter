@@ -170,6 +170,7 @@ ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 	SIGNAL droutingSwitch : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
 	SIGNAL dsourcePortOut : array_t(numports DOWNTO 0)(1 DOWNTO 0); -- Debugport
 	SIGNAL ddestinationPort : array_t(numports DOWNTO 0)(7 DOWNTO 0); -- Debugport
+	signal dstrobeOut: std_logic_vector(numports downto 0); -- Debugport
 	SIGNAL spw_d_r2p : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
 	SIGNAL spw_s_r2p : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
 	SIGNAL spw_d_p2r : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');

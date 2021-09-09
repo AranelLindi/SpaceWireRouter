@@ -76,7 +76,7 @@ BEGIN
 
         WAIT FOR clock_period;
 
-        req <= (1 => '1', OTHERS => '0'); -- Port0 requieres access.
+        req <= (1 => '1', 0 => 'U', 2 => '0'); -- Port0 requieres access.
 
         WAIT FOR clock_period;
 

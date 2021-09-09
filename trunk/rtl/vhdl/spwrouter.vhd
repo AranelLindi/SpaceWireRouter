@@ -199,8 +199,8 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         dreadyOut <= readyOut;
         drequestOut <= requestOut;
         ddataOut <= dataOut;
-        dstrobeOut <= strobeOut;
-        dgranted <= granted;
+        dstrobeOut <= busMasterGranted;--strobeOut;
+        dgranted <= busMasterRequestOut;--granted;
         dSwitchPortNumber <= iSwitchPortNumber;
         dSelectDestinationPort <= iSelectDestinationPort;
         droutingSwitch <= routingSwitch;
@@ -436,8 +436,8 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                         iBusSlaveWriteEnableIn <= busMasterWriteEnableOut(i);
                         iBusSlaveOriginalPortIn <= x"ff";
                         iBusSlaveDataIn <= (OTHERS => '0');
-                        busMasterAcknowledgeIn <= (others => '0');
-                        busMasterAcknowledgeIn(i) <= iBusSlaveAcknowledgeOut;
+                        --busMasterAcknowledgeIn <= (others => '0');
+                        busMasterAcknowledgeIn <= (i => iBusSlaveAcknowledgeOut, others => '0');
                     END IF;
                 END LOOP;
                 -- Port0 ist Spezialfall, daher außerhalb der For-Loop!
@@ -448,8 +448,8 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                     iBusSlaveWriteEnableIn <= busMasterWriteEnableOut(0);
                     --iBusSlaveOriginalPortIn <= busMasterOriginalPortOut(0); -- wohl nur für RMAP nötig
                     iBusSlaveDataIn <= busMasterDataOut(0);
-                    busMasterAcknowledgeIn <= (others => '0');
-                    busMasterAcknowledgeIn(0) <= iBusSlaveAcknowledgeOut;
+                    --busMasterAcknowledgeIn <= (others => '0');
+                    busMasterAcknowledgeIn <= (0 => iBusSlaveAcknowledgeOut, others => '0');
                 END IF;
 
                 busSlaveDataOut <= ibusMasterDataOut;
