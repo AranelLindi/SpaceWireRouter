@@ -61,5 +61,14 @@ set_property IOSTANDARD LVCMOS33 [get_ports rst]
 ##USB-RS232 Interface
 set_property PACKAGE_PIN B18 [get_ports rxstream]
 set_property IOSTANDARD LVCMOS33 [get_ports rxstream]
+set_false_path -from [get_ports rxstream]
+
 set_property PACKAGE_PIN A18 [get_ports txstream]
 set_property IOSTANDARD LVCMOS33 [get_ports txstream]
+
+set_input_delay -clock [get_clocks sys_clk_pin] -min -add_delay 0.000 [get_ports {selectdestport[*]}]
+set_input_delay -clock [get_clocks sys_clk_pin] -max -add_delay 0.000 [get_ports {selectdestport[*]}]
+set_input_delay -clock [get_clocks sys_clk_pin] -min -add_delay 0.000 [get_ports {selectport[*]}]
+set_input_delay -clock [get_clocks sys_clk_pin] -max -add_delay 0.000 [get_ports {selectport[*]}]
+set_input_delay -clock [get_clocks sys_clk_pin] -min -add_delay 0.000 [get_ports rst]
+set_input_delay -clock [get_clocks sys_clk_pin] -max -add_delay 0.000 [get_ports rst]

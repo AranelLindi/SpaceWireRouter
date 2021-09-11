@@ -94,23 +94,23 @@ ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 			perrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			rerrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-			sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-			fsmstate : OUT fsmarr(numports DOWNTO 0); -- Debugport
-			debugdataout : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
-			dreadyIn : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-			drequestIn : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-			ddataIn : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
-			dstrobeIn : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-			dreadyOut : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-			drequestOut : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-			ddataOut : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
-			dstrobeOut : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-			dgranted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-			dSwitchPortNumber : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
-			dSelectDestinationPort : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
-			droutingSwitch : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
-			dsourcePortOut : OUT array_t(numports DOWNTO 0)(1 DOWNTO 0); -- Debugport
-			ddestinationPort : OUT array_t(numports DOWNTO 0)(7 DOWNTO 0); -- Debugport
+			--sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			--fsmstate : OUT fsmarr(numports DOWNTO 0); -- Debugport
+			--debugdataout : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
+			--dreadyIn : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			--drequestIn : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			--ddataIn : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
+			--dstrobeIn : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			--dreadyOut : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			--drequestOut : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			--ddataOut : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
+			--dstrobeOut : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			--dgranted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+			--dSwitchPortNumber : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
+			--dSelectDestinationPort : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
+			--droutingSwitch : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
+			--dsourcePortOut : OUT array_t(numports DOWNTO 0)(1 DOWNTO 0); -- Debugport
+			--ddestinationPort : OUT array_t(numports DOWNTO 0)(7 DOWNTO 0); -- Debugport
 			spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Data signal from router to external ports
 			spw_s_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Strobe signal from router to external ports
 			spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Data signal from external ports to router
@@ -157,20 +157,20 @@ ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 	SIGNAL perrcred : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	SIGNAL rerrcred : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	SIGNAL gotData : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-	SIGNAL sentData : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-	SIGNAL fsmstate : fsmarr(numports DOWNTO 0); -- Debugport
-	SIGNAL debugdataout : array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
-	SIGNAL dreadyIn : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-	SIGNAL drequestIn : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-	SIGNAL ddataIn : array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
-	SIGNAL dstrobeIn : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-	SIGNAL dgranted : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-	SIGNAL dSwitchPortNumber : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
-	SIGNAL dSelectDestinationPort : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
-	SIGNAL droutingSwitch : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
-	SIGNAL dsourcePortOut : array_t(numports DOWNTO 0)(1 DOWNTO 0); -- Debugport
-	SIGNAL ddestinationPort : array_t(numports DOWNTO 0)(7 DOWNTO 0); -- Debugport
-	signal dstrobeOut: std_logic_vector(numports downto 0); -- Debugport
+	--SIGNAL sentData : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+	--SIGNAL fsmstate : fsmarr(numports DOWNTO 0); -- Debugport
+	--SIGNAL debugdataout : array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
+	--SIGNAL dreadyIn : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+	--SIGNAL drequestIn : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+	--SIGNAL ddataIn : array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
+	--SIGNAL dstrobeIn : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+	--SIGNAL dgranted : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+	--SIGNAL dSwitchPortNumber : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
+	--SIGNAL dSelectDestinationPort : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
+	--SIGNAL droutingSwitch : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Debugport
+	--SIGNAL dsourcePortOut : array_t(numports DOWNTO 0)(1 DOWNTO 0); -- Debugport
+	--SIGNAL ddestinationPort : array_t(numports DOWNTO 0)(7 DOWNTO 0); -- Debugport
+	--signal dstrobeOut: std_logic_vector(numports downto 0); -- Debugport
 	SIGNAL spw_d_r2p : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
 	SIGNAL spw_s_r2p : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
 	SIGNAL spw_d_p2r : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
@@ -184,16 +184,17 @@ ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 	signal s_fin: std_logic;
 
 	-- Debug
-	SIGNAL s_fsmstate : fsmarr(numports DOWNTO 0);
-	SIGNAL s_dreadyOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL s_drequestOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL s_ddataOut : array_t(numports DOWNTO 0)(8 DOWNTO 0);
-	SIGNAL s_dstrobeOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	--SIGNAL s_fsmstate : fsmarr(numports DOWNTO 0);
+	--SIGNAL s_dreadyOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	--SIGNAL s_drequestOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	--SIGNAL s_ddataOut : array_t(numports DOWNTO 0)(8 DOWNTO 0);
+	--SIGNAL s_dstrobeOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
+	--SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0);
 BEGIN
-	fsmstate <= s_fsmstate;
+	--fsmstate <= s_fsmstate;
 	-- Debug
-	dgranted <= s_granted;
+	--dgranted <= s_granted;
+
 	spwroutertest : routertest
 	GENERIC MAP(
 		numports => numports,
@@ -246,23 +247,23 @@ BEGIN
 		perrcred => perrcred,
 		rerrcred => rerrcred,
 		gotData => gotData, -- Debugport
-		sentData => sentData, -- Debugport
-		debugdataout => debugdataout, -- Debugport
-		dreadyIn => dreadyIn, -- Debugport
-		drequestIn => drequestIn, -- Debugport
-		ddataIn => ddataIn, -- Debugport
-		dstrobeIn => dstrobeIn, -- Debugport
-		dreadyOut => s_dreadyOut, -- Debugport
-		drequestOut => s_drequestOut, -- Debugport
-		ddataOut => s_ddataOut, -- Debugport
-		dstrobeOut => s_dstrobeOut, -- Debugport
-		fsmstate => s_fsmstate, -- Debugport
-		dgranted => s_granted, -- Debugport
-		dSwitchPortNumber => dSwitchPortNumber, -- Debugport
-		dSelectDestinationPort => dSelectDestinationPort, -- Debugport
-		droutingSwitch => droutingSwitch, -- Debugport
-		dsourcePortOut => dsourcePortOut, -- Debugport
-		ddestinationPort => ddestinationPort, -- Debugport
+		--sentData => sentData, -- Debugport
+		--debugdataout => debugdataout, -- Debugport
+		--dreadyIn => dreadyIn, -- Debugport
+		--drequestIn => drequestIn, -- Debugport
+		--ddataIn => ddataIn, -- Debugport
+		--dstrobeIn => dstrobeIn, -- Debugport
+		--dreadyOut => s_dreadyOut, -- Debugport
+		--drequestOut => s_drequestOut, -- Debugport
+		--ddataOut => s_ddataOut, -- Debugport
+		--dstrobeOut => s_dstrobeOut, -- Debugport
+		--fsmstate => s_fsmstate, -- Debugport
+		--dgranted => s_granted, -- Debugport
+		--dSwitchPortNumber => dSwitchPortNumber, -- Debugport
+		--dSelectDestinationPort => dSelectDestinationPort, -- Debugport
+		--droutingSwitch => droutingSwitch, -- Debugport
+		--dsourcePortOut => dsourcePortOut, -- Debugport
+		--ddestinationPort => ddestinationPort, -- Debugport
 		spw_d_r2p => spw_d_r2p, -- Data signals from router to extern ports
 		spw_s_r2p => spw_s_r2p, -- Strobe signals from router to extern ports
 		spw_d_p2r => spw_d_p2r, -- Data signals from extern ports to router

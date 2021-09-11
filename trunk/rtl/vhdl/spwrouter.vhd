@@ -76,23 +76,23 @@ ENTITY spwrouter IS
 
         -- Debug ports ON
         gotData : OUT std_logic_vector(numports downto 0);
-        sentData: out std_logic_vector(numports downto 0);
-        fsmstate: out fsmarr(numports downto 0);
-        debugdataout: out array_t(numports downto 0)(8 downto 0);
-        dreadyIn : out std_logic_vector(numports downto 0);
-        drequestIn: out std_logic_vector(numports downto 0);
-        ddataIn : out array_t(numports downto 0)(8 downto 0);
-        dstrobeIn: out std_logic_vector(numports downto 0);
-        dreadyOut: out std_logic_vector(numports downto 0);
-        drequestOut: out std_logic_vector(numports downto 0);
-        ddataOut: out array_t(numports downto 0)(8 downto 0);
-        dstrobeOut: out std_logic_vector(numports downto 0);
-        dgranted: out std_logic_vector(numports downto 0);
-        dSwitchPortNumber: out array_t(numports downto 0)(numports downto 0);
-        dSelectDestinationPort: out array_t(numports downto 0)(numports downto 0);
-        droutingSwitch: out array_t(numports downto 0)(numports downto 0);
-        dsourcePortOut: out array_t(numports downto 0)(1 downto 0);
-        ddestinationPort: out array_t(numports downto 0)(7 downto 0);
+        --sentData: out std_logic_vector(numports downto 0);
+        --fsmstate: out fsmarr(numports downto 0);
+        --debugdataout: out array_t(numports downto 0)(8 downto 0);
+        --dreadyIn : out std_logic_vector(numports downto 0);
+        --drequestIn: out std_logic_vector(numports downto 0);
+        --ddataIn : out array_t(numports downto 0)(8 downto 0);
+        --dstrobeIn: out std_logic_vector(numports downto 0);
+        --dreadyOut: out std_logic_vector(numports downto 0);
+        --drequestOut: out std_logic_vector(numports downto 0);
+        --ddataOut: out array_t(numports downto 0)(8 downto 0);
+        --dstrobeOut: out std_logic_vector(numports downto 0);
+        --dgranted: out std_logic_vector(numports downto 0);
+        --dSwitchPortNumber: out array_t(numports downto 0)(numports downto 0);
+        --dSelectDestinationPort: out array_t(numports downto 0)(numports downto 0);
+        --droutingSwitch: out array_t(numports downto 0)(numports downto 0);
+        --dsourcePortOut: out array_t(numports downto 0)(1 downto 0);
+        --ddestinationPort: out array_t(numports downto 0)(7 downto 0);
         -- Debug ports OFF
 
 
@@ -191,21 +191,21 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
 
 
         -- DEBUG
-        fsmstate <= s_fsm;
-        dreadyIn <= iReadyIn;
-        drequestIn <= iRequestIn;
-        ddataIn <= iDataIn;
-        dstrobeIn <= iStrobeIn;
-        dreadyOut <= readyOut;
-        drequestOut <= requestOut;
-        ddataOut <= dataOut;
-        dstrobeOut <= busMasterGranted;--strobeOut;
-        dgranted <= busMasterRequestOut;--granted;
-        dSwitchPortNumber <= iSwitchPortNumber;
-        dSelectDestinationPort <= iSelectDestinationPort;
-        droutingSwitch <= routingSwitch;
-        dsourcePortOut <= sourcePortOut;
-        ddestinationPort <= destinationPort;
+        --fsmstate <= s_fsm;
+        --dreadyIn <= iReadyIn;
+        --drequestIn <= iRequestIn;
+        --ddataIn <= iDataIn;
+        --dstrobeIn <= iStrobeIn;
+        --dreadyOut <= readyOut;
+        --drequestOut <= requestOut;
+        --ddataOut <= dataOut;
+        --dstrobeOut <= busMasterGranted;--strobeOut;
+        --dgranted <= busMasterRequestOut;--granted;
+        --dSwitchPortNumber <= iSwitchPortNumber;
+        --dSelectDestinationPort <= iSelectDestinationPort;
+        --droutingSwitch <= routingSwitch;
+        --dsourcePortOut <= sourcePortOut;
+        --ddestinationPort <= destinationPort;
 
     
     
@@ -358,10 +358,10 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 busMasterStrobeOut => busMasterStrobeOut(i),
                 busMasterRequestOut => busMasterRequestOut(i),
                 busMasterAcknowledgeIn => busMasterAcknowledgeIn(i),
-                gotData => gotData(i), -- Debugport
-                sentData => sentData(i), -- Debugport
-                fsmstate => s_fsm(i), -- Debugport
-                debugdataout => debugdataout(i), -- Debugport
+                --gotData => gotData(i), -- Debugport
+                --sentData => sentData(i), -- Debugport
+                --fsmstate => s_fsm(i), -- Debugport
+                --debugdataout => debugdataout(i), -- Debugport
                 spw_di => spw_di(i),
                 spw_si => spw_si(i),
                 spw_do => spw_do(i),
