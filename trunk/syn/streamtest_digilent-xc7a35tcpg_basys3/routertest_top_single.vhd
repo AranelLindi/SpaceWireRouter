@@ -62,19 +62,19 @@ ENTITY routertest_top_single IS
 		rerror : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 
 		-- High if corresponding external port has reported an error.
-		perror : OUT STD_LOGIC_VECTOR(2 DOWNTO 0)
+		perror : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 
 		-- Debugports
---		received : OUT STD_LOGIC;
---		rxvalid : OUT STD_LOGIC;
---		txwrite : OUT STD_LOGIC_vector(2 downto 0);
---		prxvalid : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
---		txinact : OUT STD_LOGIC;
---		spw_d_p2r : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
---		spw_d_r2p : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
---		uart_txdata : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
---		txdata : out array_t(2 downto 0)(8 downto 0);
---		recdata: out std_logic_vector(8 downto 0)
+		received : OUT STD_LOGIC;
+		rxvalid : OUT STD_LOGIC;
+		txwrite : OUT STD_LOGIC_vector(2 downto 0);
+		prxvalid : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+		txinact : OUT STD_LOGIC;
+		spw_d_p2r : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+		spw_d_r2p : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+		uart_txdata : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+		txdata : out array_t(2 downto 0)(8 downto 0);
+		recdata: out std_logic_vector(8 downto 0)
 	);
 END routertest_top_single;
 
@@ -112,6 +112,25 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 			txdone : OUT STD_LOGIC
 		);
 	END COMPONENT;
+
+--    component RS232 is
+--        generic (
+--            Quarz_Taktfrequenz : integer := 10e6;
+--            Baudrate : integer := 115200 -- 9600 vorher
+--        );
+--        port (
+--            CLK: in std_logic;
+--            RXD: in STD_LOGIC;
+--            RX_Data: out std_logic_vector(7 downto 0);
+--            RX_Busy: out std_logic;
+--            RX_Valid: out std_logic;
+--            TXD: out std_logic;
+--            TX_Data: in std_logic_vector(7 downto 0);
+--            TX_Start: in std_logic;
+--            TX_Busy: out std_logic
+--        );
+--    end component;
+
 
 	-- Routertest module.
 	COMPONENT routertest
@@ -192,15 +211,15 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 
 	-- Uart receiver.
 	--SIGNAL s_uart_rxstream : STD_LOGIC;
-	SIGNAL s_uart_rxvalid : STD_LOGIC := '0';
-	SIGNAL s_uart_rxdata : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
+	SIGNAL s_uartrxdata : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
+	signal s_uartrxbusy : std_logic;
+	signal s_uartrxvalid : std_logic;
 
 	-- Uart transmitter.
-	SIGNAL s_uart_txwrite : STD_LOGIC := '0';
-	SIGNAL s_uart_txdata : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
-	SIGNAL s_uart_txactive : STD_LOGIC := '0';
-	--SIGNAL s_uart_txstream : STD_LOGIC;
-	SIGNAL s_uart_txdone : STD_LOGIC := '0';
+	SIGNAL s_uarttxwrite : STD_LOGIC;
+	SIGNAL s_uarttxdata : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
+	SIGNAL s_uarttxactive : STD_LOGIC;
+	SIGNAL s_uarttxdone : STD_LOGIC;
 
 	-- Routertest.
 	SIGNAL s_rst : STD_LOGIC := '1';
@@ -238,7 +257,7 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 	SIGNAL s_rerresc : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL s_perrcred : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL s_rerrcred : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL gotData : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	SIGNAL gotData : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	--SIGNAL sentData : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	--SIGNAL fsmstate : fsmarr(2 DOWNTO 0);
 	--SIGNAL debugdataout : array_t(2 DOWNTO 0)(8 DOWNTO 0);
@@ -345,7 +364,7 @@ BEGIN
     process(clk, rst)
     begin
         if rst = '1' then
-        
+            -- TODO: reset
         elsif rising_edge(clk) then
             case selectport is
                 when "00" =>
@@ -368,19 +387,24 @@ BEGIN
                     s_selectdestport <= 1;                
             end case;
             
-            if s_uart_rxvalid = '1' and s_uart_rxdata = "11111111" then
+
+			if s_rxempty = '0' then
+				s_writepacket <= '0';
+            elsif s_uartrxvalid = '1' and s_uartrxdata = "11111111" then
                 s_writepacket <= '1';
-            elsif s_rxempty <= '0' then
-                s_writepacket <= '0';
-            else
-                s_writepacket <= '0'; -- nicht sicher ob ich diesen fall brauche...
+            --elsif s_rxempty = '0' then
+            --    s_writepacket <= '0';
+            --else
+                --s_writepacket <= '0'; -- nicht sicher ob ich diesen fall brauche...
             end if;
             
-            --s_recdata <= '0' & s_uart_rxdata WHEN s_uart_rxdata /= "11111111" else "100000000";
-            if s_uart_rxdata /= "11111111" then
-                s_recdata <= '0' & s_uart_rxdata;
+          
+			--s_recdata <= '0' & s_uart_rxdata WHEN s_uart_rxdata /= "11111111" else "100000000";
+            if s_uartrxdata /= "11111111" then
+                s_recdata <= '0' & s_uartrxdata;
             else
                 s_recdata <= "100000000";
+				--s_rxempty <= '1';
             end if;
         end if;
     end process;
@@ -390,20 +414,34 @@ BEGIN
 
 	
 	-- Debug
---	received <= s_writepacket;
---	rxvalid <= s_uart_rxvalid;
---	txwrite <= s_txwrite;
---	prxvalid <= s_rxvalid;
---	spw_d_p2r <= s_spw_d_p2r;
---	spw_d_r2p <= s_spw_d_r2p;
---	uart_txdata <= s_uart_txdata;
---	s_dtxdata(0) <= s_txflag(0) & s_txdata(0);
---	s_dtxdata(1) <= s_txflag(1) & s_txdata(1);
---	s_dtxdata(2) <= s_txflag(2) & s_txdata(2);
---	txdata <= s_dtxdata;
---	recdata <= s_recdata;
+	received <= s_writepacket;
+	rxvalid <= s_uartrxvalid;
+	txwrite <= s_txwrite;
+	prxvalid <= s_rxvalid;
+	spw_d_p2r <= s_spw_d_p2r;
+	spw_d_r2p <= s_spw_d_r2p;
+	uart_txdata <= s_uarttxdata;
+	s_dtxdata(0) <= s_txflag(0) & s_txdata(0);
+	s_dtxdata(1) <= s_txflag(1) & s_txdata(1);
+	s_dtxdata(2) <= s_txflag(2) & s_txdata(2);
+	txdata <= s_dtxdata;
+	recdata <= s_recdata;
 
-
+--    uart: RS232
+--		generic map (
+--			Baudrate => 115200
+--		)
+--        port map (
+--            CLK => clk,
+--            RXD => rxstream,
+--            RX_Data => s_uartrxdata,
+--            RX_Busy => s_uartrxbusy,
+--            RX_Valid => s_uartrxvalid,
+--            TXD => txstream,
+--            TX_Data => s_uarttxdata,
+--            TX_Start => s_uarttxwrite,
+--            TX_Busy => s_uarttxactive
+--        );
 
 
 
@@ -414,8 +452,8 @@ BEGIN
 	PORT MAP(
 		clk => clk,
 		rxstream => rxstream,
-		rxvalid => s_uart_rxvalid,
-		rxdata => s_uart_rxdata
+		rxvalid => s_uartrxvalid,
+		rxdata => s_uartrxdata
 	);
 
 	UartTransmitter : uart_tx
@@ -424,11 +462,11 @@ BEGIN
 	)
 	PORT MAP(
 		clk => clk,
-		txwrite => s_uart_txwrite,
-		txdata => s_uart_txdata,
-		txactive => s_uart_txactive,
+		txwrite => s_uarttxwrite,
+		txdata => s_uarttxdata,
+		txactive => s_uarttxactive,
 		txstream => txstream,
-		txdone => s_uart_txdone
+		txdone => s_uarttxdone
 	);
 
 	RouterToExtPortsComm : routertest
@@ -482,7 +520,7 @@ BEGIN
 		rerresc => s_rerresc,
 		perrcred => s_perrcred,
 		rerrcred => s_rerrcred,
-		--gotData => gotData,
+		gotData => gotData,
 		--sentData => sentData,
 		--fsmstate => fsmstate,
 		--debugdataout => debugdataout,
@@ -523,7 +561,7 @@ BEGIN
 	);
 
 --	-- rausgenommen aus sensitivitätsliste: s_uart_rxdata
-	PROCESS (r, s_writepacket, s_rxvalid, s_recdata, s_rxflag, s_selectdestport, s_selectport, prunning, s_rxfifo_rdata, rst, s_uart_rxvalid, s_txdivcnt, s_tick_in, s_ctrl_in, s_time_in, s_txwrite, s_txflag, s_txdata, s_rxdata, s_rxread, s_uart_txdata, s_uart_txactive, s_uart_txdone)
+	PROCESS (r, s_writepacket, s_rxvalid, s_recdata, s_selectdestport, s_selectport, prunning, s_rxfifo_rdata, rst, s_uartrxvalid, s_txdivcnt, s_tick_in, s_ctrl_in, s_time_in, s_rxdata, s_rxread, s_uarttxactive)
 		VARIABLE v : regs_type;
 		VARIABLE v_tmprxroom : unsigned(3 DOWNTO 0);
 		--variable v_tmptxroom: unsigned(3 downto 0); -- brauch ich doch eigentlich nicht
@@ -533,11 +571,11 @@ BEGIN
 		--v_tmptxroom := to_unsigned(0, v_tmptxroom'length);
 
 		-- Check for incomming uart byte
-		if s_uart_rxvalid = '1' then
+		if rising_edge(s_uartrxvalid) then-- = '1' then
 		-- got character
 			v.rxpacket := not s_recdata(8);
 		end if;
-		if s_uart_txactive = '0' and s_rxvalid /= "000" then -- added
+		if s_uarttxactive = '0' and s_rxvalid /= "000" then -- added
 		-- send character
 			v.txpacket := not s_rxflag(s_selectdestport);
 		end if;
@@ -548,18 +586,21 @@ BEGIN
 			v.rxfifo_raddr := STD_LOGIC_VECTOR(unsigned(r.rxfifo_raddr) + 1);
 		END IF;
 		IF r.rxfull = '0' THEN
-			IF s_uart_rxvalid = '1' then --OR r.rxeep = '1' THEN
+			IF rising_edge(s_uartrxvalid) then-- = '1' then --OR r.rxeep = '1' THEN
 				-- write to fifo (received char or pending eep)
 				v.rxfifo_waddr := STD_LOGIC_VECTOR(unsigned(r.rxfifo_waddr) + 1);
 			END IF;
 			v.rxeep := '0';
 		END IF;
 
-		s_rxempty <= r.rxfifo_rvalid and not r.txdiscard; -- added
-
 		-- Keep track of whether the rx fifo contains valid data.
 		-- (use new value of rxfifo_raddr)
 		v.rxfifo_rvalid := bool_to_logic(v.rxfifo_raddr /= r.rxfifo_waddr);
+
+		
+		--s_rxempty <= bool_to_logic(std_logic_vector(unsigned(v.rxfifo_raddr)-1) /= std_logic_vector(unsigned(r.rxfifo_waddr)));
+		s_rxempty <= v.rxfifo_rvalid and not r.txdiscard; -- added
+
 
 		-- Update room in rx fifo (use new value of rxfifo_waddr)
 		v_tmprxroom := unsigned(r.rxfifo_raddr) - unsigned(v.rxfifo_waddr) - 1;
@@ -582,7 +623,7 @@ BEGIN
 		
 		-- Drive control signals to rx fifo.
 		s_rxfifo_raddr <= v.rxfifo_raddr; -- using new value of rxfifo_raddr
-		s_rxfifo_wen <= (NOT r.rxfull) AND (s_uart_rxvalid OR r.rxeep); -- hier evtl s_uart_rxvalid = '1' wenn er muckt
+		s_rxfifo_wen <= (NOT r.rxfull) AND (s_uartrxvalid OR r.rxeep); -- hier evtl s_uart_rxvalid = '1' wenn er muckt
 		s_rxfifo_waddr <= r.rxfifo_waddr;
 		IF r.rxeep = '1' THEN
 			s_rxfifo_wdata <= "100000001";
@@ -613,10 +654,10 @@ BEGIN
 	    end case;
 		--s_txwrite <= (s_selectport => s_writepacket, OTHERS => '0');
 		-- Spacewire ports -> uart transmitter.
-		s_uart_txdata <= s_rxdata(s_selectdestport);
-		s_uart_txwrite <= s_rxvalid(s_selectdestport);
+		s_uarttxdata <= s_rxdata(s_selectdestport);
+		s_uarttxwrite <= s_rxvalid(s_selectdestport);
 
-		if s_rxvalid /= "000" and s_uart_txactive = '0' then
+		if s_rxvalid /= "000" and s_uarttxactive = '0' then
 			case s_rxvalid is
 			     when "001" =>
 			         s_rxread <= (0 => '1', others => '0');

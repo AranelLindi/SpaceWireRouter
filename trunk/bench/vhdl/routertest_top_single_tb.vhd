@@ -24,16 +24,16 @@ ARCHITECTURE bench OF routertest_top_single_tb IS
 			rerror : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			perror : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			-- Debugstates:
-			--rxvalid : OUT STD_LOGIC;
-			--txwrite : OUT STD_LOGIC_vector(2 downto 0);
-			--prxvalid: out std_logic_vector(2 downto 0);
-			--txinact: out std_logic;
+			rxvalid : OUT STD_LOGIC;
+			txwrite : OUT STD_LOGIC_vector(2 downto 0);
+			prxvalid: out std_logic_vector(2 downto 0);
+			txinact: out std_logic;
 			spw_d_p2r: out std_logic_vector(2 downto 0);
-			spw_d_r2p: out std_logic_vector(2 downto 0)
-			--uart_txdata: out std_logic_vector(7 downto 0);
-			--received: out std_logic;
-			--txdata: out array_t(2 downto 0)(8 downto 0);
-			--recdata: out std_logic_vector(8 downto 0)
+			spw_d_r2p: out std_logic_vector(2 downto 0);
+			uart_txdata: out std_logic_vector(7 downto 0);
+			received: out std_logic;
+			txdata: out array_t(2 downto 0)(8 downto 0);
+			recdata: out std_logic_vector(8 downto 0)
 		);
 	END COMPONENT;
 
@@ -59,7 +59,7 @@ ARCHITECTURE bench OF routertest_top_single_tb IS
 	signal spw_d_r2p: std_logic_vector(2 downto 0);
 	signal uart_txdata : std_logic_vector(7 downto 0);
 	signal received: std_logic;
-	--signal s_dtxdata: array_t(2 downto 0)(8 downto 0);
+	signal s_dtxdata: array_t(2 downto 0)(8 downto 0);
 	signal s_recdata: std_logic_vector(8 downto 0);
 
 
@@ -101,16 +101,16 @@ BEGIN
 		prunning => prunning,
 		rerror => rerror,
 		perror => perror,
-		--rxvalid => rxvalid,
-		--txwrite => txwrite,
-		--prxvalid => prxvalid,
-		--txinact => txinact,
+		rxvalid => rxvalid,
+		txwrite => txwrite,
+		prxvalid => prxvalid,
+		txinact => txinact,
 		spw_d_r2p => spw_d_r2p,
-		spw_d_p2r => spw_d_p2r
-		--uart_txdata => uart_txdata,
-		--received => received,
-		--txdata => s_dtxdata,
-		--recdata => s_recdata
+		spw_d_p2r => spw_d_p2r,
+		uart_txdata => uart_txdata,
+		received => received,
+		txdata => s_dtxdata,
+		recdata => s_recdata
 	);
 
 	stimulus : PROCESS

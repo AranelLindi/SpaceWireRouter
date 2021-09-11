@@ -40,20 +40,26 @@ PACKAGE BODY spwrouterfunc IS
     END select7x1xVector8;
 
     function select7x1xVector9(selectVector : std_logic_vector(numports DOWNTO 0); bits: array_t(numports DOWNTO 0)(8 downto 0)) return std_logic_vector is
-        variable selected: boolean := false;
-        constant cnull : std_logic_vector(8 downto 0) := (others => '0');
+        --variable selected: boolean := false;
+        --constant cnull : std_logic_vector(8 downto 0) := (others => '0');
+        
+        variable vec: std_logic_vector(8 downto 0) := (others => '0');
     begin
-        for i in numports downto 0 loop
+        for i in 0 to numports loop -- reihenfolge vertauscht: normalerweise umgekehrt um gleiche prio zu behalten. in diesem fall geht dies aber nicht, da in jeder if abfrage ein return statement ist womit stehts nur bis zur ersten erfüllten bedingung durchlaufen wird und nicht automatisch alle
             if (selectVector(i) = '1') then
-                selected := true;
-                return bits(i);
+                --selected := true;
+                --return bits(i);
+                vec := bits(i);
+                return vec;
             end if;
         end loop;
 
         -- else case
-        if selected = false then
-            return cnull;
-        end if;
+        --if selected = false then
+            --return cnull;
+        --end if;
+        
+        return vec;
     end select7x1xVector9;
 END PACKAGE BODY;
 
