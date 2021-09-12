@@ -179,11 +179,11 @@ ENTITY routertest IS
 		-- Credit error detected. Triggers a reset and reconnect of the link.
 		-- This indication is auto-clearing.
 		perrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-		rerrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+		rerrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
 
 
 		-- debug ports ON
-		gotData: out std_logic_vector(numports downto 0);
+		--gotData: out std_logic_vector(numports downto 0);
 		--sentData: out std_logic_vector(numports downto 0);
 		--fsmstate: out fsmarr(numports downto 0);
 		--debugdataout : out array_t(numports downto 0)(8 downto 0);
@@ -205,16 +205,16 @@ ENTITY routertest IS
 
 
 		-- Data In signal from SpaceWire bus.
-		spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+		--spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
 		-- Strobe In signal from SpaceWire bus.
-		spw_s_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+		--spw_s_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
 		-- Data Out signal to SpaceWire bus.
-		spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+		--spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
 		-- Strobe Out signal to SpaceWire bus.
-		spw_s_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+		--spw_s_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
 	);
 END routertest;
 
@@ -247,20 +247,20 @@ ARCHITECTURE routertest_arch OF routertest IS
 
 
 	-- Debug
-	signal s_fsmstate: fsmarr(numports downto 0);
-	signal s_dreadyOut: std_logic_vector(numports downto 0);
-	signal s_drequestOut: std_logic_vector(numports downto 0);
-	signal s_ddataOut: array_t(numports downto 0)(8 downto 0);
-	signal s_dstrobeOut: std_logic_vector(numports downto 0);
-	signal s_granted: std_logic_vector(numports downto 0);
+	--signal s_fsmstate: fsmarr(numports downto 0);
+	--signal s_dreadyOut: std_logic_vector(numports downto 0);
+	--signal s_drequestOut: std_logic_vector(numports downto 0);
+	--signal s_ddataOut: array_t(numports downto 0)(8 downto 0);
+	--signal s_dstrobeOut: std_logic_vector(numports downto 0);
+	--signal s_granted: std_logic_vector(numports downto 0);
 BEGIN
 	-- Drive outputs.
 	-- Signals from router to ports.
-	spw_d_r2p <= s_spw_di;
-	spw_s_r2p <= s_spw_si;
+	--spw_d_r2p <= s_spw_di;
+	--spw_s_r2p <= s_spw_si;
 	-- Signals from ports to router.
-	spw_d_p2r <= s_spw_do;
-	spw_s_p2r <= s_spw_so;
+	--spw_d_p2r <= s_spw_do;
+	--spw_s_p2r <= s_spw_so;
 
 	-- Status/errors for router and ports.
 	rstarted <= s_rstarted;
@@ -328,7 +328,7 @@ BEGIN
 		running => s_prunning(0),
 		errdisc => s_perrdisc(0),
 		errpar => s_perrpar(0),
-		erresc => s_perrpar(0),
+		erresc => s_perresc(0),
 		errcred => s_perrcred(0),
 		spw_di => s_spw_di(0), -- kommt vom router
 		spw_si => s_spw_si(0), -- kommt vom router
@@ -409,7 +409,7 @@ BEGIN
 		errpar => s_rerrpar,
 		erresc => s_rerresc,
 		errcred => s_rerrcred,
-		gotData => gotData, -- Debugport
+--		gotData => gotData, -- Debugport
 --		sentData => sentData, -- Debugport
 --		fsmstate => s_fsmstate, -- Debugport
 --		debugdataout => debugdataout, -- Debugport

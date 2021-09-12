@@ -32,6 +32,9 @@ ENTITY routertest_top_single IS
 		-- Reset.
 		rst : IN STD_LOGIC;
 
+		-- Clear button.
+		clear: in std_logic;
+
 		-- Marks which port (0 to 2) is selected to send the next packet.
 		-- (10 == 2; 01 == 1; 00 == 0)
 		selectport : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -62,19 +65,19 @@ ENTITY routertest_top_single IS
 		rerror : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 
 		-- High if corresponding external port has reported an error.
-		perror : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+		perror : OUT STD_LOGIC_VECTOR(2 DOWNTO 0)
 
 		-- Debugports
-		received : OUT STD_LOGIC;
-		rxvalid : OUT STD_LOGIC;
-		txwrite : OUT STD_LOGIC_vector(2 downto 0);
-		prxvalid : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-		txinact : OUT STD_LOGIC;
-		spw_d_p2r : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-		spw_d_r2p : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-		uart_txdata : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-		txdata : out array_t(2 downto 0)(8 downto 0);
-		recdata: out std_logic_vector(8 downto 0)
+		--received : OUT STD_LOGIC;
+		--rxvalid : OUT STD_LOGIC;
+		--txwrite : OUT STD_LOGIC_vector(2 downto 0);
+		--prxvalid : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+		--txinact : OUT STD_LOGIC;
+		--spw_d_p2r : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+		--spw_d_r2p : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+		--uart_txdata : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+		--txdata : out array_t(2 downto 0)(8 downto 0);
+		--recdata: out std_logic_vector(8 downto 0)
 	);
 END routertest_top_single;
 
@@ -183,8 +186,8 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 			perresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			rerresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			perrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			rerrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+			rerrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+			--gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			--sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			--fsmstate : OUT fsmarr(numports DOWNTO 0);
 			--debugdataout : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0);
@@ -202,9 +205,9 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 			--droutingSwitch : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0);
 			--dsourcePortOut : OUT array_t(numports DOWNTO 0)(1 DOWNTO 0);
 			--ddestinationPort : OUT array_t(numports DOWNTO 0)(7 DOWNTO 0);
-			spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+			--spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			--spw_s_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+			--spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
 			--spw_s_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
 		);
 	END COMPONENT;
@@ -225,7 +228,7 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 	SIGNAL s_rst : STD_LOGIC := '1';
 	SIGNAL s_autostart : STD_LOGIC_VECTOR(2 DOWNTO 0) := (OTHERS => '1');
 	SIGNAL s_linkstart : STD_LOGIC_VECTOR(2 DOWNTO 0) := (OTHERS => '1');
-	SIGNAL s_linkdis : STD_LOGIC_VECTOR(2 DOWNTO 0) := (0 => '1', OTHERS => '0');
+	SIGNAL s_linkdis : STD_LOGIC_VECTOR(2 DOWNTO 0) := (0 => '0', OTHERS => '0'); -- to deactivate port0, set here '1'
 	SIGNAL s_txdivcnt : STD_LOGIC_VECTOR(7 DOWNTO 0) := "00000001";
 	SIGNAL s_tick_in : STD_LOGIC_VECTOR(2 DOWNTO 1) := (OTHERS => '0');
 	SIGNAL s_ctrl_in : array_t(2 DOWNTO 1)(1 DOWNTO 0) := (OTHERS => (OTHERS => '0'));
@@ -257,7 +260,7 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 	SIGNAL s_rerresc : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL s_perrcred : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL s_rerrcred : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	SIGNAL gotData : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	--SIGNAL gotData : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	--SIGNAL sentData : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	--SIGNAL fsmstate : fsmarr(2 DOWNTO 0);
 	--SIGNAL debugdataout : array_t(2 DOWNTO 0)(8 DOWNTO 0);
@@ -275,9 +278,9 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 	--SIGNAL droutingSwitch : array_t(2 DOWNTO 0)(2 DOWNTO 0);
 	--SIGNAL dsourcePortOut : array_t(2 DOWNTO 0)(1 DOWNTO 0);
 	--SIGNAL ddestinationPort : array_t(2 DOWNTO 0)(7 DOWNTO 0);
-	SIGNAL s_spw_d_r2p : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	--SIGNAL s_spw_d_r2p : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	--SIGNAL s_spw_s_r2p : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	SIGNAL s_spw_d_p2r : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	--SIGNAL s_spw_d_p2r : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	--SIGNAL s_spw_s_p2r : STD_LOGIC_VECTOR(2 DOWNTO 0);
 
 
@@ -337,15 +340,44 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 	
 	type states is (S_Idle, S_Send, S_End);
 	signal state : states := S_Idle;
+
+
+	-- Zwischensignale Output ports
+	signal s_rxvalid_int : std_logic_vector(2 downto 0);
+	--signal s_prunning: std_logic_vector(2 downto 0);
+	--signal s_rrunning: std_logic_vector(2 downto 0);
+	signal s_perror_int : std_logic_vector(2 downto 0);
+	signal s_rerror_int : std_logic_vector(2 downto 0);
+	signal s_perror: std_logic_vector(2 downto 0);
+	signal s_rerror: std_logic_vector(2 downto 0);
 BEGIN
-	-- Drive outputs
-	rxhalff <= s_rxhalff; -- half receive fifo (spacewire -> uart) is full
 
-	prunning <= s_prunning; -- running mode of external ports
-	rrunning <= s_rrunning; -- running mode of router ports
+			-- Drive outputs
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			rxhalff <= s_rxvalid_int; -- Debugging!
+			prunning <= s_prunning;
+			rrunning <= s_rrunning;
+			perror <= s_perror;
+			rerror <= s_rerror;
 
-	perror <= s_perrdisc OR s_perrpar OR s_perresc OR s_perrcred; -- error external ports
-	rerror <= s_rerrdisc OR s_rerrpar OR s_rerresc OR s_rerrcred; -- error router ports
+			-- Debugging: Zeigt an wenn ein externer Port daten empfangen hat (muss mit clear quittiert werden!)
+			s_rxvalid_int <= (s_rxvalid_int or s_rxvalid) and (not clear) and (not rst);--s_rxhalff; -- half receive fifo (spacewire -> uart) is full
+
+			-- Shows running ports.
+			s_prunning <= s_prunning; -- running mode of external ports
+			s_rrunning <= s_rrunning; -- running mode of router ports
+
+			-- Sticky error led.
+			s_perror_int <= (s_perror_int or s_perror) and (not clear) and (not rst);
+			s_rerror_int <= (s_rerror_int or s_rerror) and (not clear) and (not rst);
+
+			-- Shows all errors on one led.
+			s_perror <= s_perrdisc OR s_perrpar OR s_perresc OR s_perrcred; -- error external ports
+			s_rerror <= s_rerrdisc OR s_rerrpar OR s_rerresc OR s_rerrcred; -- error router ports
+		end if;
+	end process;
 
 	--s_recdata <= '0' & s_uart_rxdata WHEN s_uart_rxdata /= "11111111" else "100000000";
 
@@ -414,18 +446,18 @@ BEGIN
 
 	
 	-- Debug
-	received <= s_writepacket;
-	rxvalid <= s_uartrxvalid;
-	txwrite <= s_txwrite;
-	prxvalid <= s_rxvalid;
-	spw_d_p2r <= s_spw_d_p2r;
-	spw_d_r2p <= s_spw_d_r2p;
-	uart_txdata <= s_uarttxdata;
-	s_dtxdata(0) <= s_txflag(0) & s_txdata(0);
-	s_dtxdata(1) <= s_txflag(1) & s_txdata(1);
-	s_dtxdata(2) <= s_txflag(2) & s_txdata(2);
-	txdata <= s_dtxdata;
-	recdata <= s_recdata;
+	--received <= s_writepacket;
+	--rxvalid <= s_uartrxvalid;
+	--txwrite <= s_txwrite;
+	--prxvalid <= s_rxvalid;
+	--spw_d_p2r <= s_spw_d_p2r;
+	--spw_d_r2p <= s_spw_d_r2p;
+	--uart_txdata <= s_uarttxdata;
+	--s_dtxdata(0) <= s_txflag(0) & s_txdata(0);
+	--s_dtxdata(1) <= s_txflag(1) & s_txdata(1);
+	--s_dtxdata(2) <= s_txflag(2) & s_txdata(2);
+	--txdata <= s_dtxdata;
+	--recdata <= s_recdata;
 
 --    uart: RS232
 --		generic map (
@@ -519,8 +551,8 @@ BEGIN
 		perresc => s_perresc,
 		rerresc => s_rerresc,
 		perrcred => s_perrcred,
-		rerrcred => s_rerrcred,
-		gotData => gotData,
+		rerrcred => s_rerrcred
+		--gotData => gotData,
 		--sentData => sentData,
 		--fsmstate => fsmstate,
 		--debugdataout => debugdataout,
@@ -538,9 +570,9 @@ BEGIN
 		--droutingSwitch => droutingSwitch,
 		--dsourcePortOut => dsourcePortOut,
 		--ddestinationPort => ddestinationPort,
-		spw_d_r2p => s_spw_d_r2p, -- Signale werden für Hardwareimplementierung nicht benötigt, sind eher für Simulation interessant zur Nachverfolgung
+		--spw_d_r2p => s_spw_d_r2p, -- Signale werden für Hardwareimplementierung nicht benötigt, sind eher für Simulation interessant zur Nachverfolgung
 		--spw_s_r2p => open, --s_spw_s_r2p,
-		spw_d_p2r => s_spw_d_p2r
+		--spw_d_p2r => s_spw_d_p2r
 		--spw_s_p2r => open --s_spw_s_p2r
 	);
 
@@ -561,7 +593,7 @@ BEGIN
 	);
 
 --	-- rausgenommen aus sensitivitätsliste: s_uart_rxdata
-	PROCESS (r, s_writepacket, s_rxvalid, s_recdata, s_selectdestport, s_selectport, prunning, s_rxfifo_rdata, rst, s_uartrxvalid, s_txdivcnt, s_tick_in, s_ctrl_in, s_time_in, s_rxdata, s_rxread, s_uarttxactive)
+	PROCESS (r, s_writepacket, s_rxvalid, s_recdata, s_selectdestport, s_selectport, s_rxflag, prunning, s_rxfifo_rdata, rst, s_uartrxvalid, s_txdivcnt, s_tick_in, s_ctrl_in, s_time_in, s_rxdata, s_rxread, s_uarttxactive)
 		VARIABLE v : regs_type;
 		VARIABLE v_tmprxroom : unsigned(3 DOWNTO 0);
 		--variable v_tmptxroom: unsigned(3 downto 0); -- brauch ich doch eigentlich nicht
@@ -654,8 +686,10 @@ BEGIN
 	    end case;
 		--s_txwrite <= (s_selectport => s_writepacket, OTHERS => '0');
 		-- Spacewire ports -> uart transmitter.
-		s_uarttxdata <= s_rxdata(s_selectdestport);
-		s_uarttxwrite <= s_rxvalid(s_selectdestport);
+		if s_rxread(s_selectdestport) = '1' then
+		  s_uarttxdata <= s_rxdata(s_selectdestport);
+		  s_uarttxwrite <= s_rxvalid(s_selectdestport);
+        end if;
 
 		if s_rxvalid /= "000" and s_uarttxactive = '0' then
 			case s_rxvalid is
@@ -666,7 +700,14 @@ BEGIN
 			     when "100" =>
 			         s_rxread <= (2 => '1', others => '0');
 			     when others =>
-			         s_rxread <= (others => '0'); -- Sollte normalerweise nicht passieren, es sei denn es werden pakete parallel verschickt - problematisch!
+			         --s_rxread <= (others => '0'); -- Sollte normalerweise nicht passieren, es sei denn es werden pakete parallel verschickt - problematisch!
+			         if s_rxvalid(2) = '1' then
+			             s_rxread <= (2 => '1', others => '0');
+			         elsif s_rxvalid(1) = '1' then
+			             s_rxread <= (1 => '1', others => '0');
+			         else
+			             s_rxread <= (0 => '1', others => '0');
+			         end if;
 			end case;
 		else
 			s_rxread <= (others => '0');
