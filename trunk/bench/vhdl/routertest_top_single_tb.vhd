@@ -14,8 +14,10 @@ ARCHITECTURE bench OF routertest_top_single_tb IS
 		PORT (
 			clk : IN STD_LOGIC;
 			rst : IN STD_LOGIC;
+			clear : IN STD_LOGIC;
+			uartfifofull : OUT STD_LOGIC;
 			selectport : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
-			selectdestport: in std_logic_vector(1 downto 0);
+			selectdestport : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
 			rxstream : IN STD_LOGIC;
 			txstream : OUT STD_LOGIC;
 			rxhalff : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -25,22 +27,26 @@ ARCHITECTURE bench OF routertest_top_single_tb IS
 			perror : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			-- Debugstates:
 			rxvalid : OUT STD_LOGIC;
-			txwrite : OUT STD_LOGIC_vector(2 downto 0);
-			prxvalid: out std_logic_vector(2 downto 0);
-			txinact: out std_logic;
-			spw_d_p2r: out std_logic_vector(2 downto 0);
-			spw_d_r2p: out std_logic_vector(2 downto 0);
-			uart_txdata: out std_logic_vector(7 downto 0);
-			received: out std_logic;
-			txdata: out array_t(2 downto 0)(8 downto 0);
-			recdata: out std_logic_vector(8 downto 0)
+			txwrite : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			prxvalid : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			txinact : OUT STD_LOGIC;
+			spw_d_p2r : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			spw_d_r2p : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			uart_txdata : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+			received : OUT STD_LOGIC;
+			txdata : OUT array_t(2 DOWNTO 0)(8 DOWNTO 0);
+			recdata : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
+			raddr : out integer range 0 to 16;
+			waddr: out integer range 0 to 16
 		);
 	END COMPONENT;
 
 	SIGNAL clk : STD_LOGIC;
 	SIGNAL rst : STD_LOGIC;
+	SIGNAL clear : STD_LOGIC := '0';
+	SIGNAL uartfifofull : STD_LOGIC;
 	SIGNAL selectport : STD_LOGIC_VECTOR(1 DOWNTO 0) := "10";
-	signal selectdestport: std_logic_vector(1 downto 0) := "01";
+	SIGNAL selectdestport : STD_LOGIC_VECTOR(1 DOWNTO 0) := "01";
 	SIGNAL rxstream : STD_LOGIC := '1';
 	SIGNAL txstream : STD_LOGIC := '1';
 	SIGNAL rxhalff : STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -48,24 +54,24 @@ ARCHITECTURE bench OF routertest_top_single_tb IS
 	SIGNAL prunning : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL rerror : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL perror : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	
-
 	-- Debugports
 	SIGNAL rxvalid : STD_LOGIC;
-	SIGNAL txwrite : STD_LOGIC_vector(2 downto 0);
-	signal prxvalid : std_logic_vector(2 downto 0);
-	signal txinact: std_logic;
-	signal spw_d_p2r: std_logic_vector(2 downto 0);
-	signal spw_d_r2p: std_logic_vector(2 downto 0);
-	signal uart_txdata : std_logic_vector(7 downto 0);
-	signal received: std_logic;
-	signal s_dtxdata: array_t(2 downto 0)(8 downto 0);
-	signal s_recdata: std_logic_vector(8 downto 0);
+	SIGNAL txwrite : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	SIGNAL prxvalid : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	SIGNAL txinact : STD_LOGIC;
+	SIGNAL spw_d_p2r : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	SIGNAL spw_d_r2p : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	SIGNAL uart_txdata : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL received : STD_LOGIC;
+	SIGNAL s_dtxdata : array_t(2 DOWNTO 0)(8 DOWNTO 0);
+	SIGNAL s_recdata : STD_LOGIC_VECTOR(8 DOWNTO 0);
+	signal raddr: integer range 0 to 16;
+	signal waddr: integer range 0 to 16;
 
 
 	CONSTANT clock_period : TIME := 100 ns; -- 10 MHz
 
-	constant c_BIT_PERIOD : time := 8680 ns; -- 115200 baud rate
+	CONSTANT c_BIT_PERIOD : TIME := 8680 ns; -- 115200 baud rate (115 kHz)
 
 	-- Low-level byte-write
 	PROCEDURE UART_WRITE_BYTE (
@@ -92,6 +98,8 @@ BEGIN
 	dut : routertest_top_single PORT MAP(
 		clk => clk,
 		rst => rst,
+		clear => clear,
+		uartfifofull => uartfifofull,
 		selectport => selectport,
 		selectdestport => selectdestport,
 		rxstream => rxstream,
@@ -110,34 +118,45 @@ BEGIN
 		uart_txdata => uart_txdata,
 		received => received,
 		txdata => s_dtxdata,
-		recdata => s_recdata
+		recdata => s_recdata,
+		raddr => raddr,
+		waddr => waddr
 	);
 
 	stimulus : PROCESS
 	BEGIN
 		rst <= '1';
-		wait for clock_period;
+		WAIT FOR clock_period;
 		rst <= '0';
-		wait;
+		WAIT;
 	END PROCESS;
+	PROCESS
+		VARIABLE state : integer range 1 to 2 := 1;
+	BEGIN
+		CASE state IS
+			WHEN 1 =>
+				WAIT FOR c_bit_period;
 
+				uart_write_byte("00000001", rxstream);
 
-	process
-	begin
-		wait for c_bit_period;
+				WAIT FOR c_bit_period; -- zu testzwecken mal einblenden um zu schauen was bei etwas abstand passiert
 
-		uart_write_byte("00000001", rxstream);
+				uart_write_byte("10111111", rxstream);
+				uart_write_byte("00000111", rxstream);
+				WAIT FOR c_bit_period;
+				uart_write_byte("11111111", rxstream);
 
-		wait for c_bit_period; -- zu testzwecken mal einblenden um zu schauen was bei etwas abstand passiert
+				state := 2;
 
-		uart_write_byte("10111111", rxstream);
-		wait for c_bit_period;		
-		uart_write_byte("11111111", rxstream);
-
-		wait;
-	end process;
-
-
+			WHEN 2 =>
+				WAIT for 400 us;
+				uart_write_byte("00000001", rxstream);
+				uart_write_byte("11111110", rxstream);
+				uart_write_byte("00000000", rxstream);
+				uart_write_byte("11111111", rxstream);
+				wait;
+		END CASE;
+	END PROCESS;
 	clocking : PROCESS
 	BEGIN
 		clk <= '0', '1' AFTER clock_period / 2;

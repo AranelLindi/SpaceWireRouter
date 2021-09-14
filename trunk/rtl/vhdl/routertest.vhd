@@ -179,12 +179,12 @@ ENTITY routertest IS
 		-- Credit error detected. Triggers a reset and reconnect of the link.
 		-- This indication is auto-clearing.
 		perrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-		rerrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+		rerrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
 
 		-- debug ports ON
-		--gotData: out std_logic_vector(numports downto 0);
-		--sentData: out std_logic_vector(numports downto 0);
+		gotData: out std_logic_vector(numports downto 0);
+		sentData: out std_logic_vector(numports downto 0);
 		--fsmstate: out fsmarr(numports downto 0);
 		--debugdataout : out array_t(numports downto 0)(8 downto 0);
 		--dreadyIn : out std_logic_vector(numports downto 0);
@@ -205,13 +205,13 @@ ENTITY routertest IS
 
 
 		-- Data In signal from SpaceWire bus.
-		--spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+		spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
 		-- Strobe In signal from SpaceWire bus.
 		--spw_s_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
 		-- Data Out signal to SpaceWire bus.
-		--spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+		spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
 
 		-- Strobe Out signal to SpaceWire bus.
 		--spw_s_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
@@ -255,11 +255,11 @@ ARCHITECTURE routertest_arch OF routertest IS
 	--signal s_granted: std_logic_vector(numports downto 0);
 BEGIN
 	-- Drive outputs.
-	-- Signals from router to ports.
-	--spw_d_r2p <= s_spw_di;
+	-- Signals from router to ports. (Ist glaub ich nur für debugging)
+	spw_d_r2p <= s_spw_di;
 	--spw_s_r2p <= s_spw_si;
 	-- Signals from ports to router.
-	--spw_d_p2r <= s_spw_do;
+	spw_d_p2r <= s_spw_do;
 	--spw_s_p2r <= s_spw_so;
 
 	-- Status/errors for router and ports.
@@ -409,8 +409,8 @@ BEGIN
 		errpar => s_rerrpar,
 		erresc => s_rerresc,
 		errcred => s_rerrcred,
---		gotData => gotData, -- Debugport
---		sentData => sentData, -- Debugport
+		gotData => gotData, -- Debugport
+		sentData => sentData, -- Debugport
 --		fsmstate => s_fsmstate, -- Debugport
 --		debugdataout => debugdataout, -- Debugport
 --		dreadyIn => dreadyIn, -- Debugport

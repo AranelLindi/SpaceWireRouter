@@ -275,7 +275,7 @@ PACKAGE spwrouterpkg IS
             erresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
             errcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
             gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-            --sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+            sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
             --fsmstate: out fsmarr(numports downto 0); -- Debugport
             --debugdataout : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
             --dreadyIn : out std_logic_vector(numports downto 0); -- Debugport

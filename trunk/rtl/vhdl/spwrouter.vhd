@@ -76,7 +76,7 @@ ENTITY spwrouter IS
 
         -- Debug ports ON
         gotData : OUT std_logic_vector(numports downto 0);
-        --sentData: out std_logic_vector(numports downto 0);
+        sentData: out std_logic_vector(numports downto 0);
         --fsmstate: out fsmarr(numports downto 0);
         --debugdataout: out array_t(numports downto 0)(8 downto 0);
         --dreadyIn : out std_logic_vector(numports downto 0);
@@ -358,8 +358,8 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 busMasterStrobeOut => busMasterStrobeOut(i),
                 busMasterRequestOut => busMasterRequestOut(i),
                 busMasterAcknowledgeIn => busMasterAcknowledgeIn(i),
-                --gotData => gotData(i), -- Debugport
-                --sentData => sentData(i), -- Debugport
+                gotData => gotData(i), -- Debugport
+                sentData => sentData(i), -- Debugport
                 --fsmstate => s_fsm(i), -- Debugport
                 --debugdataout => debugdataout(i), -- Debugport
                 spw_di => spw_di(i),
