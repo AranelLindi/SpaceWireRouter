@@ -118,10 +118,6 @@ ARCHITECTURE routertest_top_multi_adapter_arch OF routertest_top_multi_adapter I
 	   );
 	end component;
 
-
-	-- System clock.
-	--signal slowclk : std_logic := '0';
-
 	-- Uart receiver.
 	--SIGNAL s_uart_rxstream : STD_LOGIC;
 	SIGNAL s_uartrxdata : STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -186,12 +182,6 @@ ARCHITECTURE routertest_top_multi_adapter_arch OF routertest_top_multi_adapter I
 	SIGNAL s_spw_do : STD_LOGIC;
 	SIGNAL s_spw_so : STD_LOGIC;
 
-	-- Debug
-	--SIGNAL s_dtxdata : STD_LOGIC_VECTOR(8 DOWNTO 0);
-	--SIGNAL s_debugsig : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL s_selectport : INTEGER RANGE 0 TO 2 := 2; --std_logic_vector(1 downto 0);
-	--SIGNAL s_selectdestport : INTEGER RANGE 0 TO 2 := 2; --std_logic_vector(1 downto 0);
-
 	SIGNAL s_rxvalid_int : STD_LOGIC;
 	SIGNAL s_error_int : STD_LOGIC;
 	SIGNAL s_error : STD_LOGIC;
@@ -209,7 +199,7 @@ BEGIN
     s_spw_di <= spw_di;
     s_spw_si <= spw_si;
 
-	
+	-- Von uart zu ext. Ports.
 	PROCESS (clk, rst)
 		VARIABLE selectport : INTEGER RANGE 0 TO 2;
 		VARIABLE data : STD_LOGIC_VECTOR(7 DOWNTO 0);

@@ -69,7 +69,15 @@ ENTITY routertest_top_multi_router IS
 		rerror : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 
 		-- High if corresponding external port has reported an error.
-		perror : OUT STD_LOGIC
+		perror : OUT STD_LOGIC;
+		
+		spw_di : in std_logic;
+		
+		spw_si : in std_logic;
+		
+		spw_do : out std_logic;
+		
+		spw_so : out std_logic
 
 		-- Debugports
 --		received : OUT STD_LOGIC;
@@ -207,7 +215,15 @@ ARCHITECTURE routertest_top_multi_router_arch OF routertest_top_multi_router IS
 	TYPE uartrxstates IS (S_Idle, S_EOP, S_Send, S_Clean);
 	SIGNAL rxstate : uartrxstates := S_Idle;
 BEGIN
+    -- Drive outputs.
+    s_spw_di(1) <= spw_di;
+    s_spw_si(1) <= spw_si;
+    
+    spw_do <= s_spw_do(1);
+    spw_so <= s_spw_so(1);
+
 	
+	-- Von uart zu ext. Ports.
 	PROCESS (clk, rst)
 		VARIABLE selectport : INTEGER RANGE 0 TO 2;
 		VARIABLE data : STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -332,9 +348,9 @@ BEGIN
 			WHEN "01" =>
 				s_selectport <= 1;
 			WHEN "10" =>
-				s_selectport <= 2;
+				s_selectport <= 1;
 			WHEN OTHERS =>
-				s_selectport <= 2;
+				s_selectport <= 1;
 		END CASE;
 		CASE selectdestport IS
 			WHEN "00" =>
@@ -342,9 +358,9 @@ BEGIN
 			WHEN "01" =>
 				s_selectdestport <= 1;
 			WHEN "10" =>
-				s_selectdestport <= 2;
+				s_selectdestport <= 1;
 			WHEN OTHERS =>
-				s_selectdestport <= 2;
+				s_selectdestport <= 1;
 		END CASE;
 	END PROCESS;
 

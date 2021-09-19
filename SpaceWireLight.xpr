@@ -341,7 +341,7 @@
       </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="routertest_top_single"/>
+        <Option Name="TopModule" Val="routertest_top_multi_adapter"/>
       </Config>
     </FileSet>
     <FileSet Name="DigilentBasys3" Type="Constrs" RelSrcDir="$PSRCDIR/DigilentBasys3" RelGenDir="$PGENDIR/DigilentBasys3">
@@ -415,8 +415,20 @@
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/trunk/syn/streamtest_digilent-xc7a35tcpg_basys3/routertest_top_multi_adapter.xdc">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/syn/streamtest_digilent-xc7a35tcpg_basys3/routertest_top_multi_router.xdc">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
       <Config>
-        <Option Name="TargetConstrsFile" Val="$PPRDIR/trunk/syn/streamtest_digilent-xc7a35tcpg_basys3/routertest_top_single.xdc"/>
+        <Option Name="TargetConstrsFile" Val="$PPRDIR/trunk/syn/streamtest_digilent-xc7a35tcpg_basys3/routertest_top_multi_adapter.xdc"/>
         <Option Name="ConstrsType" Val="XDC"/>
       </Config>
     </FileSet>
