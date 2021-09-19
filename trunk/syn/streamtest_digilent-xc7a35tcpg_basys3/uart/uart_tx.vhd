@@ -31,6 +31,8 @@ ENTITY uart_tx IS
         -- System clock.
         clk : IN STD_LOGIC;
 
+        rst : in std_logic;
+
         -- 'High' if transmitter shall start to send tx_byte.
         -- 'Low' when nothing should be send.
         txwrite : IN STD_LOGIC;
@@ -69,9 +71,15 @@ BEGIN
     -- Drive other output.
     txdone <= s_txdone;
 
-    PROCESS (clk)
+    PROCESS (clk, rst)
     BEGIN
-        IF rising_edge(clk) THEN
+        if rst = '1' then
+            state <= S_Idle;
+            s_clk_count <= 0;
+            s_bit_index <= 0;
+            s_txdata <= (others => '0');
+            s_txdone <= '0';
+        ELSIF rising_edge(clk) THEN
             CASE state IS
                 WHEN S_Idle =>
                     txactive <= '0';
@@ -140,9 +148,7 @@ BEGIN
                     txactive <= '0';
                     s_txdone <= '1';
                     state <= S_Idle;
-                    
-                when others =>
-                    state <= S_Idle;
+                   
             END CASE;
         END IF;
     END PROCESS;

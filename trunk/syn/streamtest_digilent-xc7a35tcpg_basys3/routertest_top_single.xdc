@@ -4,6 +4,7 @@
 set_property PACKAGE_PIN W5 [get_ports clk]
 set_property IOSTANDARD LVCMOS33 [get_ports clk]
 create_clock -period 100.000 -name sys_clk_pin -waveform {0.000 50.000} -add [get_ports clk]
+#set_property CLOCK_DELAY_GROUP ClockDiv [get_nets {clk slowclk}]
 
 ## Switches
 set_property PACKAGE_PIN V17 [get_ports {selectport[0]}]
@@ -56,22 +57,25 @@ set_property IOSTANDARD LVCMOS33 [get_ports {perror[2]}]
 # Reset
 set_property PACKAGE_PIN U18 [get_ports rst]
 set_property IOSTANDARD LVCMOS33 [get_ports rst]
+
+# Button Up (clear)
 set_property PACKAGE_PIN T18 [get_ports clear]
 set_property IOSTANDARD LVCMOS33 [get_ports clear]
 
+# Button Down (eop)
+set_property PACKAGE_PIN U17 [get_ports eop] 						
+	set_property IOSTANDARD LVCMOS33 [get_ports eop]
 
 ##USB-RS232 Interface
 set_property PACKAGE_PIN B18 [get_ports rxstream]
 set_property IOSTANDARD LVCMOS33 [get_ports rxstream]
-set_false_path -from [get_ports rxstream]
+set_false_path -from [get_ports rxstream] -to *
 
 set_property PACKAGE_PIN A18 [get_ports txstream]
 set_property IOSTANDARD LVCMOS33 [get_ports txstream]
-set_false_path -to [get_ports txstream]
+#set_false_path -from * -to [get_ports txstream]
 
-#set_input_delay -clock [get_clocks sys_clk_pin] -min -add_delay 0.000 [get_ports {selectdestport[*]}]
-#set_input_delay -clock [get_clocks sys_clk_pin] -max -add_delay 0.000 [get_ports {selectdestport[*]}]
-#set_input_delay -clock [get_clocks sys_clk_pin] -min -add_delay 0.000 [get_ports {selectport[*]}]
-#set_input_delay -clock [get_clocks sys_clk_pin] -max -add_delay 0.000 [get_ports {selectport[*]}]
-#set_input_delay -clock [get_clocks sys_clk_pin] -min -add_delay 0.000 [get_ports rst]
-#set_input_delay -clock [get_clocks sys_clk_pin] -max -add_delay 0.000 [get_ports rst]
+
+#set_property ALLOW_COMBINATORIAL_LOOPS true [get_nets -of_objects [get_cells rxhalff_OBUF[0]_inst_i_1 rxhalff_OBUF[1]_inst_i_1 rxhalff_OBUF[2]_inst_i_1]]
+#set_property SEVERITY {Warning}  [get_drc_checks LUTLP-1]
+#set_property SEVERITY {Warning} [get_drc_checks NSTD-1]

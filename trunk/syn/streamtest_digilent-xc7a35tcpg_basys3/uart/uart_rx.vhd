@@ -30,6 +30,8 @@ ENTITY uart_rx IS
     PORT (
         -- System clock.
         clk : IN STD_LOGIC;
+        
+        rst : in std_logic;
 
         -- Incoming data bits (serial stream).
         rxstream : IN STD_LOGIC;
@@ -67,18 +69,27 @@ BEGIN
     rxdata <= s_rxdata;
 
     -- Samples incoming data bits into shift register to avoid metastability issues.
-    Data_Sampling : PROCESS (clk)
+    Data_Sampling : PROCESS (clk, rst)
     BEGIN
-        IF rising_edge(clk) THEN
+        if rst = '1' then
+            s_shiftreg(0) <= '1';
+            s_shiftreg(0) <= '1';
+        ELSIF rising_edge(clk) THEN
             s_shiftreg(0) <= rxstream;
             s_shiftreg(1) <= s_shiftreg(0);
         END IF;
     END PROCESS;
 
     -- Finite state machine of receiver.
-    FiniteStateMachine : PROCESS (clk)
+    FiniteStateMachine : PROCESS (clk, rst)
     BEGIN
-        IF rising_edge(clk) THEN
+        if rst = '1' then
+            state <= S_Idle;
+            s_clk_count <= 0;
+            s_bit_index <= 0;
+            s_rxdata <= (others => '0');
+            s_rxvalid <= '0';
+        ELSIF rising_edge(clk) THEN
             CASE state IS
                 WHEN S_Idle =>
                     s_rxvalid <= '0';
@@ -140,9 +151,7 @@ BEGIN
                 WHEN S_Cleanup =>
                     state <= S_Idle;
                     s_rxvalid <= '0';
-                    
-                when others =>
-                    state <= S_Idle;
+
             END CASE;
         END IF;
     END PROCESS;
