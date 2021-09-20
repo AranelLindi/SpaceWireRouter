@@ -314,15 +314,19 @@ BEGIN
 	
 	-- Drive outputs.
 	rxhalff <= s_rxvalid_int; -- Debugging!
-	prunning <= s_prunning;
-	rrunning <= s_rrunning;
+	--prunning <= s_prunning;
+	--rrunning <= s_rrunning;
 	perror <= s_perror_int;
 	rerror <= s_rerror;
 	-- Shows running ports.
-	s_prunning <= s_prunning; -- running mode of external ports
-	s_rrunning <= s_rrunning; -- running mode of router ports
+	--s_prunning <= s_prunning; -- running mode of external ports
+	rrunning <= s_rrunning; -- running mode of router ports
 	-- Shows rxfifo filling;
 	--uartfifofull <= '0';--(uartfifofull OR s_rxfull) AND (NOT clear) AND (NOT rst);
+
+	pstarted <= s_pstarted;
+	pconnecting <= s_pconnecting;
+	prunning <= s_prunning;
 
 	PROCESS (clk)
 	BEGIN
@@ -330,7 +334,7 @@ BEGIN
 			-- Debugging: Zeigt an wenn ein externer Port daten empfangen hat (muss mit clear quittiert werden!)
 			s_rxvalid_int <= (s_rxvalid_int OR s_rxvalid) AND (NOT clear) AND (NOT rst);--s_rxhalff; -- half receive fifo (spacewire -> uart) is full
 			-- Sticky error led.
-			s_perror_int <= (s_perror_int OR s_rxvalid) AND (NOT clear) AND (NOT rst); -- ACHTUNG! Für debug geänderT! TODO! (rxvalid)
+			s_perror_int <= (s_perror_int OR s_perror) AND (NOT clear) AND (NOT rst); -- ACHTUNG! Für debug geänderT! TODO! (rxvalid)
 			s_rerror_int <= (s_rerror_int OR s_rerror);-- AND (NOT clear) AND (NOT rst);
 
 			-- Shows all errors on one led.
@@ -466,8 +470,8 @@ BEGIN
         rxclk => clk,
         txclk => clk,
         rst => rst,
-        autostart => '1',
-        linkstart => '1',
+        autostart => s_autostart,
+        linkstart => s_linkstart,
         linkdis => '0',
         txdivcnt => s_txdivcnt,
         tick_in => '0',
@@ -522,9 +526,13 @@ BEGIN
 	       errcred => s_rerrcred,
 	       gotData => open, -- Debugport
 	       sentData => open, -- Debugport
-	       spw_di => s_spw_di,
-	       spw_si => s_spw_si,
-	       spw_do => s_spw_do,
-	       spw_so => s_spw_so
+	       spw_di(0) => s_spw_do(0),
+	       spw_di(1) => spw_di,
+	       spw_si(0) => s_spw_so(0),
+	       spw_si(1) => spw_si,
+	       spw_do(0) => s_spw_di(0),
+	       spw_do(1) => spw_do,
+	       spw_so(0) => s_spw_si(0),
+	       spw_so(1) => spw_so
 	   );
 END routertest_top_multi_router_arch;

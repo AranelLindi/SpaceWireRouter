@@ -404,8 +404,8 @@ BEGIN
         rxclk => clk,
         txclk => clk,
         rst => rst,
-        autostart => '1',
-        linkstart => '1',
+        autostart => s_autostart,
+        linkstart => s_linkstart,
         linkdis => '0',
         txdivcnt => s_txdivcnt,
         tick_in => '0',
@@ -431,9 +431,9 @@ BEGIN
         errpar => s_errpar,
         erresc => s_erresc,
         errcred => s_errcred,
-        spw_di => s_spw_di,
-        spw_si => s_spw_si,
-        spw_do => s_spw_do,
-        spw_so => s_spw_so                
+        spw_di => spw_di,
+        spw_si => spw_si,
+        spw_do => spw_do,
+        spw_so => spw_so                
 	);
 END routertest_top_multi_adapter_arch;
