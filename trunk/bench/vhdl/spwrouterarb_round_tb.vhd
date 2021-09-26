@@ -24,7 +24,7 @@ ENTITY spwrouterarb_round_tb IS
 END;
 
 ARCHITECTURE spwrouterarb_round_tb_arch OF spwrouterarb_round_tb IS
-
+    -- Design under test.
     COMPONENT spwrouterarb_round
         GENERIC (
             numports : INTEGER RANGE 0 TO 31;
@@ -39,11 +39,9 @@ ARCHITECTURE spwrouterarb_round_tb_arch OF spwrouterarb_round_tb IS
         );
     END COMPONENT;
 
-    -- TODO: Initial values...
-
     -- Number of SpaceWire ports.
     CONSTANT numports : INTEGER RANGE 0 TO 31 := 2; -- 3 ports
-    
+
     -- Bit length to map all ports.
     CONSTANT blen : INTEGER RANGE 0 TO 4 := INTEGER(ceil(log2(real(numports))));
 
@@ -62,12 +60,10 @@ ARCHITECTURE spwrouterarb_round_tb_arch OF spwrouterarb_round_tb IS
     -- Bit sequence that indicates the access of another port.
     SIGNAL grnt : STD_LOGIC_VECTOR(numports DOWNTO 0);
     
-
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
     SIGNAL stop_the_clock : BOOLEAN;
 BEGIN
-
     -- Design under test.
     dut : spwrouterarb_round GENERIC MAP(numports => numports, blen => blen)
     PORT MAP(
@@ -81,29 +77,29 @@ BEGIN
     stimulus : PROCESS
     BEGIN
         rst <= '1'; -- Reset to initialize signals in dut.
-    
+
         WAIT FOR clock_period/4;
-        
+
         -- Set initial values for simulation.
-        rst <= '0';       
+        rst <= '0';
         occ <= '0'; -- Port is not occupied.
-        req <= (2 => '1', others => '0'); -- 2nc port mades access request. 
-        
+        req <= (2 => '1', OTHERS => '0'); -- 2nc port mades access request. 
+
         WAIT FOR clock_period/4 + clock_period/2; -- Should ensure that signals are at desired value up to rising_edge(clk)
-        
-        req <= (others => '1'); -- Every port made a access request.
-        
-        wait for clock_period/2 + clock_period;
-        
-        req <= (others => '0'); -- No port requieres access.
-        
-        wait for clock_period;
-        
+
+        req <= (OTHERS => '1'); -- Every port made a access request.
+
+        WAIT FOR clock_period/2 + clock_period;
+
+        req <= (OTHERS => '0'); -- No port requieres access.
+
+        WAIT FOR clock_period;
+
         occ <= '1'; -- Now port is occupied, should never give any permission.
-        req <= (others => '1'); -- Every port made a request.
-        
-        wait for clock_period;
-               
+        req <= (OTHERS => '1'); -- Every port made a request.
+
+        WAIT FOR clock_period;
+
         stop_the_clock <= true;
         WAIT;
     END PROCESS;

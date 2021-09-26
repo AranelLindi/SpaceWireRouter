@@ -5,10 +5,10 @@
 -- Create Date: 05.08.2021 18:47
 -- Design Name: Testbench for SpaceWire Router Arbiter
 -- Module Name: spwrouterarb_tb
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
--- Description: Simulate Router Arbiter.
+-- Description: Simulates Router Arbiter.
 -- The module supplies bit sequences that indicate which port
 -- has access to other ports. Issues are relatively simple, no
 -- major stress tests necessary. Note that another module is
@@ -28,7 +28,7 @@ ENTITY spwrouterarb_tb IS
 END;
 
 ARCHITECTURE spwrouterarb_tb_arch OF spwrouterarb_tb IS
-
+    -- Design under test.
     COMPONENT spwrouterarb
         GENERIC (
             numports : INTEGER RANGE 0 TO 31
@@ -43,8 +43,6 @@ ARCHITECTURE spwrouterarb_tb_arch OF spwrouterarb_tb IS
         );
     END COMPONENT;
 
-    -- TODO: Initial values...
-
     -- Number of SpaceWire ports.
     CONSTANT numports : INTEGER RANGE 0 TO 31 := 2;
 
@@ -55,7 +53,7 @@ ARCHITECTURE spwrouterarb_tb_arch OF spwrouterarb_tb IS
     SIGNAL rst : STD_LOGIC;
 
     -- Destination of port x.
-    SIGNAL dest : array_t(numports DOWNTO 0)(7 DOWNTO 0);-- := (1 => (1 => '1'), 2 => (1 => '1'), OTHERS => (OTHERS => '0')); -- (1,1) = '1', (2, 1) = '1'), (others => '0')
+    SIGNAL dest : array_t(numports DOWNTO 0)(7 DOWNTO 0);
 
     -- Request of port x.
     SIGNAL req : STD_LOGIC_VECTOR(numports DOWNTO 0);-- := (numports => '1', OTHERS => '0');
@@ -108,7 +106,7 @@ BEGIN
         req <= "101";
         dest(1) <= "00000000";
 
-        wait for clock_period;
+        WAIT FOR clock_period;
 
         --dest <= (1 => (1 => '1', OTHERS => '0'), OTHERS => (OTHERS => '0'));
         --req <= (1 => '1', OTHERS => '0');
@@ -142,6 +140,6 @@ BEGIN
     clocking : PROCESS
     BEGIN
         clk <= '0', '1' AFTER clock_period / 2;
-        wait for clock_period;
+        WAIT FOR clock_period;
     END PROCESS;
 END spwrouterarb_tb_arch;

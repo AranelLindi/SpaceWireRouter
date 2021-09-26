@@ -5,7 +5,7 @@
 -- Create Date: 05.08.2021 19:14
 -- Design Name: Testbench for SpaceWire Router Table Arbiter
 -- Module Name: spwrouterarb_table_tb
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
 -- Description: Simulation time: 55 ns.
@@ -23,7 +23,7 @@ ENTITY spwrouterarb_table_tb IS
 END;
 
 ARCHITECTURE spwrouterarb_table_tb_arch OF spwrouterarb_table_tb IS
-
+    -- Design under test.
     COMPONENT spwrouterarb_table
         GENERIC (
             numports : INTEGER RANGE 0 TO 31
@@ -35,8 +35,6 @@ ARCHITECTURE spwrouterarb_table_tb_arch OF spwrouterarb_table_tb IS
             grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
         );
     END COMPONENT;
-
-    -- TODO: Initial values...
 
     -- Number of SpaceWire ports.
     CONSTANT numports : INTEGER RANGE 0 TO 31 := 2;
@@ -52,11 +50,10 @@ ARCHITECTURE spwrouterarb_table_tb_arch OF spwrouterarb_table_tb IS
 
     -- Contains which port gets access.
     SIGNAL grnt : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    
+
     -- Clock period. (10 MHz)
     CONSTANT clock_period : TIME := 100 ns;
 BEGIN
-
     -- Design under test.
     dut : spwrouterarb_table GENERIC MAP(numports => numports)
     PORT MAP(

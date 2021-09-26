@@ -1,28 +1,24 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company: University of Wuerzburg
+-- Engineer: Stefan LindÃ¶rfer
 -- 
 -- Create Date: 23.08.2021 22:28:26
--- Design Name: 
+-- Design Name: routertest_top_single
 -- Module Name: routertest_top - routertest_top_arch
--- Project Name: 
+-- Project Name: Implementation of a SpaceWire Router on an FPGA.
 -- Target Devices: 
 -- Tool Versions: 
 -- Description: 
 -- 
--- Dependencies: 
+-- Dependencies: spwpkg, spwrouterpkg
 -- 
 -- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
 ----------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 USE work.spwpkg.ALL;
 USE work.spwrouterpkg.ALL;
---USE work.routertest_top_single_tb_pkg.ALL;
 
 ENTITY routertest_top_single IS
 	PORT (
@@ -35,14 +31,17 @@ ENTITY routertest_top_single IS
 		-- Clear button.
 		clear : IN STD_LOGIC;
 		
+		-- Send manual end of packet.
 		eop : in std_logic;
 
+		-- ?
 		uartfifofull : OUT STD_LOGIC;
 
 		-- Marks which port (0 to 2) is selected to send the next packet.
 		-- (10 == 2; 01 == 1; 00 == 0)
 		selectport : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
 
+		-- Marks the port to be targeted for output via uart.
 		selectdestport : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
 
 		-- Incoming serial stream (uart).
@@ -91,7 +90,7 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 	TYPE bool_to_logic_type IS ARRAY(BOOLEAN) OF STD_ULOGIC;
 	CONSTANT bool_to_logic : bool_to_logic_type := (false => '0', true => '1');
 
-	-- Uart
+	-- Uart receiver.
 	component uart_rx
 	   generic (
 	       clk_cycles_per_bit: integer
@@ -104,6 +103,7 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 	   );
 	end component;
 	
+	-- Uart transmitter.
 	component uart_tx
 	   generic (
 	       clk_cycles_per_bit:integer
@@ -195,9 +195,6 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 		);
 	END COMPONENT;
 
-	-- System clock.
-	--signal slowclk : std_logic := '0';
-
 	-- Uart receiver.
 	--SIGNAL s_uart_rxstream : STD_LOGIC;
 	SIGNAL s_uartrxdata : STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -287,7 +284,7 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 	TYPE uartrxstates IS (S_Idle, S_EOP, S_Send, S_Clean);
 	SIGNAL rxstate : uartrxstates := S_Idle;
 BEGIN
-	
+	-- From Uart to SpaceWire port.
 	PROCESS (clk, rst)
 		VARIABLE selectport : INTEGER RANGE 0 TO 2;
 		VARIABLE data : STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -388,13 +385,14 @@ BEGIN
 	-- Shows rxfifo filling;
 	uartfifofull <= '0';--(uartfifofull OR s_rxfull) AND (NOT clear) AND (NOT rst);
 
+	-- Synchronous update of status signals.
 	PROCESS (clk)
 	BEGIN
 		IF rising_edge(clk) THEN
 			-- Debugging: Zeigt an wenn ein externer Port daten empfangen hat (muss mit clear quittiert werden!)
 			s_rxvalid_int <= (s_rxvalid_int OR s_txwrite) AND (NOT clear) AND (NOT rst);--s_rxhalff; -- half receive fifo (spacewire -> uart) is full
 			-- Sticky error led.
-			s_perror_int <= (s_perror_int OR s_rxvalid) AND (NOT clear) AND (NOT rst); -- ACHTUNG! Für debug geänderT! TODO! (rxvalid)
+			s_perror_int <= (s_perror_int OR s_rxvalid) AND (NOT clear) AND (NOT rst); -- ACHTUNG! Fï¿½r debug geï¿½nderT! TODO! (rxvalid)
 			s_rerror_int <= (s_rerror_int OR s_rerror) AND (NOT clear) AND (NOT rst);
 
 			-- Shows all errors on one led.
@@ -403,6 +401,7 @@ BEGIN
 		END IF;
 	END PROCESS;
 
+	-- Combinatorial update of selected ports into internal signals.
 	PROCESS (selectport, selectdestport)
 	BEGIN
 		-- Select Ports.
@@ -486,6 +485,7 @@ BEGIN
 		END IF;
 	END PROCESS;
 	
+	-- Uart receiver.
 	uartrec: uart_rx
 	generic map (
 	   clk_cycles_per_bit => 87
@@ -497,6 +497,7 @@ BEGIN
 	   rxdata => s_uartrxdata
 	);
 	
+	-- Uart transmitter.
 	uartrx: uart_tx
 	generic map (
 	   clk_cycles_per_bit => 87
@@ -510,6 +511,7 @@ BEGIN
 	   txdone => s_uarttxdone
 	);
 	
+	-- Routertest interface.
 	RouterToExtPortsComm : routertest
 	GENERIC MAP(
 		numports => 2,

@@ -5,15 +5,13 @@
 -- Create Date: 05.08.2021 17:52
 -- Design Name: Testbench for SpaceWire Router TimeCode Control
 -- Module Name: spwroutertcc_tb
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
 -- Description: Simulate TimeCode Control with different inputs and error provokion.
 -- It is necessary to carry out stress tests here because the module produces complex outputs.
 --
 -- Dependencies: spwrouterpkg
--- 
--- Revision:
 ----------------------------------------------------------------------------------
 
 LIBRARY IEEE;
@@ -25,7 +23,7 @@ ENTITY spwroutertcc_tb IS
 END;
 
 ARCHITECTURE spwroutertcc_tb_arch OF spwroutertcc_tb IS
-
+    -- Design under test.
     COMPONENT spwroutertcc
         GENERIC (
             numports : INTEGER RANGE 0 TO 31
@@ -44,8 +42,6 @@ ARCHITECTURE spwroutertcc_tb_arch OF spwroutertcc_tb IS
             auto_cycle : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
     END COMPONENT;
-
-    -- TODO: Initial values...
 
     -- Number of SpaceWire ports.
     CONSTANT numports : INTEGER RANGE 0 TO 31 := 5;
@@ -82,6 +78,7 @@ ARCHITECTURE spwroutertcc_tb_arch OF spwroutertcc_tb IS
 
     -- Transmission interval for automatic TimeCode sending.
     SIGNAL auto_cycle : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0'); -- start with deactivated auto TC generation.
+    
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
     SIGNAL stop_the_clock : BOOLEAN;
@@ -95,7 +92,6 @@ ARCHITECTURE spwroutertcc_tb_arch OF spwroutertcc_tb IS
 
     -- Auxiliary variables
     SIGNAL internTC : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0'); -- saves last TC.
-
 BEGIN
     -- Design under test.
     dut : spwroutertcc GENERIC MAP(numports => numports)

@@ -55,7 +55,7 @@ ENTITY spwrouterregs IS
         -- High when an operation is performing.
         proc : OUT STD_LOGIC; -- acknowledge
 
-        -- TODO: ?? Noch unklar. Eventuell wird das klarer mit dem aufrufenden Code!
+        -- Determines whether the routing table is already queried
         strobe : IN STD_LOGIC;
         cycle : IN STD_LOGIC;
 
@@ -176,7 +176,8 @@ BEGIN
     -- Address decoding and table selection.
     -- Routing table: logic addressing with ports 32 to 254 (saved in routing table)
     --s_selectRoutingTable <= '1' WHEN (addr(13 DOWNTO 2) > "000000011111" AND addr(13 DOWNTO 2) < "000100000000") ELSE '0';
-    s_selectRoutingTable <= '1' when to_integer(unsigned(addr(13 downto 2))) > 31 and to_integer(unsigned(addr(13 downto 2))) < 256 Else '0';
+    s_selectRoutingTable <= '1' WHEN to_integer(unsigned(addr(13 DOWNTO 2))) > 31 AND to_integer(unsigned(addr(13 DOWNTO 2))) < 256 ELSE
+        '0';
 
     -- ROM table (defines memory address).
     s_table_4 <= '1' WHEN addr(13 DOWNTO 8) = "000100" ELSE
@@ -264,12 +265,7 @@ BEGIN
             s_proc_out <= '0';
             s_DataOutBuffer <= (OTHERS => '0');
             s_DataInBuffer <= (OTHERS => '0');
-            --s_read_table4 <= (OTHERS => '0'); -- ausgeblendet, da im original code hier auch kein reset der tabellenzugehörigkeits variablen (select...) stattfindet!
-            --s_read_table5 <= (OTHERS => '0');
-            --s_read_table6 <= (OTHERS => '0');
-            --s_write_table4 <= (OTHERS => '0');
-            --s_write_table5 <= (OTHERS => '0');
-            --s_write_table6 <= (OTHERS => '0');
+
             s_autoTimeCodeCycleTime <= x"00000000";
             s_autoTimeCodeValue <= (OTHERS => '0');
             -- TODO: Built-in async reset for spwrams!

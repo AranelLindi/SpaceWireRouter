@@ -119,8 +119,6 @@ ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 	END COMPONENT;
 
 	SIGNAL clk : STD_LOGIC;
-	--SIGNAL rxclk : STD_LOGIC;
-	--SIGNAL txclk : STD_LOGIC;
 	SIGNAL rst : STD_LOGIC := '1';
 	SIGNAL autostart : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '1');
 	SIGNAL linkstart : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '1');
@@ -180,8 +178,8 @@ ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 	SIGNAL pstate : packetstates := S_Address;
 
 	-- Controls simulation event defined in sim-process.
-	SIGNAL proc : integer range 0 to 10 := 0;
-	signal s_fin: std_logic;
+	SIGNAL proc : INTEGER RANGE 0 TO 10 := 0;
+	SIGNAL s_fin : STD_LOGIC;
 
 	-- Debug
 	--SIGNAL s_fsmstate : fsmarr(numports DOWNTO 0);
@@ -191,10 +189,7 @@ ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 	--SIGNAL s_dstrobeOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	--SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0);
 BEGIN
-	--fsmstate <= s_fsmstate;
-	-- Debug
-	--dgranted <= s_granted;
-
+	-- Design under test.
 	spwroutertest : routertest
 	GENERIC MAP(
 		numports => numports,
@@ -278,48 +273,48 @@ BEGIN
 		WAIT;
 	END PROCESS;
 
-
-	control: process
-	begin
+	-- Simulation part 1.
+	control : PROCESS
+	BEGIN
 		WAIT FOR clock_period;
 
 		-- TODO: Put simulation instructions here...
-		
+
 		proc <= 1; -- sending one packet (physical addressing)
-		wait until s_fin = '1';
-		
-		proc <= 0; -- resets pstate and s_fin
-		
-		wait for 10 us;
-		
-		proc <= 2; -- sending two packets (physical addressing)
-		wait until s_fin = '1';
-		
+		WAIT UNTIL s_fin = '1';
+
 		proc <= 0; -- resets pstate and s_fin
 
-		wait for 10 us;
+		WAIT FOR 10 us;
+
+		proc <= 2; -- sending two packets (physical addressing)
+		WAIT UNTIL s_fin = '1';
+
+		proc <= 0; -- resets pstate and s_fin
+
+		WAIT FOR 10 us;
 
 		proc <= 3; -- sending one packet (logical addressing)
-		wait until s_fin = '1';
+		WAIT UNTIL s_fin = '1';
 
 		proc <= 0;
-		
-		wait;
-	end process;
 
+		WAIT;
+	END PROCESS;
 
-	sim: PROCESS (clk)
+	-- Simulation part 2.
+	sim : PROCESS (clk)
 	BEGIN
 		IF rising_edge(clk) THEN
 			-- Controls what should be simulated next. Further events can easily
 			-- be implemented below (above 'what others'-case!)
 			CASE proc IS
-				when 0 => pstate <= S_Address;
+				WHEN 0 => pstate <= S_Address;
 					s_fin <= '0';
 
 				WHEN 1 =>
 					-- Sends a single packet on port1 to router, it should leave router on port2.
-					
+
 					IF rrunning(1) = '1' AND prunning(1) = '1' THEN
 						CASE pstate IS
 							WHEN S_Address =>
@@ -347,7 +342,7 @@ BEGIN
 								txdata(1) <= (OTHERS => '0');
 								txflag(1) <= '0';
 								txwrite(1) <= '0'; -- Withdraw permission to send; sends then nulls automatically
-								
+
 								s_fin <= '1';
 
 						END CASE;
@@ -356,9 +351,9 @@ BEGIN
 				WHEN 2 =>
 					-- Sends two packets from to ports that should both leave the other port.
 
-					if (rrunning(1) = '1' and prunning(1) = '1') and (rrunning(2) = '1' and prunning(2) = '1') then
-						case pstate is
-							when S_Address =>
+					IF (rrunning(1) = '1' AND prunning(1) = '1') AND (rrunning(2) = '1' AND prunning(2) = '1') THEN
+						CASE pstate IS
+							WHEN S_Address =>
 								-- Packet 1
 								txdata(1) <= "00000010"; -- 2 (destination port)
 								txflag(1) <= '0';
@@ -371,7 +366,7 @@ BEGIN
 
 								pstate <= S_Cargo;
 
-							when S_Cargo =>
+							WHEN S_Cargo =>
 								-- Packet 1
 								txdata(1) <= "00000000";
 								txflag(1) <= '0';
@@ -384,7 +379,7 @@ BEGIN
 
 								pstate <= S_EOP;
 
-							when S_EOP =>
+							WHEN S_EOP =>
 								-- Packet 1
 								txdata(1) <= "00000000";
 								txflag(1) <= '1';
@@ -397,56 +392,54 @@ BEGIN
 
 								pstate <= S_Null;
 
-							when S_Null =>
+							WHEN S_Null =>
 								-- Port 1
-								txdata(1) <= (others => '0');
+								txdata(1) <= (OTHERS => '0');
 								txflag(1) <= '0';
 								txwrite(1) <= '0';
 
 								-- Port 2
-								txdata(2) <= (others => '0');
+								txdata(2) <= (OTHERS => '0');
 								txflag(2) <= '0';
 								txwrite(2) <= '0';
 
 								s_fin <= '1';
 
-						end case;
-					end if;
+						END CASE;
+					END IF;
 
-				when 3 => 
+				WHEN 3 =>
 					-- Sends one packet to logical port.
-					if rrunning(1) ='1' and prunning(1) = '1' then
-						case pstate is
-							when S_Address =>
+					IF rrunning(1) = '1' AND prunning(1) = '1' THEN
+						CASE pstate IS
+							WHEN S_Address =>
 								txdata(1) <= "01010101"; -- 85
 								txflag(1) <= '0';
 								txwrite(1) <= '1';
 
 								pstate <= S_Cargo;
 
-							when S_Cargo =>
+							WHEN S_Cargo =>
 								txdata(1) <= "01010101";
 								txflag(1) <= '0';
 								txwrite(1) <= '1';
 
 								pstate <= S_EOP;
 
-							when S_EOP =>
+							WHEN S_EOP =>
 								txdata(1) <= "00000000";
 								txflag(1) <= '1';
 								txwrite(1) <= '1';
 
 								pstate <= S_Null;
-
-
-							when S_Null =>
-								txdata(1) <= (others => '0');
+							WHEN S_Null =>
+								txdata(1) <= (OTHERS => '0');
 								txflag(1) <= '0';
 								txwrite(1) <= '0';
 
 								s_fin <= '1';
-						end case;
-					end if;
+						END CASE;
+					END IF;
 
 				WHEN OTHERS => NULL;
 

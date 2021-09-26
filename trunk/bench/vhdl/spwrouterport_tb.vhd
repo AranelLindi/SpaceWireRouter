@@ -364,7 +364,7 @@ BEGIN
 	END PROCESS;
 
 	-- Controlled reset for initialization.
-	stimuli: PROCESS
+	stimuli : PROCESS
 	BEGIN
 		WAIT FOR 1 us;
 		rst <= '0';
@@ -429,14 +429,14 @@ BEGIN
 
 					END CASE;
 
-				WHEN S_Nothing => null;
+				WHEN S_Nothing => NULL;
 					-- send nothing
 			END CASE;
 		END IF;
 	END PROCESS;
 
 	-- Controls connection and maintenance to port.
-	Connection: PROCESS (clk)
+	Connection : PROCESS (clk)
 	BEGIN
 		IF rising_edge(clk) THEN
 			IF started = '1' THEN
@@ -459,7 +459,7 @@ BEGIN
 	END PROCESS;
 
 	-- State of port.
-	portFSM: PROCESS (clk, s_fin)
+	portFSM : PROCESS (clk, s_fin)
 	BEGIN
 		IF rising_edge(clk) THEN
 			CASE tbstate IS

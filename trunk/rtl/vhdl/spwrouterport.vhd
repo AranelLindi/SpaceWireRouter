@@ -198,14 +198,14 @@ ENTITY spwrouterport IS
         busMasterAcknowledgeIn : IN STD_LOGIC; -- busMasterAcknowledgeIn
 
         -- //pragma synthesis_off
-	    -- Zeigt an ob der Receiver ein Packet empfangen hat, nur als Debug-port verwenden (quasi einfach iReceiveFIFOReadEnable als Ausgang)
-	    gotData: OUT STD_LOGIC;
+        -- Zeigt an ob der Receiver ein Packet empfangen hat, nur als Debug-port verwenden (quasi einfach iReceiveFIFOReadEnable als Ausgang)
+        gotData : OUT STD_LOGIC;
 
-        sentData: OUT STD_LOGIC; -- Debug
+        sentData : OUT STD_LOGIC; -- Debug
 
-	    fsmstate : OUT spwrouterportstates; -- Debug
+        fsmstate : OUT spwrouterportstates; -- Debug
 
-        debugdataout : out std_logic_vector(8 downto 0); -- debug
+        debugdataout : OUT STD_LOGIC_VECTOR(8 DOWNTO 0); -- debug
         -- //pragma synthesis_on
 
         -- SpaceWire data in.
@@ -252,8 +252,8 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
     SIGNAL iDestinationPortOut : STD_LOGIC_VECTOR(7 DOWNTO 0);
     SIGNAL s_txrdy : STD_LOGIC;
 
-    signal s_rxflag : STD_LOGIC; -- speichert das Flag eines packets zwischen
-    signal s_rxdata: std_logic_vector(7 downto 0); -- dito
+    SIGNAL s_rxflag : STD_LOGIC; -- speichert das Flag eines packets zwischen
+    SIGNAL s_rxdata : STD_LOGIC_VECTOR(7 DOWNTO 0); -- dito
 BEGIN
     -- Drive outputs
     sourcePortOut <= STD_LOGIC_VECTOR(to_unsigned(pnum, sourcePortOut'length));
@@ -272,18 +272,15 @@ BEGIN
     gotData <= iReceiveFIFOReady; -- (rxvalid) vorher: iReceiveFIFOReadEnable; -- rxread
     sentData <= busMasterStrobeOut;--iTransmitFIFOWriteEnable; -- txwrite
     fsmstate <= state;
-    debugdataout(7 downto 0) <= s_rxdata; --receiveFIFODataOut(7 downto 0); -- nur zu debugzwecken
+    debugdataout(7 DOWNTO 0) <= s_rxdata; --receiveFIFODataOut(7 downto 0); -- nur zu debugzwecken
     debugdataout(8) <= s_rxflag;
-    
-
     -- Intermediate steps.
     iTransmitFIFOWriteEnable <= strobeIn WHEN requestIn = '1' ELSE
         '0';
     iTransmitFIFODataIn <= txdata; -- dataIn
     iTransmitFIFOReady <= s_txrdy;
     iReadyOut <= s_txrdy;
-
-
+    
     -- SpaceWire port.
     spwport : spwstream
     GENERIC MAP(
@@ -345,8 +342,8 @@ BEGIN
     -- Finite state machine.
     PROCESS (clk, rst)
         -- HIER EVENTUELL VARIABLE VERWENDEN UM SCHWIERIGKEITEN BEI DER VERWENDUNG VON HILFSSIGNALE (AUSWERTUNG BOOLSCHER FUNKTIONEN) ZU HABEN!
-	    VARIABLE v_validport : STD_LOGIC; -- S_Dest2; für boolsche or operationen
-        variable v_reqports : STD_LOGIC; -- S_RT1
+        VARIABLE v_validport : STD_LOGIC; -- S_Dest2; für boolsche or operationen
+        VARIABLE v_reqports : STD_LOGIC; -- S_RT1
     BEGIN
         IF (rst = '1') THEN -- reset
             state <= S_Idle;
@@ -357,8 +354,8 @@ BEGIN
             iStrobeOut <= '0';
             iRoutingTableAddress <= (OTHERS => '0');
             iRoutingTableRequest <= '0';
-            receiveFIFODataOut <= (others => '0');
-            
+            receiveFIFODataOut <= (OTHERS => '0');
+
         ELSIF rising_edge(clk) THEN
             CASE state IS
                 WHEN S_Idle =>
@@ -376,13 +373,13 @@ BEGIN
                 WHEN S_Dest0 =>
                     -- Wait to read data from buffer.
                     receiveFIFODataOut(8) <= s_rxflag; -- per Handshake übernehmen
-                    receiveFIFODataOut(7 downto 0) <= s_rxdata;
+                    receiveFIFODataOut(7 DOWNTO 0) <= s_rxdata;
                     iReceiveFIFOReadEnable <= '0'; -- rxread
                     state <= S_Dest1;
 
                 WHEN S_Dest1 =>
                     -- Confirm first data logical address or physical port address.
-                    
+
                     IF (receiveFIFODataOut(8) = '0') THEN -- vorher: receiveFIFODataOut(8)
                         IF (receiveFIFODataOut(7 DOWNTO 5) = "000") THEN
                             -- Physical port addressed.
@@ -410,14 +407,14 @@ BEGIN
                     END IF;
 
                 WHEN S_Dest2 =>
-	                -- Reset variable for new iteration.
-	                v_validport := '0';
+                    -- Reset variable for new iteration.
+                    v_validport := '0';
 
                     -- Transmit request to destination port.
                     FOR i IN 1 TO numports LOOP
-                        if (linkUp(i) = '1' AND iDestinationPortOut(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(i, blen + 1))) then
+                        IF (linkUp(i) = '1' AND iDestinationPortOut(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(i, blen + 1))) THEN
                             v_validport := '1'; -- potenzielle Fehlerquelle mit blen+1 !! Im Original Code werden hier 5 Bits (4 downto 0) abgefragt. falls blen == 4 ist, muss folglich blen+1 für 5 gelten!
-                        end if;
+                        END IF;
                     END LOOP;
 
                     IF ((iDestinationPortOut(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(0, blen + 1))) OR (v_validport = '1')) THEN
@@ -448,7 +445,7 @@ BEGIN
                     -- Geht alle Ports 
                     --FOR i IN 0 TO numports LOOP
                     --    if (linkUp(i) = '1' AND busMasterDataIn(i) = '1') then
-                            
+
                     --    end if;
                     --END LOOP;
 
@@ -493,7 +490,7 @@ BEGIN
                     iStrobeOut <= '0';
 
                     receiveFIFODataOut(8) <= s_rxflag; -- per Handshake übernehmen
-                    receiveFIFODataOut(7 downto 0) <= s_rxdata;
+                    receiveFIFODataOut(7 DOWNTO 0) <= s_rxdata;
 
                     iReceiveFIFOReadEnable <= '0';
                     state <= S_Data2;
@@ -540,7 +537,7 @@ BEGIN
                     -- Wait to read data from receive buffer.
 
                     receiveFIFODataOut(8) <= s_rxflag; -- per Handshake übernehmen
-                    receiveFIFODataOut(7 downto 0) <= s_rxdata;
+                    receiveFIFODataOut(7 DOWNTO 0) <= s_rxdata;
 
                     iReceiveFIFOReadEnable <= '0';
                     state <= S_Dummy2;
@@ -555,8 +552,8 @@ BEGIN
 
                     END IF;
 
-                --WHEN OTHERS => -- Because of unused state problem.
-                --    state <= S_Idle;
+                    --WHEN OTHERS => -- Because of unused state problem.
+                    --    state <= S_Idle;
             END CASE;
         END IF;
     END PROCESS;

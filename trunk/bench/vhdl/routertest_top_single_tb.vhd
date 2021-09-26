@@ -1,14 +1,29 @@
+----------------------------------------------------------------------------------
+-- Company: University of Wuerzburg, Germany
+-- Engineer: Stefan Lindoerfer
+-- 
+-- Create Date: 04.09.2021 21:35
+-- Design Name: SpaceWire Router Single Hardware Implementation
+-- Module Name: routertest_top_single_tb
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: 
+--
+-- Dependencies: none
+-- 
+-- Revision:
+----------------------------------------------------------------------------------
+
 LIBRARY IEEE;
 USE IEEE.Std_logic_1164.ALL;
 USE IEEE.Numeric_Std.ALL;
---USE work.spwpkg.ALL;
 USE work.spwrouterpkg.ALL;
---USE work.routertest_top_single_tb_pkg.ALL;
 
 ENTITY routertest_top_single_tb IS
 END;
 
-ARCHITECTURE bench OF routertest_top_single_tb IS
+ARCHITECTURE routertest_top_single_tb_arch OF routertest_top_single_tb IS
 
 	COMPONENT routertest_top_single
 		PORT (
@@ -36,8 +51,8 @@ ARCHITECTURE bench OF routertest_top_single_tb IS
 			received : OUT STD_LOGIC;
 			txdata : OUT array_t(2 DOWNTO 0)(8 DOWNTO 0);
 			recdata : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
-			raddr : out integer range 0 to 16;
-			waddr: out integer range 0 to 16
+			raddr : OUT INTEGER RANGE 0 TO 16;
+			waddr : OUT INTEGER RANGE 0 TO 16
 		);
 	END COMPONENT;
 
@@ -54,6 +69,7 @@ ARCHITECTURE bench OF routertest_top_single_tb IS
 	SIGNAL prunning : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL rerror : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL perror : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	
 	-- Debugports
 	SIGNAL rxvalid : STD_LOGIC;
 	SIGNAL txwrite : STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -65,12 +81,10 @@ ARCHITECTURE bench OF routertest_top_single_tb IS
 	SIGNAL received : STD_LOGIC;
 	SIGNAL s_dtxdata : array_t(2 DOWNTO 0)(8 DOWNTO 0);
 	SIGNAL s_recdata : STD_LOGIC_VECTOR(8 DOWNTO 0);
-	signal raddr: integer range 0 to 16;
-	signal waddr: integer range 0 to 16;
-
+	SIGNAL raddr : INTEGER RANGE 0 TO 16;
+	SIGNAL waddr : INTEGER RANGE 0 TO 16;
 
 	CONSTANT clock_period : TIME := 100 ns; -- 10 MHz
-
 	CONSTANT c_BIT_PERIOD : TIME := 8680 ns; -- 115200 baud rate (115 kHz)
 
 	-- Low-level byte-write
@@ -78,7 +92,6 @@ ARCHITECTURE bench OF routertest_top_single_tb IS
 		i_data_in : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
 		SIGNAL o_serial : OUT STD_LOGIC) IS
 	BEGIN
-
 		-- Send Start Bit
 		o_serial <= '0';
 		WAIT FOR c_BIT_PERIOD;
@@ -94,7 +107,7 @@ ARCHITECTURE bench OF routertest_top_single_tb IS
 		WAIT FOR c_BIT_PERIOD;
 	END UART_WRITE_BYTE;
 BEGIN
-
+	-- Design under test.
 	dut : routertest_top_single PORT MAP(
 		clk => clk,
 		rst => rst,
@@ -123,6 +136,7 @@ BEGIN
 		waddr => waddr
 	);
 
+	-- Simulation.
 	stimulus : PROCESS
 	BEGIN
 		rst <= '1';
@@ -131,7 +145,7 @@ BEGIN
 		WAIT;
 	END PROCESS;
 	PROCESS
-		VARIABLE state : integer range 1 to 2 := 1;
+		VARIABLE state : INTEGER RANGE 1 TO 2 := 1;
 	BEGIN
 		CASE state IS
 			WHEN 1 =>
@@ -139,7 +153,7 @@ BEGIN
 
 				uart_write_byte("00000001", rxstream);
 
-				WAIT FOR c_bit_period; -- zu testzwecken mal einblenden um zu schauen was bei etwas abstand passiert
+				WAIT FOR c_bit_period;
 
 				uart_write_byte("10111111", rxstream);
 				uart_write_byte("00000111", rxstream);
@@ -149,17 +163,19 @@ BEGIN
 				state := 2;
 
 			WHEN 2 =>
-				WAIT for 400 us;
+				WAIT FOR 400 us;
 				uart_write_byte("00000001", rxstream);
 				uart_write_byte("11111110", rxstream);
 				uart_write_byte("00000000", rxstream);
 				uart_write_byte("11111111", rxstream);
-				wait;
+				WAIT;
 		END CASE;
 	END PROCESS;
+
+	-- Creates clock.
 	clocking : PROCESS
 	BEGIN
 		clk <= '0', '1' AFTER clock_period / 2;
 		WAIT FOR clock_period;
 	END PROCESS;
-END;
+END routertest_top_single_tb_arch;

@@ -72,15 +72,15 @@ BEGIN
     occSig : FOR i IN 0 TO numports GENERATE
         -- unten: hier inner loop nur nötig wenn mit rout(i) nicht eine ganze Zeile angesprochen werden kann!! Operatoren sind so definiert, dass sie auch eine komplete Zeile verarbeiten!
         s_occupied(i) <= OR s_routing(i); -- hoffentlich richtig addressiert
-    END GENERATE;
+    END GENERATE occSig;
 
     -- Source port number which requests port as destination port.
     outererloop : FOR i IN 0 TO numports GENERATE
         innerloop : FOR j IN 0 TO numports GENERATE
             s_request(j, i) <= '1' WHEN req(i) = '1' AND to_integer(unsigned(dest(i))) = j ELSE
             '0'; -- potenzielle fehlerquelle!
-        END GENERATE;
-    END GENERATE;
+        END GENERATE innerloop;
+    END GENERATE outerloop;
 
     -- Generate Arbiter_Round for every port.
     spwrouterarbiter_roundrobin : FOR i IN 0 TO numports GENERATE
@@ -90,7 +90,7 @@ BEGIN
         -- Convert matrix line into vector.
         Conv : FOR j IN numports DOWNTO 0 GENERATE
             s_request_vec(j) <= s_request(i, j);
-        END GENERATE;
+        END GENERATE Conv;
 
         Roundx : spwrouterarb_round GENERIC MAP(
             numports => numports,
@@ -107,12 +107,11 @@ BEGIN
 
     -- Connection enabling signal
     rowloop : FOR i IN 0 TO numports GENERATE
-	 SIGNAL s_transform : std_logic_vector(numports downto 0);
-	BEGIN
-
+        SIGNAL s_transform : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    BEGIN
         columnloop : FOR j IN numports DOWNTO 0 GENERATE
-		s_transform(j) <= s_routing(j)(i);
+            s_transform(j) <= s_routing(j)(i);
         END GENERATE columnloop;
-	s_granted(i) <= OR s_transform;
+        s_granted(i) <= OR s_transform;
     END GENERATE rowloop;
 END ARCHITECTURE spwrouterarb_arch;

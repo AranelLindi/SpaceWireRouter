@@ -23,7 +23,9 @@ USE work.spwrouterpkg.ALL;
 
 ENTITY routertest IS
 	GENERIC (
+		-- Number of SpaceWire ports.
 		numports : INTEGER RANGE 0 TO 31;
+
 		-- System clock frequency in Hz.
 		-- This must be set to the frequency of "clk". It is used to setup
 		-- counters for reset timing, disconnect timeout and to transmit
@@ -148,43 +150,49 @@ ENTITY routertest IS
 		rxread : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
 
 		-- High if the link state machine is currently in the Started state.
+		-- (p) = external Ports; (r) = Router ports
 		pstarted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 		rstarted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
 		-- High if the link state machine is currently in the Connecting state.
+		-- (p) = external Ports; (r) = Router ports
 		pconnecting : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 		rconnecting : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
 		-- High if the link state machine is currently in the Run state, indicating
 		-- that the link is fully operational. If none of started, connecting or running
 		-- is high, the link is in an initial state and the transmitter is not yet enabled.
+		-- (p) = external Ports; (r) = Router ports
 		prunning : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 		rrunning : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
 		-- Disconnect detected in state Run. Triggers a reset and reconnect of the link.
 		-- This indication is auto-clearing.
+		-- (p) = external Ports; (r) = Router ports
 		perrdisc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 		rerrdisc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
 		-- Parity error detected in state Run. Triggers a reset and reconnect of the link.
 		-- This indication is auto-clearing.
+		-- (p) = external Ports; (r) = Router ports
 		perrpar : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 		rerrpar : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
 		-- Invalid escape sequence detected in state Run. Triggers a reset and reconnect of
 		-- the link. This indication is auto-clearing.
+		-- (p) = external Ports; (r) = Router ports
 		perresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 		rerresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
 		-- Credit error detected. Triggers a reset and reconnect of the link.
 		-- This indication is auto-clearing.
+		-- (p) = external Ports; (r) = Router ports
 		perrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 		rerrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-
-
+		
 		-- debug ports ON
-		gotData: out std_logic_vector(numports downto 0);
-		sentData: out std_logic_vector(numports downto 0);
+		gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+		sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 		--fsmstate: out fsmarr(numports downto 0);
 		--debugdataout : out array_t(numports downto 0)(8 downto 0);
 		--dreadyIn : out std_logic_vector(numports downto 0);
@@ -202,8 +210,6 @@ ENTITY routertest IS
 		--dsourcePortOut: out array_t(numports downto 0)(1 downto 0); -- Debugport
 		--ddestinationPort: out array_t(numports downto 0)(7 downto 0); -- Debugport
 		-- debug ports OFF
-
-
 		-- Data In signal from SpaceWire bus.
 		spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
@@ -245,7 +251,6 @@ ARCHITECTURE routertest_arch OF routertest IS
 	SIGNAL s_perresc : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	SIGNAL s_perrcred : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-
 	-- Debug
 	--signal s_fsmstate: fsmarr(numports downto 0);
 	--signal s_dreadyOut: std_logic_vector(numports downto 0);
@@ -279,12 +284,12 @@ BEGIN
 	perrcred <= s_perrcred;
 
 	-- Debug
---	fsmstate <= s_fsmstate;
---	dreadyOut <= s_dreadyOut;
---	drequestOut <= s_drequestOut;
---	ddataOut <= s_ddataOut;
---	dstrobeOut <= s_dstrobeOut;
---	dgranted <= s_granted;
+	--	fsmstate <= s_fsmstate;
+	--	dreadyOut <= s_dreadyOut;
+	--	drequestOut <= s_drequestOut;
+	--	ddataOut <= s_ddataOut;
+	--	dstrobeOut <= s_dstrobeOut;
+	--	dgranted <= s_granted;
 
 	-- Port 0
 	ExternPort0 : spwstream
@@ -411,22 +416,22 @@ BEGIN
 		errcred => s_rerrcred,
 		gotData => gotData, -- Debugport
 		sentData => sentData, -- Debugport
---		fsmstate => s_fsmstate, -- Debugport
---		debugdataout => debugdataout, -- Debugport
---		dreadyIn => dreadyIn, -- Debugport
---		drequestIn => drequestIn, -- Debugport
---		ddataIn => ddataIn, -- Debugport
---		dstrobeIn => dstrobeIn, -- Debugport
---		dreadyOut => s_dreadyOut, -- Debugport
---		drequestOut => s_drequestOut, -- Debugport
---		ddataOut => s_ddataOut, -- Debugport
---		dstrobeOut => s_dstrobeOut, -- Debugport
---		dgranted => s_granted, -- Debugport
---		dSwitchPortNumber => dSwitchPortNumber, -- Debugport
---		dSelectDestinationPort => dSelectDestinationPort, -- Debugport
---		droutingSwitch => droutingSwitch, -- Debugport
---		dsourcePortOut => dsourcePortOut, -- Debugport
---		ddestinationPort => ddestinationPort, -- Debugport
+		--		fsmstate => s_fsmstate, -- Debugport
+		--		debugdataout => debugdataout, -- Debugport
+		--		dreadyIn => dreadyIn, -- Debugport
+		--		drequestIn => drequestIn, -- Debugport
+		--		ddataIn => ddataIn, -- Debugport
+		--		dstrobeIn => dstrobeIn, -- Debugport
+		--		dreadyOut => s_dreadyOut, -- Debugport
+		--		drequestOut => s_drequestOut, -- Debugport
+		--		ddataOut => s_ddataOut, -- Debugport
+		--		dstrobeOut => s_dstrobeOut, -- Debugport
+		--		dgranted => s_granted, -- Debugport
+		--		dSwitchPortNumber => dSwitchPortNumber, -- Debugport
+		--		dSelectDestinationPort => dSelectDestinationPort, -- Debugport
+		--		droutingSwitch => droutingSwitch, -- Debugport
+		--		dsourcePortOut => dsourcePortOut, -- Debugport
+		--		ddestinationPort => ddestinationPort, -- Debugport
 		spw_di => s_spw_do,
 		spw_si => s_spw_so,
 		spw_do => s_spw_di,

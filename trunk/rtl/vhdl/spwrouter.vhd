@@ -32,7 +32,7 @@ ENTITY spwrouter IS
 
         -- txclk frequency in Hz (if tximpl = impl_fast)
         txclkfreq : real;
-        
+
         -- Selection of receiver front-end implementation.
         rx_impl : rximpl_array(numports DOWNTO 0);
 
@@ -72,11 +72,9 @@ ENTITY spwrouter IS
 
         -- High if the corresponding port detected a credit error.
         errcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-
-
         -- Debug ports ON
-        gotData : OUT std_logic_vector(numports downto 0);
-        sentData: out std_logic_vector(numports downto 0);
+        gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+        sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
         --fsmstate: out fsmarr(numports downto 0);
         --debugdataout: out array_t(numports downto 0)(8 downto 0);
         --dreadyIn : out std_logic_vector(numports downto 0);
@@ -95,8 +93,6 @@ ENTITY spwrouter IS
         --ddestinationPort: out array_t(numports downto 0)(7 downto 0);
         -- Debug ports OFF
 
-
-
         -- Data In signals from SpaceWire bus.
         spw_di : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
 
@@ -113,7 +109,7 @@ END spwrouter;
 
 ARCHITECTURE spwrouter_arch OF spwrouter IS
     PACKAGE function_pkg IS NEW work.spwrouterfunc
-        GENERIC MAP(numports => numports);
+        GENERIC MAP(numports => numports); -- Import package with various functions.
 
         -- Necessary number of bits to represent numport-ports.
         CONSTANT blen : INTEGER RANGE 0 TO 4 := INTEGER(ceil(log2(real(numports))));
@@ -177,19 +173,15 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         -- TimeCodes & Register.
         SIGNAL autoTimeCodeValue : STD_LOGIC_VECTOR(7 DOWNTO 0);
         SIGNAL autoTimeCodeCycleTime : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        
+
         -- Eigene Signale
         SIGNAL s_running : STD_LOGIC_VECTOR(numports DOWNTO 0);
-
-
         -- Debug
-        signal s_fsm : fsmarr(numports downto 0);
+        SIGNAL s_fsm : fsmarr(numports DOWNTO 0);
     BEGIN
         -- Drive outputs.
         running <= s_running;
         iLinkUp <= s_running;
-
-
         -- DEBUG
         --fsmstate <= s_fsm;
         --dreadyIn <= iReadyIn;
@@ -207,9 +199,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         --dsourcePortOut <= sourcePortOut;
         --ddestinationPort <= destinationPort;
 
-    
-    
-        -- Crossbar Switch.
+        -- Crossbar Switch - Router Arbiter.
         arb : spwrouterarb
         GENERIC MAP(
             numports => numports
@@ -221,23 +211,21 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             req => requestOut,
             grnt => granted,
             rout => routingSwitch
-        ); -- passt alles, auch bereits getestet!
-
+        );
 
         -- The destination PortNo regarding to the source PortNo.
         destPort : FOR i IN 0 TO numports GENERATE
             destPortI : FOR j IN 0 TO numports GENERATE
                 iSelectDestinationPort(i)(j) <= routingSwitch(j)(i);
             END GENERATE destPortI;
-        END GENERATE destPort; -- vorläufig check
-
+        END GENERATE destPort;
 
         -- The source to the destination PortNo PortNo.
         srcPort : FOR i IN 0 TO numports GENERATE
             iSwitchPortNumber(i) <= routingSwitch(i);
         END GENERATE srcPort;
 
-
+        -- Routing process: Assigns information to ports from the routing process.
         spx : FOR i IN 0 TO numports GENERATE
             iReadyIn(i) <= function_pkg.select7x1(iSelectDestinationPort(i), readyOut);
             iRequestIn(i) <= function_pkg.select7x1(iSwitchPortNumber(i), requestOut);
@@ -245,9 +233,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             iDataIn(i) <= function_pkg.select7x1xVector9(iSwitchPortNumber(i), dataOut);
             iStrobeIn(i) <= function_pkg.select7x1(iSwitchPortNumber(i), strobeOut);
         END GENERATE spx;
-
-
-        -- SpaceWirePort LinkUP Signal. (entfällt)
+        -- SpaceWirePort LinkUP Signal. (dropped)
 
         -- Internal Configuration Port.
         port0 : spwrouterport
@@ -271,7 +257,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             linkdis => '0',
             txdivcnt => "00000001",
             tick_in => '0',
-            time_in => (others => '0'),
+            time_in => (OTHERS => '0'),
             txdata => iDataIn(0),
             tick_out => OPEN,
             time_out => OPEN,
@@ -307,6 +293,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             spw_so => spw_so(0)
         );
 
+        -- Other ports (numport-1)-ports.
         spwports : FOR i IN 1 TO numports GENERATE
             spwport : spwrouterport GENERIC MAP(
                 numports => numports,
@@ -323,7 +310,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 rxclk => rxclk,
                 txclk => txclk,
                 rst => rst,
-                autostart => '1',
+                autostart => '1', -- active autostart but none linkstart! Router is waiting for incoming connection attempt.
                 linkstart => '0',
                 linkdis => '0',
                 txdivcnt => "00000001",
@@ -369,7 +356,6 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             );
         END GENERATE;
 
-
         -- Router Link Control, Status Register and Routing Table
         routerControlRegister : spwrouterregs
         GENERIC MAP(
@@ -386,14 +372,13 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             proc => iBusSlaveAcknowledgeOut,
             strobe => iBusSlaveStrobeIn,
             cycle => iBusSlaveCycleIn,
-            portstatus => (others => (others => '0')), -- TODO!
+            portstatus => (OTHERS => (OTHERS => '0')), -- TODO!
             receiveTimeCode => routerTimeCode,
             autoTimeCodeValue => autoTimeCodeValue,
             autoTimeCodeCycleTime => autoTimeCodeCycleTime
         );
 
-
-        -- Bus arbiter
+        -- Bus arbiter & Router table arbiter
         arb_table : spwrouterarb_table
         GENERIC MAP(
             numports => numports
@@ -405,27 +390,13 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             grnt => busMasterGranted
         );
 
-
         -- Timing adjustment. BusSlaveAccessSelector
         PROCESS (clk)
             --VARIABLE varB : STD_LOGIC := '0';
         BEGIN
             IF rising_edge(clk) THEN
 
-                --FOR i IN 0 TO numports LOOP
-                --    if busMasterRequestOut(i) = '1' then
-                --        varB := '1';
-                --    end if;
-                --END LOOP;
-
-                --IF varB = '1' THEN
-                --    iBusSlaveCycleIn <= '1';
-                --ELSE
-                --    iBusSlaveCycleIn <= '0';
-                --END IF;
-                iBusSlaveCycleIn <= or busMasterRequestOut; -- ist doch das gleiche wie oben oder?
-
-
+                iBusSlaveCycleIn <= OR busMasterRequestOut; -- ist doch das gleiche wie oben oder?
                 -- Wieder umgedrehte Prioriät (im Vergleich zum Originalcode)
 
                 FOR i IN numports DOWNTO 1 LOOP
@@ -437,7 +408,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                         iBusSlaveOriginalPortIn <= x"ff";
                         iBusSlaveDataIn <= (OTHERS => '0');
                         --busMasterAcknowledgeIn <= (others => '0');
-                        busMasterAcknowledgeIn <= (i => iBusSlaveAcknowledgeOut, others => '0');
+                        busMasterAcknowledgeIn <= (i => iBusSlaveAcknowledgeOut, OTHERS => '0');
                     END IF;
                 END LOOP;
                 -- Port0 ist Spezialfall, daher außerhalb der For-Loop!
@@ -449,13 +420,12 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                     --iBusSlaveOriginalPortIn <= busMasterOriginalPortOut(0); -- wohl nur für RMAP nötig
                     iBusSlaveDataIn <= busMasterDataOut(0);
                     --busMasterAcknowledgeIn <= (others => '0');
-                    busMasterAcknowledgeIn <= (0 => iBusSlaveAcknowledgeOut, others => '0');
+                    busMasterAcknowledgeIn <= (0 => iBusSlaveAcknowledgeOut, OTHERS => '0');
                 END IF;
 
                 busSlaveDataOut <= ibusMasterDataOut;
             END IF;
         END PROCESS;
-
         
         -- Time code forwarding logic.
         timecodecontrol : spwroutertcc

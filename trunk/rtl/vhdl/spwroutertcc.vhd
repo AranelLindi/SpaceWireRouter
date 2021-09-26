@@ -21,7 +21,7 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 --use IEEE.STD_LOGIC_ARITH.all;
-use IEEE.STD_LOGIC_UNSIGNED.all;
+USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 USE work.spwrouterpkg.ALL;
 
 ENTITY spwroutertcc IS

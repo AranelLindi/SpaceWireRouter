@@ -14,21 +14,17 @@
 -- transmission rates up to system clock in Mbps.
 -- 
 -- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
 ----------------------------------------------------------------------------------
 
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
+
 ENTITY spwrecvfront_clkrec_tb IS
 END;
 
 ARCHITECTURE spwrecvfront_clkrec_tb_arch OF spwrecvfront_clkrec_tb IS
-    -- Component Declaration: must be equal to entity in spwrecvfront_clkrec.
+    -- Design under test.
     COMPONENT spwrecvfront_clkrec
         GENERIC (
             WIDTH : INTEGER RANGE 1 TO 3
@@ -94,7 +90,7 @@ ARCHITECTURE spwrecvfront_clkrec_tb_arch OF spwrecvfront_clkrec_tb IS
     CONSTANT NumberOfShiftRegisters : INTEGER RANGE 1 TO 3 := 2;
     -- #################################
 BEGIN
-    -- Design under test:
+    -- Design under test.
     dut : spwrecvfront_clkrec
     GENERIC MAP(
         -- Width of shift registers (default: 2)
@@ -207,4 +203,4 @@ BEGIN
             bin(0) <= rbit;
         END IF;
     END PROCESS;
-END;
+END spwrecvfront_clkrec_tb_arch;

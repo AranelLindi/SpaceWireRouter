@@ -87,7 +87,6 @@ ARCHITECTURE spwrecvfront_clkrec_arch OF spwrecvfront_clkrec IS
     -- output register (receiver signal)
     SIGNAL s_inbvalid : STD_ULOGIC;
 BEGIN
-
     -- Clock recovery process.
     ClkRec : recclk <= spw_di XOR spw_si;
 

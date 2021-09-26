@@ -72,12 +72,8 @@ PACKAGE spwrouterpkg IS
     -- General used types.
     TYPE array_t IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR;
     TYPE matrix_t IS ARRAY(NATURAL RANGE <>, NATURAL RANGE <>) OF STD_LOGIC;
-
-
     -- Debug type
     TYPE fsmarr IS ARRAY(NATURAL RANGE <>) OF spwrouterportstates; -- Debug type
-
-
     -- Component declarations:
     -- Round Robin Arbiter (spwrouterarb_table.vhd)
     COMPONENT spwrouterarb_round IS

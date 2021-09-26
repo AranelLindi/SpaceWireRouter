@@ -24,7 +24,7 @@ ENTITY spwrouterregs_tb IS
 END;
 
 ARCHITECTURE spwrouterregs_tb_arch OF spwrouterregs_tb IS
-
+	-- Design under test.
 	COMPONENT spwrouterregs
 		GENERIC (
 			numports : INTEGER RANGE 0 TO 31
@@ -46,8 +46,6 @@ ARCHITECTURE spwrouterregs_tb_arch OF spwrouterregs_tb IS
 			autoTimeCodeCycleTime : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
 		);
 	END COMPONENT;
-
-	-- TODO: Initial values... 
 
 	-- Number of SpaceWire ports.
 	CONSTANT numports : INTEGER RANGE 0 TO 31 := 5;
@@ -78,8 +76,10 @@ ARCHITECTURE spwrouterregs_tb_arch OF spwrouterregs_tb IS
 	-- High when an operation is performing.
 	SIGNAL proc : STD_LOGIC;
 
-	-- TODO: ?? noch unklar
+	-- Indicates whether the process is already busy.
 	SIGNAL strobe : STD_LOGIC := '0';
+
+	-- 
 	SIGNAL cycle : STD_LOGIC := '0';
 
 	-- Port status register. Created for maximum ports of 32.
@@ -90,14 +90,13 @@ ARCHITECTURE spwrouterregs_tb_arch OF spwrouterregs_tb IS
 	SIGNAL receiveTimeCode : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
 
 	-- AutoTimeCode value register.
-	SIGNAL autoTimeCodeValue : STD_LOGIC_VECTOR(7 DOWNTO 0) := (others => '0');
+	SIGNAL autoTimeCodeValue : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
 
 	-- AutoTimeCodeCycleTime register.
-	SIGNAL autoTimeCodeCycleTime : STD_LOGIC_VECTOR(31 DOWNTO 0) := (others => '0');
+	SIGNAL autoTimeCodeCycleTime : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
 
 	-- Clock period. (10 MHz)
 	CONSTANT clock_period : TIME := 100 ns;
-	-- TODO: Testbench switcher.
 BEGIN
 	-- Design under test.
 	dut : spwrouterregs GENERIC MAP(numports => numports)
@@ -120,22 +119,22 @@ BEGIN
 
 	stimulus : PROCESS
 	BEGIN
-		wait for clock_period;
+		WAIT FOR clock_period;
 
 		rst <= '0';
 
 		strobe <= '1';
 		cycle <= '1';
-		
-		addr <= (13 downto 2 => "000001010101", others => '0');
+
+		addr <= (13 DOWNTO 2 => "000001010101", OTHERS => '0');
 
 		WAIT;
 	END PROCESS;
 
 	clocking : PROCESS
 	BEGIN
-			clk <= '0', '1' AFTER clock_period / 2;
-			WAIT FOR clock_period;
+		clk <= '0', '1' AFTER clock_period / 2;
+		WAIT FOR clock_period;
 	END PROCESS;
 
 END spwrouterregs_tb_arch;

@@ -24,6 +24,7 @@ ENTITY spwroutertable_tb IS
 END;
 
 ARCHITECTURE spwroutertable_tb_arch OF spwroutertable_tb IS
+    -- Design under test.
     COMPONENT spwroutertable
         GENERIC (
             numports : INTEGER RANGE 0 TO 31
@@ -42,11 +43,9 @@ ARCHITECTURE spwroutertable_tb_arch OF spwroutertable_tb IS
         );
     END COMPONENT;
 
-    -- TODO: Initial values in stimulus process...
-    
     -- Number of SpaceWire ports.
     CONSTANT numports : INTEGER RANGE 0 TO 31 := 2; -- 3 ports.
-    
+
     -- System clock.
     SIGNAL clk : STD_LOGIC;
 
@@ -78,21 +77,17 @@ ARCHITECTURE spwroutertable_tb_arch OF spwroutertable_tb IS
 
     -- High if a read or write operation is in progress.
     SIGNAL proc : STD_LOGIC;
-    
+
     -- Internal state of the FSM of spwroutertable.
-    signal dut_state : spwroutertablestates;
-    
-    
+    SIGNAL dut_state : spwroutertablestates;
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
     SIGNAL stop_the_clock : BOOLEAN;
-    
-    
     -- Control counter (for internal coordination only).
-    signal counter : INTEGER := 1;
+    SIGNAL counter : INTEGER := 1;
 
     -- Switcher for simulation end.   
-    signal done : boolean := false;
+    SIGNAL done : BOOLEAN := false;
 BEGIN
     -- Design under test.
     dut : spwroutertable GENERIC MAP(numports => numports)
@@ -107,16 +102,16 @@ BEGIN
         wdata => wdata,
         rdata => rdata,
         proc => proc
-        );  
-    
-    -- Resets dut and internal variables.
+    );
+
+    -- Resets DuT and internal variables.
     reset : PROCESS
     BEGIN
         -- Initial reset (important to initialize signals in dut!)
         rst <= '1';
         WAIT FOR clock_period/2;
         rst <= '0';
-        
+
         WAIT UNTIL done; -- Wait until all operations are performed, then reset.
         rst <= '1';
     END PROCESS;
@@ -126,76 +121,76 @@ BEGIN
     BEGIN
         WHILE NOT stop_the_clock LOOP
             clk <= '0', '1' AFTER clock_period / 2;
-            
+
             WAIT FOR clock_period;
         END LOOP;
         WAIT;
     END PROCESS;
-    
+
     -- Performs test operations exactly when (fsm)-machine is ready to receive them. 
-    stimulus: process(dut_state)
-    begin
-        if dut_state = S_Idle then -- FSM of router table starts only in idle state!
-            case counter is
-                when 1 =>
+    stimulus : PROCESS (dut_state)
+    BEGIN
+        IF dut_state = S_Idle THEN -- FSM of router table starts only in idle state!
+            CASE counter IS
+                WHEN 1 =>
                     -- 1. Write
-                    report "1. Write";
-                    
+                    REPORT "1. Write";
+
                     act <= '1'; -- activate router table
                     readwrite <= '1'; -- write
                     dByte <= (OTHERS => '1'); -- write in all four bits
                     addr <= (OTHERS => '0'); -- write in 1st field of array
                     wdata <= "10101011101010101010101011101010"; -- word to be written
-                
-                when 2 =>
+
+                WHEN 2 =>
                     -- 2. Read
-                    report "2. Read";
-                    
+                    REPORT "2. Read";
+
                     act <= '1';
                     readwrite <= '0'; -- read
                     dByte <= (3 => '1', 0 => '1', OTHERS => '0'); -- Has no effect on reading operation but marks corresponding point in timing diagram.
                     addr <= (OTHERS => '0'); -- first array field              
-                
-                when 3 =>
+
+                WHEN 3 =>
                     -- 3. Try to read in inactive mode
-                    report "3. Try to read in inact mode";
-                    
+                    REPORT "3. Try to read in inact mode";
+
                     act <= '1'; -- should be '1'
                     readwrite <= '0'; -- read
                     dByte <= (OTHERS => '1'); -- Has no effect on reading operation but marks corresponding point in timing diagram.
                     addr <= (OTHERS => '0'); -- first array field
-                
-                when 4 =>
+
+                WHEN 4 =>
                     -- 4. Write without permission
-                    report "4. Write without permission";    
-                    
+                    REPORT "4. Write without permission";
+
                     act <= '1';
                     readwrite <= '0'; -- should be '1'
                     dByte <= (3 => '1', 2 => '1', 1 => '1', OTHERS => '0'); -- select all four bytes
                     addr <= (OTHERS => '0'); -- first array field
                     wdata <= (OTHERS => '0'); -- replace with nulls
-                
-                when 5 =>
+
+                WHEN 5 =>
                     -- 5. Proof that it didn't overwrite
-                    report "5. Proof that it didn't overwrite";
-                    
+                    REPORT "5. Proof that it didn't overwrite";
+
                     act <= '1';
                     readwrite <= '0'; -- read
                     dByte <= (3 => '1', 0 => '1', OTHERS => '0'); -- read first and last byte
                     addr <= (OTHERS => '0'); -- first array field
-                
-                when others =>
+
+                WHEN OTHERS =>
                     -- Set reset signal to high.
-                    done <= true;                     
-            end case;
-            
+                    done <= true;
+            END CASE;
+
             -- Increment counter for next test operation.
-            counter <= counter + 1;                     
-                
+            counter <= counter + 1;
+
             -- Stop clock if all test operations are executed.
-            if counter > 6 then
+            IF counter > 6 THEN
                 stop_the_clock <= true;
-            end if;
-        end if;
-    end process;
+            END IF;
+        END IF;
+    END PROCESS;
 END spwroutertable_tb_arch;
