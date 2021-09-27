@@ -87,11 +87,6 @@ BEGIN
 
         req <= (2 => '1', OTHERS => '0'); -- Port2 wants access, system should grant it.
 
-        --rst <= '1';        
-
-        --WAIT FOR clock_period;
-
-        --stop_the_clock <= true;
         WAIT;
     END PROCESS;
 

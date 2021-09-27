@@ -463,7 +463,7 @@ BEGIN
                     END LOOP;
 
                     -- Kann sein, dass das so nicht funktioniert: Signale bekommen ihren Wert erst bei Prozessende! Daher kann es sein, dass s_reqports zu beginn stets 0 ist!!
-                    IF (v_reqports = '0') THEN -- discard invalid addressed packet if none if statement before was executed.
+                    IF (v_reqports = '0') THEN -- discard invalid addressed packet if none 'if-statement' before was executed.
                         state <= S_Dummy0;
 
                     END IF;
@@ -536,7 +536,7 @@ BEGIN
                 WHEN S_Dummy1 =>
                     -- Wait to read data from receive buffer.
 
-                    receiveFIFODataOut(8) <= s_rxflag; -- per Handshake übernehmen
+                    receiveFIFODataOut(8) <= s_rxflag; -- take over by handshake mechanism
                     receiveFIFODataOut(7 DOWNTO 0) <= s_rxdata;
 
                     iReceiveFIFOReadEnable <= '0';

@@ -8,8 +8,9 @@
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
--- Description: Simulate TimeCode Control with different inputs and error provokion.
--- It is necessary to carry out stress tests here because the module produces complex outputs.
+-- Description: Simulate Time-Code Control with different inputs and error provocation.
+-- It is necessary to carry out some stress tests because it could be that the module
+-- is producing complex outputs.
 --
 -- Dependencies: spwrouterpkg
 ----------------------------------------------------------------------------------
@@ -78,7 +79,7 @@ ARCHITECTURE spwroutertcc_tb_arch OF spwroutertcc_tb IS
 
     -- Transmission interval for automatic TimeCode sending.
     SIGNAL auto_cycle : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0'); -- start with deactivated auto TC generation.
-    
+
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
     SIGNAL stop_the_clock : BOOLEAN;
@@ -87,10 +88,11 @@ ARCHITECTURE spwroutertcc_tb_arch OF spwroutertcc_tb IS
     SIGNAL sw_rst : BOOLEAN := true; -- controls reset.
     SIGNAL sw_TC_incoming : BOOLEAN := true; -- controls incoming TC.
     SIGNAL sw_wrong_TC : BOOLEAN := true; -- incoming TC is smaller or bigger than it should be.
+
     -- Counter: Helps to raise events.
     SIGNAL counter : INTEGER := 0;
 
-    -- Auxiliary variables
+    -- Support variable.
     SIGNAL internTC : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0'); -- saves last TC.
 BEGIN
     -- Design under test.
@@ -150,15 +152,12 @@ BEGIN
     -- Creates clock and controls counter.
     clocking : PROCESS
     BEGIN
-        WHILE NOT stop_the_clock LOOP
-            clk <= '0', '1' AFTER clock_period / 2;
+        clk <= '0', '1' AFTER clock_period / 2;
 
-            IF counter = 100 THEN
-                counter <= 0;
-            END IF;
-            counter <= counter + 1;
-            WAIT FOR clock_period;
-        END LOOP;
-        WAIT;
+        IF counter = 100 THEN
+            counter <= 0;
+        END IF;
+        counter <= counter + 1;
+        WAIT FOR clock_period;
     END PROCESS;
 END spwroutertcc_tb_arch;

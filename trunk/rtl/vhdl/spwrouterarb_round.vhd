@@ -77,10 +77,10 @@ BEGIN
             arbitration : FOR i IN numports DOWNTO 0 LOOP
                 IF (s_lstgrnt = STD_LOGIC_VECTOR(to_unsigned(i, s_lstgrnt'length))) THEN
 
-                    -- Following ports in line (0..1..numports..0) are given prefered access to current
-                    -- port. Normally in if-statements early conditions takes priority over later.
-                    -- Through rolling out for-loops, many seperate if statements will be
-                    -- created. Therefore the highes priority must be listed last in order to
+                    -- The following ports in the line (0..1..numports..0) will give prefered access to current
+                    -- port. Normally in if-statements early conditions takes priority above later.
+                    -- Through rolling out for-loops, many seperate if-statements will be
+                    -- created. Therefore the highes priority must be listed in the  last order to
                     -- be able to overwrite any previous decision with lower priority.
 
                     lowerpriority : FOR j IN i DOWNTO 0 LOOP

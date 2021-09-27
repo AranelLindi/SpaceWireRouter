@@ -8,7 +8,7 @@
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
--- Description: Allows provision and administration of SpaceWire TimeCodes.
+-- Description: Allows provision and administration of SpaceWire Time-Codes.
 --
 -- CAUTION! The assignment is shifted for every std_logic_vector-port that 
 -- excludes port0 (internal port): Port1 has index 0, Port2 -> 1, etc.
@@ -20,7 +20,6 @@
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
---use IEEE.STD_LOGIC_ARITH.all;
 USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 USE work.spwrouterpkg.ALL;
 
@@ -122,7 +121,7 @@ BEGIN
     END GENERATE PortTick;
 
     -- TimeCode generation:
-    -- Generates both requested and automatic (Host) TimeCodes
+    -- Generates both requested and automatically generated (Host) Time-Codes
     -- and controls which port receives it.
     TCGenerate : PROCESS (clk, rst)
     BEGIN
@@ -132,7 +131,7 @@ BEGIN
             s_ports_out <= (OTHERS => '0');
 
         ELSIF rising_edge(clk) THEN
-            -- In case of automatic TimeCode generation: every
+            -- In case of automatic Time-Code generation: every
             -- port will get the new TC. (If (s_auto_enable = '0'),
             -- counter has not yet reached interval limit in auto_cylce.)
             IF (auto_cycle /= x"00000000") THEN
@@ -144,7 +143,7 @@ BEGIN
 
                 END IF;
             ELSE
-                -- TimeCode Target
+                -- Time-Code Target
                 FOR i IN numports DOWNTO 1 LOOP
                     IF (tick_in(i) = '1') THEN
                         IF (time_in(i) = (s_tc_counterval + 1)) THEN -- hier steht im original: port1TimeCodeOut(5 downto 0) = counterValuePlus1 ?!
@@ -163,7 +162,7 @@ BEGIN
     END PROCESS TCGenerate;
 
     -- TimeCode Host:
-    -- Outputs signal at in register specified interval to generate new
+    -- Outputs signal at in register specified interval to generate new ?????ß
     -- time code 
     TCHost : PROCESS (clk, rst)
     BEGIN

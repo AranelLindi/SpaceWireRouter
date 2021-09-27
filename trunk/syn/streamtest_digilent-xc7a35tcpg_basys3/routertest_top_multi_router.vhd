@@ -8,7 +8,8 @@
 -- Project Name: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
--- Description: 
+-- Description: Hardwareimplementation which contains a router (2 ports), external
+-- port and uart receiver/transmitter. 
 -- 
 -- Dependencies: spwpgk, spwrouterpkg
 -- 

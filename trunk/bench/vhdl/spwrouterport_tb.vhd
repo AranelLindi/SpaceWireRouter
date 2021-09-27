@@ -8,7 +8,7 @@
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
--- Description: Testbench for spwrouterport. It was created primarily to examine 
+-- Description: Testbench for spwrouterport. It was primarily created to examine 
 -- the finite state machine of the port/router-connection bus for its correct
 -- functionality. (To test the port itself, run appropiate test benches
 -- (e. g. streamtest_tb))
@@ -16,7 +16,7 @@
 -- clock delay is not real, just the general behavior.
 --
 -- In general, only the behavior of single port is tested here. When assigning
--- addresses in packets you must therefore ensure that packets with port 
+-- addresses in packets you must ensure therefore that packets with port 
 -- addresses between 1 and 31 are rejected. Also - due to the missing connection
 -- to the routing table - forwarding (Port 32 - 254) is only possible if a port
 -- is marked in busMasterData in.
@@ -37,7 +37,6 @@ END spwrouterport_tb;
 
 ARCHITECTURE spwrouterport_tb_arch OF spwrouterport_tb IS
 	-- Generic constants.
-
 	CONSTANT numports : INTEGER RANGE 0 TO 31 := 0;
 	CONSTANT blen : INTEGER RANGE 0 TO 4 := 0;
 	CONSTANT pnum : INTEGER RANGE 0 TO 31 := 0;

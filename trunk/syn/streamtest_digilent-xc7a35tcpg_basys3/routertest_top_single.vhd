@@ -8,7 +8,8 @@
 -- Project Name: Implementation of a SpaceWire Router on an FPGA.
 -- Target Devices: 
 -- Tool Versions: 
--- Description: 
+-- Description: Hardwareimplementation which contains a router (3 ports), external
+-- ports and uart receiver/transmitter.
 -- 
 -- Dependencies: spwpkg, spwrouterpkg
 -- 
@@ -34,7 +35,7 @@ ENTITY routertest_top_single IS
 		-- Send manual end of packet.
 		eop : in std_logic;
 
-		-- ?
+		-- Shows if the fifo memory is filled
 		uartfifofull : OUT STD_LOGIC;
 
 		-- Marks which port (0 to 2) is selected to send the next packet.

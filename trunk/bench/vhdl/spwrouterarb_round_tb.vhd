@@ -5,7 +5,7 @@
 -- Create Date: 31.07.2021 22:38
 -- Design Name: Testbench for SpaceWire Router Arbiter Round (submodule for SpaceWire Router Arbiter)
 -- Module Name: spwrouterarb_round_tb
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
 -- Description: Simulation time: 55 ns.
@@ -59,7 +59,7 @@ ARCHITECTURE spwrouterarb_round_tb_arch OF spwrouterarb_round_tb IS
 
     -- Bit sequence that indicates the access of another port.
     SIGNAL grnt : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    
+
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
     SIGNAL stop_the_clock : BOOLEAN;
@@ -107,10 +107,7 @@ BEGIN
     -- Creates clock and controls counter.
     clocking : PROCESS
     BEGIN
-        WHILE NOT stop_the_clock LOOP
-            clk <= '0', '1' AFTER clock_period / 2;
-            WAIT FOR clock_period;
-        END LOOP;
-        WAIT;
+        clk <= '0', '1' AFTER clock_period / 2;
+        WAIT FOR clock_period;
     END PROCESS;
 END spwrouterarb_round_tb_arch;

@@ -8,8 +8,8 @@
 -- Project Name: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
--- Description: Implements a UART-SpaceWire Communication Entity which allows
--- to send and receive SpaceWire data over UART.
+-- Description: Implements a UART-SpaceWire communication entity which allows
+-- to send and receive SpaceWire data via Uart.
 -- 
 -- Dependencies: spwpkg, spwrouterpkg
 -- 
@@ -97,7 +97,7 @@ ARCHITECTURE routertest_top_multi_adapter_arch OF routertest_top_multi_adapter I
 	TYPE bool_to_logic_type IS ARRAY(BOOLEAN) OF STD_ULOGIC;
 	CONSTANT bool_to_logic : bool_to_logic_type := (false => '0', true => '1');
 
-	-- Uart Receiver.
+	-- Uart receiver.
 	COMPONENT uart_rx
 		GENERIC (
 			clk_cycles_per_bit : INTEGER
@@ -110,7 +110,7 @@ ARCHITECTURE routertest_top_multi_adapter_arch OF routertest_top_multi_adapter I
 		);
 	END COMPONENT;
 
-	-- Uart Transmitter.
+	-- Uart transmitter.
 	COMPONENT uart_tx
 		GENERIC (
 			clk_cycles_per_bit : INTEGER
@@ -126,7 +126,6 @@ ARCHITECTURE routertest_top_multi_adapter_arch OF routertest_top_multi_adapter I
 	END COMPONENT;
 
 	-- Uart receiver.
-	--SIGNAL s_uart_rxstream : STD_LOGIC;
 	SIGNAL s_uartrxdata : STD_LOGIC_VECTOR(7 DOWNTO 0);
 	SIGNAL s_uartrxbusy : STD_LOGIC;
 	SIGNAL s_uartrxvalid : STD_LOGIC := '0';
@@ -206,7 +205,7 @@ BEGIN
 	s_spw_di <= spw_di;
 	s_spw_si <= spw_si;
 
-	-- Von uart zu ext. Ports.
+	-- From uart to external ports.
 	PROCESS (clk, rst)
 		VARIABLE selectport : INTEGER RANGE 0 TO 2;
 		VARIABLE data : STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -306,6 +305,7 @@ BEGIN
 	BEGIN
 		IF rising_edge(clk) THEN
 			-- Debugging: Zeigt an wenn ein externer Port daten empfangen hat (muss mit clear quittiert werden!)
+			-- It shows if an external port has received data (will be confirmed with clear)
 			s_rxvalid_int <= (s_rxvalid_int OR s_rxvalid) AND (NOT clear) AND (NOT rst);--s_rxhalff; -- half receive fifo (spacewire -> uart) is full
 			-- Sticky error led.
 			s_error_int <= (s_error_int OR s_error) AND (NOT clear) AND (NOT rst);

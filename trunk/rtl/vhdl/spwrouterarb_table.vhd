@@ -59,6 +59,9 @@ BEGIN
             -- that order must be reversed to keep same priority list if-elsif-conditions would have.
             -- Example: Port4: 5..6..7..0..1..2..3 --> 1..0..7..6..5
 
+            -- To have the right priority the order was changed in unusual order
+
+
             arbitrationaccess : FOR i IN numports DOWNTO 0 LOOP
                 IF (s_granted(i) = '1' AND req(i) = '0') THEN
                     preports : FOR j IN (i - 1) DOWNTO 0 LOOP

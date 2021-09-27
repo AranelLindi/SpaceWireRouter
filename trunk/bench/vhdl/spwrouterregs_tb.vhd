@@ -5,7 +5,7 @@
 -- Create Date: 10.08.2021 16:47
 -- Design Name: SpaceWire Router Control Register Testbench
 -- Module Name: spwrouterregs_tb
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
 -- Description: 
@@ -117,6 +117,7 @@ BEGIN
 		autoTimeCodeCycleTime => autoTimeCodeCycleTime
 	);
 
+	-- Simulates design under test.
 	stimulus : PROCESS
 	BEGIN
 		WAIT FOR clock_period;
@@ -131,6 +132,7 @@ BEGIN
 		WAIT;
 	END PROCESS;
 
+	-- Creates clock.
 	clocking : PROCESS
 	BEGIN
 		clk <= '0', '1' AFTER clock_period / 2;

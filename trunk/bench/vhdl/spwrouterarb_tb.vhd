@@ -10,9 +10,9 @@
 -- Tool Versions: 
 -- Description: Simulates Router Arbiter.
 -- The module supplies bit sequences that indicate which port
--- has access to other ports. Issues are relatively simple, no
--- major stress tests necessary. Note that another module is
--- is integrated: spwrouterarb_table !
+-- has access to other ports. Outputs are relatively simple, no
+-- major stress tests necessary. Note that another module
+-- is integrated: spwrouterarb_table!
 --
 -- Dependencies: spwrouterpkg, spwrouterarb_table
 -- 

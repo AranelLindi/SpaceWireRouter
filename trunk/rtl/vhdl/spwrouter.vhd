@@ -8,7 +8,8 @@
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions: 
--- Description: 
+-- Description: Complete router implementation which contains all necessary entities.
+-- (Active autostart but no linkstart! Router is waiting for an attemption of an incoming connection)
 --
 -- Dependencies: none
 -- 
@@ -399,6 +400,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 iBusSlaveCycleIn <= OR busMasterRequestOut; -- ist doch das gleiche wie oben oder?
                 -- Wieder umgedrehte Prioriät (im Vergleich zum Originalcode)
 
+                -- Reversed priority conditioned through if-statements.
                 FOR i IN numports DOWNTO 1 LOOP
                     IF (busMasterGranted(i) = '1') THEN
                         iBusSlaveStrobeIn <= busMasterStrobeOut(i);

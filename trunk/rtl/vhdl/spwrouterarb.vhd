@@ -75,7 +75,7 @@ BEGIN
     END GENERATE occSig;
 
     -- Source port number which requests port as destination port.
-    outererloop : FOR i IN 0 TO numports GENERATE
+    outerloop : FOR i IN 0 TO numports GENERATE
         innerloop : FOR j IN 0 TO numports GENERATE
             s_request(j, i) <= '1' WHEN req(i) = '1' AND to_integer(unsigned(dest(i))) = j ELSE
             '0'; -- potenzielle fehlerquelle!

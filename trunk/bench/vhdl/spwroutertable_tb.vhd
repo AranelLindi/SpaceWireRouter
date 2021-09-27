@@ -5,7 +5,7 @@
 -- Create Date: 05.08.2021 19:34
 -- Design Name: Testbench for SpaceWire Router Table
 -- Module Name: spwroutertable_tb
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
 -- Target Devices: 
 -- Tool Versions:
 -- Description: Simulation time 300 ns.
@@ -56,7 +56,7 @@ ARCHITECTURE spwroutertable_tb_arch OF spwroutertable_tb IS
     -- (Only recognized when FSM is in idle.)
     SIGNAL act : STD_LOGIC := '0';
 
-    -- type of operation: High if a write process and Low if
+    -- Type of operation: High if a write process and low if
     -- a read process should be executed. (Works only if 
     -- act is High and FSM is in idle state.)
     SIGNAL readwrite : STD_LOGIC := '0';
@@ -119,12 +119,8 @@ BEGIN
     -- Creates clock and controls counter.
     clocking : PROCESS
     BEGIN
-        WHILE NOT stop_the_clock LOOP
-            clk <= '0', '1' AFTER clock_period / 2;
-
-            WAIT FOR clock_period;
-        END LOOP;
-        WAIT;
+        clk <= '0', '1' AFTER clock_period / 2;
+        WAIT FOR clock_period;
     END PROCESS;
 
     -- Performs test operations exactly when (fsm)-machine is ready to receive them. 

@@ -26,7 +26,7 @@ PACKAGE spwrouterfunc IS
     );
 
     FUNCTION select7x1(selectBit : STD_LOGIC_VECTOR(numports DOWNTO 0); bits : STD_LOGIC_VECTOR(numports DOWNTO 0)) RETURN STD_LOGIC;
-    FUNCTION select7x1xVector8(selectVector : STD_LOGIC_VECTOR(numports DOWNTO 0); bits : array_t(numports DOWNTO 0)(numports DOWNTO 0)) RETURN STD_LOGIC_VECTOR;
+    --FUNCTION select7x1xVector8(selectVector : STD_LOGIC_VECTOR(numports DOWNTO 0); bits : array_t(numports DOWNTO 0)(numports DOWNTO 0)) RETURN STD_LOGIC_VECTOR;
     FUNCTION select7x1xVector9(selectVector : STD_LOGIC_VECTOR(numports DOWNTO 0); bits : array_t(numports DOWNTO 0)(8 DOWNTO 0)) RETURN STD_LOGIC_VECTOR;
 END PACKAGE;
 

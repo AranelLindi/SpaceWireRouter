@@ -129,7 +129,7 @@ BEGIN
                         END IF;
                     END IF;
                 WHEN S_Write0 =>
-                    -- Additional status to keep write and read cycles (time!) same.
+                    -- Additional status to keep write and read cycles the same.
                     state <= S_Write1;
 
                 WHEN S_Write1 =>
