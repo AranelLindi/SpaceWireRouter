@@ -526,8 +526,8 @@ BEGIN
 		errpar => s_rerrpar,
 		erresc => s_rerresc,
 		errcred => s_rerrcred,
-		gotData => OPEN, -- Debugport
-		sentData => OPEN, -- Debugport
+		--gotData => OPEN, -- Debugport
+		--sentData => OPEN, -- Debugport
 		spw_di(0) => s_spw_do(0),
 		spw_di(1) => spw_di,
 		spw_si(0) => s_spw_so(0),

@@ -78,7 +78,7 @@ ENTITY routertest_top_single IS
 --		prxvalid : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 --		txinact : OUT STD_LOGIC;
 --		spw_d_p2r : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
---		spw_d_r2p : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+--		spw_d_r2p : OUT STD_LOGIC_VECTOR(2 DOWNTO 0)
 --		uart_txdata : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 --		txdata : OUT array_t(2 DOWNTO 0)(8 DOWNTO 0);
 --		recdata : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
@@ -170,9 +170,9 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 			perresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			rerresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			perrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			rerrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugports ab hier!
-			sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+			rerrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+			--gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugports ab hier!
+			--sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			--fsmstate : OUT fsmarr(numports DOWNTO 0);
 			--debugdataout : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0);
 			--dreadyIn : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
@@ -189,9 +189,9 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 			--droutingSwitch : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0);
 			--dsourcePortOut : OUT array_t(numports DOWNTO 0)(1 DOWNTO 0);
 			--ddestinationPort : OUT array_t(numports DOWNTO 0)(7 DOWNTO 0);
-			spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+			--spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			--spw_s_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+			--spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
 			--spw_s_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
 		);
 	END COMPONENT;
@@ -244,8 +244,8 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 	SIGNAL s_rerresc : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL s_perrcred : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL s_rerrcred : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	SIGNAL gotData : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	SIGNAL sentData : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	--SIGNAL gotData : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	--SIGNAL sentData : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	--SIGNAL fsmstate : fsmarr(2 DOWNTO 0);
 	--SIGNAL debugdataout : array_t(2 DOWNTO 0)(8 DOWNTO 0);
 	--SIGNAL dreadyIn : STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -262,9 +262,9 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 	--SIGNAL droutingSwitch : array_t(2 DOWNTO 0)(2 DOWNTO 0);
 	--SIGNAL dsourcePortOut : array_t(2 DOWNTO 0)(1 DOWNTO 0);
 	--SIGNAL ddestinationPort : array_t(2 DOWNTO 0)(7 DOWNTO 0);
-	SIGNAL s_spw_d_r2p : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	--SIGNAL s_spw_d_r2p : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	--SIGNAL s_spw_s_r2p : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	SIGNAL s_spw_d_p2r : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	--SIGNAL s_spw_d_p2r : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	--SIGNAL s_spw_s_p2r : STD_LOGIC_VECTOR(2 DOWNTO 0);
 
 	-- Debug
@@ -563,9 +563,9 @@ BEGIN
 		perresc => s_perresc,
 		rerresc => s_rerresc,
 		perrcred => s_perrcred,
-		rerrcred => s_rerrcred,
-		gotData => gotData,
-		sentData => sentData,
+		rerrcred => s_rerrcred
+		--gotData => gotData,
+		--sentData => sentData,
 		--fsmstate => fsmstate,
 		--debugdataout => debugdataout,
 		--dreadyIn => dreadyIn,
@@ -582,9 +582,9 @@ BEGIN
 		--droutingSwitch => droutingSwitch,
 		--dsourcePortOut => dsourcePortOut,
 		--ddestinationPort => ddestinationPort,
-		spw_d_r2p => s_spw_d_r2p, -- Signale werden f�r Hardwareimplementierung nicht ben�tigt, sind eher f�r Simulation interessant zur Nachverfolgung
+		--spw_d_r2p => s_spw_d_r2p, -- Signale werden f�r Hardwareimplementierung nicht ben�tigt, sind eher f�r Simulation interessant zur Nachverfolgung
 		--spw_s_r2p => open, --s_spw_s_r2p,
-		spw_d_p2r => s_spw_d_p2r
+		--spw_d_p2r => s_spw_d_p2r
 		--spw_s_p2r => open --s_spw_s_p2r
 	);
 END routertest_top_single_arch;

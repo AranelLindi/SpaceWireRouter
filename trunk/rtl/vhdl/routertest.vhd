@@ -414,8 +414,8 @@ BEGIN
 		errpar => s_rerrpar,
 		erresc => s_rerresc,
 		errcred => s_rerrcred,
-		gotData => gotData, -- Debugport
-		sentData => sentData, -- Debugport
+		--gotData => gotData, -- Debugport
+		--sentData => sentData, -- Debugport
 		--		fsmstate => s_fsmstate, -- Debugport
 		--		debugdataout => debugdataout, -- Debugport
 		--		dreadyIn => dreadyIn, -- Debugport

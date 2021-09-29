@@ -112,9 +112,9 @@ ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 			--dsourcePortOut : OUT array_t(numports DOWNTO 0)(1 DOWNTO 0); -- Debugport
 			--ddestinationPort : OUT array_t(numports DOWNTO 0)(7 DOWNTO 0); -- Debugport
 			spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Data signal from router to external ports
-			spw_s_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Strobe signal from router to external ports
-			spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Data signal from external ports to router
-			spw_s_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0) -- Strobe signal from external ports to router
+			--spw_s_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Strobe signal from router to external ports
+			spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0) -- Data signal from external ports to router
+			--spw_s_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0) -- Strobe signal from external ports to router
 		);
 	END COMPONENT;
 
@@ -260,9 +260,9 @@ BEGIN
 		--dsourcePortOut => dsourcePortOut, -- Debugport
 		--ddestinationPort => ddestinationPort, -- Debugport
 		spw_d_r2p => spw_d_r2p, -- Data signals from router to extern ports
-		spw_s_r2p => spw_s_r2p, -- Strobe signals from router to extern ports
-		spw_d_p2r => spw_d_p2r, -- Data signals from extern ports to router
-		spw_s_p2r => spw_s_p2r -- Strobe signals from extern ports to router
+		--spw_s_r2p => spw_s_r2p, -- Strobe signals from router to extern ports
+		spw_d_p2r => spw_d_p2r -- Data signals from extern ports to router
+		--spw_s_p2r => spw_s_p2r -- Strobe signals from extern ports to router
 	);
 
 	-- Performs initialize reset.
@@ -325,7 +325,7 @@ BEGIN
 								pstate <= S_Cargo;
 
 							WHEN S_Cargo =>
-								txdata(1) <= "00000000"; -- easier to locate in timing diagram
+								txdata(1) <= "10010010"; -- easier to locate in timing diagram
 								txflag(1) <= '0';
 								txwrite(1) <= '1';
 
@@ -368,7 +368,7 @@ BEGIN
 
 							WHEN S_Cargo =>
 								-- Packet 1
-								txdata(1) <= "00000000";
+								txdata(1) <= "10010010";
 								txflag(1) <= '0';
 								txwrite(1) <= '1';
 

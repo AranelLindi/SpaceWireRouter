@@ -236,10 +236,10 @@ PACKAGE spwrouterpkg IS
             busMasterAcknowledgeIn : IN STD_LOGIC;
 
             -- //pragma synthesis_off
-            gotData : OUT STD_LOGIC; -- debug
-            sentData : OUT STD_LOGIC; -- debug
-            fsmstate : OUT spwrouterportstates; -- debug
-            debugdataout : OUT STD_LOGIC_VECTOR(8 DOWNTO 0); -- debug
+            --gotData : OUT STD_LOGIC; -- debug
+            --sentData : OUT STD_LOGIC; -- debug
+            --fsmstate : OUT spwrouterportstates; -- debug
+            --debugdataout : OUT STD_LOGIC_VECTOR(8 DOWNTO 0); -- debug
             -- //pragma synthesis_on
 
             spw_di : IN STD_LOGIC;
@@ -270,8 +270,8 @@ PACKAGE spwrouterpkg IS
             errpar : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
             erresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
             errcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-            gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
-            sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+            --gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
+            --sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugport
             --fsmstate: out fsmarr(numports downto 0); -- Debugport
             --debugdataout : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Debugport
             --dreadyIn : out std_logic_vector(numports downto 0); -- Debugport
