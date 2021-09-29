@@ -79,7 +79,7 @@ PACKAGE spwrouterpkg IS
     COMPONENT spwrouterarb_round IS
         GENERIC (
             numports : INTEGER RANGE 0 TO 31;
-            blen : INTEGER RANGE 0 TO 4
+            blen : INTEGER RANGE 0 TO 5
         );
         PORT (
             clk : IN STD_LOGIC;
@@ -183,7 +183,7 @@ PACKAGE spwrouterpkg IS
     COMPONENT spwrouterport IS
         GENERIC (
             numports : INTEGER RANGE 0 TO 31;
-            blen : INTEGER RANGE 0 TO 4;
+            blen : INTEGER RANGE 0 TO 5;
             pnum : INTEGER RANGE 0 TO 31;
             sysfreq : real;
             txclkfreq : real := 0.0;

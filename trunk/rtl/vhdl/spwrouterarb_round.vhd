@@ -28,7 +28,7 @@ ENTITY spwrouterarb_round IS
         numports : INTEGER RANGE 0 TO 31;
 
         -- Bit length to map ports.
-        blen : INTEGER RANGE 0 TO 4 -- (max 5 bits for 0-31 ports)
+        blen : INTEGER RANGE 0 TO 5 -- (max 5 bits for 0-31 ports)
     );
     PORT (
         -- System clock.

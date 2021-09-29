@@ -26,19 +26,19 @@ USE WORK.SPWPKG.ALL;
 ENTITY spwrouter IS
     GENERIC (
         -- Number of SpaceWire ports.
-        numports : INTEGER RANGE 0 TO 31;
+        numports : INTEGER RANGE 0 TO 31 := 2;
 
         -- System clock frequency in Hz.
-        sysfreq : real;
+        sysfreq : real := 10.0e6;
 
         -- txclk frequency in Hz (if tximpl = impl_fast)
-        txclkfreq : real;
+        txclkfreq : real := 10.0e6;
 
         -- Selection of receiver front-end implementation.
-        rx_impl : rximpl_array(numports DOWNTO 0);
+        rx_impl : rximpl_array(numports DOWNTO 0) := (others => impl_fast);
 
         -- Selection of transmitter implementation.
-        tx_impl : tximpl_array(numports DOWNTO 0)
+        tx_impl : tximpl_array(numports DOWNTO 0) := (others => impl_fast)
     );
     PORT (
         -- System clock.
@@ -74,8 +74,8 @@ ENTITY spwrouter IS
         -- High if the corresponding port detected a credit error.
         errcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
         -- Debug ports ON
-        gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-        sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+        --gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+        --sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
         --fsmstate: out fsmarr(numports downto 0);
         --debugdataout: out array_t(numports downto 0)(8 downto 0);
         --dreadyIn : out std_logic_vector(numports downto 0);
@@ -113,7 +113,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         GENERIC MAP(numports => numports); -- Import package with various functions.
 
         -- Necessary number of bits to represent numport-ports.
-        CONSTANT blen : INTEGER RANGE 0 TO 4 := INTEGER(ceil(log2(real(numports))));
+        CONSTANT blen : INTEGER RANGE 0 TO 5 := INTEGER(ceil(log2(real(numports))));
 
         SIGNAL iSelectDestinationPort : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- korrekte definition?
         SIGNAL iSwitchPortNumber : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- korrekte def?
@@ -346,8 +346,8 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 busMasterStrobeOut => busMasterStrobeOut(i),
                 busMasterRequestOut => busMasterRequestOut(i),
                 busMasterAcknowledgeIn => busMasterAcknowledgeIn(i),
-                gotData => gotData(i), -- Debugport
-                sentData => sentData(i), -- Debugport
+                --gotData => gotData(i), -- Debugport
+                --sentData => sentData(i), -- Debugport
                 --fsmstate => s_fsm(i), -- Debugport
                 --debugdataout => debugdataout(i), -- Debugport
                 spw_di => spw_di(i),
