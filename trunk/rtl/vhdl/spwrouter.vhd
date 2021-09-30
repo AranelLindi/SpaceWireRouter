@@ -73,26 +73,6 @@ ENTITY spwrouter IS
 
         -- High if the corresponding port detected a credit error.
         errcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-        -- Debug ports ON
-        --gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-        --sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-        --fsmstate: out fsmarr(numports downto 0);
-        --debugdataout: out array_t(numports downto 0)(8 downto 0);
-        --dreadyIn : out std_logic_vector(numports downto 0);
-        --drequestIn: out std_logic_vector(numports downto 0);
-        --ddataIn : out array_t(numports downto 0)(8 downto 0);
-        --dstrobeIn: out std_logic_vector(numports downto 0);
-        --dreadyOut: out std_logic_vector(numports downto 0);
-        --drequestOut: out std_logic_vector(numports downto 0);
-        --ddataOut: out array_t(numports downto 0)(8 downto 0);
-        --dstrobeOut: out std_logic_vector(numports downto 0);
-        --dgranted: out std_logic_vector(numports downto 0);
-        --dSwitchPortNumber: out array_t(numports downto 0)(numports downto 0);
-        --dSelectDestinationPort: out array_t(numports downto 0)(numports downto 0);
-        --droutingSwitch: out array_t(numports downto 0)(numports downto 0);
-        --dsourcePortOut: out array_t(numports downto 0)(1 downto 0);
-        --ddestinationPort: out array_t(numports downto 0)(7 downto 0);
-        -- Debug ports OFF
 
         -- Data In signals from SpaceWire bus.
         spw_di : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
@@ -115,39 +95,35 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         -- Necessary number of bits to represent numport-ports.
         CONSTANT blen : INTEGER RANGE 0 TO 5 := INTEGER(ceil(log2(real(numports))));
 
-        SIGNAL iSelectDestinationPort : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- korrekte definition?
-        SIGNAL iSwitchPortNumber : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- korrekte def?
+        SIGNAL iSelectDestinationPort : array_t(numports DOWNTO 0)(numports DOWNTO 0);
+        SIGNAL iSwitchPortNumber : array_t(numports DOWNTO 0)(numports DOWNTO 0);
 
         SIGNAL requestOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL destinationPort : array_t(numports DOWNTO 0)(7 DOWNTO 0);
         SIGNAL sourcePortOut : array_t(numports DOWNTO 0)(blen DOWNTO 0);
         SIGNAL granted : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL iReadyIn : STD_LOGIC_VECTOR(numports DOWNTO 0);
-        SIGNAL dataOut : array_t(numports DOWNTO 0)(8 DOWNTO 0); -- korrekte def?
+        SIGNAL dataOut : array_t(numports DOWNTO 0)(8 DOWNTO 0);
         SIGNAL strobeOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL iRequestIn : STD_LOGIC_VECTOR(numports DOWNTO 0);
-        --signal iSourcePortIn : array_t(numports DOWNTO 0)(numports downto 0); -- korrekte def?
+
         SIGNAL iDataIn : array_t(numports DOWNTO 0)(8 DOWNTO 0);
         SIGNAL iStrobeIn : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL readyOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
         SIGNAL routingSwitch : array_t(numports DOWNTO 0)(numports DOWNTO 0);
 
-        SIGNAL routerTimeCode : STD_LOGIC_VECTOR(7 DOWNTO 0); -- nötig?
-        --signal transmitTimeCodeEnable: std_logic_vector(6 downto 0); -- nötig?
-
-        --signal timeOutEnable: std_logic; -- nötig?
+        SIGNAL routerTimeCode : STD_LOGIC_VECTOR(7 DOWNTO 0);
 
         -- Bus System I.
-        SIGNAL busMasterAddressOut : array_t(numports DOWNTO 0)(31 DOWNTO 0); -- korrekte def?
-        SIGNAL busMasterDataOut : array_t(numports DOWNTO 0)(31 DOWNTO 0); -- korrekte def?
-        SIGNAL busMasterByteEnableOut : array_t(numports DOWNTO 0)(3 DOWNTO 0); -- korrekte def?
+        SIGNAL busMasterAddressOut : array_t(numports DOWNTO 0)(31 DOWNTO 0);
+        SIGNAL busMasterDataOut : array_t(numports DOWNTO 0)(31 DOWNTO 0);
+        SIGNAL busMasterByteEnableOut : array_t(numports DOWNTO 0)(3 DOWNTO 0);
         SIGNAL busMasterWriteEnableOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL busMasterRequestOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL busMasterGranted : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL busMasterAcknowledgeIn : STD_LOGIC_VECTOR(numports DOWNTO 0);
         SIGNAL busMasterStrobeOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
-        --signal busMasterOriginalPortOut: array_t(numports DOWNTO 0)(numports downto 0); -- korrekte def?
 
         -- Bus System II.
         SIGNAL iBusSlaveCycleIn : STD_LOGIC;
@@ -177,29 +153,11 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
 
         -- Eigene Signale
         SIGNAL s_running : STD_LOGIC_VECTOR(numports DOWNTO 0);
-        -- Debug
-        SIGNAL s_fsm : fsmarr(numports DOWNTO 0);
     BEGIN
         -- Drive outputs.
         running <= s_running;
         iLinkUp <= s_running;
-        -- DEBUG
-        --fsmstate <= s_fsm;
-        --dreadyIn <= iReadyIn;
-        --drequestIn <= iRequestIn;
-        --ddataIn <= iDataIn;
-        --dstrobeIn <= iStrobeIn;
-        --dreadyOut <= readyOut;
-        --drequestOut <= requestOut;
-        --ddataOut <= dataOut;
-        --dstrobeOut <= busMasterGranted;--strobeOut;
-        --dgranted <= busMasterRequestOut;--granted;
-        --dSwitchPortNumber <= iSwitchPortNumber;
-        --dSelectDestinationPort <= iSelectDestinationPort;
-        --droutingSwitch <= routingSwitch;
-        --dsourcePortOut <= sourcePortOut;
-        --ddestinationPort <= destinationPort;
-
+        
         -- Crossbar Switch - Router Arbiter.
         arb : spwrouterarb
         GENERIC MAP(
@@ -346,10 +304,6 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 busMasterStrobeOut => busMasterStrobeOut(i),
                 busMasterRequestOut => busMasterRequestOut(i),
                 busMasterAcknowledgeIn => busMasterAcknowledgeIn(i),
-                --gotData => gotData(i), -- Debugport
-                --sentData => sentData(i), -- Debugport
-                --fsmstate => s_fsm(i), -- Debugport
-                --debugdataout => debugdataout(i), -- Debugport
                 spw_di => spw_di(i),
                 spw_si => spw_si(i),
                 spw_do => spw_do(i),
@@ -393,13 +347,10 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
 
         -- Timing adjustment. BusSlaveAccessSelector
         PROCESS (clk)
-            --VARIABLE varB : STD_LOGIC := '0';
         BEGIN
             IF rising_edge(clk) THEN
 
-                iBusSlaveCycleIn <= OR busMasterRequestOut; -- ist doch das gleiche wie oben oder?
-                -- Wieder umgedrehte Prioriät (im Vergleich zum Originalcode)
-
+                iBusSlaveCycleIn <= OR busMasterRequestOut;
                 -- Reversed priority conditioned through if-statements.
                 FOR i IN numports DOWNTO 1 LOOP
                     IF (busMasterGranted(i) = '1') THEN
@@ -409,19 +360,17 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                         iBusSlaveWriteEnableIn <= busMasterWriteEnableOut(i);
                         iBusSlaveOriginalPortIn <= x"ff";
                         iBusSlaveDataIn <= (OTHERS => '0');
-                        --busMasterAcknowledgeIn <= (others => '0');
                         busMasterAcknowledgeIn <= (i => iBusSlaveAcknowledgeOut, OTHERS => '0');
                     END IF;
                 END LOOP;
-                -- Port0 ist Spezialfall, daher außerhalb der For-Loop!
+
+                -- Port0 is special case so handling outside for loop
                 IF (busMasterGranted(0) = '1') THEN
                     iBusSlaveStrobeIn <= busMasterStrobeOut(0);
                     iBusSlaveAddressIn <= busMasterAddressOut(0);
                     iBusSlaveByteEnableIn <= busMasterByteEnableOut(0);
                     iBusSlaveWriteEnableIn <= busMasterWriteEnableOut(0);
-                    --iBusSlaveOriginalPortIn <= busMasterOriginalPortOut(0); -- wohl nur für RMAP nötig
                     iBusSlaveDataIn <= busMasterDataOut(0);
-                    --busMasterAcknowledgeIn <= (others => '0');
                     busMasterAcknowledgeIn <= (0 => iBusSlaveAcknowledgeOut, OTHERS => '0');
                 END IF;
 
@@ -439,7 +388,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             rst => rst,
             running => iLinkUp,
             lst_time => routerTimeCode,
-            tc_en => (OTHERS => '1'), -- korrekt? Nochmal mit spwroutertcc-Code abgleichen!
+            tc_en => (OTHERS => '1'),
             tick_out => tick_out,
             tick_in => tick_in,
             time_in => time_in,

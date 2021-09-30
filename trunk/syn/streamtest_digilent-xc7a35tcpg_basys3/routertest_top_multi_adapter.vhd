@@ -74,20 +74,6 @@ ENTITY routertest_top_multi_adapter IS
 
 		-- Outgoing SpaceWire strobe signal.
 		spw_so : OUT STD_LOGIC
-
-		-- Debugports
-		--		received : OUT STD_LOGIC;
-		--		rxvalid : OUT STD_LOGIC;
-		--		txwrite : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-		--		prxvalid : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-		--		txinact : OUT STD_LOGIC;
-		--		spw_d_p2r : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-		--		spw_d_r2p : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-		--		uart_txdata : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-		--		txdata : OUT array_t(2 DOWNTO 0)(8 DOWNTO 0);
-		--		recdata : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
-		--		raddr : OUT INTEGER RANGE 0 TO 16;
-		--		waddr : OUT INTEGER RANGE 0 TO 16
 	);
 END routertest_top_multi_adapter;
 
@@ -165,24 +151,6 @@ ARCHITECTURE routertest_top_multi_adapter_arch OF routertest_top_multi_adapter I
 	SIGNAL s_errpar : STD_LOGIC;
 	SIGNAL s_erresc : STD_LOGIC;
 	SIGNAL s_errcred : STD_LOGIC;
-	--SIGNAL gotData : STD_LOGIC;
-	--SIGNAL sentData : STD_LOGIC;
-	--SIGNAL fsmstate : fsmarr(2 DOWNTO 0);
-	--SIGNAL debugdataout : array_t(2 DOWNTO 0)(8 DOWNTO 0);
-	--SIGNAL dreadyIn : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL drequestIn : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL ddataIn : array_t(2 DOWNTO 0)(8 DOWNTO 0);
-	--SIGNAL dstrobeIn : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL dreadyOut : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL drequestOut : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL ddataOut : array_t(2 DOWNTO 0)(8 DOWNTO 0);
-	--SIGNAL dstrobeOut : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL dgranted : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL dSwitchPortNumber : array_t(2 DOWNTO 0)(2 DOWNTO 0);
-	--SIGNAL dSelectDestinationPort : array_t(2 DOWNTO 0)(2 DOWNTO 0);
-	--SIGNAL droutingSwitch : array_t(2 DOWNTO 0)(2 DOWNTO 0);
-	--SIGNAL dsourcePortOut : array_t(2 DOWNTO 0)(1 DOWNTO 0);
-	--SIGNAL ddestinationPort : array_t(2 DOWNTO 0)(7 DOWNTO 0);
 	SIGNAL s_spw_di : STD_LOGIC;
 	SIGNAL s_spw_si : STD_LOGIC;
 	SIGNAL s_spw_do : STD_LOGIC;
@@ -271,27 +239,6 @@ BEGIN
 		END IF;
 	END PROCESS;
 
-	-- Drive outputs
-
-	-- Debug
-	--	received <= '0';
-	--	rxvalid <= s_uartrxvalid;
-	--	txwrite <= s_txwrite;
-	--	prxvalid <= s_rxvalid;
-	--	spw_d_p2r <= s_spw_d_p2r;
-	--	spw_d_r2p <= s_spw_d_r2p;
-	--	uart_txdata <= s_uartrxdata;--s_rxfifo_wdata(7 DOWNTO 0);
-	--	s_dtxdata(0) <= s_txflag(0) & s_txdata(0);
-	--	s_dtxdata(1) <= s_txflag(1) & s_txdata(1);
-	--	s_dtxdata(2) <= s_txflag(2) & s_txdata(2);
-	--	txdata <= s_dtxdata;
-	--	recdata(7 DOWNTO 0) <= (OTHERS => '0');--;s_recdata;
-	--	txinact <= NOT s_uarttxactive;
-	--	raddr <= 1 WHEN rxstate = S_Idle ELSE
-	--		2 WHEN rxstate = S_Prepare ELSE
-	--		3 WHEN rxstate = S_Send ELSE
-	--		4 WHEN rxstate = S_Clean;
-	--waddr <= to_integer(unsigned(s_rxfifo_waddr));
 	-- Drive outputs.
 	rxhalff <= s_rxhalff; -- Debugging!
 	started <= s_started;

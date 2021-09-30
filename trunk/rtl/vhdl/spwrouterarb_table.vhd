@@ -61,21 +61,17 @@ BEGIN
 
             -- To have the right priority the order was changed in unusual order
 
-
             arbitrationaccess : FOR i IN numports DOWNTO 0 LOOP
                 IF (s_granted(i) = '1' AND req(i) = '0') THEN
                     preports : FOR j IN (i - 1) DOWNTO 0 LOOP
                         IF (req(j) = '1') THEN
                             s_granted <= STD_LOGIC_VECTOR(to_unsigned(2 ** j, s_granted'length));
-                            --s_granted <= (j => '1', OTHERS => '0');
-                            --s_granted(j) <= '1';
                         END IF;
                     END LOOP preports;
                     -- except current port i
                     seqports : FOR k IN numports DOWNTO (i + 1) LOOP
                         IF (req(k) = '1') THEN
                             s_granted <= STD_LOGIC_VECTOR(to_unsigned(2 ** k, s_granted'length));
-                            --s_granted <= (k => '1', OTHERS => '0');
                         END IF;
                     END LOOP seqports;
                 END IF;

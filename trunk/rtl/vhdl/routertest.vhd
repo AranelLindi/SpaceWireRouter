@@ -190,26 +190,6 @@ ENTITY routertest IS
 		perrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 		rerrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 		
-		-- debug ports ON
-		gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-		sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-		--fsmstate: out fsmarr(numports downto 0);
-		--debugdataout : out array_t(numports downto 0)(8 downto 0);
-		--dreadyIn : out std_logic_vector(numports downto 0);
-		--drequestIn: out std_logic_vector(numports downto 0);
-		--ddataIn: out array_t(numports downto 0)(8 downto 0);
-		--dstrobeIn: out std_logic_vector(numports downto 0);
-		--dreadyOut: out std_logic_vector(numports downto 0);
-		--drequestOut: out std_logic_vector(numports downto 0);
-		--ddataOut : out array_t(numports downto 0)(8 downto 0);
-		--dstrobeOut: out std_logic_vector(numports downto 0);
-		--dgranted: out std_logic_vector(numports downto 0);
-		--dSwitchPortNumber: out array_t(numports downto 0)(numports downto 0); -- Debugport
-		--dSelectDestinationPort: out array_t(numports downto 0)(numports downto 0); -- Debugport
-		--droutingSwitch: out array_t(numports downto 0)(numports downto 0); -- Debugport
-		--dsourcePortOut: out array_t(numports downto 0)(1 downto 0); -- Debugport
-		--ddestinationPort: out array_t(numports downto 0)(7 downto 0); -- Debugport
-		-- debug ports OFF
 		-- Data In signal from SpaceWire bus.
 		spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
@@ -225,15 +205,15 @@ ENTITY routertest IS
 END routertest;
 
 ARCHITECTURE routertest_arch OF routertest IS
-	-- Kommt vom Router
+	-- Signals from router.
 	SIGNAL s_spw_di : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	SIGNAL s_spw_si : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-	-- Geht zum Router
+	-- Signals to router.
 	SIGNAL s_spw_do : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	SIGNAL s_spw_so : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-	-- Router Signale
+	-- Router status signals.
 	SIGNAL s_rstarted : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	SIGNAL s_rconnecting : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	SIGNAL s_rrunning : STD_LOGIC_VECTOR(numports DOWNTO 0);
@@ -242,7 +222,7 @@ ARCHITECTURE routertest_arch OF routertest IS
 	SIGNAL s_rerresc : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	SIGNAL s_rerrcred : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-	-- Port Signale
+	-- Port status signals.
 	SIGNAL s_pstarted : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	SIGNAL s_pconnecting : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	SIGNAL s_prunning : STD_LOGIC_VECTOR(numports DOWNTO 0);
@@ -251,20 +231,12 @@ ARCHITECTURE routertest_arch OF routertest IS
 	SIGNAL s_perresc : STD_LOGIC_VECTOR(numports DOWNTO 0);
 	SIGNAL s_perrcred : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-	-- Debug
-	--signal s_fsmstate: fsmarr(numports downto 0);
-	--signal s_dreadyOut: std_logic_vector(numports downto 0);
-	--signal s_drequestOut: std_logic_vector(numports downto 0);
-	--signal s_ddataOut: array_t(numports downto 0)(8 downto 0);
-	--signal s_dstrobeOut: std_logic_vector(numports downto 0);
-	--signal s_granted: std_logic_vector(numports downto 0);
 BEGIN
-	-- Drive outputs.
-	-- Signals from router to ports. (Ist glaub ich nur für debugging)
-	spw_d_r2p <= s_spw_di;
+	-- Signals from router to ports. (for debugging only)
+	--spw_d_r2p <= s_spw_di;
 	--spw_s_r2p <= s_spw_si;
 	-- Signals from ports to router.
-	spw_d_p2r <= s_spw_do;
+	--spw_d_p2r <= s_spw_do;
 	--spw_s_p2r <= s_spw_so;
 
 	-- Status/errors for router and ports.
@@ -282,14 +254,6 @@ BEGIN
 	perresc <= s_perresc;
 	rerrcred <= s_rerrcred;
 	perrcred <= s_perrcred;
-
-	-- Debug
-	--	fsmstate <= s_fsmstate;
-	--	dreadyOut <= s_dreadyOut;
-	--	drequestOut <= s_drequestOut;
-	--	ddataOut <= s_ddataOut;
-	--	dstrobeOut <= s_dstrobeOut;
-	--	dgranted <= s_granted;
 
 	-- Port 0
 	ExternPort0 : spwstream
@@ -335,10 +299,10 @@ BEGIN
 		errpar => s_perrpar(0),
 		erresc => s_perresc(0),
 		errcred => s_perrcred(0),
-		spw_di => s_spw_di(0), -- kommt vom router
-		spw_si => s_spw_si(0), -- kommt vom router
-		spw_do => s_spw_do(0), -- geht zum router
-		spw_so => s_spw_so(0) -- geht zum router
+		spw_di => s_spw_di(0), -- from router
+		spw_si => s_spw_si(0), -- from router
+		spw_do => s_spw_do(0), -- to router
+		spw_so => s_spw_so(0) -- to router
 	);
 
 	-- Port 1 to numports
@@ -386,9 +350,9 @@ BEGIN
 			errpar => s_perrpar(i),
 			erresc => s_perresc(i),
 			errcred => s_perrcred(i),
-			spw_di => s_spw_di(i), -- Kommt vom Router
+			spw_di => s_spw_di(i), -- from router
 			spw_si => s_spw_si(i),
-			spw_do => s_spw_do(i), -- Geht zum Router
+			spw_do => s_spw_do(i), -- to router
 			spw_so => s_spw_so(i)
 		);
 	END GENERATE ExternPortX;
@@ -414,24 +378,6 @@ BEGIN
 		errpar => s_rerrpar,
 		erresc => s_rerresc,
 		errcred => s_rerrcred,
-		--gotData => gotData, -- Debugport
-		--sentData => sentData, -- Debugport
-		--		fsmstate => s_fsmstate, -- Debugport
-		--		debugdataout => debugdataout, -- Debugport
-		--		dreadyIn => dreadyIn, -- Debugport
-		--		drequestIn => drequestIn, -- Debugport
-		--		ddataIn => ddataIn, -- Debugport
-		--		dstrobeIn => dstrobeIn, -- Debugport
-		--		dreadyOut => s_dreadyOut, -- Debugport
-		--		drequestOut => s_drequestOut, -- Debugport
-		--		ddataOut => s_ddataOut, -- Debugport
-		--		dstrobeOut => s_dstrobeOut, -- Debugport
-		--		dgranted => s_granted, -- Debugport
-		--		dSwitchPortNumber => dSwitchPortNumber, -- Debugport
-		--		dSelectDestinationPort => dSelectDestinationPort, -- Debugport
-		--		droutingSwitch => droutingSwitch, -- Debugport
-		--		dsourcePortOut => dsourcePortOut, -- Debugport
-		--		ddestinationPort => ddestinationPort, -- Debugport
 		spw_di => s_spw_do,
 		spw_si => s_spw_so,
 		spw_do => s_spw_di,

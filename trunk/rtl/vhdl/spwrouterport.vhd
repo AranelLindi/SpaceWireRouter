@@ -65,78 +65,78 @@ ENTITY spwrouterport IS
     );
     PORT (
         -- System clock.
-        clk : IN STD_LOGIC; -- clock -- fertig
+        clk : IN STD_LOGIC; -- clock
 
         -- Receiver sample clock (only for impl_fast)
-        rxclk : IN STD_LOGIC; -- receiveclock -- fertig
+        rxclk : IN STD_LOGIC; -- receiveclock
 
         -- Transmit clock (only for impl_fast)
-        txclk : IN STD_LOGIC; -- transmitclock -- fertig
+        txclk : IN STD_LOGIC; -- transmitclock
 
         -- Synchronous reset (active-high).
-        rst : IN STD_LOGIC; -- reset -- fertig
+        rst : IN STD_LOGIC; -- reset
 
         -- Enables automatic link start on receipt of a NULL character.
-        autostart : IN STD_LOGIC; -- autoStart -- fertig
+        autostart : IN STD_LOGIC; -- autoStart
 
         -- Enables link start once the Ready state is reached.
         -- Without autostart or linkstart, the link remains in state Ready.
-        linkstart : IN STD_LOGIC; -- linkStart -- fertig
+        linkstart : IN STD_LOGIC; -- linkStart
 
         -- Do not start link (overrides linkstart and autostart) and/or
         -- disconnect a running link.
-        linkdis : IN STD_LOGIC; -- linkDisable -- fertig
+        linkdis : IN STD_LOGIC; -- linkDisable
 
         -- Scaling factor minus 1, used to scale the transmit base clock into
         -- the transmission bit rate. The system clock (for impl_generic) or
         -- the txclk (for impl_fast) is divided by (unsigned(txdivcnt) + 1).
         -- Changing this signal will immediately change the transmission rate.
         -- During link setup, the transmission rate is always 10 Mbit/s.
-        txdivcnt : IN STD_LOGIC_VECTOR(7 DOWNTO 0); -- transmitClockDivide -- fertig
+        txdivcnt : IN STD_LOGIC_VECTOR(7 DOWNTO 0); -- transmitClockDivide
 
         -- High for one clock cycle to request transmission of a TimeCode.
         -- The request is registered inside the entity until it can be processed.
-        tick_in : IN STD_LOGIC; -- tickIn -- check
+        tick_in : IN STD_LOGIC; -- tickIn
 
         -- Time-code (control bits and counter value) to be send. Must be valid when tick_in is high.
-        time_in : IN STD_LOGIC_VECTOR(7 DOWNTO 0); -- enthält ctrl_in und time_in -- check
+        time_in : IN STD_LOGIC_VECTOR(7 DOWNTO 0); -- enthält ctrl_in und time_in
 
         -- Control flag and data byte so to be sent. Set control flag low to send a data byte, or
         -- high and data to 0x00 to send EOP or 0x01 for EEP. Must be valid while txwrite is high.
-        txdata : IN STD_LOGIC_VECTOR(8 DOWNTO 0); -- enthält txflag und txdata
+        txdata : IN STD_LOGIC_VECTOR(8 DOWNTO 0); -- contains txflag and txdata
 
         -- High for one clock cycle if a time-code was just received.
         tick_out : OUT STD_LOGIC; -- check
 
         -- Control bits and counter value of last received time-code.
-        time_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0); -- enthält ctrl_out und time_out -- check
+        time_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0); -- contains ctrl_out and time_out
 
         -- Received byte and control flag. Control flag is high if the received character is EOP (data
         -- is 0x00) or EEP (0x01); low if received character is a data byte. Valid if rxvalid is high. 
-        rxdata : OUT STD_LOGIC_VECTOR(8 DOWNTO 0); -- enthält rxflag und rxdata
+        rxdata : OUT STD_LOGIC_VECTOR(8 DOWNTO 0); -- contains rxflag and rxdata
 
         -- High if the link state machine is in the started state.
-        started : OUT STD_LOGIC; -- check
+        started : OUT STD_LOGIC;
 
         -- High if the link state machine is in the connecting state.
-        connecting : OUT STD_LOGIC; -- check
+        connecting : OUT STD_LOGIC;
 
         -- High if the link state machine is in the run state, indicating that the link is operational.
         -- If started, connecting and rannung are all low, the link is in an initial state with the
         -- transmitter disabled.
-        running : OUT STD_LOGIC; -- check
+        running : OUT STD_LOGIC;
 
         -- Disconnection detected in the run state. Triggers a link reset; auto-clearing.
-        errdisc : OUT STD_LOGIC; -- check
+        errdisc : OUT STD_LOGIC;
 
         -- Parity error detected in the run state. Trigger a link reset; auto-clearing.
-        errpar : OUT STD_LOGIC; -- check
+        errpar : OUT STD_LOGIC;
 
         -- Invalid escape sequence detected in the run state. Triggers a link reset; auto-clearing.
-        erresc : OUT STD_LOGIC; -- check
+        erresc : OUT STD_LOGIC;
 
         -- Credit error detected. Triggers a link reset; auto-clearing
-        errcred : OUT STD_LOGIC; -- check
+        errcred : OUT STD_LOGIC;
 
         -- Shows which port is in the running state.
         linkUp : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
@@ -196,17 +196,6 @@ ENTITY spwrouterport IS
 
         -- 
         busMasterAcknowledgeIn : IN STD_LOGIC; -- busMasterAcknowledgeIn
-
-        -- //pragma synthesis_off
-        -- Zeigt an ob der Receiver ein Packet empfangen hat, nur als Debug-port verwenden (quasi einfach iReceiveFIFOReadEnable als Ausgang)
-        gotData : OUT STD_LOGIC;
-
-        sentData : OUT STD_LOGIC; -- Debug
-
-        fsmstate : OUT spwrouterportstates; -- Debug
-
-        debugdataout : OUT STD_LOGIC_VECTOR(8 DOWNTO 0); -- debug
-        -- //pragma synthesis_on
 
         -- SpaceWire data in.
         spw_di : IN STD_LOGIC; -- check
@@ -268,12 +257,6 @@ BEGIN
     busMasterByteEnableOut <= (OTHERS => '1');
     busMasterDataOut <= (OTHERS => '0');
 
-    -- Debug
-    gotData <= iReceiveFIFOReady; -- (rxvalid) vorher: iReceiveFIFOReadEnable; -- rxread
-    sentData <= busMasterStrobeOut;--iTransmitFIFOWriteEnable; -- txwrite
-    fsmstate <= state;
-    debugdataout(7 DOWNTO 0) <= s_rxdata; --receiveFIFODataOut(7 downto 0); -- nur zu debugzwecken
-    debugdataout(8) <= s_rxflag;
     -- Intermediate steps.
     iTransmitFIFOWriteEnable <= strobeIn WHEN requestIn = '1' ELSE
         '0';
@@ -294,41 +277,41 @@ BEGIN
         txfifosize_bits => txfifosize_bits
     )
     PORT MAP(
-        clk => clk, -- check
-        rxclk => rxclk, -- check
-        txclk => txclk, -- check
-        rst => rst, -- check
-        autostart => autostart, -- check
-        linkstart => linkstart, -- check
-        linkdis => linkdis, -- check
-        txdivcnt => txdivcnt, -- check
-        tick_in => tick_in, -- check
-        ctrl_in => time_in(7 DOWNTO 6), -- check
-        time_in => time_in(5 DOWNTO 0), -- check
-        txflag => iTransmitFIFODataIn(8), -- check
-        txdata => iTransmitFIFODataIn(7 DOWNTO 0), -- check
-        txwrite => iTransmitFIFOWriteEnable, -- check
-        txrdy => s_txrdy, -- check
-        txhalff => OPEN, -- check
-        tick_out => tick_out, -- check
-        ctrl_out => time_out(7 DOWNTO 6), -- check
-        time_out => time_out(5 DOWNTO 0), -- check
-        rxvalid => iReceiveFIFOReady, -- check
-        rxhalff => OPEN, -- check
-        rxflag => s_rxflag, -- check -- vorher: receiveFIFODatOut(8)
-        rxdata => s_rxdata, -- check
-        rxread => iReceiveFIFOReadEnable, -- check
-        started => started, -- check
-        connecting => connecting, -- check
-        running => running, -- check
-        errpar => errpar, -- check
-        erresc => erresc, -- check
-        errcred => errcred, -- check
-        errdisc => errdisc, -- check
-        spw_di => spw_di, -- check
-        spw_si => spw_si, -- check
-        spw_do => spw_do, -- check
-        spw_so => spw_so -- check
+        clk => clk,
+        rxclk => rxclk,
+        txclk => txclk,
+        rst => rst,
+        autostart => autostart,
+        linkstart => linkstart,
+        linkdis => linkdis,
+        txdivcnt => txdivcnt,
+        tick_in => tick_in,
+        ctrl_in => time_in(7 DOWNTO 6),
+        time_in => time_in(5 DOWNTO 0),
+        txflag => iTransmitFIFODataIn(8),
+        txdata => iTransmitFIFODataIn(7 DOWNTO 0),
+        txwrite => iTransmitFIFOWriteEnable,
+        txrdy => s_txrdy,
+        txhalff => OPEN,
+        tick_out => tick_out,
+        ctrl_out => time_out(7 DOWNTO 6),
+        time_out => time_out(5 DOWNTO 0),
+        rxvalid => iReceiveFIFOReady,
+        rxhalff => OPEN,
+        rxflag => s_rxflag,
+        rxdata => s_rxdata,
+        rxread => iReceiveFIFOReadEnable,
+        started => started,
+        connecting => connecting,
+        running => running,
+        errpar => errpar,
+        erresc => erresc,
+        errcred => errcred,
+        errdisc => errdisc,
+        spw_di => spw_di,
+        spw_si => spw_si,
+        spw_do => spw_do,
+        spw_so => spw_so
     );
 
     -- Synchronous update.
@@ -341,8 +324,7 @@ BEGIN
 
     -- Finite state machine.
     PROCESS (clk, rst)
-        -- HIER EVENTUELL VARIABLE VERWENDEN UM SCHWIERIGKEITEN BEI DER VERWENDUNG VON HILFSSIGNALE (AUSWERTUNG BOOLSCHER FUNKTIONEN) ZU HABEN!
-        VARIABLE v_validport : STD_LOGIC; -- S_Dest2; für boolsche or operationen
+        VARIABLE v_validport : STD_LOGIC; -- S_Dest2; for boolean operationen
         VARIABLE v_reqports : STD_LOGIC; -- S_RT1
     BEGIN
         IF (rst = '1') THEN -- reset
@@ -362,8 +344,7 @@ BEGIN
                     -- If receive buffer is not empty, read data from the buffer.
                     IF (iReceiveFIFOReady = '1') THEN
                         iReceiveFIFOReadEnable <= '1'; -- rxread
-                        --receiveFIFODataOut(8) <= s_rxflag; -- Flag per Handshake übernehmen
-                        --debugdataout(8) <= s_rxflag; -- debug
+
                         state <= S_Dest0;
 
                     END IF;
@@ -441,15 +422,7 @@ BEGIN
                     -- Reset variable for new iteration.
                     v_reqports := '0';
 
-                    -- Wird benötigt um festzustellen ob kein Port ausgewählt wurde!
-                    -- Geht alle Ports 
-                    --FOR i IN 0 TO numports LOOP
-                    --    if (linkUp(i) = '1' AND busMasterDataIn(i) = '1') then
-
-                    --    end if;
-                    --END LOOP;
-
-                    -- Wichtig! Hier auch wieder umgedrehte Prioritäten!
+                    -- Changed priority!
                     FOR i IN numports DOWNTO 0 LOOP
                         IF (linkUp(i) = '1' AND busMasterDataIn(i) = '1') THEN
                             iDestinationPortOut <= STD_LOGIC_VECTOR(to_unsigned(i, iDestinationPortOut'length));
@@ -462,7 +435,6 @@ BEGIN
                         END IF;
                     END LOOP;
 
-                    -- Kann sein, dass das so nicht funktioniert: Signale bekommen ihren Wert erst bei Prozessende! Daher kann es sein, dass s_reqports zu beginn stets 0 ist!!
                     IF (v_reqports = '0') THEN -- discard invalid addressed packet if none 'if-statement' before was executed.
                         state <= S_Dummy0;
 

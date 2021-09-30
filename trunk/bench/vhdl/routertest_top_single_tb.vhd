@@ -39,20 +39,7 @@ ARCHITECTURE routertest_top_single_tb_arch OF routertest_top_single_tb IS
 			rrunning : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			prunning : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			rerror : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			perror : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			-- Debugstates:
-			rxvalid : OUT STD_LOGIC;
-			txwrite : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			prxvalid : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			txinact : OUT STD_LOGIC;
-			spw_d_p2r : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			spw_d_r2p : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			uart_txdata : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-			received : OUT STD_LOGIC;
-			txdata : OUT array_t(2 DOWNTO 0)(8 DOWNTO 0);
-			recdata : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
-			raddr : OUT INTEGER RANGE 0 TO 16;
-			waddr : OUT INTEGER RANGE 0 TO 16
+			perror : OUT STD_LOGIC_VECTOR(2 DOWNTO 0)
 		);
 	END COMPONENT;
 
@@ -70,20 +57,6 @@ ARCHITECTURE routertest_top_single_tb_arch OF routertest_top_single_tb IS
 	SIGNAL rerror : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL perror : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	
-	-- Debugports
-	SIGNAL rxvalid : STD_LOGIC;
-	SIGNAL txwrite : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	SIGNAL prxvalid : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	SIGNAL txinact : STD_LOGIC;
-	SIGNAL spw_d_p2r : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	SIGNAL spw_d_r2p : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	SIGNAL uart_txdata : STD_LOGIC_VECTOR(7 DOWNTO 0);
-	SIGNAL received : STD_LOGIC;
-	SIGNAL s_dtxdata : array_t(2 DOWNTO 0)(8 DOWNTO 0);
-	SIGNAL s_recdata : STD_LOGIC_VECTOR(8 DOWNTO 0);
-	SIGNAL raddr : INTEGER RANGE 0 TO 16;
-	SIGNAL waddr : INTEGER RANGE 0 TO 16;
-
 	CONSTANT clock_period : TIME := 100 ns; -- 10 MHz
 	CONSTANT c_BIT_PERIOD : TIME := 8680 ns; -- 115200 baud rate (115 kHz)
 
@@ -121,19 +94,7 @@ BEGIN
 		rrunning => rrunning,
 		prunning => prunning,
 		rerror => rerror,
-		perror => perror,
-		rxvalid => rxvalid,
-		txwrite => txwrite,
-		prxvalid => prxvalid,
-		txinact => txinact,
-		spw_d_r2p => spw_d_r2p,
-		spw_d_p2r => spw_d_p2r,
-		uart_txdata => uart_txdata,
-		received => received,
-		txdata => s_dtxdata,
-		recdata => s_recdata,
-		raddr => raddr,
-		waddr => waddr
+		perror => perror
 	);
 
 	-- Simulation.

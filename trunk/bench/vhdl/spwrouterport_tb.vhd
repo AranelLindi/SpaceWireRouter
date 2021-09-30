@@ -110,7 +110,6 @@ ARCHITECTURE spwrouterport_tb_arch OF spwrouterport_tb IS
 	SIGNAL spw_so : STD_LOGIC;
 
 	CONSTANT clock_period : TIME := 50 ns; -- 20 MHz
-	--constant data_clock_period: time := 100 ns; -- 10 MHz
 
 	-- Specifies which kind of data should be send to port receiver. (Idle = Nulls)
 	TYPE spwrouterport_tb_states IS (S_Idle, S_FCT, S_Data, S_Nothing);
@@ -191,8 +190,8 @@ BEGIN
 		txfifosize_bits => 11)
 	PORT MAP(
 		clk => clk,
-		rxclk => clk, -- eigentlich offen
-		txclk => clk, -- eigentlich offen
+		rxclk => clk,
+		txclk => clk,
 		rst => rst,
 		autostart => autostart,
 		linkstart => linkstart,

@@ -70,20 +70,6 @@ ENTITY routertest_top_single IS
 
 		-- High if corresponding external port has reported an error.
 		perror : OUT STD_LOGIC_VECTOR(2 DOWNTO 0)
-
-		-- Debugports
---		received : OUT STD_LOGIC;
---		rxvalid : OUT STD_LOGIC;
---		txwrite : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
---		prxvalid : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
---		txinact : OUT STD_LOGIC;
---		spw_d_p2r : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
---		spw_d_r2p : OUT STD_LOGIC_VECTOR(2 DOWNTO 0)
---		uart_txdata : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
---		txdata : OUT array_t(2 DOWNTO 0)(8 DOWNTO 0);
---		recdata : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
---		raddr : OUT INTEGER RANGE 0 TO 16;
---		waddr : OUT INTEGER RANGE 0 TO 16
 	);
 END routertest_top_single;
 
@@ -171,28 +157,6 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 			rerresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			perrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			rerrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
-			--gotData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Debugports ab hier!
-			--sentData : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			--fsmstate : OUT fsmarr(numports DOWNTO 0);
-			--debugdataout : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0);
-			--dreadyIn : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			--drequestIn : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			--ddataIn : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0);
-			--dstrobeIn : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			--dreadyOut : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			--drequestOut : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			--ddataOut : OUT array_t(numports DOWNTO 0)(8 DOWNTO 0);
-			--dstrobeOut : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			--dgranted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			--dSwitchPortNumber : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0);
-			--dSelectDestinationPort : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0);
-			--droutingSwitch : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0);
-			--dsourcePortOut : OUT array_t(numports DOWNTO 0)(1 DOWNTO 0);
-			--ddestinationPort : OUT array_t(numports DOWNTO 0)(7 DOWNTO 0);
-			--spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			--spw_s_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			--spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
-			--spw_s_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
 		);
 	END COMPONENT;
 
@@ -244,34 +208,6 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 	SIGNAL s_rerresc : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL s_perrcred : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL s_rerrcred : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL gotData : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL sentData : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL fsmstate : fsmarr(2 DOWNTO 0);
-	--SIGNAL debugdataout : array_t(2 DOWNTO 0)(8 DOWNTO 0);
-	--SIGNAL dreadyIn : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL drequestIn : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL ddataIn : array_t(2 DOWNTO 0)(8 DOWNTO 0);
-	--SIGNAL dstrobeIn : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL dreadyOut : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL drequestOut : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL ddataOut : array_t(2 DOWNTO 0)(8 DOWNTO 0);
-	--SIGNAL dstrobeOut : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL dgranted : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL dSwitchPortNumber : array_t(2 DOWNTO 0)(2 DOWNTO 0);
-	--SIGNAL dSelectDestinationPort : array_t(2 DOWNTO 0)(2 DOWNTO 0);
-	--SIGNAL droutingSwitch : array_t(2 DOWNTO 0)(2 DOWNTO 0);
-	--SIGNAL dsourcePortOut : array_t(2 DOWNTO 0)(1 DOWNTO 0);
-	--SIGNAL ddestinationPort : array_t(2 DOWNTO 0)(7 DOWNTO 0);
-	--SIGNAL s_spw_d_r2p : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL s_spw_s_r2p : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL s_spw_d_p2r : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	--SIGNAL s_spw_s_p2r : STD_LOGIC_VECTOR(2 DOWNTO 0);
-
-	-- Debug
-	SIGNAL s_dtxdata : array_t(2 DOWNTO 0)(8 DOWNTO 0);
-	SIGNAL s_debugsig : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	SIGNAL s_selectport : INTEGER RANGE 0 TO 2 := 2; --std_logic_vector(1 downto 0);
-	SIGNAL s_selectdestport : INTEGER RANGE 0 TO 2 := 2; --std_logic_vector(1 downto 0);
 
 	SIGNAL s_rxvalid_int : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL s_perror_int : STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -350,29 +286,6 @@ BEGIN
 			end if;
 		END IF;
 	END PROCESS;
-
-	-- Drive outputs
-
-	-- Debug
---	received <= '0';
---	rxvalid <= s_uartrxvalid;
---	txwrite <= s_txwrite;
---	prxvalid <= s_rxvalid;
---	spw_d_p2r <= s_spw_d_p2r;
---	spw_d_r2p <= s_spw_d_r2p;
---	uart_txdata <= s_uartrxdata;--s_rxfifo_wdata(7 DOWNTO 0);
---	s_dtxdata(0) <= s_txflag(0) & s_txdata(0);
---	s_dtxdata(1) <= s_txflag(1) & s_txdata(1);
---	s_dtxdata(2) <= s_txflag(2) & s_txdata(2);
---	txdata <= s_dtxdata;
---	recdata(7 DOWNTO 0) <= (OTHERS => '0');--;s_recdata;
---	txinact <= NOT s_uarttxactive;
---	raddr <= 1 WHEN rxstate = S_Idle ELSE
---		2 WHEN rxstate = S_Prepare ELSE
---		3 WHEN rxstate = S_Send ELSE
---		4 WHEN rxstate = S_Clean;
-	--waddr <= to_integer(unsigned(s_rxfifo_waddr));
-
 	
 	-- Drive outputs.
 	rxhalff <= s_rxvalid_int; -- Debugging!
@@ -564,27 +477,5 @@ BEGIN
 		rerresc => s_rerresc,
 		perrcred => s_perrcred,
 		rerrcred => s_rerrcred
-		--gotData => gotData,
-		--sentData => sentData,
-		--fsmstate => fsmstate,
-		--debugdataout => debugdataout,
-		--dreadyIn => dreadyIn,
-		--drequestIn => drequestIn,
-		--ddataIn => ddataIn,
-		--dstrobeIn => dstrobeIn,
-		--dreadyOut => dreadyOut,
-		--drequestOut => drequestOut,
-		--ddataOut => ddataOut,
-		--dstrobeOut => dstrobeOut,
-		--dgranted => dgranted,
-		--dSwitchPortNumber => dSwitchPortNumber,
-		--dSelectDestinationPort => dSelectDestinationPort,
-		--droutingSwitch => droutingSwitch,
-		--dsourcePortOut => dsourcePortOut,
-		--ddestinationPort => ddestinationPort,
-		--spw_d_r2p => s_spw_d_r2p, -- Signale werden f�r Hardwareimplementierung nicht ben�tigt, sind eher f�r Simulation interessant zur Nachverfolgung
-		--spw_s_r2p => open, --s_spw_s_r2p,
-		--spw_d_p2r => s_spw_d_p2r
-		--spw_s_p2r => open --s_spw_s_p2r
 	);
 END routertest_top_single_arch;
