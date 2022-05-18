@@ -31,9 +31,9 @@ ENTITY routertest_top_single IS
 
 		-- Clear button.
 		clear : IN STD_LOGIC;
-		
+
 		-- Send manual end of packet.
-		eop : in std_logic;
+		eop : IN STD_LOGIC;
 
 		-- Shows if the fifo memory is filled
 		uartfifofull : OUT STD_LOGIC;
@@ -77,33 +77,24 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 	TYPE bool_to_logic_type IS ARRAY(BOOLEAN) OF STD_ULOGIC;
 	CONSTANT bool_to_logic : bool_to_logic_type := (false => '0', true => '1');
 
-	-- Uart receiver.
-	component uart_rx
-	   generic (
-	       clk_cycles_per_bit: integer
-	       );
-	   port (
-	       clk: in std_logic;
-	       rxstream : in std_logic;
-	       rxvalid : out std_logic;
-	       rxdata : out std_logic_vector(7 downto 0)
-	   );
-	end component;
-	
-	-- Uart transmitter.
-	component uart_tx
-	   generic (
-	       clk_cycles_per_bit:integer
-	   );
-	   port (
-	       clk: in std_logic;
-	       txwrite : in std_logic;
-	       txdata : in std_logic_vector(7 downto 0);
-	       txactive : out std_logic;
-	       txstream: out std_logic;
-	       txdone: out std_logic
-	   );
-	end component;
+	-- Uart module (includes rx and tx)
+	COMPONENT uart IS
+		GENERIC (
+			clk_cycles_per_bit : INTEGER
+		);
+		PORT (
+			clk : IN STD_LOGIC;
+			rst : IN STD_LOGIC;
+			tx_data : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+			tx_ack : IN STD_LOGIC;
+			tx_port : OUT STD_LOGIC := '1';
+			tx_rdy : OUT STD_LOGIC := '1';
+			rx_port : IN STD_LOGIC;
+			rx_ack : IN STD_LOGIC;
+			rx_data : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+			rx_rdy : OUT STD_LOGIC := '0'
+		);
+	END COMPONENT uart;
 
 	-- Routertest module.
 	COMPONENT routertest
@@ -158,20 +149,22 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 			perrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 			rerrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
 		);
-	END COMPONENT;
+	END COMPONENT routertest;
 
-	-- Uart receiver.
-	--SIGNAL s_uart_rxstream : STD_LOGIC;
-	SIGNAL s_uartrxdata : STD_LOGIC_VECTOR(7 DOWNTO 0);
-	SIGNAL s_uartrxbusy : STD_LOGIC;
-	SIGNAL s_uartrxvalid : STD_LOGIC := '0';
-	SIGNAL s_uartrxerror : STD_LOGIC;
+	SIGNAL s_selectport : INTEGER RANGE 0 TO 3;
+	SIGNAL s_selectdestport : INTEGER RANGE 0 TO 3;
 
-	-- Uart transmitter.
-	SIGNAL s_uarttxwrite : STD_LOGIC := '0';
-	SIGNAL s_uarttxdata : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
-	SIGNAL s_uarttxactive : STD_LOGIC;
-	SIGNAL s_uarttxdone : STD_LOGIC;
+	-- buffer needed
+	SIGNAL uart_buffer : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL spw_buffer : STD_LOGIC_VECTOR(7 DOWNTO 0);
+
+	-- wires for uart
+	SIGNAL uart_buffer_rx : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL uart_buffer_tx : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL uart_tx_ack : STD_LOGIC := '0';
+	SIGNAL uart_tx_ready : STD_LOGIC;
+	SIGNAL uart_rx_ack : STD_LOGIC := '0';
+	SIGNAL uart_rx_ready : STD_LOGIC;
 
 	-- Routertest.
 	SIGNAL s_autostart : STD_LOGIC_VECTOR(2 DOWNTO 0) := (OTHERS => '1');
@@ -182,8 +175,8 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 	SIGNAL s_ctrl_in : array_t(2 DOWNTO 1)(1 DOWNTO 0) := (OTHERS => (OTHERS => '0'));
 	SIGNAL s_time_in : array_t(2 DOWNTO 1)(5 DOWNTO 0) := (OTHERS => (OTHERS => '0'));
 	SIGNAL s_txwrite : STD_LOGIC_VECTOR(2 DOWNTO 0) := (OTHERS => '0');
-	SIGNAL s_txflag : STD_LOGIC_VECTOR(2 DOWNTO 0) := (OTHERS => '0');
-	SIGNAL s_txdata : array_t(2 DOWNTO 0)(7 DOWNTO 0) := (OTHERS => "00000010");--(OTHERS => '1'));
+	SIGNAL s_txflag : STD_LOGIC_VECTOR(2 DOWNTO 0);-- := (OTHERS => '0');
+	SIGNAL s_txdata : array_t(2 DOWNTO 0)(7 DOWNTO 0);-- := (OTHERS => "00000010");--(OTHERS => '1'));
 	SIGNAL s_txrdy : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL s_txhalff : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL s_tick_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -214,79 +207,11 @@ ARCHITECTURE routertest_top_single_arch OF routertest_top_single IS
 	SIGNAL s_rerror_int : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL s_perror : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL s_rerror : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	TYPE fsm_state IS (s_Idle, s_Recv, s_Wait, s_Send);
 
-	TYPE uarttxstates IS (S_Idle, S_Check, S_Prepare1, S_Prepare2, S_Prepare3, S_Send, S_Wait1, S_Wait2);
-	SIGNAL txstate : uarttxstates := S_Idle;
-
-	TYPE uartrxstates IS (S_Idle, S_EOP, S_Send, S_Clean);
-	SIGNAL rxstate : uartrxstates := S_Idle;
+	SIGNAL stateUART2SpW : fsm_state := S_Idle;
+	SIGNAL stateSpW2UART : fsm_state := S_Idle;
 BEGIN
-	-- From Uart to SpaceWire port.
-	PROCESS (clk, rst)
-		VARIABLE selectport : INTEGER RANGE 0 TO 2;
-		VARIABLE data : STD_LOGIC_VECTOR(7 DOWNTO 0);
-		VARIABLE pdata : STD_LOGIC_VECTOR(8 DOWNTO 0);
-	BEGIN
-		IF rst = '1' THEN
-			rxstate <= S_Idle;
-			data := (OTHERS => '0');
-			pdata := (OTHERS => '0');
-			s_txwrite <= (others => '0');
-			s_txdata <= (others => std_logic_vector(to_unsigned(s_selectdestport, 8)));
-			s_txflag <= (others => '0');
-		ELSIF rising_edge(clk) THEN
-		    if eop = '1' then
-		      -- Send EOPs.
-		      s_txflag <= (others => '1');
-		      s_txdata <= (others => "00000000");
-		      s_txwrite <= (others => '1');
-		      rxstate <= S_Idle;
-		    elsif eop = '0' then
-                CASE rxstate IS
-                    WHEN S_Idle =>
-                        s_txwrite <= (others => '0');
-                        s_txdata <= (others => s_uartrxdata);
-                    
-                        IF s_uartrxvalid = '1' THEN
-                            selectport := s_selectport;
-                            data := s_uartrxdata;
-                                                    
-                            if data = "11111111" then
-                              s_txflag(selectport) <= '1';
-                              s_txdata(selectport) <= "00000000";
-                              rxstate <= S_EOP;
-                            else
-                              s_txflag(selectport) <= '0';
-                              s_txdata(selectport) <= std_logic_vector(to_unsigned(s_selectdestport, 8));
-                              rxstate <= S_Send;
-                            end if;
-                        END IF;
-    
-                    WHEN S_EOP =>
-                        if s_txrdy(selectport) = '1' then
-                            s_txwrite(selectport) <= '1';
-                            rxstate <= S_Clean;			
-                        end if;	
-    
-                    WHEN S_Send =>
-                        IF s_txrdy(selectport) = '1' THEN
-                            s_txwrite(selectport) <= '1';
-                            rxstate <= S_Clean;
-                        END IF;
-    
-                    WHEN S_Clean =>
-                        s_txwrite <= (others => '0');
-                        s_txdata <= (others => std_logic_vector(to_unsigned(s_selectport, 8)));
-                        s_txflag <= (others => '0');
-                        --data := (OTHERS => '0');
-                        --pdata := (OTHERS => '0');					
-    
-                        rxstate <= S_Idle;
-                END CASE;
-			end if;
-		END IF;
-	END PROCESS;
-	
 	-- Drive outputs.
 	rxhalff <= s_rxvalid_int; -- Debugging!
 	prunning <= s_prunning;
@@ -316,7 +241,7 @@ BEGIN
 	END PROCESS;
 
 	-- Combinatorial update of selected ports into internal signals.
-	PROCESS (selectport, selectdestport)
+	PROCESS (clk)--(selectport, selectdestport)
 	BEGIN
 		-- Select Ports.
 		CASE selectport IS
@@ -341,90 +266,254 @@ BEGIN
 		END CASE;
 	END PROCESS;
 
-	-- Von externen Ports zu uart (transmitter)   
-	PROCESS (clk, rst)--, s_selectdestport)
-		VARIABLE destport : INTEGER RANGE 0 TO 2;
-		VARIABLE rdata : STD_LOGIC_VECTOR(8 DOWNTO 0);
-	BEGIN
-		IF rst = '1' THEN
-			txstate <= S_Idle;
-		ELSIF rising_edge(clk) THEN
-			CASE txstate IS
-				WHEN S_Idle =>
-					IF s_rxvalid(s_selectdestport) = '1' THEN
-						destport := s_selectdestport;
+	--	-- Uart receiver.
+	--	uartrec: uart_rx
+	--	generic map (
+	--	   clk_cycles_per_bit => 87
+	--	)
+	--	port map (
+	--	   clk => clk,
+	--	   rxstream => rxstream,
+	--	   rxvalid => s_uartrxvalid,
+	--	   rxdata => s_uartrxdata
+	--	);
+	--	
+	--	-- Uart transmitter.
+	--	uartrx: uart_tx
+	--	generic map (
+	--	   clk_cycles_per_bit => 87
+	--	   )
+	--	port map (
+	--	   clk => clk,
+	--	   txstream => txstream,
+	--	   txdata => s_uarttxdata,
+	--	   txactive => s_uarttxactive,
+	--	   txwrite => s_uarttxwrite,
+	--	   txdone => s_uarttxdone
+	--	);
 
-						txstate <= S_Check;
-					END IF;
-
-				WHEN S_Check =>
-					IF s_uarttxactive = '0' THEN
-						txstate <= S_Prepare1;
-					END IF;
-
-				WHEN S_Prepare1 =>
-					s_rxread(destport) <= '1';
-					txstate <= S_Prepare2;
-
-				WHEN S_Prepare2 =>
-					rdata(8) := s_rxflag(destport);
-					rdata(7 DOWNTO 0) := s_rxdata(destport);
-					s_rxread <= "000";
-					txstate <= S_Prepare3;
-
-				WHEN S_Prepare3 =>
-					IF rdata(8) = '1' THEN
-						txstate <= S_Idle;
-					ELSIF rdata(8) = '0' THEN
-						s_uarttxdata <= rdata(7 DOWNTO 0);
-						txstate <= S_Send;
-					END IF;
-
-				WHEN S_Send =>
-					s_uarttxwrite <= '1';
-
-					txstate <= S_Wait1;
-
-				WHEN S_Wait1 =>
-					--IF s_uarttxactive = '0' THEN
-					s_uarttxwrite <= '0';
-					txstate <= S_Wait2;
-					--END IF;
-
-				WHEN S_Wait2 =>
-					IF s_uarttxdone = '1' THEN
-						txstate <= S_Idle;
-					END IF;
-			END CASE;
-		END IF;
-	END PROCESS;
-	
-	-- Uart receiver.
-	uartrec: uart_rx
-	generic map (
-	   clk_cycles_per_bit => 87
+	uart_object : uart
+	GENERIC MAP(
+		clk_cycles_per_bit => 87
 	)
-	port map (
-	   clk => clk,
-	   rxstream => rxstream,
-	   rxvalid => s_uartrxvalid,
-	   rxdata => s_uartrxdata
+	PORT MAP(
+		clk => clk,
+		rst => rst,
+		tx_port => txstream,
+		tx_ack => uart_tx_ack,
+		tx_data => uart_buffer_tx,
+		tx_rdy => uart_tx_ready,
+		rx_port => rxstream,
+		rx_ack => uart_rx_ack,
+		rx_data => uart_buffer_rx,
+		rx_rdy => uart_rx_ready
 	);
-	
-	-- Uart transmitter.
-	uartrx: uart_tx
-	generic map (
-	   clk_cycles_per_bit => 87
-	   )
-	port map (
-	   clk => clk,
-	   txstream => txstream,
-	   txdata => s_uarttxdata,
-	   txactive => s_uarttxactive,
-	   txwrite => s_uarttxwrite,
-	   txdone => s_uarttxdone
-	);
-	
+
+	UART2SpW : PROCESS (clk) IS
+	BEGIN
+		IF rising_edge(clk) THEN
+			IF (rst = '1') THEN
+				-- synchronous reset.
+				stateUART2SpW <= s_Idle;
+			ELSE
+				CASE stateUART2SpW IS
+					WHEN s_Idle =>
+						IF (uart_rx_ready = '1') THEN
+							uart_buffer <= uart_buffer_rx;
+							uart_rx_ack <= '1';
+							stateUART2SpW <= s_Recv;
+						ELSE
+							s_txwrite <= (OTHERS => '0');
+							s_txflag <= (OTHERS => '0');
+							s_txdata <= (OTHERS => (OTHERS => '0'));
+
+							uart_rx_ack <= '0';
+						END IF;
+
+					WHEN s_Recv =>
+						uart_rx_ack <= '0';
+						stateUART2SpW <= s_Wait;
+
+					WHEN s_Wait =>
+						IF s_txrdy(s_selectport) = '1' THEN
+							s_txdata(s_selectport) <= uart_buffer;
+							s_txflag(s_selectport) <= '0';
+							s_txwrite(s_selectport) <= '1';
+							stateUART2SpW <= s_Send;
+						END IF;
+
+					WHEN s_Send =>
+						s_txwrite(s_selectport) <= '0';
+						stateUART2SpW <= s_Idle;
+				END CASE;
+			END IF;
+		END IF;
+	END PROCESS UART2SpW;
+
+	SpW2UART : PROCESS (clk) IS
+	BEGIN
+		IF rising_edge(clk) THEN
+			IF (rst = '1') THEN
+				-- synchronous reset.
+				stateSpW2UART <= s_Idle;
+			ELSE
+				CASE stateSpW2UART IS
+					WHEN s_Idle =>
+						IF s_rxvalid(s_selectdestport) = '1' THEN
+							spw_buffer <= s_rxdata(s_selectdestport);
+							s_rxread(s_selectdestport) <= '1';
+
+							stateSpW2UART <= s_Recv;
+
+						ELSE
+							s_rxread <= (OTHERS => '0');
+
+							uart_tx_ack <= '0';
+						END IF;
+
+					WHEN s_Recv =>
+						s_rxread(s_selectdestport) <= '0';
+						uart_tx_ack <= '0';
+						stateSpW2UART <= s_Wait;
+
+					WHEN s_Wait =>
+						IF uart_tx_ready = '1' THEN
+							uart_buffer_tx <= spw_buffer;
+							uart_tx_ack <= '1';
+
+							stateSpW2UART <= s_Send;
+						END IF;
+
+					WHEN s_Send =>
+						uart_tx_ack <= '0';
+						stateSpW2UART <= s_Idle;
+				END CASE;
+			END IF;
+		END IF;
+	END PROCESS SpW2UART;
+	--	-- From Uart to SpaceWire port.
+	--	PROCESS (clk, rst)
+	--		VARIABLE selectport : INTEGER RANGE 0 TO 2;
+	--		VARIABLE data : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	--		VARIABLE pdata : STD_LOGIC_VECTOR(8 DOWNTO 0);
+	--	BEGIN
+	--		IF rst = '1' THEN
+	--			rxstate <= S_Idle;
+	--			data := (OTHERS => '0');
+	--			pdata := (OTHERS => '0');
+	--			s_txwrite <= (others => '0');
+	--			s_txdata <= (others => std_logic_vector(to_unsigned(s_selectdestport, 8)));
+	--			s_txflag <= (others => '0');
+	--		ELSIF rising_edge(clk) THEN
+	--		    if eop = '1' then
+	--		      -- Send EOPs.
+	--		      s_txflag <= (others => '1');
+	--		      s_txdata <= (others => "00000000");
+	--		      s_txwrite <= (others => '1');
+	--		      rxstate <= S_Idle;
+	--		    elsif eop = '0' then
+	--                CASE rxstate IS
+	--                    WHEN S_Idle =>
+	--                        s_txwrite <= (others => '0');
+	--                        s_txdata <= (others => s_uartrxdata);
+	--                    
+	--                        IF s_uartrxvalid = '1' THEN
+	--                            selectport := s_selectport;
+	--                            data := s_uartrxdata;
+	--                                                    
+	--                            if data = "11111111" then
+	--                              s_txflag(selectport) <= '1';
+	--                              s_txdata(selectport) <= "00000000";
+	--                             rxstate <= S_EOP;
+	--                            else
+	--                              s_txflag(selectport) <= '0';
+	--                              s_txdata(selectport) <= std_logic_vector(to_unsigned(s_selectdestport, 8));
+	--                              rxstate <= S_Send;
+	--                            end if;
+	--                        END IF;
+	--    
+	--                    WHEN S_EOP =>
+	--                        if s_txrdy(selectport) = '1' then
+	--                            s_txwrite(selectport) <= '1';
+	--                            rxstate <= S_Clean;			
+	--                        end if;	
+	--    
+	--                    WHEN S_Send =>
+	--                        IF s_txrdy(selectport) = '1' THEN
+	--                            s_txwrite(selectport) <= '1';
+	--                            rxstate <= S_Clean;
+	--                        END IF;
+	--    
+	--                    WHEN S_Clean =>
+	--                        s_txwrite <= (others => '0');
+	--                        s_txdata <= (others => std_logic_vector(to_unsigned(s_selectport, 8)));
+	--                        s_txflag <= (others => '0');
+	--                        --data := (OTHERS => '0');
+	--                        --pdata := (OTHERS => '0');					
+	--    
+	--                        rxstate <= S_Idle;
+	--                END CASE;
+	--			end if;
+	--		END IF;
+	--	END PROCESS;
+	--	-- Von externen Ports zu uart (transmitter)   
+	--	PROCESS (clk, rst)--, s_selectdestport)
+	--		VARIABLE destport : INTEGER RANGE 0 TO 2;
+	--		VARIABLE rdata : STD_LOGIC_VECTOR(8 DOWNTO 0);
+	--	BEGIN
+	--		IF rst = '1' THEN
+	--			txstate <= S_Idle;
+	--		ELSIF rising_edge(clk) THEN
+	--			CASE txstate IS
+	--				WHEN S_Idle =>
+	--					IF s_rxvalid(s_selectdestport) = '1' THEN
+	--						destport := s_selectdestport;
+	--
+	--						txstate <= S_Check;
+	--					END IF;
+	--
+	--				WHEN S_Check =>
+	--					IF s_uarttxactive = '0' THEN
+	--						txstate <= S_Prepare1;
+	--					END IF;
+	--
+	--				WHEN S_Prepare1 =>
+	--					s_rxread(destport) <= '1';
+	--					txstate <= S_Prepare2;
+	--
+	--				WHEN S_Prepare2 =>
+	--					rdata(8) := s_rxflag(destport);
+	--					rdata(7 DOWNTO 0) := s_rxdata(destport);
+	--					s_rxread <= "000";
+	--					txstate <= S_Prepare3;
+	--
+	--				WHEN S_Prepare3 =>
+	--					IF rdata(8) = '1' THEN
+	--						txstate <= S_Idle;
+	--					ELSIF rdata(8) = '0' THEN
+	--						s_uarttxdata <= rdata(7 DOWNTO 0);
+	--						txstate <= S_Send;
+	--					END IF;
+	--
+	--				WHEN S_Send =>
+	--					s_uarttxwrite <= '1';
+	--
+	--					txstate <= S_Wait1;
+	--
+	--				WHEN S_Wait1 =>
+	--					--IF s_uarttxactive = '0' THEN
+	--					s_uarttxwrite <= '0';
+	--					txstate <= S_Wait2;
+	--					--END IF;
+	--
+	--				WHEN S_Wait2 =>
+	--					IF s_uarttxdone = '1' THEN
+	--						txstate <= S_Idle;
+	--					END IF;
+	--			END CASE;
+	--		END IF;
+	--	END PROCESS;
+
 	-- Routertest interface.
 	RouterToExtPortsComm : routertest
 	GENERIC MAP(

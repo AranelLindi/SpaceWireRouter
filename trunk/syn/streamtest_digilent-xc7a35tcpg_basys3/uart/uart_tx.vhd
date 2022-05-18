@@ -7,10 +7,7 @@
 -- Module Name: uart_tx
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
 -- Target Devices: 
--- Tool Versions: based on code from: https://www.nandland.com/vhdl/modules/module-uart-serial-port-rs232.html
--- Description: This file contains the Uart Transmitter. This transmitter is able to transmit
--- 8 bits of serial data, one start bit, one stop bit and no parity bit. When transmit is
--- complete txdone will be driven 'High' for one clock cycle.
+-- Tool Versions: 
 -- Dependencies: none
 -- 
 -- Revision:
@@ -19,6 +16,7 @@
 
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
 
 ENTITY uart_tx IS
     GENERIC (
@@ -31,125 +29,108 @@ ENTITY uart_tx IS
         -- System clock.
         clk : IN STD_LOGIC;
 
-        rst : in std_logic;
+        -- Reset.
+        rst : IN STD_LOGIC;
 
-        -- 'High' if transmitter shall start to send tx_byte.
-        -- 'Low' when nothing should be send.
-        txwrite : IN STD_LOGIC;
+        -- Byte to transmit throug UART.
+        tx_data : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
 
-        -- Data byte to be send.
-        txdata : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+        -- HIGH if byte on tx_data will be sent; LOW when nothing should be send.
+        tx_ack : IN STD_LOGIC;
 
-        -- 'High' if transmitting process has started.
-        -- 'Low' when system is in idle mode.
-        txactive : OUT STD_LOGIC;
+        -- Outgoing data bits (serial stream).
+        tx_port : OUT STD_LOGIC := '1';
 
-        -- Outgoing serial data stream.
-        txstream : OUT STD_LOGIC;
-
-        -- 'High' if transmitting process for one byte is complete.
-        -- 'Low' when transmitter is in idle or transmitting mode.
-        txdone : OUT STD_LOGIC
+        -- HIGH if transmitter is ready to send; LOW transmitter is processing.
+        tx_rdy : OUT STD_LOGIC := '1'
     );
 END uart_tx;
 
 ARCHITECTURE uart_tx_arch OF uart_tx IS
-    -- Finite machine states.
-    TYPE state_type IS (S_Idle, S_Tx_Start_Bit, S_Tx_Data_Bits, S_Tx_Stop_Bit, S_Cleanup);
+    CONSTANT freq : INTEGER := clk_cycles_per_bit;
 
-    -- Current state.
-    SIGNAL state : state_type := S_Idle;
+    -- Counter needed for baud_rate
+    SIGNAL s_tx_counter : NATURAL RANGE 0 TO freq := freq - 1;
+    SIGNAL s_tx_strobe : STD_LOGIC := '0';
+    SIGNAL s_tx_bitno : NATURAL RANGE 0 TO 8 := 0;
 
-    -- Internal counters.
-    SIGNAL s_clk_count : INTEGER RANGE 0 TO (clk_cycles_per_bit - 1) := 0;
-    SIGNAL s_bit_index : INTEGER RANGE 0 TO 7 := 0; -- 8 Bits total
+    -- to latch the input
+    SIGNAL s_tx_latch : STD_LOGIC_VECTOR(7 DOWNTO 0);
 
-    -- Initialize outputs with standard values.
-    SIGNAL s_txdata : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
-    SIGNAL s_txdone : STD_LOGIC := '0';
+    -- fsm for tx operation
+    TYPE fsm_state IS (s_Idle, s_Start, s_Data, s_Stop);
+    SIGNAL state : fsm_state := S_Idle;
 BEGIN
-    -- Drive other output.
-    txdone <= s_txdone;
-
-    PROCESS (clk, rst)
+    tx_fsm : PROCESS (clk) IS
     BEGIN
-        if rst = '1' then
-            state <= S_Idle;
-            s_clk_count <= 0;
-            s_bit_index <= 0;
-            s_txdata <= (others => '0');
-            s_txdone <= '0';
-        ELSIF rising_edge(clk) THEN
-            CASE state IS
-                WHEN S_Idle =>
-                    txactive <= '0';
-                    txstream <= '1'; -- Drive line 'High' for Idle.
-                    s_txdone <= '0';
-                    s_clk_count <= 0;
-                    s_bit_index <= 0;
-
-                    IF (txwrite = '1') THEN
-                        s_txdata <= txdata;
-                        state <= S_Tx_Start_Bit;
-                    ELSE
-                        state <= S_Idle;
-                    END IF;
-
-                -- Send out Start Bit. Start bit = 0
-                WHEN S_Tx_Start_Bit =>
-                    txactive <= '1';
-                    txstream <= '0';
-
-                    -- Wait (clk_cycles_per_bit - 1) clock cycles for start bit to finish.
-                    IF (s_clk_count < (clk_cycles_per_bit - 1)) THEN
-                        s_clk_count <= (s_clk_count + 1);
-                        state <= S_Tx_Start_Bit;
-                    ELSE
-                        s_clk_count <= 0;
-                        state <= S_Tx_Data_Bits;
-                    END IF;
-
-                -- Wait (clk_cycles_per_bit - 1) clock cycles for data bits to finish.
-                WHEN S_Tx_Data_Bits =>
-                    txstream <= s_txdata(s_bit_index);
-
-                    IF (s_clk_count < clk_cycles_per_bit - 1) THEN
-                        s_clk_count <= (s_clk_count + 1);
-                        state <= S_Tx_Data_Bits;
-                    ELSE
-                        s_clk_count <= 0;
-
-                        -- Check if we have sent out all bits.
-                        IF (s_bit_index < 7) THEN
-                            s_bit_index <= (s_bit_index + 1);
-                            state <= S_Tx_Data_Bits;
-                        ELSE
-                            s_bit_index <= 0;
-                            state <= S_Tx_Stop_Bit;
+        -- handle normal operation
+        IF rising_edge(clk) THEN
+            IF (rst = '1') THEN
+                -- synchronous reset.
+                state <= s_Idle;
+                s_tx_bitno <= 0;
+            Else
+                -- handle tx fsm
+                CASE state IS
+                    WHEN s_Idle =>
+                        IF (tx_ack <= '1') THEN
+                            tx_rdy <= '0';
+                            s_tx_latch <= tx_data;
+                            state <= s_Start;
                         END IF;
-                    END IF;
-
-                -- Send out Stop bit. Stop bit = 1
-                WHEN S_Tx_Stop_Bit =>
-                    txstream <= '1';
-
-                    -- Wait (clk_cycles_per_bit - 1) clock cycles for Stop bit to finish.
-                    IF (s_clk_count < (clk_cycles_per_bit - 1)) THEN
-                        s_clk_count <= (s_clk_count + 1);
-                        state <= S_Tx_Stop_Bit;
-                    ELSE
-                        s_txdone <= '1';
-                        s_clk_count <= 0;
-                        state <= S_Cleanup;
-                    END IF;
-
-                -- Stay here for one clk cycle.
-                WHEN S_Cleanup =>
-                    txactive <= '0';
-                    s_txdone <= '1';
-                    state <= S_Idle;
-                   
-            END CASE;
+    
+                    WHEN s_Start =>
+                        IF (s_tx_strobe = '1') THEN
+                            tx_port <= '0';
+                            state <= s_Data;
+                        END IF;
+    
+                    WHEN s_Data =>
+                        IF (s_tx_strobe = '1') THEN
+                            tx_port <= s_tx_latch(s_tx_bitno);
+                            s_tx_bitno <= s_tx_bitno + 1;
+                            IF (s_tx_bitno = 7) THEN
+                                state <= s_Stop;
+                            END IF;
+                        END IF;
+    
+                    WHEN s_Stop =>
+                        IF (s_tx_strobe = '1') THEN
+                            s_tx_bitno <= 0;
+                            tx_port <= '1';
+                            tx_rdy <= '1';
+                            state <= s_Idle;
+                        END IF;
+                END CASE;
         END IF;
-    END PROCESS;
-END uart_tx_arch;
+        end if;
+    END PROCESS tx_fsm;
+
+    counters : PROCESS (clk) IS
+    BEGIN
+        IF rising_edge(clk) THEN
+            IF (rst = '1') THEN
+                s_tx_counter <= freq - 1;
+                s_tx_strobe <= '0';
+            ELSE
+            -- handle counter
+            IF (state = s_Idle AND tx_ack = '1') THEN
+                s_tx_counter <= freq - 1;
+            ELSE
+                IF (s_tx_counter = 0) THEN
+                    s_tx_counter <= freq - 1;
+                ELSE
+                    s_tx_counter <= s_tx_counter - 1;
+                END IF;
+
+                -- handle rx_strobe
+                IF (s_tx_counter = 1) THEN
+                    s_tx_strobe <= '1';
+                ELSE
+                    s_tx_strobe <= '0';
+                END IF;
+            END IF;
+         end if;
+         end if;
+        END PROCESS counters;
+    END uart_tx_arch;

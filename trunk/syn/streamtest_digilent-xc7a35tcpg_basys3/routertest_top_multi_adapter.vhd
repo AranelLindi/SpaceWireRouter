@@ -30,16 +30,16 @@ ENTITY routertest_top_multi_adapter IS
 		rst : IN STD_LOGIC;
 
 		-- Clear button.
-		clear : IN STD_LOGIC;
+		--clear : IN STD_LOGIC;
 
 		-- Send manual end of packet.
-		eop : IN STD_LOGIC;
+		--eop : IN STD_LOGIC;
 
 		-- Incoming serial stream (uart).
-		rxstream : IN STD_LOGIC;
+		rx_stream : IN STD_LOGIC;
 
 		-- Outgoing serial stream (uart).
-		txstream : OUT STD_LOGIC;
+		tx_stream : OUT STD_LOGIC;
 
 		-- Conversion from spacewire to uart is slowed down by its slower data 
 		-- transfer. For this reason, that port is used to inform when output
@@ -83,47 +83,40 @@ ARCHITECTURE routertest_top_multi_adapter_arch OF routertest_top_multi_adapter I
 	TYPE bool_to_logic_type IS ARRAY(BOOLEAN) OF STD_ULOGIC;
 	CONSTANT bool_to_logic : bool_to_logic_type := (false => '0', true => '1');
 
-	-- Uart receiver.
-	COMPONENT uart_rx
+	-- Uart
+	COMPONENT uart IS
 		GENERIC (
 			clk_cycles_per_bit : INTEGER
-		);
+		)
 		PORT (
 			clk : IN STD_LOGIC;
-			rxstream : IN STD_LOGIC;
-			rxvalid : OUT STD_LOGIC;
-			rxdata : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+			rst : IN STD_LOGIC;
+			-- tx
+			tx_data : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+			tx_ack : IN STD_LOGIC;
+			tx_port : OUT STD_LOGIC := '1';
+			tx_rdy : OUT STD_LOGIC := '1';
+			-- rx
+			rx_port : IN STD_LOGIC;
+			rx_ack : IN STD_LOGIC;
+			rx_data : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+			rx_rdy : OUT STD_LOGIC := '0'
 		);
-	END COMPONENT;
+	END COMPONENT uart;
 
-	-- Uart transmitter.
-	COMPONENT uart_tx
-		GENERIC (
-			clk_cycles_per_bit : INTEGER
-		);
-		PORT (
-			clk : IN STD_LOGIC;
-			txwrite : IN STD_LOGIC;
-			txdata : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-			txactive : OUT STD_LOGIC;
-			txstream : OUT STD_LOGIC;
-			txdone : OUT STD_LOGIC
-		);
-	END COMPONENT;
+	-- buffer needed
+	SIGNAL uart_buffer : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL spw_buffer : STD_LOGIC_VECTOR(7 DOWNTO 0);
 
-	-- Uart receiver.
-	SIGNAL s_uartrxdata : STD_LOGIC_VECTOR(7 DOWNTO 0);
-	SIGNAL s_uartrxbusy : STD_LOGIC;
-	SIGNAL s_uartrxvalid : STD_LOGIC := '0';
-	SIGNAL s_uartrxerror : STD_LOGIC;
+	-- wires for uart
+	SIGNAL uart_buffer_rx : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL uart_buffer_tx : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL uart_tx_ack : STD_LOGIC := '0';
+	SIGNAL uart_tx_ready : STD_LOGIC;
+	SIGNAL uart_rx_ack : STD_LOGIC := '0';
+	SIGNAL uart_rx_ready : STD_LOGIC;
 
-	-- Uart transmitter.
-	SIGNAL s_uarttxwrite : STD_LOGIC := '0';
-	SIGNAL s_uarttxdata : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
-	SIGNAL s_uarttxactive : STD_LOGIC;
-	SIGNAL s_uarttxdone : STD_LOGIC;
-
-	-- Routertest.
+	-- SpaceWire Light.
 	SIGNAL s_autostart : STD_LOGIC := '1';
 	SIGNAL s_linkstart : STD_LOGIC := '1';
 	SIGNAL s_linkdis : STD_LOGIC := '0';
@@ -160,11 +153,10 @@ ARCHITECTURE routertest_top_multi_adapter_arch OF routertest_top_multi_adapter I
 	SIGNAL s_error_int : STD_LOGIC;
 	SIGNAL s_error : STD_LOGIC;
 
-	TYPE uarttxstates IS (S_Idle, S_Check, S_Prepare1, S_Prepare2, S_Prepare3, S_Send, S_Wait1, S_Wait2);
-	SIGNAL txstate : uarttxstates := S_Idle;
-
-	TYPE uartrxstates IS (S_Idle, S_EOP, S_Send, S_Clean);
-	SIGNAL rxstate : uartrxstates := S_Idle;
+	-- fsm for operation
+	TYPE fsm_state IS (s_Idle, s_Recv, s_Wait, s_Send);
+	TYPE stateUART2SpW : fsm_state := s_Idle;
+	TYPE stateSpW2UART : fsm_state := s_Idle;
 BEGIN
 	-- Drive outputs.
 	spw_do <= s_spw_do;
@@ -172,175 +164,21 @@ BEGIN
 
 	s_spw_di <= spw_di;
 	s_spw_si <= spw_si;
-
-	-- From uart to external ports.
-	PROCESS (clk, rst)
-		VARIABLE selectport : INTEGER RANGE 0 TO 2;
-		VARIABLE data : STD_LOGIC_VECTOR(7 DOWNTO 0);
-		VARIABLE pdata : STD_LOGIC_VECTOR(8 DOWNTO 0);
-	BEGIN
-		IF rst = '1' THEN
-			rxstate <= S_Idle;
-			data := (OTHERS => '0');
-			pdata := (OTHERS => '0');
-			s_txwrite <= '0';
-			s_txdata <= STD_LOGIC_VECTOR(to_unsigned(portnumber, 8));
-			s_txflag <= '0';
-		ELSIF rising_edge(clk) THEN
-			IF eop = '1' THEN
-				-- Send EOPs.
-				s_txflag <= '1';
-				s_txdata <= "00000000";
-				s_txwrite <= '1';
-				rxstate <= S_Idle;
-			ELSIF eop = '0' THEN
-				CASE rxstate IS
-					WHEN S_Idle =>
-						s_txwrite <= '0';
-						s_txdata <= s_uartrxdata;
-
-						IF s_uartrxvalid = '1' THEN
-							selectport := portnumber;
-							data := s_uartrxdata;
-
-							IF data = "11111111" THEN
-								s_txflag <= '1';
-								s_txdata <= "00000000";
-								rxstate <= S_EOP;
-							ELSE
-								s_txflag <= '0';
-								s_txdata <= STD_LOGIC_VECTOR(to_unsigned(portnumber, 8));
-								rxstate <= S_Send;
-							END IF;
-						END IF;
-
-					WHEN S_EOP =>
-						IF s_txrdy = '1' THEN
-							s_txwrite <= '1';
-							rxstate <= S_Clean;
-						END IF;
-
-					WHEN S_Send =>
-						IF s_txrdy = '1' THEN
-							s_txwrite <= '1';
-							rxstate <= S_Clean;
-						END IF;
-
-					WHEN S_Clean =>
-						s_txwrite <= '0';
-						s_txdata <= STD_LOGIC_VECTOR(to_unsigned(portnumber, 8));
-						s_txflag <= '0';
-						--data := (OTHERS => '0');
-						--pdata := (OTHERS => '0');					
-
-						rxstate <= S_Idle;
-				END CASE;
-			END IF;
-		END IF;
-	END PROCESS;
-
-	-- Drive outputs.
-	rxhalff <= s_rxhalff; -- Debugging!
-	started <= s_started;
-	connecting <= s_connecting;
-	running <= s_running;
-	rxvalid <= s_rxvalid_int;
-	error <= s_error_int;
-
-	-- Synchronous update of status signals.
-	PROCESS (clk)
-	BEGIN
-		IF rising_edge(clk) THEN
-			-- Debugging: Zeigt an wenn ein externer Port daten empfangen hat (muss mit clear quittiert werden!)
-			-- It shows if an external port has received data (will be confirmed with clear)
-			s_rxvalid_int <= (s_rxvalid_int OR s_rxvalid) AND (NOT clear) AND (NOT rst);--s_rxhalff; -- half receive fifo (spacewire -> uart) is full
-			-- Sticky error led.
-			s_error_int <= (s_error_int OR s_error) AND (NOT clear) AND (NOT rst);
-
-			-- Shows all errors on one led.
-			s_error <= s_errdisc OR s_errpar OR s_erresc OR s_errcred; -- error router ports
-		END IF;
-	END PROCESS;
-
-	-- From port to uart transmitter.   
-	PROCESS (clk, rst)--, s_selectdestport)
-		VARIABLE rdata : STD_LOGIC_VECTOR(8 DOWNTO 0);
-	BEGIN
-		IF rst = '1' THEN
-			txstate <= S_Idle;
-		ELSIF rising_edge(clk) THEN
-			CASE txstate IS
-				WHEN S_Idle =>
-					IF s_rxvalid = '1' THEN
-						txstate <= S_Check;
-					END IF;
-
-				WHEN S_Check =>
-					IF s_uarttxactive = '0' THEN
-						txstate <= S_Prepare1;
-					END IF;
-
-				WHEN S_Prepare1 =>
-					s_rxread <= '1';
-					txstate <= S_Prepare2;
-
-				WHEN S_Prepare2 =>
-					rdata(8) := s_rxflag;
-					rdata(7 DOWNTO 0) := s_rxdata;
-					s_rxread <= '0';
-					txstate <= S_Prepare3;
-
-				WHEN S_Prepare3 =>
-					IF rdata(8) = '1' THEN
-						txstate <= S_Idle;
-					ELSIF rdata(8) = '0' THEN
-						s_uarttxdata <= rdata(7 DOWNTO 0);
-						txstate <= S_Send;
-					END IF;
-
-				WHEN S_Send =>
-					s_uarttxwrite <= '1';
-
-					txstate <= S_Wait1;
-
-				WHEN S_Wait1 =>
-					--IF s_uarttxactive = '0' THEN
-					s_uarttxwrite <= '0';
-					txstate <= S_Wait2;
-					--END IF;
-
-				WHEN S_Wait2 =>
-					IF s_uarttxdone = '1' THEN
-						txstate <= S_Idle;
-					END IF;
-			END CASE;
-		END IF;
-	END PROCESS;
-
-	-- Uart receiver.
-	uartrec : uart_rx
+	uart_object : uart
 	GENERIC MAP(
-		clk_cycles_per_bit => 87
+		clk_cycles_per_bit => clk_cycles_per_bit
 	)
 	PORT MAP(
 		clk => clk,
-		rxstream => rxstream,
-		rxvalid => s_uartrxvalid,
-		rxdata => s_uartrxdata
-	);
-
-	-- Uart transmitter.
-	uartrx : uart_tx
-	GENERIC MAP(
-		clk_cycles_per_bit => 87
-	)
-	PORT MAP(
-		clk => clk,
-		txstream => txstream,
-		txdata => s_uarttxdata,
-		txactive => s_uarttxactive,
-		txwrite => s_uarttxwrite,
-		txdone => s_uarttxdone
+		rst => rst,
+		tx_port => tx_serial,
+		tx_ack => uart_tx_ack,
+		tx_data => uart_buffer_tx,
+		tx_rdy => uart_tx_ready,
+		rx_port => rx_serial,
+		rx_ack => uart_rx_ack,
+		rx_data => uart_buffer_rx,
+		rx_rdy => uart_rx_ready
 	);
 
 	-- Internal port interface.
@@ -392,4 +230,85 @@ BEGIN
 		spw_do => spw_do,
 		spw_so => spw_so
 	);
-END routertest_top_multi_adapter_arch;
+	UART2SpW : PROCESS (clk) IS
+	BEGIN
+		IF rising_edge(clk) THEN
+			IF (rst = '1') THEN
+				-- synchronous reset.
+				stateUART2SpW <= s_Idle;
+			ELSE
+				CASE stateUART2SpW IS
+					WHEN s_Idle =>
+						IF (uart_rx_ready = '1') THEN
+							uart_buffer <= uart_buffer_rx;
+							uart_rx_ack <= '1';
+							stateUART2SpW <= s_Recv;
+						ELSE
+							s_txwrite <= '0';
+							s_txflag <= '0';
+							s_txdata <= (OTHERS => '0');
+
+							uart_rx_ack <= '0';
+						END IF;
+
+					WHEN s_Recv =>
+						uart_rx_ack <= '0';
+						stateUART2SpW <= s_Wait;
+
+					WHEN s_Wait =>
+						IF s_txrdy = '1' THEN
+							s_txdata <= uart_buffer;
+							s_txflag <= '0';
+							s_txwrite <= '1';
+							stateUART2SpW <= s_Send;
+						END IF;
+
+					WHEN s_Send =>
+						s_txwrite <= '0';
+						stateUART2SpW <= s_Idle;
+				END CASE
+			END IF;
+		END IF;
+	END PROCESS UART2SpW;
+
+	SpW2UART : PROCESS (clk) IS
+	BEGIN
+		IF rising_edge(clk) THEN
+			IF (rst = '1') THEN
+				-- synchronous reset.
+				stateSpW2UART <= s_Idle;
+			ELSE
+				CASE stateSpW2UART IS
+					WHEN s_Idle =>
+						IF s_rxvalid = '1' THEN
+							spw_buffer <= s_rxdata;
+							s_rxread <= '1';
+
+							stateSpW2UART <= s_Recv;
+
+						ELSE
+							s_rxread <= '0';
+
+							uart_tx_ack <= '0';
+						END IF;
+
+					WHEN s_Recv =>
+						s_rxread <= '0';
+						uart_tx_ack <= '0';
+						stateSpW2UART <= s_Wait;
+
+					WHEN s_Wait =>
+						IF uart_tx_ready = '1' THEN
+							uart_buffer_tx <= spw_buffer;
+							uart_tx_ack <= '1';
+
+							stateSpW2UART <= s_Send;
+						END IF;
+
+					WHEN s_Send =>
+						uart_tx_ack <= '0';
+						stateSpW2UART <= s_Idle;
+				END CASE;
+			END IF;
+		END PROCESS SpW2UART;
+	END routertest_top_multi_adapter_arch;
