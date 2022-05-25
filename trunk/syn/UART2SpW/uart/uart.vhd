@@ -5,8 +5,8 @@ USE IEEE.numeric_std.ALL;
 ENTITY uart IS
     GENERIC (
         -- frequency clk / frequency Uart
-        -- Example: 10 MHz Clock, 115200 baud rate Uart
-        -- 10000000 / 115200 = 87
+        -- Example: 100 MHz Clock, 115200 baud rate Uart
+        -- 100_000_000 / 115_200 = 868
         clk_cycles_per_bit : INTEGER
     );
     PORT (
@@ -46,11 +46,10 @@ ARCHITECTURE uart_arch OF uart IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            tx_data : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
             tx_ack : IN STD_LOGIC;
-
-            tx_port : OUT STD_LOGIC := '1';
-            tx_rdy : OUT STD_LOGIC := '1'
+            tx_data : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+            tx_rdy : OUT STD_LOGIC := '1';
+            tx_port : OUT STD_LOGIC := '1'
         );
     end component uart_tx;
     BEGIN
