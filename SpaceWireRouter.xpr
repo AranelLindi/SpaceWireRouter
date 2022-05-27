@@ -257,6 +257,12 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/trunk/bench/vhdl/adapter_tb.vhd">
+        <FileInfo SFType="VHDL2008">
+          <Attr Name="UserDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>      
       <File Path="$PPRDIR/trunk/bench/vhdl/streamtest_tb.vhd">
         <FileInfo SFType="VHDL2008">
           <Attr Name="UserDisabled" Val="1"/>
@@ -332,25 +338,19 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/trunk/syn/UART2SpW/uart/uart.vhd">
+      <File Path="$PPRDIR/trunk/syn/Adapter/uart/uart_rx.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/trunk/syn/UART2SpW/uart/uart_rx.vhd">
+      <File Path="$PPRDIR/trunk/syn/Adapter/uart/uart_tx.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/trunk/syn/UART2SpW/uart/uart_tx.vhd">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/syn/UART2SpW/UART2SpW.vhd">
+      <File Path="$PPRDIR/trunk/syn/Adapter/adapter.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
