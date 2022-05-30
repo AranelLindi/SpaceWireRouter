@@ -78,7 +78,8 @@ BEGIN
                 -- Synchronous reset.
                 s_clk_count <= 0;
                 s_bit_index <= 0;
-                s_txdata <= (OTHERS => '0');
+                s_tx_data <= (OTHERS => '0');
+                tx_port <= '1';
                 --s_txdone <= '0';
                 state <= S_Idle;
             ELSE

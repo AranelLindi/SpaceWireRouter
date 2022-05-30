@@ -30,6 +30,14 @@ entity UARTSpWAdapter is
         -- Number of SpaceWire Ports in this adapter.
         numports : integer range 0 to 31;
         
+        -- Initial SpW input port (in chase that no commands are allowed, it cannot be changed !)
+        init_input_port : integer range 0 to 31 := 0;
+        
+        -- Initial SpW output port (in chase that no commands are allowed, it cannot be changed !)
+        init_output_port : integer range 0 to 31 := 0;
+        
+        -- Determines whether commands are permitted or data bytes are sent only. 
+        activate_commands : boolean;
         
         -- SpaceWire Ports:
         
@@ -69,10 +77,10 @@ entity UARTSpWAdapter is
         clk : in std_logic;
         
         -- SpW port receiver sample clock (only for impl_fast)
-        rxclk : in std_logic := clk; -- Standard implementation with impl_fast, therefore rxclk = clk must apply !
+        rxclk : in std_logic; -- Standard implementation with impl_fast, therefore rxclk = clk must apply !
         
         -- SpW port transmit clock (only for impl_fast)
-        txclk : in std_logic := clk; -- Standard implementation with impl_fast, therefore txclk = clk must apply !
+        txclk : in std_logic; -- Standard implementation with impl_fast, therefore txclk = clk must apply !
         
         -- Reset.
         rst : in std_logic;
@@ -216,7 +224,7 @@ architecture UARTSpWAdapter_config_arch of UARTSpWAdapter is
     signal s_linkstart : std_logic_vector(numports downto 0);
     signal s_linkdis : std_logic_vector(numports downto 0);
     signal s_txdivcnt : std_logic_vector(7 downto 0);
-    signal s_tick_in : std_logic_vector(numports downto 0); -- Caution ! TCs for port 0 are deactivated !
+    signal s_tick_in : std_logic_vector(numports downto 0); -- Caution ! TimeCodes for port 0 are deactivated !
     signal s_ctrl_in : array_t(numports downto 0)(1 downto 0);
     signal s_time_in : array_t(numports downto 0)(5 downto 0);
     signal s_txwrite : std_logic_vector(numports downto 0);
@@ -246,7 +254,7 @@ architecture UARTSpWAdapter_config_arch of UARTSpWAdapter is
     signal istate : input_states := s_Idle;
     
     -- SpW2UART fsm.
-    type output_states is (s_Idle, s_Send); -- Unvollständig!
+    type output_states is (s_Idle, s_NChar, s_Wait, s_CleanUp); -- Unvollständig!
     signal ostate : output_states := s_Idle;
     
     -- Buffer.
@@ -256,8 +264,8 @@ architecture UARTSpWAdapter_config_arch of UARTSpWAdapter is
     signal s_uart_output : std_logic_vector(7 downto 0) := (others => '0'); -- buffers outgoing bytes (uart)
     
     -- Control.
-    signal s_port_input : integer range 0 to numports := 0;
-    signal s_port_output : integer range 0 to numports := 0;
+    signal s_port_input : integer range 0 to numports := init_input_port;
+    signal s_port_output : integer range 0 to numports := init_output_port;
     
     -- Intern infos request.
     signal s_info1 : std_logic := '0'; -- SpW input port.
@@ -448,8 +456,8 @@ begin
                         s_txdata <= (others => (others => '0'));
                         s_ctrl_in <= (others => (others => '0'));
                         s_time_in <= (others => (others => '0'));
-                        s_tick_in <= (others => '0');                        
-                    
+                        s_tick_in <= (others => '0');
+                        
                         -- Check if uart has received new byte.
                         if s_rx_rdy = '1' then
                             s_uart_buffer <= s_rx_data; -- buffering byte
@@ -461,7 +469,7 @@ begin
                         s_rx_ack <= '0'; -- Handshake
                     
                         -- Decide what was received.
-                        if s_uart_buffer(7) = '1' then
+                        if s_uart_buffer(7) = '1' and activate_commands = true then -- Commands are allowed only activated in config adapter !
                             -- Command
                             istate <= s_Cmd;
                         else
@@ -491,7 +499,10 @@ begin
                                         
                                     when "11" =>
                                         -- Output Info3
-                                        s_info3 <= '1';                                        
+                                        s_info3 <= '1';
+                                        
+                                    when others => -- just for simulation
+                                        null;                                        
                                     
                                 end case;
                                 
@@ -499,18 +510,14 @@ begin
                             
                             when "01" =>
                                 -- Set router input port
-                                if (to_integer(unsigned(s_uart_buffer(4 downto 0))) > numports) then
-                                    s_port_input <= numports;
-                                else
+                                if (to_integer(unsigned(s_uart_buffer(4 downto 0))) <= numports) then -- If number is bigger than numports, port remains unchanged.
                                     s_port_input <= to_integer(unsigned(s_uart_buffer(4 downto 0)));
                                 end if;
                                 --istate <= s_Idle;
                             
                             when "10" =>
                                 -- Set router output port
-                                if (to_integer(unsigned(s_uart_buffer(4 downto 0))) > numports) then
-                                    s_port_output <= numports;
-                                else
+                                if (to_integer(unsigned(s_uart_buffer(4 downto 0))) <= numports) then -- If number is bigger that numports, port remains unchanged.
                                     s_port_output <= to_integer(unsigned(s_uart_buffer(4 downto 0)));
                                 end if;
                                 --istate <= s_Idle;
@@ -528,23 +535,35 @@ begin
                                 end if;
                                 
                                 s_txwrite(s_port_input) <= '1';
-                                --istate <= s_Idle;                                
+                                istate <= s_Idle;
+                                
+                            when others => -- just for simulation
+                                null;                         
                                                             
                         end case;
                         
                         istate <= s_Idle;               
 
                     when s_Data =>
-                        if s_uart_buffer(6) = '1' then
+                        if s_uart_buffer(6) = '1' and activate_commands = true then -- Sending Time Code is allowed only when Commands are activated !
                             -- TimeCode
                             s_time_in(s_port_input) <= s_uart_buffer(5 downto 0);
                             s_tick_in(s_port_input) <= '1';
                         else
                             -- N-Char
-                            s_txdata(s_port_input) <= "00" & s_uart_buffer(5 downto 0);
-                            s_txflag(s_port_input) <= '0';
+                            if s_uart_buffer = "11111111" and activate_commands = false then -- Only active if no commands are allowed to close packet.
+                                -- Create EOP
+                                s_txdata(s_port_input) <= x"00";
+                                s_txflag(s_port_input) <= '1';
+                                
+                                s_txwrite(s_port_input) <= '1';                            
+                            else
+                                -- Normal N-Char (default chase)
+                                s_txdata(s_port_input) <= "00" & s_uart_buffer(5 downto 0);
+                                s_txflag(s_port_input) <= '0';
                             
-                            s_txwrite(s_port_input) <= '1';
+                                s_txwrite(s_port_input) <= '1';
+                            end if;
                         end if;
                         
                         istate <= s_Idle;                      
@@ -560,6 +579,7 @@ begin
         if rising_edge(clk) then
             if rst = '1' then
                 -- Synchronous reset.
+                s_rxread <= (others => '0');
                 s_uart_output <= (others => '0');
                 s_tx_data <= (others => '0');
                 s_tx_ack <= '0';
@@ -567,63 +587,161 @@ begin
             else
                 case ostate is
                     when s_Idle =>
-                        s_uart_output <= (others => '0');
-                    
-                        if s_tick_out(s_port_output) = '1' then
-                            -- TimeCode was received (highest priority !)
+                        if s_tick_out(s_port_output) = '1' and activate_commands = true then
                             s_uart_output <= "01" & s_time_out(s_port_output);
+                            ostate <= s_Wait;
                         elsif s_rxvalid(s_port_output) = '1' then
-                            -- N-Char was received.
-                            if s_txflag(s_port_output) = '1' then
+                            if s_rxflag(s_port_output) = '1' then
                                 -- EOP / EEP
-                                case s_txdata(s_port_output) is
-                                    when x"00" =>
-                                        -- EOP
-                                        s_uart_output <= "10000000";
-                                        
-                                    when x"01" =>
-                                        -- EEP
-                                        s_uart_output <= "10000001";
-                                        
-                                    when others =>
-                                        s_uart_output <= "00000000";
-
-                                end case;
+                                if s_rxdata(s_port_output) = x"00" then
+                                    -- EOP
+                                    s_uart_output <= x"ff"; -- 11111111                                    
+                                else
+                                    -- EEP
+                                    -- Hier könnte potenzielle Fehler auftreten! In der Dokumentation wird ausgeschlossen, dass bei einem flag = 1 etwas anderes als EOP/EEP an rxdata anliegt. Trotzdem hier ein Auge darauf haben.
+                                    s_uart_output <= x"fe"; -- 11111110                                    
+                                end if;
+                                
+                                s_rxread(s_port_output) <= '1';
+                                ostate <= s_NChar;
                             else
                                 -- Data byte
-                                s_uart_output <= "00" & s_txdata(s_port_output)(5 downto 0);
-                               
+                                if activate_commands = true then
+                                    s_uart_output <= "00" & s_rxdata(s_port_output)(5 downto 0);
+                                else
+                                    s_uart_output <= s_rxdata(s_port_output);
+                                end if;
                             end if;
                             
-                        elsif s_info1 = '1' then
-                            -- Intern Info1 is requested.
+                            s_rxread(s_port_output) <= '1';
+                            ostate <= s_NChar;
+                        
+                        elsif s_info1 = '1' and activate_commands = true then
                             s_uart_output <= "101" & std_logic_vector(to_unsigned(s_port_input, 5));
-
-                        elsif s_info2 = '1' then
-                            -- Intern Info2 is requested.
-                            s_uart_output <= "110" & std_logic_vector(to_unsigned(s_port_output, 5));
-
                             
-                        elsif s_info3 = '1' then
-                            -- Intern Info3 is requested.
-                            s_uart_output(7 downto 5) <= "111";
+                            ostate <= s_Wait;
+                        elsif s_info2 = '1' and activate_commands = true then
+                            s_uart_output <= "110" & std_logic_vector(to_unsigned(s_port_output, 5));
+                            
+                            ostate <= s_Wait;
+                        elsif s_info3 = '1' and activate_commands = true then
+                            s_uart_output(7 downto 5) <= "100";
                             s_uart_output(4) <= s_started(s_port_input) or s_connecting(s_port_input);
                             s_uart_output(3) <= s_running(s_port_input);
                             s_uart_output(2) <= s_errdisc(s_port_input) or s_errpar(s_port_input);
                             s_uart_output(1) <= s_erresc(s_port_input) or s_errcred(s_port_input);
                             s_uart_output(0) <= s_rxhalff(s_port_output) or s_txhalff(s_port_input); -- input / output !
                             
-                        end if; 
+                            ostate <= s_Wait;                                        
+                        end if;
+                    
+                    when s_NChar =>
+                        s_rxread(s_port_output) <= '0';
                         
-                        ostate <= s_Send;
-                   
-                    when s_Send =>
+                        ostate <= s_Wait;
+                    
+                    when s_Wait =>
                         if s_tx_rdy = '1' then
                             s_tx_data <= s_uart_output;
                             s_tx_ack <= '1';
-                            ostate <= s_Idle;
+                            ostate <= s_CleanUp;
                         end if;
+                    
+                    when s_CleanUp =>
+                        s_tx_ack <= '0';
+                        
+                        ostate <= s_Idle;
+                    
                 end case;
+            
+            
+--                case ostate is
+--                    when s_Idle =>
+--                        s_rxread(s_port_output) <= '0';
+--                        s_uart_output <= (others => '0');
+                    
+--                        if s_tick_out(s_port_output) = '1' and activate_commands = true then -- Allow receiving Time Codes only in command mode adapter to avoid ambiguity N-Chars.
+--                            -- TimeCode was received (highest priority !)
+--                            s_uart_output <= "01" & s_time_out(s_port_output);
+                            
+--                            ostate <= s_Send;
+--                        elsif s_rxvalid(s_port_output) = '1' then -- If activate_commands = false, this is the only block that is actively running.
+--                            -- N-Char was received.
+--                            if s_rxflag(s_port_output) = '1' then
+--                                -- EOP / EEP
+--                                case s_rxdata(s_port_output) is
+--                                    when x"00" =>
+--                                        -- EOP
+--                                        s_uart_output <= "11111111"; -- 0xff
+--                                        s_rxread(s_port_output) <= '1';
+--                                        ostate <= s_Send;
+                                        
+--                                    when x"01" =>
+--                                        -- EEP
+--                                        s_uart_output <= "11111110"; -- 0xfe
+--                                        s_rxread(s_port_output) <= '1';
+--                                        ostate <= s_Send;
+                                        
+--                                    when others => -- Important ! (Not only for simulation !)
+--                                        s_uart_output <= (others => '0');
+                                        
+--                                        s_rxread(s_port_output) <= '0';
+                                        
+--                                        ostate <= s_Idle;
+
+--                                end case;
+                                
+--                                --s_rxread(s_port_output) <= '1';
+                                
+--                            else
+--                                -- Data byte
+--                                if activate_commands = true then -- If commands are allowed, to avoid ambiguity, return data in specific scheme that fits to commands.
+--                                    s_uart_output <= "00" & s_rxdata(s_port_output)(5 downto 0);
+--                                else -- If no commands are allowed data is output unchanged.
+--                                    s_uart_output <= s_rxdata(s_port_output);
+--                                end if;
+                                
+--                                s_rxread(s_port_output) <= '1';
+                               
+--                               ostate <= s_Send;
+                               
+--                            end if;
+                            
+--                            --s_rxread(s_port_output) <= '1';
+                            
+--                        elsif s_info1 = '1' and activate_commands = true then
+--                            -- Intern Info1 is requested.
+--                            s_uart_output <= "101" & std_logic_vector(to_unsigned(s_port_input, 5));
+                            
+--                            ostate <= s_Send;
+
+--                        elsif s_info2 = '1' and activate_commands = true then
+--                            -- Intern Info2 is requested.
+--                            s_uart_output <= "110" & std_logic_vector(to_unsigned(s_port_output, 5));
+
+--                            ostate <= s_Send;
+                            
+--                        elsif s_info3 = '1' and activate_commands = true then
+--                            -- Intern Info3 is requested.
+--                            s_uart_output(7 downto 5) <= "100";
+--                            s_uart_output(4) <= s_started(s_port_input) or s_connecting(s_port_input);
+--                            s_uart_output(3) <= s_running(s_port_input);
+--                            s_uart_output(2) <= s_errdisc(s_port_input) or s_errpar(s_port_input);
+--                            s_uart_output(1) <= s_erresc(s_port_input) or s_errcred(s_port_input);
+--                            s_uart_output(0) <= s_rxhalff(s_port_output) or s_txhalff(s_port_input); -- input / output !
+                            
+--                            ostate <= s_Send;
+                            
+--                        end if;
+                        
+--                    when s_Send =>
+--                        s_rxread(s_port_output) <= '0';
+--                        if s_tx_rdy = '1' then
+--                            s_tx_data <= s_uart_output;
+--                            s_tx_ack <= '1';
+--                            ostate <= s_Idle;
+--                        end if;
+--                end case;
             end if;
         end if;
     end process spw2uart;

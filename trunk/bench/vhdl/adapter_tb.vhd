@@ -17,7 +17,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.spwpkg.all; -- for spwstream (and definitions)
-use work.spwrouterpkg.all; -- for spwrouter (and definitions)
+--use work.spwrouterpkg.all; -- for spwrouter (and definitions)
 
 entity adapter_tb is
 end;
@@ -32,7 +32,7 @@ architecture adapter_tb_arch of adapter_tb is
         wait for dt;
         
         -- Send byte
-        for i in 0 to byte'length - 1 loop -- LSB first !
+        for i in 0 to 7 loop -- LSB first !
             stream <= byte(i);
             wait for dt;
         end loop;
@@ -45,11 +45,15 @@ architecture adapter_tb_arch of adapter_tb is
     -- Component declaration of DuT.
     component UARTSpWAdapter
         generic (
-            clk_cycles_per_bit : integer,
+            clk_cycles_per_bit : integer;
             numports : integer range 0 to 31;
+            init_input_port : integer range 0 to numports := 0;
+            init_output_port : integer range 0 to numports := 0;
+            activate_commands : boolean;
             sysfreq : real;
             txclkfreq : real := 0.0;
             rximpl : spw_implementation_type_rec;
+            rxchunk : integer range 1 to 4 := 1;
             WIDTH : integer range 1 to 3 := 2;
             tximpl : spw_implementation_type_xmit;
             rxfifosize_bits : integer range 6 to 14 := 11;
@@ -57,8 +61,8 @@ architecture adapter_tb_arch of adapter_tb is
         );
         port (
             clk : in std_logic;
-            rxclk : in std_logic := clk;
-            txclk : in std_logic := clk;
+            rxclk : in std_logic;
+            txclk : in std_logic;
             rst : in std_logic;
             autostart : in std_logic_vector(numports downto 0) := (others => '1');
             linkstart : in std_logic_vector(numports downto 0) := (others => '1');
@@ -80,13 +84,15 @@ architecture adapter_tb_arch of adapter_tb is
             rx : in std_logic;
             tx : out std_logic
         );
-    end component UARTSpWAdapter
+    end component UARTSpWAdapter;
+    
+    type array_t is array(natural range<>) of std_logic_vector;
     
     
     -- Constants and generic values
     -- SpaceWire specific.
     constant numports : integer range 0 to 31 := 3;
-    constant sysfreq : real := 100 * (10**6); -- 100 MHz
+    constant sysfreq : real := 100.0e6; -- 100 MHz
     constant txclkfreq : real := sysfreq;
     constant rximpl : spw_implementation_type_rec := impl_fast;
     constant rxchunk : integer range 1 to 4 := 1;
@@ -100,9 +106,9 @@ architecture adapter_tb_arch of adapter_tb is
     
     -- Simulation signals.
     signal clk: std_logic;
-    signal rxclk: std_logic := clk;
-    signal txclk: std_logic := clk;
-    signal rst: std_logic;
+    --signal rxclk: std_logic;
+    --signal txclk: std_logic;
+    signal rst: std_logic := '1';
     signal autostart: std_logic_vector(numports downto 0) := (others => '1');
     signal linkstart: std_logic_vector(numports downto 0) := (others => '1');
     signal linkdis: std_logic_vector(numports downto 0) := (0 => '0', others => '0');
@@ -116,42 +122,63 @@ architecture adapter_tb_arch of adapter_tb is
     signal errcred: std_logic_vector(numports downto 0);
     signal txhalff: std_logic_vector(numports downto 0);
     signal rxhalff: std_logic_vector(numports downto 0);
-    signal spw_di: std_logic_vector(numports downto 0);
-    signal spw_si: std_logic_vector(numports downto 0);
-    signal spw_do: std_logic_vector(numports downto 0);
-    signal spw_so: std_logic_vector(numports downto 0);
+    --signal spw_di: std_logic_vector(numports downto 0);
+    --signal spw_si: std_logic_vector(numports downto 0);
+    --signal spw_do: std_logic_vector(numports downto 0);
+    --signal spw_so: std_logic_vector(numports downto 0);
     
     
-    -- Router status signals
-    signal s_router_started : std_logic_vector(numports downto 0);
-    signal s_router_connecting : std_logic_vector(numports downto 0);
-    signal s_router_running : std_logic_vector(numports downto 0);
-    signal s_router_errdisc : std_logic_vector(numports downto 0);
-    signal s_router_errpar : std_logic_vector(numports downto 0);
-    signal s_router_erresc : std_logic_vector(numports downto 0);
-    signal s_router_errcred : std_logic_vector(numports downto 0);
+--    -- Router status signals
+--    signal s_router_started : std_logic_vector(numports downto 0);
+--    signal s_router_connecting : std_logic_vector(numports downto 0);
+--    signal s_router_running : std_logic_vector(numports downto 0);
+--    signal s_router_errdisc : std_logic_vector(numports downto 0);
+--    signal s_router_errpar : std_logic_vector(numports downto 0);
+--    signal s_router_erresc : std_logic_vector(numports downto 0);
+--    signal s_router_errcred : std_logic_vector(numports downto 0);
+
+    -- Corresponding SpaceWire Port signals.
+    signal s_corr_tick_in : std_logic_vector(numports downto 0) := (others => '0');
+    signal s_corr_ctrl_in : array_t(numports downto 0)(1 downto 0) := (others => (others => '0'));
+    signal s_corr_time_in : array_t(numports downto 0)(5 downto 0) := (others => (others => '0'));
+    signal s_corr_txwrite : std_logic_vector(numports downto 0) := (others => '0');
+    signal s_corr_txflag : std_logic_vector(numports downto 0) := (others => '0');
+    signal s_corr_txdata : array_t(numports downto 0)(7 downto 0) := (others => (others => '0'));
+    signal s_corr_txrdy : std_logic_vector(numports downto 0) := (others => '0');
+    signal s_corr_txhalff : std_logic_vector(numports downto 0) := (others => '0');
+    signal s_corr_tick_out : std_logic_vector(numports downto 0) := (others => '0');
+    signal s_corr_ctrl_out : array_t(numports downto 0)(1 downto 0) := (others => (others => '0'));
+    signal s_corr_time_out : array_t(numports downto 0)(5 downto 0) := (others => (others => '0'));
+    signal s_corr_rxflag : std_logic_vector(numports downto 0) := (others => '0');
+    signal s_corr_rxdata : array_t(numports downto 0)(7 downto 0) := (others => (others => '0'));
+    signal s_corr_rxvalid : std_logic_vector(numports downto 0) := (others => '0');
+
     
     
     -- SpaceWire signals.
-    signal s_spw_data_to_router : std_logic_vector(numports downto 0);
-    signal s_spw_strobe_to_router : std_logic_vector(numports downto 0);
-    signal s_spw_data_from_router : std_logic_vector(numports downto 0);
-    signal s_spw_strobe_from_router : std_logic_vector(numports downto 0);
+    signal s_spw_data_to_router : std_logic_vector(numports downto 0) := (others => '0');
+    signal s_spw_strobe_to_router : std_logic_vector(numports downto 0) := (others => '0');
+    signal s_spw_data_from_router : std_logic_vector(numports downto 0) := (others => '0');
+    signal s_spw_strobe_from_router : std_logic_vector(numports downto 0) := (others => '0');
     
     
     -- Input variables
-    signal rx: std_logic;
-    signal tx: std_logic ;
+    signal rx: std_logic := '1';
+    signal tx: std_logic;
 
     -- Simulation specific constants and signals.
     constant clock_period: time := 10 ns; -- 100 MHz
     signal stop_the_clock: boolean;
+    signal newround : std_logic := '0';
 begin
     -- Instance of UART-SpaceWire Adapter
     DuT: UARTSpWAdapter
         generic map (
             clk_cycles_per_bit => 868, -- 100_000_000 (Hz) / 115_200 (baud rate) = 868
             numports           => numports,
+            init_input_port    => 0,
+            init_output_port   => 0,
+            activate_commands  => true,
             sysfreq            => sysfreq,
             txclkfreq          => txclkfreq,
             rximpl             => rximpl,
@@ -162,8 +189,8 @@ begin
             txfifosize_bits    => txfifosize_bits)
         port map (
             clk                => clk,
-            rxclk              => rxclk,
-            txclk              => txclk,
+            rxclk              => clk,
+            txclk              => clk,
             rst                => rst,
             autostart          => autostart,
             linkstart          => linkstart,
@@ -178,59 +205,112 @@ begin
             errcred            => errcred,
             txhalff            => txhalff,
             rxhalff            => rxhalff,
-            spw_di             => spw_di,
-            spw_si             => spw_si,
-            spw_do             => spw_do,
-            spw_so             => spw_so,
+            spw_di             => s_spw_data_from_router,
+            spw_si             => s_spw_strobe_from_router,
+            spw_do             => s_spw_data_to_router,
+            spw_so             => s_spw_strobe_to_router,
             rx                 => rx,
             tx                 => tx );
-    
-    -- Instance of SpaceWire router to allow realistic SpaceWire communication.        
-    SpWRouter : spwrouter
-        generic map (
-            numports => numports,
-            sysfreq => sysfreq,
-            txclkfreq => txclkfreq,
-            rx_impl => rx_impl,
-            tx_impl => tx_impl
-        )
-        port map (
-            clk => clk,
-            rxclk => rxclk,
-            txclk => txclk,
-            rst => rst,
-            started => s_router_started,
-            connecting => s_router_connecting,
-            running => s_router_running,
-            errdisc => s_router_errdisc,
-            errpar => s_router_errpar,
-            erresc => s_router_erresc,
-            errcred => s_router_errcred,
-            spw_di => s_spw_data_to_router,
-            spw_si => s_spw_strobe_to_router,
-            spw_do => s_spw_data_from_router,
-            spw_so => s_spw_strobe_from_router
-        );
+            
+
+    ComSpWPorts : for n in 0 to numports generate
+        portN : spwstream
+            generic map (
+                sysfreq => sysfreq,
+                txclkfreq => txclkfreq,
+                rximpl => rximpl,
+                rxchunk => rxchunk,
+                tximpl => tximpl,
+                rxfifosize_bits => rxfifosize_bits,
+                txfifosize_bits => txfifosize_bits,
+                WIDTH => WIDTH
+            )
+            port map (
+                clk => clk,
+                rxclk => clk,
+                txclk => clk,
+                rst => rst,
+                autostart => '1', -- Start link automaticly on receipt of NULL character
+                linkstart => '1',
+                linkdis => '0',
+                txdivcnt => txdivcnt,
+                tick_in => s_corr_tick_in(n),
+                ctrl_in => s_corr_ctrl_in(n),
+                time_in => s_corr_time_in(n),
+                txwrite => s_corr_txwrite(n),
+                txflag => s_corr_txflag(n),
+                txdata => s_corr_txdata(n),
+                txrdy => s_corr_txrdy(n),
+                txhalff => s_corr_txhalff(n),
+                tick_out => s_corr_tick_out(n),
+                ctrl_out => s_corr_ctrl_out(n),
+                time_out => s_corr_time_out(n),
+                rxvalid => s_corr_rxvalid(n),
+                rxflag => s_corr_rxflag(n),
+                rxdata => s_corr_rxdata(n),
+                rxread => '1',
+                started => open,
+                connecting => open,
+                running => open,
+                errdisc => open,
+                errpar => open,
+                erresc => open,
+                errcred => open,
+                spw_di => s_spw_data_to_router(n),
+                spw_si => s_spw_strobe_to_router(n),
+                spw_do => s_spw_data_from_router(n),
+                spw_so => s_spw_strobe_from_router(n)
+            );
+    end generate ComSpWPorts;      
+        
+
+--    -- Instance of SpaceWire router to allow realistic SpaceWire communication.        
+--    Router : spwrouter
+--        generic map (
+--            numports => numports,
+--            sysfreq => sysfreq,
+--            txclkfreq => txclkfreq,
+--            rx_impl => (others => rximpl),
+--            tx_impl => (others => tximpl)
+--        )
+--        port map (
+--            clk => clk,
+--            rxclk => rxclk,
+--            txclk => txclk,
+--            rst => rst,
+--            started => s_router_started,
+--            connecting => s_router_connecting,
+--            running => s_router_running,
+--            errdisc => s_router_errdisc,
+--            errpar => s_router_errpar,
+--            erresc => s_router_erresc,
+--            errcred => s_router_errcred,
+--            spw_di => s_spw_data_to_router,
+--            spw_si => s_spw_strobe_to_router,
+--            spw_do => s_spw_data_from_router,
+--            spw_so => s_spw_strobe_from_router
+--        );
         
     -- Simulation tasks.
     stimulus : process
     begin
+        newround <= '0';
         -- Initial reset
-        rst <= '1';
-        wait for 2 * clock_period;
+        --rx <= '1';
+        --rst <= '1';
+        wait for clock_period;
         rst <= '0';
     
         -- Simulation programm
-        rx <= '1';
         
         wait for 20 us; -- Give router and ports opportunity to connect.
         
         -- Start sending first command to select input and output spacewire ports.
-        SendViaUART("10100001", dt, rx); -- Send to port 1
-        wait for 5 * clock_period;
-        SendViaUART("10000010", dt, rx); -- Watch data from port 2
+        SendViaUART("10100010", dt, rx); -- Send to port 1
+        wait for 90 us;
+        SendViaUART("11000010", dt, rx); -- Watch data from port 2
         
-        wait for 20 us;
+        wait for 90 us;
         
         -- First SpaceWire packet. 
         -- CAUTION !
@@ -241,24 +321,58 @@ begin
         
         SendViaUART(x"02", dt, rx);
         
-        wait for 5 * clock_period;
+        wait for 90 us;
         
-        SendViaUART(x"55", dt, rx); -- "10101010"
+        SendViaUART(x"55", dt, rx); -- "10101010" -- Eingangsport 21 wird gesendet, müsste auf Port 3 (numports == 3) geändert werden
         
-        wait for 5 * clock_period;
+        wait for 90 us;
         
         SendViaUART("11100000", dt, rx); -- EOP
         
-        wait for 10 us;
+        wait for 90 us;
         
-        stop_the_clock <= true;       
+        report("Sending Data from corresponding SpaceWire port");
+        -- Send Packet from corresponding port 2
+        s_corr_txdata(2) <= x"02";
+        s_corr_txflag(2) <= '0';
+        s_corr_txwrite(2) <= '1';
+        
+        wait for clock_period;
+        
+        s_corr_txwrite(2) <= '0';
+        
+        wait for clock_period;
+        
+        s_corr_txdata(2) <= x"55";
+        s_corr_txflag(2) <= '0';
+        s_corr_txwrite(2) <= '1';
+        
+        wait for clock_period;
+        
+        s_corr_txwrite(2) <= '0';
+        
+        wait for clock_period;
+        
+        s_corr_txdata(2) <= x"00";
+        s_corr_txflag(2) <= '1';
+        s_corr_txwrite(2) <= '1';
+        
+        wait for clock_period;
+        
+        s_corr_txwrite(2) <= '0';
+        
+        wait for 450 us;
+        
+        newround <= '1';
+        wait for clock_period;
+        --stop_the_clock <= true;       
     end process stimulus;
     
     clocking : process
     begin
-        while not stop_the_clock loop
+        --while not stop_the_clock loop
             clk <= '0', '1' after clock_period /2;
             wait for clock_period;
-        end loop;
+        --end loop;
     end process clocking;
 end architecture adapter_tb_arch;
