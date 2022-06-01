@@ -22,12 +22,12 @@ entity UARTSpWAdapter is
     generic (
         -- UARTSpWAdapter:
     
-        -- frequency clk / frequency Uart
-        -- Example: 10 MHz Clock, 115200 baud rate Uart
+        -- frequency clk / Uart baud rate
+        -- Example: 100 MHz Clock, 115200 baud rate Uart
         -- 100_000_000 / 115_200 = 868
         clk_cycles_per_bit : Integer;
         
-        -- Number of SpaceWire Ports in this adapter.
+        -- Number of SpaceWire ports in this adapter.
         numports : integer range 0 to 31;
         
         -- Initial SpW input port (in chase that no commands are allowed, it cannot be changed !)
@@ -76,25 +76,25 @@ entity UARTSpWAdapter is
         -- System clock.
         clk : in std_logic;
         
-        -- SpW port receiver sample clock (only for impl_fast)
+        -- SpW port receiver sample clock (only for impl_fast).
         rxclk : in std_logic; -- Standard implementation with impl_fast, therefore rxclk = clk must apply !
         
-        -- SpW port transmit clock (only for impl_fast)
+        -- SpW port transmit clock (only for impl_fast).
         txclk : in std_logic; -- Standard implementation with impl_fast, therefore txclk = clk must apply !
         
         -- Reset.
         rst : in std_logic;
 
-        -- Enables atomatic automatic link start for SpW ports on receipt of a NULL character.
+        -- Enables atomatic link start for SpW ports on receipt of a NULL character.
         autostart : in std_logic_vector(numports downto 0) := (others => '1');
         
-        -- Enables Spw link start once the ready state is reached.
+        -- Enables SpW link start once the ready state is reached.
         -- Without autostart or linkstart, the link remains in state ready.
         linkstart : in std_logic_vector(numports downto 0) := (others => '1');
         
         -- Do not start SpW link (overrides linkstart and autostart) and/or
         -- disconnect a running link.
-        linkdis : in std_logic_vector(numports downto 0) := (0 => '0', others => '0'); -- to deactivate port 0 set here '1';
+        linkdis : in std_logic_vector(numports downto 0) := (0 => '0', others => '0'); -- to deactivate port 0 set here '1'
             
         -- Scaling factor minus 1, used to scale the SpW transmit base clock into
         -- the transmission bit rate. The system clock (for impl_generic) or
@@ -593,13 +593,12 @@ begin
                         elsif s_rxvalid(s_port_output) = '1' then
                             if s_rxflag(s_port_output) = '1' then
                                 -- EOP / EEP
-                                if s_rxdata(s_port_output) = x"00" then
+                                if s_rxdata(s_port_output) = x"01" then
+                                    -- EEP
+                                    s_uart_output <= x"fe"; -- 11111110                                    
+                                else
                                     -- EOP
                                     s_uart_output <= x"ff"; -- 11111111                                    
-                                else
-                                    -- EEP
-                                    -- Hier könnte potenzielle Fehler auftreten! In der Dokumentation wird ausgeschlossen, dass bei einem flag = 1 etwas anderes als EOP/EEP an rxdata anliegt. Trotzdem hier ein Auge darauf haben.
-                                    s_uart_output <= x"fe"; -- 11111110                                    
                                 end if;
                                 
                                 s_rxread(s_port_output) <= '1';
