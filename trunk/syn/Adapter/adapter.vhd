@@ -486,8 +486,8 @@ begin
                                     when "00" =>
                                         -- Reset of all state variables (no global reset !)
                                         -- List everything that should be reset here...
-                                        s_port_input <= 0;
-                                        s_port_output <= 0;
+                                        s_port_input <= init_input_port;
+                                        s_port_output <= init_output_port;
                                         
                                     when "01" =>
                                         -- Output Info1

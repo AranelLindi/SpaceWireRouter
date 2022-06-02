@@ -64,6 +64,9 @@ ARCHITECTURE uart_rx_arch OF uart_rx IS
     -- Initialize outputs with standard values.
     SIGNAL s_rx_data : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
     SIGNAL s_rx_rdy : STD_LOGIC := '0';
+    
+    -- Invalid byte detector.
+    SIGNAL s_invalid_byte : std_logic := '0';
 
 BEGIN
     -- Drive outputs.
@@ -95,13 +98,15 @@ BEGIN
                 s_bit_index <= 0;
                 s_rx_data <= (OTHERS => '0');
                 s_rx_rdy <= '0';
+                s_invalid_byte <= '0';
                 state <= S_Idle;
             ELSE
                 CASE state IS
                     WHEN S_Idle =>
                         IF (s_shiftreg(1) <= '0') THEN -- Start bit detected.
-                            state <= S_Rx_Start_Bit;
+                            s_invalid_byte <= '0';
                             s_rx_rdy <= '0';
+                            state <= S_Rx_Start_Bit;
                         ELSE
                             state <= S_Idle;
                         END IF;
@@ -139,19 +144,42 @@ BEGIN
                             END IF;
                         END IF;
 
-                    -- Receive Stop bit. Stop bit = 1
+                    -- Receive Stop bit. Stop bit = 1.
                     WHEN S_Rx_Stop_Bit =>
-                        -- Wait (clk_cycles_per_bit - 1) clock cycles for Stop bit to finish.
-                        IF (s_clk_count < (clk_cycles_per_bit - 1)) THEN
+                        if s_clk_count = ((clk_cycles_per_bit - 1) / 2) then -- Check middle of stop bit once to make sure its high and wait still to end of bit.
+                            if (s_shiftreg(1) = '0') then
+                                -- Invalid stop bit (Stop bit = 0)
+                                s_invalid_byte <= '1';
+                            else
+                                s_clk_count <= (s_clk_count +1);
+                                state <= S_Rx_Stop_Bit;
+                            end if;
+                        elsif (s_clk_count < (clk_cycles_per_bit -1 )) then -- Wait (clk_cycles_per_bit - 1) clock cycles for Stop bit to finish.
                             s_clk_count <= (s_clk_count + 1);
                             state <= S_Rx_Stop_Bit;
-                        ELSE
-                            s_rx_rdy <= '1';
-                            s_clk_count <= 0;
-                            state <= S_Cleanup;
-                        END IF;
+                        else
+                            if s_invalid_byte = '1' then -- if stop bit is invalid go back to idle and receive next byte.
+                                s_rx_rdy <= '0';
+                                s_clk_count <= 0;
+                                state <= S_Idle;
+                            else -- If stop bit was valid, deliver received byte.
+                                s_rx_rdy <= '1';
+                                s_clk_count <= 0;
+                                state <= S_Cleanup;
+                            end if;
+                        end if;                   
+                    
+                        -- Wait (clk_cycles_per_bit - 1) clock cycles for Stop bit to finish. -- ORIGINAL CODE ! KEEP IT !
+--                        IF (s_clk_count < (clk_cycles_per_bit - 1)) THEN
+--                            s_clk_count <= (s_clk_count + 1);
+--                            state <= S_Rx_Stop_Bit;
+--                        ELSE
+--                            s_rx_rdy <= '1';
+--                            s_clk_count <= 0;
+--                            state <= S_Cleanup;
+--                        END IF;
 
-                    -- Stay here for one clock cycle.
+                    -- Stay here for handshake. 
                     WHEN S_Cleanup =>
                         IF rx_ack = '1' THEN
                             s_rx_rdy <= '0';

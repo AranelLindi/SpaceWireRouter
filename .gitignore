@@ -35,6 +35,8 @@ SpaceWireLight*
 #All bd comments and layout coordinates are stored within .ui
 !*.ui
 !*.ooc
+#All pdf files
+!*.pdf
 #########
 #System Generator
 #########

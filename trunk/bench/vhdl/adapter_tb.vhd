@@ -23,7 +23,7 @@ entity adapter_tb is
 end;
 
 architecture adapter_tb_arch of adapter_tb is
-    procedure SendViaUART(constant byte : in std_logic_vector(7 downto 0); constant dt : in time; signal stream : out std_logic) is
+    procedure SendViaUART(constant byte : in std_logic_vector(8 downto 0); constant dt : in time; signal stream : out std_logic) is
     begin
         -- Start bit.
         stream <= '0';
@@ -306,9 +306,9 @@ begin
         wait for 20 us; -- Give router and ports opportunity to connect.
         
         -- Start sending first command to select input and output spacewire ports.
-        SendViaUART("10100010", dt, rx); -- Send to port 1
+        SendViaUART('1' & "10100010", dt, rx); -- Send to port 2
         wait for 90 us;
-        SendViaUART("11000010", dt, rx); -- Watch data from port 2
+        SendViaUART('1' & "11000010", dt, rx); -- Watch data from port 2
         
         wait for 90 us;
         
@@ -319,15 +319,15 @@ begin
         -- this could cause a systematic error in which the watchdog silently terminates
         -- open packets !
         
-        SendViaUART(x"02", dt, rx);
+        SendViaUART('0' & x"02", dt, rx);
         
         wait for 90 us;
         
-        SendViaUART(x"55", dt, rx); -- "10101010" -- Eingangsport 21 wird gesendet, müsste auf Port 3 (numports == 3) geändert werden
+        SendViaUART('1' & x"B5", dt, rx); -- "10110101" -- Eingangsport 21 wird gesendet, es wird im Adapter keine Änderung des Ports vorgenommen (Out of range)
         
         wait for 90 us;
         
-        SendViaUART("11100000", dt, rx); -- EOP
+        SendViaUART('1' & "11100000", dt, rx); -- EOP
         
         wait for 90 us;
         
