@@ -7,7 +7,10 @@
 -- Module Name: UART2SpW
 -- Project Name: SpaceWire Router
 -- Target Devices: xc7a35tcpg236-1 (tested);
--- Tool Versions: 
+-- Tool Versions:
+-- Description: Raw version of UART SpaceWire adapter. Contains UART Receiver and
+-- Transmitter as well as SpaceWire ports.
+--
 -- Dependencies: spwpkg (spwstream)
 -- 
 -- Revision:
@@ -250,17 +253,15 @@ architecture UARTSpWAdapter_config_arch of UARTSpWAdapter is
     
     -- Intern used signals.
     -- UART2SpW fsm.
-    type input_states is (s_Idle, s_Decode, s_Cmd, s_Data); -- unvollständig!
+    type input_states is (s_Idle, s_Decode, s_Cmd, s_Data);
     signal istate : input_states := s_Idle;
     
     -- SpW2UART fsm.
-    type output_states is (s_Idle, s_NChar, s_Wait, s_CleanUp); -- Unvollständig!
+    type output_states is (s_Idle, s_NChar, s_Wait, s_CleanUp);
     signal ostate : output_states := s_Idle;
     
     -- Buffer.
     signal s_uart_buffer : std_logic_vector(7 downto 0) := (others => '0'); -- buffers incoming bytes (uart)
-    --signal s_spw_buffer : std_logic_vector(8 downto 0) := (8 => '1', others => '0'); -- buffers input data for spacewire port (flag + N-Char)
-    signal s_spw_output: std_logic_vector(7 downto 0) := (others => '0'); -- buffers output data for spacewire port (flag + N-Char)
     signal s_uart_output : std_logic_vector(7 downto 0) := (others => '0'); -- buffers outgoing bytes (uart)
     
     -- Control.
@@ -316,61 +317,10 @@ begin
             tx_rdy => s_tx_rdy,
             tx_data => s_tx_data
         );
-        
-    -- Internal configuration port (port 0)
-    -- (for detailed description pls look to spwstream manual and/or SpaceWire standard specifications)
-    port0 : spwstream
-        generic map (
-            sysfreq => sysfreq,
-            txclkfreq => txclkfreq,
-            rximpl => rximpl,
-            rxchunk => rxchunk,
-            WIDTH => WIDTH,
-            tximpl => tximpl,
-            rxfifosize_bits => rxfifosize_bits,
-            txfifosize_bits => txfifosize_bits
-        )
-        port map (
-            clk => clk,
-            rxclk => rxclk,
-            txclk => txclk,
-            rst => rst,
-            autostart => autostart(0),
-            linkstart => linkstart(0),
-            linkdis => linkdis(0),
-            txdivcnt => txdivcnt,
-            tick_in => '0', -- TCs are deactivated for port 0 ! (Internal configuration port)
-            ctrl_in => s_ctrl_in(0),
-            time_in => s_time_in(0),
-            txwrite => s_txwrite(0),
-            txflag => s_txflag(0),
-            txdata => s_txdata(0),
-            txrdy => s_txrdy(0),
-            txhalff => s_txhalff(0),
-            tick_out => open, -- if port 0 should be able to receive TCs please modify signals here !
-            ctrl_out => open,
-            time_out => open,
-            rxvalid => s_rxvalid(0),
-            rxhalff => s_rxhalff(0),
-            rxflag => s_rxflag(0),
-            rxdata => s_rxdata(0),
-            rxread => s_rxread(0),
-            started => s_started(0),
-            connecting => s_connecting(0),
-            running => s_running(0),
-            errdisc => s_errdisc(0),
-            errpar => s_errpar(0),
-            erresc => s_erresc(0),
-            errcred => s_errcred(0),
-            spw_di => spw_di(0), -- from router (SpW receiver front-end contains FFs to sync in !)
-            spw_si => spw_si(0),
-            spw_do => spw_do(0), -- to router
-            spw_so => spw_so(0)
-        );
-        
-    -- Port 1 to numports
-    portsN : for n in 1 to numports generate
-        portN : spwstream
+                
+    -- Port 0 to numports
+    SpW_Ports : for n in 0 to numports generate
+        port_n : spwstream
 		GENERIC MAP(
 			sysfreq => sysfreq,
 			txclkfreq => txclkfreq,
@@ -413,12 +363,12 @@ begin
 			errpar => s_errpar(n),
 			erresc => s_erresc(n),
 			errcred => s_errcred(n),
-			spw_di => spw_di(n), -- from router SpW receiver front-end contains FFs to sync in !
+			spw_di => spw_di(n), -- from router SpW receiver (front-end ensures synchronization !)
 			spw_si => spw_si(n),
 			spw_do => spw_do(n), -- to router
 			spw_so => spw_so(n)
 		);   
-    end generate portsN;    
+    end generate SpW_Ports;    
     
     -- UART -> SpaceWire
     uart2spw : process(clk)
@@ -437,8 +387,8 @@ begin
                 s_ctrl_in <= (others => (others => '0'));
                 s_time_in <= (others => (others => '0'));
                 -- Intern signals.
-                s_port_input <= 0;
-                s_port_output <= 0;
+                s_port_input <= init_input_port;
+                s_port_output <= init_output_port;
                 s_info1 <= '0';
                 s_info2 <= '0';
                 s_info3 <= '0';
@@ -559,7 +509,11 @@ begin
                                 s_txwrite(s_port_input) <= '1';                            
                             else
                                 -- Normal N-Char (default chase)
-                                s_txdata(s_port_input) <= "00" & s_uart_buffer(5 downto 0);
+                                if activate_commands = true then
+                                    s_txdata(s_port_input) <= "00" & s_uart_buffer(5 downto 0);
+                                else
+                                    s_txdata(s_port_input) <= s_uart_buffer;
+                                end if;
                                 s_txflag(s_port_input) <= '0';
                             
                                 s_txwrite(s_port_input) <= '1';
@@ -587,6 +541,7 @@ begin
             else
                 case ostate is
                     when s_Idle =>
+                        -- Wait until a Time Code (highest priority) or N-Char were received or command information is requested.
                         if s_tick_out(s_port_output) = '1' and activate_commands = true then
                             s_uart_output <= "01" & s_time_out(s_port_output);
                             ostate <= s_Wait;
@@ -616,14 +571,17 @@ begin
                             ostate <= s_NChar;
                         
                         elsif s_info1 = '1' and activate_commands = true then
+                            -- Send selected input port.
                             s_uart_output <= "101" & std_logic_vector(to_unsigned(s_port_input, 5));
                             
                             ostate <= s_Wait;
                         elsif s_info2 = '1' and activate_commands = true then
+                            -- Send selected output port.
                             s_uart_output <= "110" & std_logic_vector(to_unsigned(s_port_output, 5));
                             
                             ostate <= s_Wait;
                         elsif s_info3 = '1' and activate_commands = true then
+                            -- Send error & status report.
                             s_uart_output(7 downto 5) <= "100";
                             s_uart_output(4) <= s_started(s_port_input) or s_connecting(s_port_input);
                             s_uart_output(3) <= s_running(s_port_input);
@@ -635,11 +593,13 @@ begin
                         end if;
                     
                     when s_NChar =>
+                        -- Reset handshake with SpaceWire port.
                         s_rxread(s_port_output) <= '0';
-                        
+                                                
                         ostate <= s_Wait;
                     
                     when s_Wait =>
+                        -- Wait until UART transmitter is ready to send...
                         if s_tx_rdy = '1' then
                             s_tx_data <= s_uart_output;
                             s_tx_ack <= '1';
@@ -647,100 +607,12 @@ begin
                         end if;
                     
                     when s_CleanUp =>
+                        -- Widthdraw transmission permission.
                         s_tx_ack <= '0';
                         
                         ostate <= s_Idle;
                     
                 end case;
-            
-            
---                case ostate is
---                    when s_Idle =>
---                        s_rxread(s_port_output) <= '0';
---                        s_uart_output <= (others => '0');
-                    
---                        if s_tick_out(s_port_output) = '1' and activate_commands = true then -- Allow receiving Time Codes only in command mode adapter to avoid ambiguity N-Chars.
---                            -- TimeCode was received (highest priority !)
---                            s_uart_output <= "01" & s_time_out(s_port_output);
-                            
---                            ostate <= s_Send;
---                        elsif s_rxvalid(s_port_output) = '1' then -- If activate_commands = false, this is the only block that is actively running.
---                            -- N-Char was received.
---                            if s_rxflag(s_port_output) = '1' then
---                                -- EOP / EEP
---                                case s_rxdata(s_port_output) is
---                                    when x"00" =>
---                                        -- EOP
---                                        s_uart_output <= "11111111"; -- 0xff
---                                        s_rxread(s_port_output) <= '1';
---                                        ostate <= s_Send;
-                                        
---                                    when x"01" =>
---                                        -- EEP
---                                        s_uart_output <= "11111110"; -- 0xfe
---                                        s_rxread(s_port_output) <= '1';
---                                        ostate <= s_Send;
-                                        
---                                    when others => -- Important ! (Not only for simulation !)
---                                        s_uart_output <= (others => '0');
-                                        
---                                        s_rxread(s_port_output) <= '0';
-                                        
---                                        ostate <= s_Idle;
-
---                                end case;
-                                
---                                --s_rxread(s_port_output) <= '1';
-                                
---                            else
---                                -- Data byte
---                                if activate_commands = true then -- If commands are allowed, to avoid ambiguity, return data in specific scheme that fits to commands.
---                                    s_uart_output <= "00" & s_rxdata(s_port_output)(5 downto 0);
---                                else -- If no commands are allowed data is output unchanged.
---                                    s_uart_output <= s_rxdata(s_port_output);
---                                end if;
-                                
---                                s_rxread(s_port_output) <= '1';
-                               
---                               ostate <= s_Send;
-                               
---                            end if;
-                            
---                            --s_rxread(s_port_output) <= '1';
-                            
---                        elsif s_info1 = '1' and activate_commands = true then
---                            -- Intern Info1 is requested.
---                            s_uart_output <= "101" & std_logic_vector(to_unsigned(s_port_input, 5));
-                            
---                            ostate <= s_Send;
-
---                        elsif s_info2 = '1' and activate_commands = true then
---                            -- Intern Info2 is requested.
---                            s_uart_output <= "110" & std_logic_vector(to_unsigned(s_port_output, 5));
-
---                            ostate <= s_Send;
-                            
---                        elsif s_info3 = '1' and activate_commands = true then
---                            -- Intern Info3 is requested.
---                            s_uart_output(7 downto 5) <= "100";
---                            s_uart_output(4) <= s_started(s_port_input) or s_connecting(s_port_input);
---                            s_uart_output(3) <= s_running(s_port_input);
---                            s_uart_output(2) <= s_errdisc(s_port_input) or s_errpar(s_port_input);
---                            s_uart_output(1) <= s_erresc(s_port_input) or s_errcred(s_port_input);
---                            s_uart_output(0) <= s_rxhalff(s_port_output) or s_txhalff(s_port_input); -- input / output !
-                            
---                            ostate <= s_Send;
-                            
---                        end if;
-                        
---                    when s_Send =>
---                        s_rxread(s_port_output) <= '0';
---                        if s_tx_rdy = '1' then
---                            s_tx_data <= s_uart_output;
---                            s_tx_ack <= '1';
---                            ostate <= s_Idle;
---                        end if;
---                end case;
             end if;
         end if;
     end process spw2uart;

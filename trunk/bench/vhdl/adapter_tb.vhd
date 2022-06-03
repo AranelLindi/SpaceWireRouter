@@ -17,12 +17,12 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.spwpkg.all; -- for spwstream (and definitions)
---use work.spwrouterpkg.all; -- for spwrouter (and definitions)
 
 entity adapter_tb is
 end;
 
 architecture adapter_tb_arch of adapter_tb is
+    -- Sends a given byte + Stop bit (Stopbit & Byte) via Uart. (Stop bit can be used to test how a byte with invalid stop bit (stop bit = 0) is handled.
     procedure SendViaUART(constant byte : in std_logic_vector(8 downto 0); constant dt : in time; signal stream : out std_logic) is
     begin
         -- Start bit.
@@ -32,7 +32,7 @@ architecture adapter_tb_arch of adapter_tb is
         wait for dt;
         
         -- Send byte
-        for i in 0 to 7 loop -- LSB first !
+        for i in 0 to byte'length-1 loop -- LSB first !
             stream <= byte(i);
             wait for dt;
         end loop;
@@ -86,6 +86,7 @@ architecture adapter_tb_arch of adapter_tb is
         );
     end component UARTSpWAdapter;
     
+    -- Array definition.
     type array_t is array(natural range<>) of std_logic_vector;
     
     
@@ -106,8 +107,6 @@ architecture adapter_tb_arch of adapter_tb is
     
     -- Simulation signals.
     signal clk: std_logic;
-    --signal rxclk: std_logic;
-    --signal txclk: std_logic;
     signal rst: std_logic := '1';
     signal autostart: std_logic_vector(numports downto 0) := (others => '1');
     signal linkstart: std_logic_vector(numports downto 0) := (others => '1');
@@ -122,20 +121,7 @@ architecture adapter_tb_arch of adapter_tb is
     signal errcred: std_logic_vector(numports downto 0);
     signal txhalff: std_logic_vector(numports downto 0);
     signal rxhalff: std_logic_vector(numports downto 0);
-    --signal spw_di: std_logic_vector(numports downto 0);
-    --signal spw_si: std_logic_vector(numports downto 0);
-    --signal spw_do: std_logic_vector(numports downto 0);
-    --signal spw_so: std_logic_vector(numports downto 0);
-    
-    
---    -- Router status signals
---    signal s_router_started : std_logic_vector(numports downto 0);
---    signal s_router_connecting : std_logic_vector(numports downto 0);
---    signal s_router_running : std_logic_vector(numports downto 0);
---    signal s_router_errdisc : std_logic_vector(numports downto 0);
---    signal s_router_errpar : std_logic_vector(numports downto 0);
---    signal s_router_erresc : std_logic_vector(numports downto 0);
---    signal s_router_errcred : std_logic_vector(numports downto 0);
+
 
     -- Corresponding SpaceWire Port signals.
     signal s_corr_tick_in : std_logic_vector(numports downto 0) := (others => '0');
@@ -152,7 +138,6 @@ architecture adapter_tb_arch of adapter_tb is
     signal s_corr_rxflag : std_logic_vector(numports downto 0) := (others => '0');
     signal s_corr_rxdata : array_t(numports downto 0)(7 downto 0) := (others => (others => '0'));
     signal s_corr_rxvalid : std_logic_vector(numports downto 0) := (others => '0');
-
     
     
     -- SpaceWire signals.
@@ -177,8 +162,8 @@ begin
             clk_cycles_per_bit => 868, -- 100_000_000 (Hz) / 115_200 (baud rate) = 868
             numports           => numports,
             init_input_port    => 0,
-            init_output_port   => 0,
-            activate_commands  => true,
+            init_output_port   => 2,
+            activate_commands  => false, -- define adapter type (commands / non-commands version)
             sysfreq            => sysfreq,
             txclkfreq          => txclkfreq,
             rximpl             => rximpl,
@@ -212,7 +197,8 @@ begin
             rx                 => rx,
             tx                 => tx );
             
-
+    
+    -- Corresponding SpaceWire ports that send and receive data from and to adapter.
     ComSpWPorts : for n in 0 to numports generate
         portN : spwstream
             generic map (
@@ -263,33 +249,6 @@ begin
             );
     end generate ComSpWPorts;      
         
-
---    -- Instance of SpaceWire router to allow realistic SpaceWire communication.        
---    Router : spwrouter
---        generic map (
---            numports => numports,
---            sysfreq => sysfreq,
---            txclkfreq => txclkfreq,
---            rx_impl => (others => rximpl),
---            tx_impl => (others => tximpl)
---        )
---        port map (
---            clk => clk,
---            rxclk => rxclk,
---            txclk => txclk,
---            rst => rst,
---            started => s_router_started,
---            connecting => s_router_connecting,
---            running => s_router_running,
---            errdisc => s_router_errdisc,
---            errpar => s_router_errpar,
---            erresc => s_router_erresc,
---            errcred => s_router_errcred,
---            spw_di => s_spw_data_to_router,
---            spw_si => s_spw_strobe_to_router,
---            spw_do => s_spw_data_from_router,
---            spw_so => s_spw_strobe_from_router
---        );
         
     -- Simulation tasks.
     stimulus : process
@@ -319,7 +278,7 @@ begin
         -- this could cause a systematic error in which the watchdog silently terminates
         -- open packets !
         
-        SendViaUART('0' & x"02", dt, rx);
+        SendViaUART('1' & "00000010", dt, rx); -- Should not be received through UART because of wrong stop bit (stop bit = '0') !
         
         wait for 90 us;
         
@@ -363,16 +322,15 @@ begin
         
         wait for 450 us;
         
-        newround <= '1';
-        wait for clock_period;
-        --stop_the_clock <= true;       
+        newround <= '1'; -- Just to show new iteration in simulation plot.
+        wait for clock_period;       
     end process stimulus;
     
+    
+    -- Creates clk.
     clocking : process
     begin
-        --while not stop_the_clock loop
-            clk <= '0', '1' after clock_period /2;
-            wait for clock_period;
-        --end loop;
+        clk <= '0', '1' after clock_period /2;
+        wait for clock_period;
     end process clocking;
 end architecture adapter_tb_arch;

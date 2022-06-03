@@ -103,7 +103,7 @@ BEGIN
             ELSE
                 CASE state IS
                     WHEN S_Idle =>
-                        IF (s_shiftreg(1) <= '0') THEN -- Start bit detected.
+                        IF (s_shiftreg(1) = '0') THEN -- Start bit detected.
                             s_invalid_byte <= '0';
                             s_rx_rdy <= '0';
                             state <= S_Rx_Start_Bit;
@@ -118,6 +118,7 @@ BEGIN
                                 s_clk_count <= 0; -- reset counter since we found the middle.
                                 state <= s_Rx_Data_Bits;
                             ELSE
+                                -- Invalid start bit (start bit = '1').
                                 state <= S_Idle;
                             END IF;
                         ELSE
@@ -146,38 +147,22 @@ BEGIN
 
                     -- Receive Stop bit. Stop bit = 1.
                     WHEN S_Rx_Stop_Bit =>
-                        if s_clk_count = ((clk_cycles_per_bit - 1) / 2) then -- Check middle of stop bit once to make sure its high and wait still to end of bit.
-                            if (s_shiftreg(1) = '0') then
-                                -- Invalid stop bit (Stop bit = 0)
-                                s_invalid_byte <= '1';
-                            else
-                                s_clk_count <= (s_clk_count +1);
-                                state <= S_Rx_Stop_Bit;
-                            end if;
-                        elsif (s_clk_count < (clk_cycles_per_bit -1 )) then -- Wait (clk_cycles_per_bit - 1) clock cycles for Stop bit to finish.
+                        -- Wait (clk_cycles_per_bit - 1) clock cycles for Stop bit to finish. -- ORIGINAL CODE ! KEEP IT !
+                        IF (s_clk_count < (clk_cycles_per_bit - 1)) THEN
                             s_clk_count <= (s_clk_count + 1);
                             state <= S_Rx_Stop_Bit;
-                        else
-                            if s_invalid_byte = '1' then -- if stop bit is invalid go back to idle and receive next byte.
-                                s_rx_rdy <= '0';
-                                s_clk_count <= 0;
-                                state <= S_Idle;
-                            else -- If stop bit was valid, deliver received byte.
+                        ELSE
+                            s_clk_count <= 0;                        
+                        
+                            if s_shiftreg(1) = '1' then
                                 s_rx_rdy <= '1';
-                                s_clk_count <= 0;
                                 state <= S_Cleanup;
+                            else
+                                -- Invalid stop bit.
+                                s_invalid_byte <= '1';
+                                state <= S_Idle;
                             end if;
-                        end if;                   
-                    
-                        -- Wait (clk_cycles_per_bit - 1) clock cycles for Stop bit to finish. -- ORIGINAL CODE ! KEEP IT !
---                        IF (s_clk_count < (clk_cycles_per_bit - 1)) THEN
---                            s_clk_count <= (s_clk_count + 1);
---                            state <= S_Rx_Stop_Bit;
---                        ELSE
---                            s_rx_rdy <= '1';
---                            s_clk_count <= 0;
---                            state <= S_Cleanup;
---                        END IF;
+                        END IF;
 
                     -- Stay here for handshake. 
                     WHEN S_Cleanup =>

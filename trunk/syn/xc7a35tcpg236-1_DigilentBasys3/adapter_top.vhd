@@ -3,18 +3,18 @@
 -- Engineer: Stefan Lindoerfer
 -- 
 -- Create Date: 06/01/2022 09:52:34 AM
--- Design Name: 
+-- Design Name: adapter_top
 -- Module Name: 
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
+-- Project Name: SpaceWire Router
+-- Target Devices: -
+-- Tool Versions: 1.0
+-- Description: UART-SpaceWire Adapter.
 -- 
--- Dependencies: 
+-- Dependencies: spwpkg (spwstream)
 -- 
 -- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
+-- Revision 1.0 - File Created (Hardwaretest pending)
+-- Additional Comments: -
 -- 
 ----------------------------------------------------------------------------------
 
@@ -23,13 +23,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.spwpkg.all;
-use work.spwrouterpkg.all;
 
-entity routertest_adapter_single_top is
-    generic (
-        -- Number of SpaceWire ports in router & adapter.
-        numports : integer range 0 to 31 := 3
-    );
+entity adapter_top is
     port (
         -- System clock.
         clk : in std_logic;
@@ -43,31 +38,43 @@ entity routertest_adapter_single_top is
         -- Uart tx stream.
         tx : out std_logic;
         
-        -- Clear signal to reset error flags.
+        -- Clear signal to reset error flag.
         clear : in std_logic;
+                       
+        -- HIGH if link of adapter SpW port is in 'started' state.
+        started : out std_logic;
         
-        -- HIGH if link of adapter SpW ports is in run state, indicating that link is operational.
-        adapt_running : out std_logic_vector(numports downto 0);
-        
+        -- HIGH if link of adapter SpW port is in 'connecting' state.
+        connecting : out std_logic;
+
+        -- HIGH if link of adapter SpW port is in run state, indicating that link is operational.
+        running : out std_logic;
+
         -- HIGH if errdisc (disconnect error), errpar (parity error), erresc (invalid escape sequence) or errcred (credit error) were detected.
         -- Triggers link reset. Must be acknowledged with a 'rst' or 'clear'.
-        adapt_error : out std_logic_vector(numports downto 0);
+        error : out std_logic;
+        
+        -- HIGH if transmit FIFO of adapter SpW port is at least half full.
+        txhalff : out std_logic;
+        
+        -- HIGH if receiver FIFO of adapter SpW port is at least half full.
+        rxhalff : out std_logic;
 
         -- SpaceWire data in.
-        spw_di : in std_logic_vector(numports downto 0);
+        spw_di : in std_logic;
         
         -- SpaceWire strobe in.
-        spw_si : in std_logic_vector(numports downto 0);
+        spw_si : in std_logic;
         
         -- SpaceWire data out.
-        spw_do : out std_logic_vector(numports downto 0);
+        spw_do : out std_logic;
         
         -- SpaceWire strobe out.
-        spw_so : out std_logic_vector(numports downto 0)
+        spw_so : out std_logic
     );
-end routertest_adapter_single_top;
+end adapter_top;
 
-architecture routertest_adapter_single_top_arch of routertest_adapter_single_top is
+architecture adapter_top_arch of adapter_top is
     -- Constants
     constant sysfreq : real := 100.0e6; -- 100 MHz Digilent Basys3 Board !
 
@@ -202,53 +209,46 @@ architecture routertest_adapter_single_top_arch of routertest_adapter_single_top
     
     
     -- Adapter signals.
-    signal s_adapt_error : std_logic_vector(numports downto 0); -- error flag    
-    signal s_adapt_started : std_logic_vector(numports downto 0);
-    signal s_adapt_connecting : std_logic_vector(numports downto 0);
-    signal s_adapt_running: std_logic_vector(numports downto 0);
-    signal s_adapt_errdisc : std_logic_vector(numports downto 0);
-    signal s_adapt_errpar : std_logic_vector(numports downto 0);
-    signal s_adapt_erresc : std_logic_vector(numports downto 0);
-    signal s_adapt_errcred : std_logic_vector(numports downto 0);
-    signal s_adapt_txhalff : std_logic_vector(numports downto 0);
-    signal s_adapt_rxhalff : std_logic_vector(numports downto 0);
+    signal s_error : std_logic_vector(0 downto 0); -- error flag    
+    signal s_started : std_logic_vector(0 downto 0);
+    signal s_connecting : std_logic_vector(0 downto 0);
+    signal s_running: std_logic_vector(0 downto 0);
+    signal s_errdisc : std_logic_vector(0 downto 0);
+    signal s_errpar : std_logic_vector(0 downto 0);
+    signal s_erresc : std_logic_vector(0 downto 0);
+    signal s_errcred : std_logic_vector(0 downto 0);
+    signal s_txhalff : std_logic_vector(0 downto 0);
+    signal s_rxhalff : std_logic_vector(0 downto 0);
     
-    -- Router signals.
-    signal s_router_error : std_logic_vector(numports downto 0); -- error flag
-    signal s_router_started : std_logic_vector(numports downto 0);
-    signal s_router_connecting : std_logic_vector(numports downto 0);
-    signal s_router_running : std_logic_vector(numports downto 0);
-    signal s_router_errdisc : std_logic_vector(numports downto 0);
-    signal s_router_errpar : std_logic_vector(numports downto 0);
-    signal s_router_erresc : std_logic_vector(numports downto 0);
-    signal s_router_errcred : std_logic_vector(numports downto 0);
     
     -- SpaceWire signals.
-    signal s_spw_d_to_router : std_logic_vector(numports downto 0);
-    signal s_spw_s_to_router : std_logic_vector(numports downto 0);
-    signal s_spw_d_from_router : std_logic_vector(numports downto 0);
-    signal s_spw_s_from_router : std_logic_vector(numports downto 0);
+    signal s_spw_d_to_router : std_logic_vector(0 downto 0);
+    signal s_spw_s_to_router : std_logic_vector(0 downto 0);
+    signal s_spw_d_from_router : std_logic_vector(0 downto 0);
+    signal s_spw_s_from_router : std_logic_vector(0 downto 0);
 begin
     -- Drive outputs.
-    adapt_error <= s_adapt_error;
-    router_error <= s_router_error;
-    adapt_running <= s_adapt_running;
-    router_running <= s_router_running;
+    error <= s_error(0);
+    started <= s_started(0);
+    connecting <= s_connecting(0);
+    running <= s_running(0);
+    txhalff <= s_txhalff(0);
+    rxhalff <= s_rxhalff(0);
     
     -- Drive SpaceWire signals.
-    spw_do <= s_spw_d_to_router;
-    spw_so <= s_spw_s_to_router;
-    s_spw_d_from_router <= spw_di;
-    s_spw_s_from_router <= spw_si;
+    spw_do <= s_spw_d_to_router(0);
+    spw_so <= s_spw_s_to_router(0);
+    s_spw_d_from_router(0) <= spw_di;
+    s_spw_s_from_router(0) <= spw_si;
     
 
     -- UARTSpWAdapter
     Adapter : UARTSpWAdapter
         generic map (
             clk_cycles_per_bit => 868, -- 100_000_000 (Hz) / 115_200 (baud rate) = 868
-            numports => numports,
-            init_input_port => 1,
-            init_output_port => 1,
+            numports => 0,
+            init_input_port => 0,
+            init_output_port => 0,
             activate_commands => true,
             sysfreq => sysfreq,
             txclkfreq => sysfreq,
@@ -268,15 +268,15 @@ begin
             linkstart => (others => '1'),
             linkdis => (0 => '0', others => '0'),
             txdivcnt => "00000001",
-            started => open,
-            connecting => open,
-            running => s_adapt_running,
-            errdisc => s_adapt_errdisc,
-            errpar => s_adapt_errpar,
-            erresc => s_adapt_erresc,
-            errcred => s_adapt_errcred,
-            txhalff => open,
-            rxhalff => open,
+            started => s_started,
+            connecting => s_connecting,
+            running => s_running,
+            errdisc => s_errdisc,
+            errpar => s_errpar,
+            erresc => s_erresc,
+            errcred => s_errcred,
+            txhalff => s_txhalff,
+            rxhalff => s_rxhalff,
             spw_di => s_spw_d_from_router,
             spw_si => s_spw_s_from_router,
             spw_do => s_spw_d_to_router,
@@ -289,12 +289,10 @@ begin
     begin
         if rising_edge(clk) then
             if rst = '1' then
-                s_adapt_error <= (others => '0');
-                s_router_error <= (others => '0');
+                s_error <= (others => '0');
             else
-                s_adapt_error <= (s_adapt_error or s_adapt_errdisc or s_adapt_errpar or s_adapt_erresc or s_adapt_errcred) and (not clear);
-                s_router_error <= (s_router_error or s_router_errdisc or s_router_errpar or s_router_erresc or s_router_errcred) and (not clear);
+                s_error <= (s_error or s_errdisc or s_errpar or s_erresc or s_errcred) and (not clear);
             end if;
         end if;
     end process;
-end architecture routertest_adapter_single_top_arch;
+end architecture adapter_top_arch;

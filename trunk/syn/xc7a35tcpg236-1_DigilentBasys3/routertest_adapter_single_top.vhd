@@ -236,7 +236,7 @@ begin
             numports => numports,
             init_input_port => 1,
             init_output_port => 1,
-            activate_commands => true,
+            activate_commands => true, -- define adapter variant (command / non-command version)
             sysfreq => sysfreq,
             txclkfreq => sysfreq,
             rximpl => impl_fast,
