@@ -17,7 +17,7 @@
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
-USE ieee.numeric_std.ALL; -- Eventuell fehlt hier 'use ieee.std_logic_unsigned.all;' !
+USE ieee.numeric_std.ALL;
 USE work.spwpkg.ALL;
 
 PACKAGE spwrouterpkg IS
@@ -104,8 +104,8 @@ PACKAGE spwrouterpkg IS
         );
     END COMPONENT;
 
-    -- TimeCode Controller (spwroutertcc.vhd)
-    COMPONENT spwroutertcc IS
+    -- Time Code Controller (spwroutertcc.vhd)
+    COMPONENT spwroutertcc IS -- geändert am 04.06.2022
         GENERIC (
             numports : INTEGER RANGE 0 TO 31
         );
@@ -113,14 +113,14 @@ PACKAGE spwrouterpkg IS
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
             running : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-            lst_time : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-            tc_en : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
-            tick_out : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
-            time_out : OUT array_t(0 TO (numports - 1))(7 DOWNTO 0); -- hier ersten Index umgedreht
-            tick_in : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
-            time_in : IN array_t(0 TO (numports - 1))(7 DOWNTO 0); -- hier ersten Index umgedreht
-            auto_time_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-            auto_cycle : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
+            tc_enable : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            tc_last : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);            
+            tick_out : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            tick_in : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            tc_out : OUT array_t(numports DOWNTO 0)(7 DOWNTO 0);
+            tc_in : IN array_t(numports DOWNTO 0)(7 DOWNTO 0);
+            auto_tc_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+            auto_interval : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
     END COMPONENT;
 
