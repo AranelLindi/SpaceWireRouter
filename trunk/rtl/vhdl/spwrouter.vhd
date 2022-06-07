@@ -141,11 +141,11 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         -- All ports that are in running state.
         SIGNAL iLinkUp : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-        -- TimeCodes.
-        SIGNAL tick_in : STD_LOGIC_VECTOR(numports DOWNTO 1);
-        SIGNAL time_in : array_t(1 TO numports)(7 DOWNTO 0);
-        SIGNAL tick_out : STD_LOGIC_VECTOR(numports DOWNTO 1);
-        SIGNAL time_out : array_t(1 TO numports)(7 DOWNTO 0);
+        -- Time Codes.
+        SIGNAL s_tick_from_tcc_to_ports : std_logic_vector(numports downto 0); -- High for one clock cycle if transmission of Time Code is requested
+        signal s_tick_from_ports_to_tcc : std_logic_vector(numports downto 0); -- High for one clock cycle if Time Code was received
+        signal s_tc_from_tcc_to_ports : array_t(numports downto 0)(7 downto 0); -- Time Code (control flag & counter value) of Time Code to sent
+        signal s_tc_from_ports_to_tcc : array_t(numports downto 0)(7 downto 0); -- Time Code (control flag & coutner value) of received Time Code
 
         -- TimeCodes & Register.
         SIGNAL autoTimeCodeValue : STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -215,11 +215,11 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             linkstart => '0',
             linkdis => '0',
             txdivcnt => "00000001",
-            tick_in => '0',
-            time_in => (OTHERS => '0'),
+            tick_in => s_tick_from_tcc_to_ports(0),--tick_in(0),
+            time_in => s_tc_from_tcc_to_ports(0),--time_in(0),
             txdata => iDataIn(0),
-            tick_out => OPEN,
-            time_out => OPEN,
+            tick_out => s_tick_from_ports_to_tcc(0),--tick_out(0),
+            time_out => s_tc_from_ports_to_tcc(0),--time_out(0),
             rxdata => dataOut(0),
             started => started(0),
             connecting => connecting(0),
@@ -273,11 +273,11 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 linkstart => '0',
                 linkdis => '0',
                 txdivcnt => "00000001",
-                tick_in => tick_in(i),
-                time_in => time_in(i),
+                tick_in => s_tick_from_tcc_to_ports(i),--tick_in(i),
+                time_in => s_tc_from_tcc_to_ports(i),--time_in(i),
                 txdata => iDataIn(i),
-                tick_out => tick_out(i),
-                time_out => time_out(i),
+                tick_out => s_tick_from_ports_to_tcc(i),--tick_out(i),
+                time_out => s_tc_from_ports_to_tcc(i),--time_out(i),
                 rxdata => dataOut(i),
                 started => started(i),
                 connecting => connecting(i),
@@ -387,12 +387,13 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             clk => clk,
             rst => rst,
             running => iLinkUp,
-            lst_time => routerTimeCode,
-            tc_en => (OTHERS => '1'),
-            tick_out => tick_out,
-            tick_in => tick_in,
-            time_in => time_in,
-            auto_time_out => autoTimeCodeValue,
-            auto_cycle => autoTimeCodeCycleTime
+            tc_enable => (OTHERS => '1'),
+            tc_last => routerTimeCode,            
+            tick_out => s_tick_from_tcc_to_ports,--tick_out,
+            tick_in => s_tick_from_ports_to_tcc,--tick_in,
+            tc_out => s_tc_from_tcc_to_ports,--time_out,
+            tc_in => s_tc_from_ports_to_tcc,--time_in,
+            auto_tc_out => autoTimeCodeValue,
+            auto_interval => autoTimeCodeCycleTime
         );
     END ARCHITECTURE spwrouter_arch;

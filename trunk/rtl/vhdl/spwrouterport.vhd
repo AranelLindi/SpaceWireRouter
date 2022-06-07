@@ -524,8 +524,8 @@ BEGIN
 
                     END IF;
 
-                    --WHEN OTHERS => -- Because of unused state problem.
-                    --    state <= S_Idle;
+                WHEN OTHERS => -- Because of unused state problem.
+                    state <= S_Idle;
             END CASE;
         END IF;
     END PROCESS;

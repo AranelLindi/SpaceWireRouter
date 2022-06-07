@@ -230,6 +230,7 @@ begin
     router_running <= s_router_running;
 
     -- UARTSpWAdapter
+    -- Contains numports-SpaceWire ports.
     Adapter : UARTSpWAdapter
         generic map (
             clk_cycles_per_bit => 868, -- 100_000_000 (Hz) / 115_200 (baud rate) = 868

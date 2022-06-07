@@ -5,7 +5,7 @@
 -- Create Date: 04.08.2021 14:28
 -- Design Name: SpaceWire Control Register
 -- Module Name: spwrouterregs
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
 -- Target Devices: 
 -- Tool Versions: 
 -- Description: Manages internal registers and controls reading and writing
@@ -266,7 +266,8 @@ BEGIN
             s_DataOutBuffer <= (OTHERS => '0');
             s_DataInBuffer <= (OTHERS => '0');
 
-            s_autoTimeCodeCycleTime <= x"00000000";
+            --                         x"0BEBC200" (alle 2 sec wird ein neues automatisches Time Code generiert)
+            s_autoTimeCodeCycleTime <= x"00000000"; -- ACHTUNG ! WERT HIER UNBEDINGT WIEDER AUF x"00000000" ABÄNDERN! NUR ZU TESTZWECKEN SO IMPLEMENTIERT !
             s_autoTimeCodeValue <= (OTHERS => '0');
             -- TODO: Built-in async reset for spwrams!
 
