@@ -556,7 +556,6 @@ begin
                                     s_uart_output <= x"ff"; -- 11111111                                    
                                 end if;
                                 
-                                s_rxread(s_port_output) <= '1';
                                 ostate <= s_NChar;
                             else
                                 -- Data byte
@@ -568,7 +567,7 @@ begin
                             end if;
                             
                             s_rxread(s_port_output) <= '1';
-                            ostate <= s_NChar;
+                            ostate <= s_NChar;                            
                         
                         elsif s_info1 = '1' and activate_commands = true then
                             -- Send selected input port.

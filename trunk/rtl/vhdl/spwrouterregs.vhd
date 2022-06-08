@@ -843,14 +843,14 @@ BEGIN
     PORT MAP(
         clk => clk,
         rst => rst,
-        act => s_strobeRoutingTable,
+        ack_in => s_strobeRoutingTable,
         readwrite => readwrite,
         dByte => dByte,
-        addr => addr(9 DOWNTO 2), -- mapps hexadecimal numbers to decimals beginning with 0 step 1.
+        addr => addr(9 DOWNTO 2), -- maps hexadecimal numbers to decimals beginning with 0 step 1.
         wdata => writeData,
         rdata => s_dataRoutingTable,
-        proc => s_procRoutingTable
-    ); -- Check, genauso wie im original
+        ack_out => s_procRoutingTable
+    );
 
     -- Port status register (0x0000_0400 - 0x0000_0480)
     -- Even if fewer that maximum possible 31 ports are created (numports), 

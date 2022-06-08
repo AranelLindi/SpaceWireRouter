@@ -5,20 +5,20 @@
 -- Create Date: 31.07.2021 14:59
 -- Design Name: SpaceWire Router Package
 -- Module Name: spwrouterpkg
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
--- Target Devices: 
--- Tool Versions: 
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
+-- Target Devices: Xilinx FPGAs
+-- Tool Versions: -/-
 -- Description: Contains type and component definitions of spwrouter elements.
 --
 -- Dependencies: none
 -- 
--- Revision:
+-- Revision: 1.0
 ----------------------------------------------------------------------------------
 
-LIBRARY ieee;
-USE ieee.std_logic_1164.ALL;
-USE ieee.numeric_std.ALL;
-USE work.spwpkg.ALL;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+USE WORK.SPWPKG.ALL;
 
 PACKAGE spwrouterpkg IS
     -- Type declarations:
@@ -74,7 +74,7 @@ PACKAGE spwrouterpkg IS
     TYPE matrix_t IS ARRAY(NATURAL RANGE <>, NATURAL RANGE <>) OF STD_LOGIC;
 
     -- Component declarations:
-    -- Round Robin Arbiter (spwrouterarb_table.vhd)
+    -- Round Robin arbiter (spwrouterarb_table.vhd).
     COMPONENT spwrouterarb_round IS
         GENERIC (
             numports : INTEGER RANGE 0 TO 31;
@@ -89,7 +89,7 @@ PACKAGE spwrouterpkg IS
         );
     END COMPONENT;
 
-    -- (spwrouterarb.vhd)
+    -- Port arbiter (spwrouterarb.vhd).
     COMPONENT spwrouterarb IS
         GENERIC (
             numports : INTEGER RANGE 0 TO 31
@@ -104,7 +104,7 @@ PACKAGE spwrouterpkg IS
         );
     END COMPONENT;
 
-    -- Time Code Controller (spwroutertcc.vhd)
+    -- Time Code controller (spwroutertcc.vhd).
     COMPONENT spwroutertcc IS -- geändert am 04.06.2022
         GENERIC (
             numports : INTEGER RANGE 0 TO 31
@@ -114,7 +114,7 @@ PACKAGE spwrouterpkg IS
             rst : IN STD_LOGIC;
             running : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             tc_enable : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-            tc_last : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);            
+            tc_last : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
             tick_out : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
             tick_in : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             tc_out : OUT array_t(numports DOWNTO 0)(7 DOWNTO 0);
@@ -124,25 +124,25 @@ PACKAGE spwrouterpkg IS
         );
     END COMPONENT;
 
-    -- Router Table (spwroutertable.vhd)
-    COMPONENT spwroutertable IS
+    -- Router table (spwroutertable.vhd).
+    COMPONENT spwroutertable IS -- geändert am 07.06.2022
         GENERIC (
             numports : INTEGER RANGE 0 TO 31
         );
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            act : IN STD_LOGIC;
+            ack_in : IN STD_LOGIC;
             readwrite : IN STD_LOGIC;
             dByte : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
             addr : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
             wdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             rdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            proc : OUT STD_LOGIC
+            ack_out : OUT STD_LOGIC
         );
     END COMPONENT;
 
-    -- Control Register (spwrouterregs.vhd)
+    -- Control register (spwrouterregs.vhd).
     COMPONENT spwrouterregs IS
         GENERIC (
             numports : INTEGER RANGE 0 TO 31
@@ -178,12 +178,12 @@ PACKAGE spwrouterpkg IS
         );
     END COMPONENT;
 
-    -- Router Port (spwrouterport.vhd)
+    -- Router port (spwrouterport.vhd).
     COMPONENT spwrouterport IS
         GENERIC (
             numports : INTEGER RANGE 0 TO 31;
             blen : INTEGER RANGE 0 TO 5;
-            pnum : INTEGER RANGE 0 TO 31;
+            --pnum : INTEGER RANGE 0 TO 31;
             sysfreq : real;
             txclkfreq : real := 0.0;
             rximpl : spw_implementation_type_rec;
@@ -205,8 +205,11 @@ PACKAGE spwrouterpkg IS
             tick_in : IN STD_LOGIC;
             time_in : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
             txdata : IN STD_LOGIC_VECTOR(8 DOWNTO 0);
+            txrdy : OUT STD_LOGIC;
+            txhalff : OUT STD_LOGIC;
             tick_out : OUT STD_LOGIC;
             time_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+            rxhalff : OUT STD_LOGIC;
             rxdata : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
             started : OUT STD_LOGIC;
             connecting : OUT STD_LOGIC;
@@ -215,28 +218,28 @@ PACKAGE spwrouterpkg IS
             errpar : OUT STD_LOGIC;
             erresc : OUT STD_LOGIC;
             errcred : OUT STD_LOGIC;
-            linkUp : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-            requestOut : OUT STD_LOGIC;
-            destinationPortOut : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-            sourcePortOut : OUT STD_LOGIC_VECTOR(blen DOWNTO 0);
-            grantedIn : IN STD_LOGIC;
-            strobeOut : OUT STD_LOGIC;
-            readyIn : IN STD_LOGIC;
-            requestIn : IN STD_LOGIC;
-            strobeIn : IN STD_LOGIC;
-            readyOut : OUT STD_LOGIC;
-            busMasterAddressOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            busMasterDataIn : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-            busMasterDataOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            busMasterByteEnableOut : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-            busMasterWriteEnableOut : OUT STD_LOGIC;
-            busMasterStrobeOut : OUT STD_LOGIC;
-            busMasterRequestOut : OUT STD_LOGIC;
-            busMasterAcknowledgeIn : IN STD_LOGIC;
             spw_di : IN STD_LOGIC;
             spw_si : IN STD_LOGIC;
             spw_do : OUT STD_LOGIC;
-            spw_so : OUT STD_LOGIC
+            spw_so : OUT STD_LOGIC;
+            linkstatus : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            request_out : OUT STD_LOGIC;
+            request_in : IN STD_LOGIC;
+            destination_port : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+            --sourcePortOut : OUT STD_LOGIC_VECTOR(blen DOWNTO 0);
+            arb_granted : IN STD_LOGIC;
+            strobe_out : OUT STD_LOGIC;
+            strobe_in : IN STD_LOGIC;
+            ready_in : IN STD_LOGIC;
+            --readyOut : OUT STD_LOGIC;
+            bus_address : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            bus_data_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            --busMasterDataOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            bus_dByte : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+            bus_readwrite : OUT STD_LOGIC;
+            bus_strobe : OUT STD_LOGIC;
+            bus_request : OUT STD_LOGIC;
+            bus_ack_in : IN STD_LOGIC
         );
     END COMPONENT;
 

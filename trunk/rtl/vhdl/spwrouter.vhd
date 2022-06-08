@@ -186,11 +186,11 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
 
         -- Routing process: Assigns information to ports from the routing process.
         spx : FOR i IN 0 TO numports GENERATE
-            iReadyIn(i) <= function_pkg.select7x1(iSelectDestinationPort(i), readyOut);
-            iRequestIn(i) <= function_pkg.select7x1(iSwitchPortNumber(i), requestOut);
+            iReadyIn(i) <= function_pkg.select1(iSelectDestinationPort(i), readyOut);
+            iRequestIn(i) <= function_pkg.select1(iSwitchPortNumber(i), requestOut);
             --iSourcePortIn(i) <= select7x1xVector8(iSwitchPortNumber(i), sourcePortOut); -- wohl nur für RMAP nötig
-            iDataIn(i) <= function_pkg.select7x1xVector9(iSwitchPortNumber(i), dataOut);
-            iStrobeIn(i) <= function_pkg.select7x1(iSwitchPortNumber(i), strobeOut);
+            iDataIn(i) <= function_pkg.select9(iSwitchPortNumber(i), dataOut);
+            iStrobeIn(i) <= function_pkg.select1(iSwitchPortNumber(i), strobeOut);
         END GENERATE spx;
         -- SpaceWirePort LinkUP Signal. (dropped)
 
@@ -199,7 +199,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         GENERIC MAP(
             numports => numports,
             blen => blen,
-            pnum => 0,
+            --pnum => 0,
             sysfreq => sysfreq,
             txclkfreq => txclkfreq,
             rximpl => rx_impl(0),
@@ -218,8 +218,10 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             tick_in => s_tick_from_tcc_to_ports(0),--tick_in(0),
             time_in => s_tc_from_tcc_to_ports(0),--time_in(0),
             txdata => iDataIn(0),
+            txhalff => open,
             tick_out => s_tick_from_ports_to_tcc(0),--tick_out(0),
             time_out => s_tc_from_ports_to_tcc(0),--time_out(0),
+            rxhalff => open,
             rxdata => dataOut(0),
             started => started(0),
             connecting => connecting(0),
@@ -228,28 +230,28 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             errpar => errpar(0),
             erresc => erresc(0),
             errcred => errcred(0),
-            linkUp => iLinkUp,
-            requestOut => requestOut(0),
-            destinationPortOut => destinationPort(0),
-            sourcePortOut => sourcePortOut(0),
-            grantedIn => granted(0),
-            strobeOut => strobeOut(0),
-            readyIn => iReadyIn(0),
-            requestIn => iRequestIn(0),
-            strobeIn => iStrobeIn(0),
-            readyOut => readyOut(0),
-            busMasterAddressOut => busMasterAddressOut(0),
-            busMasterDataIn => busSlaveDataOut,
-            busMasterDataOut => busMasterDataOut(0),
-            busMasterByteEnableOut => busMasterByteEnableOut(0),
-            busMasterWriteEnableOut => busMasterWriteEnableOut(0),
-            busMasterStrobeOut => busMasterStrobeOut(0),
-            busMasterRequestOut => busMasterRequestOut(0),
-            busMasterAcknowledgeIn => busMasterAcknowledgeIn(0),
             spw_di => spw_di(0),
             spw_si => spw_si(0),
             spw_do => spw_do(0),
-            spw_so => spw_so(0)
+            spw_so => spw_so(0),            
+            linkstatus => iLinkUp,
+            request_in => iRequestIn(0),
+            request_out => requestOut(0),
+            destination_port => destinationPort(0),
+            --sourcePortOut => sourcePortOut(0),
+            arb_granted => granted(0),
+            strobe_out => strobeOut(0),
+            strobe_in => iStrobeIn(0),
+            ready_in => iReadyIn(0),
+            --readyOut => readyOut(0),
+            bus_address => busMasterAddressOut(0),
+            bus_data_in => busSlaveDataOut,
+            --busMasterDataOut => busMasterDataOut(0),
+            bus_dByte => busMasterByteEnableOut(0),
+            bus_readwrite => busMasterWriteEnableOut(0),
+            bus_strobe => busMasterStrobeOut(0),
+            bus_request => busMasterRequestOut(0),
+            bus_ack_in => busMasterAcknowledgeIn(0)
         );
 
         -- Other ports (numport-1)-ports.
@@ -257,7 +259,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             spwport : spwrouterport GENERIC MAP(
                 numports => numports,
                 blen => blen,
-                pnum => i,
+                --pnum => i,
                 sysfreq => sysfreq,
                 txclkfreq => txclkfreq,
                 rximpl => rx_impl(i),
@@ -275,9 +277,12 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 txdivcnt => "00000001",
                 tick_in => s_tick_from_tcc_to_ports(i),--tick_in(i),
                 time_in => s_tc_from_tcc_to_ports(i),--time_in(i),
+                txhalff => open,
                 txdata => iDataIn(i),
                 tick_out => s_tick_from_ports_to_tcc(i),--tick_out(i),
                 time_out => s_tc_from_ports_to_tcc(i),--time_out(i),
+                txrdy => readyOut(i),
+                rxhalff => open,
                 rxdata => dataOut(i),
                 started => started(i),
                 connecting => connecting(i),
@@ -286,28 +291,27 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 errpar => errpar(i),
                 erresc => erresc(i),
                 errcred => errcred(i),
-                linkUp => iLinkUp,
-                requestOut => requestOut(i),
-                destinationPortOut => destinationPort(i),
-                sourcePortOut => sourcePortOut(i),
-                grantedIn => granted(i),
-                strobeOut => strobeOut(i),
-                readyIn => iReadyIn(i),
-                requestIn => iRequestIn(i),
-                strobeIn => iStrobeIn(i),
-                readyOut => readyOut(i),
-                busMasterAddressOut => busMasterAddressOut(i),
-                busMasterDataIn => busSlaveDataOut,
-                busMasterDataOut => busMasterDataOut(i),
-                busMasterByteEnableOut => busMasterByteEnableOut(i),
-                busMasterWriteEnableOut => busMasterWriteEnableOut(i),
-                busMasterStrobeOut => busMasterStrobeOut(i),
-                busMasterRequestOut => busMasterRequestOut(i),
-                busMasterAcknowledgeIn => busMasterAcknowledgeIn(i),
                 spw_di => spw_di(i),
                 spw_si => spw_si(i),
                 spw_do => spw_do(i),
-                spw_so => spw_so(i)
+                spw_so => spw_so(i),
+                linkstatus => iLinkUp,
+                request_out => requestOut(i),
+                request_in => iRequestIn(i),
+                destination_port => destinationPort(i),
+                --sourcePortOut => sourcePortOut(i),
+                arb_granted => granted(i),
+                strobe_out => strobeOut(i),
+                strobe_in => iStrobeIn(i),
+                ready_in => iReadyIn(i),
+                bus_address => busMasterAddressOut(i),
+                bus_data_in => busSlaveDataOut,
+                --busMasterDataOut => busMasterDataOut(i),
+                bus_dByte => busMasterByteEnableOut(i),
+                bus_readwrite => busMasterWriteEnableOut(i),
+                bus_strobe => busMasterStrobeOut(i),
+                bus_request => busMasterRequestOut(i),
+                bus_ack_in => busMasterAcknowledgeIn(i)
             );
         END GENERATE;
 
@@ -351,7 +355,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             IF rising_edge(clk) THEN
 
                 iBusSlaveCycleIn <= OR busMasterRequestOut;
-                -- Reversed priority conditioned through if-statements.
+                -- Reversed priority conditioned through if-statements. (Erklärung noch hierzu!)
                 FOR i IN numports DOWNTO 1 LOOP
                     IF (busMasterGranted(i) = '1') THEN
                         iBusSlaveStrobeIn <= busMasterStrobeOut(i);
@@ -378,8 +382,8 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             END IF;
         END PROCESS;
         
-        -- Time code forwarding logic.
-        timecodecontrol : spwroutertcc
+        -- Time Code Control.
+        TimeCodeControl : spwroutertcc
         GENERIC MAP(
             numports => numports
         )
@@ -387,7 +391,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             clk => clk,
             rst => rst,
             running => iLinkUp,
-            tc_enable => (OTHERS => '1'),
+            tc_enable => (OTHERS => '1'), -- Time Codes are always activated on all available ports
             tc_last => routerTimeCode,            
             tick_out => s_tick_from_tcc_to_ports,--tick_out,
             tick_in => s_tick_from_ports_to_tcc,--tick_in,
