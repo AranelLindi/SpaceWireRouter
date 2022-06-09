@@ -276,7 +276,7 @@ BEGIN
     -- Port signals.
     rxhalff <= s_rxhalff;
     txhalff <= s_txhalff;    
-    txrdy <= s_txrdy;
+    --txrdy <= s_txrdy;
     
     -- Read inputs.
     s_txwrite <= strobe_in WHEN request_in = '1' ELSE
@@ -334,18 +334,17 @@ BEGIN
         spw_do => spw_do,
         spw_so => spw_so
     );
-
-    -- Dieses hier mal noch nicht löschen! Implementierung hat ergeben, dass es auch ohne diesen Abschnitt geht (sah so aus als würde s_txrdy hier um einen Takt verzögert). ist aber wohl nicht nötig. Noch einige commits lang hier auskommentiert lassen, danach kann es entfernt werden - sofern bis dahin keine Fehlfunktion auftrat.
-    -- Synchronous update. (Wenn readyOut das gleiche wie txrdy macht, dann kann dieser Process hier ebenfalls gestrichen werden, weil s_txrdy schon synchron geliefert wird)
-    --    PROCESS (clk)
-    --    BEGIN
-    --        IF rising_edge(clk) THEN
-    --            txrdy <= s_txrdy;--s_ready_out; -- s_ready_out
-    --        END IF;
-    --    END PROCESS;
+    
+    -- Infers a latch, but is necessary to maintain the signal so that the FSM of receiving port has enough time to react to it. TODO: Bad design, either rebuild in future or test thoroughly !
+    PROCESS (clk)
+    BEGIN
+        IF rising_edge(clk) THEN
+            txrdy <= s_txrdy;--s_ready_out; -- s_ready_out
+        END IF;
+    END PROCESS;
 
     -- Finite state machine.
-    PROCESS (clk, rst)
+    PROCESS (clk)
         VARIABLE v_validport : STD_LOGIC; -- S_Dest2; for boolean operationen
         VARIABLE v_reqports : STD_LOGIC; -- S_RT1
     BEGIN

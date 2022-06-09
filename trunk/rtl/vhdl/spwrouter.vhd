@@ -11,7 +11,7 @@
 -- Description: Complete router implementation which contains all necessary entities.
 -- (Active autostart but no linkstart! Router is waiting for an attemption of an incoming connection)
 --
--- Dependencies: none
+-- Dependencies: spwpkg, spwrouterpkg
 -- 
 -- Revision:
 ----------------------------------------------------------------------------------
@@ -161,23 +161,24 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         -- Crossbar Switch - Router Arbiter.
         arb : spwrouterarb
         GENERIC MAP(
-            numports => numports
+            numports => numports,
+            blen => blen
         )
         PORT MAP(
             clk => clk,
             rst => rst,
-            dest => destinationPort,
-            req => requestOut,
-            grnt => granted,
-            rout => routingSwitch
+            destport => destinationPort,
+            request => requestOut,
+            granted => granted,
+            routing_matrix => routingSwitch
         );
 
-        -- The destination PortNo regarding to the source PortNo.
-        destPort : FOR i IN 0 TO numports GENERATE
-            destPortI : FOR j IN 0 TO numports GENERATE
+        -- The destination PortNo regarding to the source PortNo (creates transposed matrix of routingSwitch).
+        rowloop : FOR i IN 0 TO numports GENERATE
+            columnloop : FOR j IN 0 TO numports GENERATE
                 iSelectDestinationPort(i)(j) <= routingSwitch(j)(i);
-            END GENERATE destPortI;
-        END GENERATE destPort;
+            END GENERATE columnloop;
+        END GENERATE rowloop;
 
         -- The source to the destination PortNo PortNo.
         srcPort : FOR i IN 0 TO numports GENERATE
@@ -204,7 +205,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             txclkfreq => txclkfreq,
             rximpl => rx_impl(0),
             tximpl => tx_impl(0)
-            -- Generics that are not listed here have default values!
+            -- (Generics that are not listed here have default values !)
         )
         PORT MAP(
             clk => clk,
@@ -221,6 +222,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             txhalff => open,
             tick_out => s_tick_from_ports_to_tcc(0),--tick_out(0),
             time_out => s_tc_from_ports_to_tcc(0),--time_out(0),
+            txrdy => readyOut(0),
             rxhalff => open,
             rxdata => dataOut(0),
             started => started(0),
@@ -345,8 +347,8 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         PORT MAP(
             clk => clk,
             rst => rst,
-            req => busMasterRequestOut,
-            grnt => busMasterGranted
+            request => busMasterRequestOut,
+            granted => busMasterGranted
         );
 
         -- Timing adjustment. BusSlaveAccessSelector

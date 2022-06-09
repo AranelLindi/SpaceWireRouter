@@ -3,115 +3,115 @@
 -- Engineer: Stefan Lindoerfer
 -- 
 -- Create Date: 31.07.2021 21:26
--- Design Name: SpaceWire Router Package
+-- Design Name: SpaceWire Router - Router Arbiter (Logic & Preperation)
 -- Module Name: spwrouterarb
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
--- Target Devices: 
--- Tool Versions: 
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
+-- Target Devices: Xilinx FPGAs
+-- Tool Versions: -/-
 -- Description: Framework of a round robin arbiter which controls access between
 -- the ports.
 --
--- Dependencies: spwrouterpkg
+-- Dependencies: array_t (spwrouterpkg)
 -- 
 -- Revision:
 ----------------------------------------------------------------------------------
 
-LIBRARY ieee;
-USE ieee.std_logic_1164.ALL;
-USE ieee.numeric_std.ALL;
-USE ieee.Math_real.ALL;
-USE work.spwrouterpkg.ALL;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+USE IEEE.MATH_REAL.ALL;
+USE WORK.SPWROUTERPKG.ALL;
 
 ENTITY spwrouterarb IS
     GENERIC (
         -- Number of SpaceWire ports.
-        numports : INTEGER RANGE 0 TO 31
+        numports : INTEGER RANGE 0 TO 31;
+
+        -- Bit length to map number of ports (ceil(log2(numports))).
+        blen : INTEGER RANGE 0 TO 5 -- (max 5 bits for 0-31 ports)
     );
     PORT (
         -- System clock.
         clk : IN STD_LOGIC;
 
-        -- Asynchronous reset.
+        -- Synchronous reset (spwrouterarb_round).
         rst : IN STD_LOGIC;
 
-        -- Destination of port x (0-254 are always addressable, therefore 8 bits are necessary!)
-        dest : IN array_t(numports DOWNTO 0)(7 DOWNTO 0);
+        -- Shows desired destination port each port (byte coded !)
+        destport : IN array_t(numports DOWNTO 0)(7 DOWNTO 0); -- dest
 
         -- Request of port x.
-        req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+        request : IN STD_LOGIC_VECTOR(numports DOWNTO 0); -- req
 
         -- Granted to port x.
-        grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+        granted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- grnt
 
         -- Routing switch matrix.
-        rout : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0) -- Falls es hier probleme gibt, auf matrix wechseln!
+        routing_matrix : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0) -- Falls es hier probleme gibt, auf matrix wechseln! -- rout
     );
 END spwrouterarb;
 
 ARCHITECTURE spwrouterarb_arch OF spwrouterarb IS
-    -- Bit length to map all ports (for spwrouterarb_round).
-    CONSTANT blen : INTEGER RANGE 0 TO 5 := INTEGER(ceil(log2(real(numports))));
+    -- Routing switch matrix: Containts decision ultimately made byte the arbiter as to which port is allowed to send over another port.
+    SIGNAL s_routing : array_t(numports DOWNTO 0)(numports DOWNTO 0);
 
-    -- Router switch matrix.
-    SIGNAL s_routing : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- hängt mit out port zusammen! siehe oben
-
-    -- Occupied port x.
+    -- Shows which ports are currently occupied.
     SIGNAL s_occupied : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-    -- Requests to port x.
-    SIGNAL s_request : matrix_t(numports DOWNTO 0, numports DOWNTO 0); -- potenzielle fehlerquelle!
+    -- Contains which ports want to access other ports.
+    SIGNAL s_request : matrix_t(numports DOWNTO 0, numports DOWNTO 0);
 
-    -- Granted to port x.
-    SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0); -- initialisierung in ursprungscode nicht vorgehsehen! evtl fehlerquelle!
+    -- Contains ports that are allowed to send (not destination ports).
+    SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0);
 BEGIN
     -- Drive outputs.
-    grnt <= s_granted;
-    rout <= s_routing;
+    granted <= s_granted;
+    routing_matrix <= s_routing;
 
-    -- Route occupation signal
-    occSig : FOR i IN 0 TO numports GENERATE
-        -- unten: hier inner loop nur nötig wenn mit rout(i) nicht eine ganze Zeile angesprochen werden kann!! Operatoren sind so definiert, dass sie auch eine komplete Zeile verarbeiten!
-        s_occupied(i) <= OR s_routing(i); -- hoffentlich richtig addressiert
-    END GENERATE occSig;
+    -- Checks for each port whether one or more ports want to access it. If so, this port is occupied.
+    Occ: FOR i IN 0 TO numports GENERATE
+        s_occupied(i) <= OR s_routing(i); -- Operator overloading (or) -- Wofür wird das benötigt?
+    END GENERATE;
 
     -- Source port number which requests port as destination port.
-    outerloop : FOR i IN 0 TO numports GENERATE
-        innerloop : FOR j IN 0 TO numports GENERATE
-            s_request(j, i) <= '1' WHEN req(i) = '1' AND to_integer(unsigned(dest(i))) = j ELSE
-            '0'; -- potenzielle fehlerquelle!
-        END GENERATE innerloop;
-    END GENERATE outerloop;
+    columnloop : FOR i IN 0 TO numports GENERATE
+        rowloop : FOR j IN 0 TO numports GENERATE
+            s_request(j, i) <= '1' WHEN request(i) = '1' AND to_integer(unsigned(destport(i))) = j ELSE
+            '0'; -- TODO: Wofür wird das benötigt? Hier stand mal potenzielle Fehlerquelle, kann weg oder?
+        END GENERATE rowloop;
+    END GENERATE columnloop;
 
-    -- Generate Arbiter_Round for every port.
-    spwrouterarbiter_roundrobin : FOR i IN 0 TO numports GENERATE
-        SIGNAL s_request_vec : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    -- Generate spwrouterarb_round for every port.
+    rowloopI : FOR i IN 0 TO numports GENERATE
+        SIGNAL s_request_vec : STD_LOGIC_VECTOR(numports DOWNTO 0); -- TODO: Wofür wird das benötigt?
     BEGIN
 
-        -- Convert matrix line into vector.
-        Conv : FOR j IN numports DOWNTO 0 GENERATE
+        -- Intermediate step: convert matrix row into vector.
+        columnloopI : FOR j IN numports DOWNTO 0 GENERATE
             s_request_vec(j) <= s_request(i, j);
-        END GENERATE Conv;
+        END GENERATE columnloopI;
 
-        Roundx : spwrouterarb_round GENERIC MAP(
+        -- Instantiate round robin.
+        RoundRobin : spwrouterarb_round GENERIC MAP(
             numports => numports,
             blen => blen
         )
         PORT MAP(
             clk => clk,
             rst => rst,
-            occ => s_occupied(i),
-            req => s_request_vec, -- vorher: s_request(i)
-            grnt => s_routing(i) -- hier evtl. eine Fehlerquelle wegen falscher zuordnung?
+            occupied => s_occupied(i),
+            request => s_request_vec,
+            granted => s_routing(i)
         );
-    END GENERATE spwrouterarbiter_roundrobin;
+    END GENERATE rowloopI;
 
-    -- Connection enabling signal
-    rowloop : FOR i IN 0 TO numports GENERATE
+    -- Connection enabling signal -- TODO: Was macht das hier?
+    rowloopII : FOR i IN 0 TO numports GENERATE
         SIGNAL s_transform : STD_LOGIC_VECTOR(numports DOWNTO 0);
     BEGIN
-        columnloop : FOR j IN numports DOWNTO 0 GENERATE
+        columnloopII : FOR j IN numports DOWNTO 0 GENERATE
             s_transform(j) <= s_routing(j)(i);
-        END GENERATE columnloop;
-        s_granted(i) <= OR s_transform;
-    END GENERATE rowloop;
+        END GENERATE columnloopII;
+        s_granted(i) <= OR s_transform; -- Operator overloading (or)
+    END GENERATE rowloopII;
 END ARCHITECTURE spwrouterarb_arch;

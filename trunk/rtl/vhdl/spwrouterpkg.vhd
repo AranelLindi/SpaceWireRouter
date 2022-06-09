@@ -83,24 +83,25 @@ PACKAGE spwrouterpkg IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            occ : IN STD_LOGIC;
-            req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-            grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+            occupied : IN STD_LOGIC;
+            request : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            granted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
         );
     END COMPONENT;
 
     -- Port arbiter (spwrouterarb.vhd).
     COMPONENT spwrouterarb IS
         GENERIC (
-            numports : INTEGER RANGE 0 TO 31
+            numports : INTEGER RANGE 0 TO 31;
+            blen : INTEGER RANGE 0 TO 5
         );
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            dest : IN array_t(numports DOWNTO 0)(7 DOWNTO 0); -- hier ersten Index umgedreht
-            req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-            grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-            rout : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0) -- hier ersten Index umgedreht
+            destport : IN array_t(numports DOWNTO 0)(7 DOWNTO 0);
+            request : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            granted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            routing_matrix : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0)
         );
     END COMPONENT;
 
@@ -173,8 +174,8 @@ PACKAGE spwrouterpkg IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-            grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+            request : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            granted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
         );
     END COMPONENT;
 
