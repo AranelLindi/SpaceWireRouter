@@ -21,6 +21,9 @@ SpaceWireLight*
 !*.v
 !*.bd
 !*.edif
+!*.mem
+!*.mmi
+!*.txt
 #########
 #IP files
 #########

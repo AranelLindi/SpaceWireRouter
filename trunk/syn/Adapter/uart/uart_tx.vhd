@@ -18,7 +18,7 @@
 ----------------------------------------------------------------------------------
 
 LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
+USE IEEE.STD_LOGIC_1164.ALL;
 
 ENTITY uart_tx IS
     GENERIC (
@@ -98,7 +98,7 @@ BEGIN
                             state <= S_Idle;
                         END IF;
 
-                    -- Send out Start Bit. Start bit = 0
+                        -- Send out Start Bit. Start bit = 0
                     WHEN S_Tx_Start_Bit =>
                         --tx_rdy <= '0'; -- ist glaub bei s_Idle (if) besser
                         tx_port <= '0';
@@ -112,7 +112,7 @@ BEGIN
                             state <= S_Tx_Data_Bits;
                         END IF;
 
-                    -- Wait (clk_cycles_per_bit - 1) clock cycles for data bits to finish.
+                        -- Wait (clk_cycles_per_bit - 1) clock cycles for data bits to finish.
                     WHEN S_Tx_Data_Bits =>
                         tx_port <= s_tx_data(s_bit_index);
 
@@ -132,7 +132,7 @@ BEGIN
                             END IF;
                         END IF;
 
-                    -- Send out Stop bit. Stop bit = 1
+                        -- Send out Stop bit. Stop bit = 1
                     WHEN S_Tx_Stop_Bit =>
                         tx_port <= '1';
 
@@ -146,7 +146,7 @@ BEGIN
                             state <= S_Cleanup;
                         END IF;
 
-                    -- Stay here for one clk cycle.
+                        -- Stay here for one clk cycle.
                     WHEN S_Cleanup =>
                         tx_rdy <= '1';
                         --s_txdone <= '1';

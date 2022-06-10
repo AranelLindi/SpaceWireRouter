@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MemInfo Version="1" Minor="0">
+  <Processor Endianness="Little" InstPath="my_bram">
+    <AddressSpace Name="BRAM_RouterTable" Begin="0" End="1824">
+      <BusBlock>
+        <BitLane MemType="RAMB32" Placement="X1Y20">
+          <DataWidth MSB="15" LSB="0"/>
+          <AddressRange Begin="0" End="1824"/>
+          <Parity ON="false" NumBits="0"/>
+        </BitLane>
+      </BusBlock>
+    </AddressSpace>
+  </Processor>
+  <Config>
+    <Option Name="Part" Val="xc7a35tcpg236-1"/>
+  </Config>
+  <DRC>
+    <Rule Name="RDADDRCHANGE" Val="false"/>
+  </DRC>
+</MemInfo>
