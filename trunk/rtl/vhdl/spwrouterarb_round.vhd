@@ -6,11 +6,12 @@
 -- Design Name: SpaceWire Router - Router Arbiter Round Robin
 -- Module Name: spwrouterarb_round
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
--- Target Devices: 
--- Tool Versions: 
--- Description: Ein Ring wird konstruiert, der alle Ports enthält und dem numerisch
--- darauffolgendem Port die höchste Priorität einräumt (numports..0). Ausgehend dabei ist der
--- Port, dem zuletzt der Zugriff gewährt wurde. Bsp für 1 bei insgesamt 3 Ports: 2..0..1
+-- Target Devices: Xilinx FPGAs
+-- Tool Versions: -/-
+-- Description: A ring is constructed that contains all (source) ports and,
+-- starting from a specific port, gives next higher priority in ascending order
+-- (0..numports..0). The starting point is always the last port to which 
+-- access was granted.
 --
 -- Dependencies: none
 -- 
@@ -36,16 +37,15 @@ ENTITY spwrouterarb_round IS
         -- Synchronous reset.
         rst : IN STD_LOGIC;
 
-        -- High if relevant port is already being used by another
-        -- transfer process. Low when the port is unused.
+        -- High if this port is already being occupied,
+        -- low when the port is unused.
         occupied : IN STD_LOGIC; -- occ
 
-        -- Corresponding bit is high when respective port sends
-        -- a request to the port.
+        -- Shows which ports making an transfer request to this port.
         request : IN STD_LOGIC_VECTOR(numports DOWNTO 0); -- req
 
-        -- Bit sequence that indicates the access of another port.
-        granted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0) -- granted
+        -- Shows which port has been guaranteed access to this port.
+        granted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0) -- grnt
     );
 END spwrouterarb_round;
 
@@ -55,7 +55,7 @@ ARCHITECTURE spwrouterarb_round_arch OF spwrouterarb_round IS
     SIGNAL s_request : STD_LOGIC_VECTOR(numports DOWNTO 0);
     SIGNAL s_occupied : STD_LOGIC;
 
-    -- Last granted port.
+    -- Last granted port (for internal purposes).
     SIGNAL s_last_granted : STD_LOGIC_VECTOR(blen DOWNTO 0);
 BEGIN
     -- Drive output.
@@ -80,19 +80,21 @@ BEGIN
                         -- The following ports in the line (0..1..numports..0) will give prefered access to current
                         -- port. Normally in if-statements early conditions takes priority above later.
                         -- Through rolling out for-loops, many seperate if-statements will be
-                        -- created. Therefore the highes priority must be listed in the  last order to
+                        -- created. Therefore the highes priority must be listed in the last order to
                         -- be able to overwrite any previous decision with lower priority.
 
-                        lowerpriority : FOR j IN i DOWNTO 0 LOOP
+                        lowerpriority : FOR j IN i DOWNTO 0 LOOP -- [i <= j <= 0]
                             IF (s_request(j) = '1' AND s_occupied = '0') THEN
-                                s_granted <= (j => '1', OTHERS => '0');
+                                s_granted <= std_logic_vector(to_unsigned(2 ** j, s_granted'length)); -- Test, should do same
+                                --s_granted <= (j => '1', OTHERS => '0'); -- works ! Procudes warnings in ModelSim
                                 s_last_granted <= STD_LOGIC_VECTOR(to_unsigned(j, s_last_granted'length));
                             END IF;
                         END LOOP lowerpriority;
                         
-                        higherpriority : FOR k IN numports DOWNTO (i + 1) LOOP
+                        higherpriority : FOR k IN numports DOWNTO (i + 1) LOOP -- [numports <= k <= (i+1)]
                             IF (s_request(k) = '1' AND s_occupied = '0') THEN
-                                s_granted <= (k => '1', OTHERS => '0');
+                                s_granted <= std_logic_vector(to_unsigned(2 ** k, s_granted'length)); -- look at lowerpriority !
+                                --s_granted <= (k => '1', OTHERS => '0'); -- works !
                                 s_last_granted <= STD_LOGIC_VECTOR(to_unsigned(k, s_last_granted'length));
                             END IF;
                         END LOOP higherpriority;

@@ -5,12 +5,12 @@
 -- Create Date: 03.08.2021 20:15
 -- Design Name: SpaceWire Router Table Arbiter
 -- Module Name: spwrouterarb_table
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
--- Target Devices: 
--- Tool Versions: 
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
+-- Target Devices: Xilinx FPGAs
+-- Tool Versions: -/-
 -- Description: Grants permission to router table and registers.
 --
--- Dependencies: spwrouterpkg
+-- Dependencies:
 -- 
 -- Revision:
 ----------------------------------------------------------------------------------
@@ -61,21 +61,23 @@ BEGIN
 
                 -- To have the right priority the order was changed in unusual order
 
-                arbitrationaccess : FOR i IN numports DOWNTO 0 LOOP
+                Arbitration_Access : FOR i IN numports DOWNTO 0 LOOP
                     IF (s_granted(i) = '1' AND request(i) = '0') THEN
-                        preports : FOR j IN (i - 1) DOWNTO 0 LOOP
+                        pre_ports : FOR j IN (i - 1) DOWNTO 0 LOOP -- [(i-1) <= j <= 0]
                             IF (request(j) = '1') THEN
                                 s_granted <= STD_LOGIC_VECTOR(to_unsigned(2 ** j, s_granted'length));
                             END IF;
-                        END LOOP preports;
-                        -- except current port i
-                        seqports : FOR k IN numports DOWNTO (i + 1) LOOP
+                        END LOOP pre_ports;
+
+                        -- (except current port i)
+                        
+                        seq_ports : FOR k IN numports DOWNTO (i + 1) LOOP -- [numports <= k <= (i+1)]
                             IF (request(k) = '1') THEN
                                 s_granted <= STD_LOGIC_VECTOR(to_unsigned(2 ** k, s_granted'length));
                             END IF;
-                        END LOOP seqports;
+                        END LOOP seq_ports;
                     END IF;
-                END LOOP arbitrationaccess;
+                END LOOP Arbitration_Access;
             END IF;
         END IF;
     END PROCESS;

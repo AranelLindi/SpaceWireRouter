@@ -11,7 +11,7 @@
 -- Description: Framework of a round robin arbiter which controls access between
 -- the ports.
 --
--- Dependencies: array_t (spwrouterpkg)
+-- Dependencies: array_t, matrix_t (spwrouterpkg)
 -- 
 -- Revision:
 ----------------------------------------------------------------------------------
@@ -37,17 +37,17 @@ ENTITY spwrouterarb IS
         -- Synchronous reset (spwrouterarb_round).
         rst : IN STD_LOGIC;
 
-        -- Shows desired destination port each port (byte coded !)
+        -- Contains desired destination port for each port (number coded in binary !)
         destport : IN array_t(numports DOWNTO 0)(7 DOWNTO 0); -- dest
 
-        -- Request of port x.
+        -- Shows for each port whether access to another port is required.
         request : IN STD_LOGIC_VECTOR(numports DOWNTO 0); -- req
 
-        -- Granted to port x.
+        -- Contains ports that have granted access to the port that is specified in destport.
         granted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- grnt
 
-        -- Routing switch matrix.
-        routing_matrix : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0) -- Falls es hier probleme gibt, auf matrix wechseln! -- rout
+        -- Routing switch matrix: Maps source ports (row) to target ports (column)
+        routing_matrix : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0) -- rout
     );
 END spwrouterarb;
 
@@ -69,30 +69,31 @@ BEGIN
     routing_matrix <= s_routing;
 
     -- Checks for each port whether one or more ports want to access it. If so, this port is occupied.
-    Occ: FOR i IN 0 TO numports GENERATE
-        s_occupied(i) <= OR s_routing(i); -- Operator overloading (or) -- Wofür wird das benötigt?
-    END GENERATE;
+    Occupation : FOR i IN 0 TO numports GENERATE
+        s_occupied(i) <= OR s_routing(i); -- Operator overloading (or)
+    END GENERATE Occupation;
 
-    -- Source port number which requests port as destination port.
-    columnloop : FOR i IN 0 TO numports GENERATE
-        rowloop : FOR j IN 0 TO numports GENERATE
+    -- Maps which ports make requests to other ports
+    Request_Column : FOR i IN 0 TO numports GENERATE
+        Request_Row : FOR j IN 0 TO numports GENERATE
             s_request(j, i) <= '1' WHEN request(i) = '1' AND to_integer(unsigned(destport(i))) = j ELSE
-            '0'; -- TODO: Wofür wird das benötigt? Hier stand mal potenzielle Fehlerquelle, kann weg oder?
-        END GENERATE rowloop;
-    END GENERATE columnloop;
+            '0';
+        END GENERATE Request_Row;
+    END GENERATE Request_Column;
 
     -- Generate spwrouterarb_round for every port.
-    rowloopI : FOR i IN 0 TO numports GENERATE
-        SIGNAL s_request_vec : STD_LOGIC_VECTOR(numports DOWNTO 0); -- TODO: Wofür wird das benötigt?
+    RoundRobin_Row : FOR i IN 0 TO numports GENERATE
+        SIGNAL s_request_vec : STD_LOGIC_VECTOR(numports DOWNTO 0);
     BEGIN
 
-        -- Intermediate step: convert matrix row into vector.
-        columnloopI : FOR j IN numports DOWNTO 0 GENERATE
+        -- Intermediate step: Convert matrix row into vector.
+        RoundRobin_Column : FOR j IN numports DOWNTO 0 GENERATE
             s_request_vec(j) <= s_request(i, j);
-        END GENERATE columnloopI;
+        END GENERATE RoundRobin_Column;
 
-        -- Instantiate round robin.
-        RoundRobin : spwrouterarb_round GENERIC MAP(
+        -- Instantiate round robin for every port i.
+        RoundRobin_Inst : spwrouterarb_round
+        GENERIC MAP(
             numports => numports,
             blen => blen
         )
@@ -103,15 +104,18 @@ BEGIN
             request => s_request_vec,
             granted => s_routing(i)
         );
-    END GENERATE rowloopI;
+    END GENERATE RoundRobin_Row;
 
-    -- Connection enabling signal -- TODO: Was macht das hier?
-    rowloopII : FOR i IN 0 TO numports GENERATE
+    -- Based on routing result of all ports, creates a list of
+    -- which source ports are allowed to execute their request.
+    Granted_Row : FOR i IN 0 TO numports GENERATE
         SIGNAL s_transform : STD_LOGIC_VECTOR(numports DOWNTO 0);
     BEGIN
-        columnloopII : FOR j IN numports DOWNTO 0 GENERATE
+        -- Intermediate step: Transpose every vector in matrix (for operator overloading).
+        Granted_Column : FOR j IN numports DOWNTO 0 GENERATE
             s_transform(j) <= s_routing(j)(i);
-        END GENERATE columnloopII;
+        END GENERATE Granted_Column;
+
         s_granted(i) <= OR s_transform; -- Operator overloading (or)
-    END GENERATE rowloopII;
+    END GENERATE Granted_Row;
 END ARCHITECTURE spwrouterarb_arch;
