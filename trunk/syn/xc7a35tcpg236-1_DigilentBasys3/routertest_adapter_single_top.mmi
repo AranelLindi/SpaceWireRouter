@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <MemInfo Version="1" Minor="0">
   <Processor Endianness="Little" InstPath="my_bram">
-    <AddressSpace Name="BRAM_RouterTable" Begin="0" End="1824">
+    <AddressSpace Name="BRAM_RouterTable" Begin="0" End="8290">
       <BusBlock>
         <BitLane MemType="RAMB32" Placement="X1Y20">
-          <DataWidth MSB="15" LSB="0"/>
-          <AddressRange Begin="0" End="1824"/>
+          <DataWidth MSB="31" LSB="0"/>
+          <AddressRange Begin="0" End="8290"/>
           <Parity ON="false" NumBits="0"/>
         </BitLane>
       </BusBlock>
