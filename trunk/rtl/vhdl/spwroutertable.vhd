@@ -82,21 +82,23 @@ BEGIN
     rdata <= s_rdata;
 
     -- Creates 32x256 routing table in BRAM. (Xilinx synthesizer infers to use ROM Block)
-    ramXilinx : spwram
-    GENERIC MAP(
-        abits => 8, -- ((2**8) - 1) rows
-        dbits => 32 -- 32 bit size
-    )
-    PORT MAP(
-        rclk => clk,
-        wclk => clk,
-        ren => '1',
-        raddr => addr,
-        rdata => s_mem_data,
-        wen => s_write_enable,
-        waddr => addr,
-        wdata => s_wdata
-    );
+--    ramXilinx : spwram
+--    GENERIC MAP(
+--        abits => 8, -- ((2**8) - 1) rows
+--        dbits => 32 -- 32 bit size
+--    )
+--    PORT MAP(
+--        rclk => clk,
+--        wclk => clk,
+--        ren => '1',
+--        raddr => addr,
+--        rdata => s_mem_data,
+--        wen => s_write_enable,
+--        waddr => addr,
+--        wdata => s_wdata
+--    );
+
+    
 
     -- Finite state machine.
     fsm : PROCESS (clk)
