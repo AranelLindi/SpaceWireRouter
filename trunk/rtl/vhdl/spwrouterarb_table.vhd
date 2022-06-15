@@ -51,7 +51,8 @@ BEGIN
         IF rising_edge(clk) THEN
             IF rst = '1' THEN
                 -- Synchronous reset.
-                s_granted <= (0 => '1', OTHERS => '0'); -- Assign increased priority for port0 (internal configuration port).
+                s_granted <= STD_LOGIC_VECTOR(to_unsigned(2 ** 0, s_granted'length)); -- ModelSim prodces warnings with following line so try this instead
+                --s_granted <= (0 => '1', OTHERS => '0'); -- works -- Assign increased priority for port0 (internal configuration port).
             ELSE
                 -- Check each ports (except current) wheather access is required.
                 -- Method: First subsequent ones and then previous ones.
@@ -70,7 +71,7 @@ BEGIN
                         END LOOP pre_ports;
 
                         -- (except current port i)
-                        
+
                         seq_ports : FOR k IN numports DOWNTO (i + 1) LOOP -- [numports <= k <= (i+1)]
                             IF (request(k) = '1') THEN
                                 s_granted <= STD_LOGIC_VECTOR(to_unsigned(2 ** k, s_granted'length));

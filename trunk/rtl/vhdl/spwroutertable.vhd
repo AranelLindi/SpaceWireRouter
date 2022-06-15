@@ -81,7 +81,7 @@ BEGIN
     ack_out <= s_ack_out;
     rdata <= s_rdata;
 
-    -- Creates 32x256 routing table in BRAM. (Xilinx synthesizer infers to use ROM Block)
+    -- Creates 32x256 routing table in BRAM. (Xilinx synthesizer infers to use RAM Block)
     ramXilinx : spwram
     GENERIC MAP(
         abits => 8, -- ((2**8) - 1) rows

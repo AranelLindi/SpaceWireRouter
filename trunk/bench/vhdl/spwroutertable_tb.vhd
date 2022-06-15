@@ -5,12 +5,12 @@
 -- Create Date: 05.08.2021 19:34
 -- Design Name: Testbench for SpaceWire Router Table
 -- Module Name: spwroutertable_tb
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
--- Target Devices: 
--- Tool Versions:
--- Description: Simulation time 300 ns.
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
+-- Target Devices: Xilinx FPGAs
+-- Tool Versions: -/-
+-- Description:
 --
--- Dependencies: spwram (defined in spwpkg); spwroutertablestates (defined in spwrouterpkg)
+-- Dependencies: spwram (spwpkg); spwroutertablestates (spwrouterpkg)
 -- 
 -- Revision:
 ----------------------------------------------------------------------------------
@@ -33,87 +33,165 @@ ARCHITECTURE spwroutertable_tb_arch OF spwroutertable_tb IS
             -- instate : out spwroutertablestates; -- Debug port - uncomment for better simulation results.
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            act : IN STD_LOGIC;
+            ack_in : IN STD_LOGIC;
             readwrite : IN STD_LOGIC;
             dByte : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
             addr : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
             wdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             rdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            proc : OUT STD_LOGIC
+            ack_out : OUT STD_LOGIC
         );
     END COMPONENT;
 
     -- Number of SpaceWire ports.
-    CONSTANT numports : INTEGER RANGE 0 TO 31 := 2; -- 3 ports.
+    CONSTANT numports : INTEGER RANGE 0 TO 31 := 2; -- 3 ports (0 - 2)
 
     -- System clock.
     SIGNAL clk : STD_LOGIC;
 
     -- Asynchronous reset.
-    SIGNAL rst : STD_LOGIC := '0';
+    SIGNAL s_rst : STD_LOGIC;
 
     -- High if read/write operation is to be performed.
     -- (Only recognized when FSM is in idle.)
-    SIGNAL act : STD_LOGIC := '0';
+    SIGNAL s_ack_in : STD_LOGIC;
 
     -- Type of operation: High if a write process and low if
     -- a read process should be executed. (Works only if 
     -- act is High and FSM is in idle state.)
-    SIGNAL readwrite : STD_LOGIC := '0';
+    SIGNAL s_readwrite : STD_LOGIC;
 
     -- Specifies the byte that is to be overwritten during a
     -- write operation in the register.
     -- (Word width 32 bits == 4 Bytes)
-    SIGNAL dByte : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    SIGNAL s_dByte : STD_LOGIC_VECTOR(3 DOWNTO 0);
 
     -- Memory address at which the operation is to be executed.
-    SIGNAL addr : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL s_addr : STD_LOGIC_VECTOR(7 DOWNTO 0);
 
     -- Word to be written in register.
-    SIGNAL wdata : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL s_wdata : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
     -- Word to be read from a register.
-    SIGNAL rdata : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL s_rdata : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
     -- High if a read or write operation is in progress.
-    SIGNAL proc : STD_LOGIC;
-
-    -- Internal state of the FSM of spwroutertable.
-    SIGNAL dut_state : spwroutertablestates;
+    SIGNAL s_ack_out : STD_LOGIC;
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;
-    SIGNAL stop_the_clock : BOOLEAN;
-    -- Control counter (for internal coordination only).
-    SIGNAL counter : INTEGER := 1;
-
-    -- Switcher for simulation end.   
-    SIGNAL done : BOOLEAN := false;
 BEGIN
     -- Design under test.
-    dut : spwroutertable GENERIC MAP(numports => numports)
+    dut : spwroutertable
+    GENERIC MAP(
+        numports => numports
+    )
     PORT MAP(
         -- instate => dut_state, -- See component declaration!
         clk => clk,
-        rst => rst,
-        act => act,
-        readwrite => readwrite,
-        dByte => dByte,
-        addr => addr,
-        wdata => wdata,
-        rdata => rdata,
-        proc => proc
+        rst => s_rst,
+        ack_in => s_ack_in,
+        readwrite => s_readwrite,
+        dByte => s_dByte,
+        addr => s_addr,
+        wdata => s_wdata,
+        rdata => s_rdata,
+        ack_out => s_ack_out
     );
 
-    -- Resets DuT and internal variables.
-    reset : PROCESS
+    -- Performs test operations exactly when (fsm)-machine is ready to receive them. 
+    PROCESS
+        --variable counter : integer range 0 to 255 := 0;
     BEGIN
-        -- Initial reset (important to initialize signals in dut!)
-        rst <= '1';
-        WAIT FOR clock_period/2;
-        rst <= '0';
+        -- Initialization
+        s_rst <= '1', '0' AFTER clock_period;
+        s_ack_in <= '0';
+        s_readwrite <= '0';
+        s_dByte <= (OTHERS => '0');
+        s_addr <= (OTHERS => '0');
+        s_wdata <= (OTHERS => '0');
 
-        WAIT UNTIL done; -- Wait until all operations are performed, then reset.
-        rst <= '1';
+        WAIT FOR clock_period;
+
+        -- Simulation
+
+
+        -- 1. Write the corresponding number in bit-coded form in each field.
+        REPORT "1. Write the corresponding number in bit-coded form in each field";
+        s_readwrite <= '1'; -- write mode
+        s_dByte <= (OTHERS => '1'); -- always overwrite all four bytes
+
+        -- Fill entire routing table (including first 31 rows that aren't not used in field)
+        FOR i IN 0 TO 255 LOOP
+            s_addr <= STD_LOGIC_VECTOR(to_unsigned(i, s_addr'length));
+            s_wdata <= STD_LOGIC_VECTOR(to_unsigned(i, s_wdata'length));
+            s_ack_in <= '1';
+            WAIT FOR 7 * clock_period; -- Wait 7 states: S_Idle->S_Write0->S_Write1->S_Write2->S_Wait1->S_Wait2->S_Wait3->S_Idle
+            s_ack_in <= '0';
+            WAIT FOR clock_period; -- Wait one cycle to seperate next iteration from previous one
+        END LOOP;
+        REPORT "Finished Step 1, current time = " & TIME'image(Now);
+
+        -- Reset signals.
+        s_addr <= (OTHERS => '0');
+        s_wdata <= (OTHERS => '0');
+        WAIT FOR 2 * clock_period; -- wait some time to get distance
+
+
+        -- 2. Iterate through entire router table and read every field
+        REPORT "2. Iterate through entire router table and read every field";
+        s_readwrite <= '0'; -- read mode
+        s_dByte <= (OTHERS => '0'); -- shouldn't affect result
+
+        FOR i IN 0 TO 255 LOOP
+            s_addr <= STD_LOGIC_VECTOR(to_unsigned(i, s_addr'length));
+            s_ack_in <= '1';
+            WAIT FOR 7 * clock_period;
+            s_ack_in <= '0';
+            WAIT FOR clock_period;
+        END LOOP;
+        REPORT "Finished Step 2, current time = " & TIME'image(Now);
+
+        s_addr <= (OTHERS => '0');
+        WAIT FOR 2 * clock_period; -- wait some time to get distance
+
+
+        -- 3. Partial overwriting of data
+        REPORT "Partial overwriting of data";
+        s_dByte <= (3 => '1', 2 => '0', 1 => '0', 0 => '1'); -- first and last byte should be used only
+        s_wdata <= (31 DOWNTO 8 => '1', 7 DOWNTO 0 => '0'); -- to make it easier replace first three bytes with 1s, last byte with 0s
+        s_readwrite <= '1'; -- write mode
+
+        s_addr <= STD_LOGIC_VECTOR(to_unsigned(31, s_addr'length));
+        s_ack_in <= '1'; -- overwrite entry 31
+        WAIT FOR 7 * clock_period;
+        s_ack_in <= '0';
+        WAIT FOR clock_period;
+        s_addr <= STD_LOGIC_VECTOR(to_unsigned(255, s_addr'length));
+        s_dByte <= not s_dByte; -- flipp all bits
+        s_ack_in <= '1'; -- overwrite entry 255 (last row)
+        WAIT FOR 7 * clock_period;
+        s_ack_in <= '0';
+        WAIT FOR clock_period;
+        REPORT "Finished Step 3, current time = " & TIME'image(Now);
+
+
+        -- 4. Read previously changed fields
+        REPORT "Read previously changed fields";
+        s_dByte <= (OTHERS => '0');
+        s_wdata <= (OTHERS => '0');
+        s_readwrite <= '0'; -- read mode
+
+        s_addr <= STD_LOGIC_VECTOR(to_unsigned(31, s_addr'length));
+        s_ack_in <= '1'; -- read entry 31
+        WAIT FOR 7 * clock_period;
+        s_ack_in <= '0';
+        WAIT FOR clock_period;
+        s_addr <= STD_LOGIC_VECTOR(to_unsigned(255, s_addr'length));
+        s_ack_in <= '1'; -- read entry 255 (last row)
+        WAIT FOR 7 * clock_period;
+        s_ack_in <= '0';
+        WAIT FOR 2 * clock_period;
+        REPORT "Finished Step 4, current time = " & TIME'image(Now);
     END PROCESS;
 
     -- Creates clock and controls counter.
@@ -121,72 +199,5 @@ BEGIN
     BEGIN
         clk <= '0', '1' AFTER clock_period / 2;
         WAIT FOR clock_period;
-    END PROCESS;
-
-    -- Performs test operations exactly when (fsm)-machine is ready to receive them. 
-    stimulus : PROCESS (dut_state)
-    BEGIN
-        IF dut_state = S_Idle THEN -- FSM of router table starts only in idle state!
-            CASE counter IS
-                WHEN 1 =>
-                    -- 1. Write
-                    REPORT "1. Write";
-
-                    act <= '1'; -- activate router table
-                    readwrite <= '1'; -- write
-                    dByte <= (OTHERS => '1'); -- write in all four bits
-                    addr <= (OTHERS => '0'); -- write in 1st field of array
-                    wdata <= "10101011101010101010101011101010"; -- word to be written
-
-                WHEN 2 =>
-                    -- 2. Read
-                    REPORT "2. Read";
-
-                    act <= '1';
-                    readwrite <= '0'; -- read
-                    dByte <= (3 => '1', 0 => '1', OTHERS => '0'); -- Has no effect on reading operation but marks corresponding point in timing diagram.
-                    addr <= (OTHERS => '0'); -- first array field              
-
-                WHEN 3 =>
-                    -- 3. Try to read in inactive mode
-                    REPORT "3. Try to read in inact mode";
-
-                    act <= '1'; -- should be '1'
-                    readwrite <= '0'; -- read
-                    dByte <= (OTHERS => '1'); -- Has no effect on reading operation but marks corresponding point in timing diagram.
-                    addr <= (OTHERS => '0'); -- first array field
-
-                WHEN 4 =>
-                    -- 4. Write without permission
-                    REPORT "4. Write without permission";
-
-                    act <= '1';
-                    readwrite <= '0'; -- should be '1'
-                    dByte <= (3 => '1', 2 => '1', 1 => '1', OTHERS => '0'); -- select all four bytes
-                    addr <= (OTHERS => '0'); -- first array field
-                    wdata <= (OTHERS => '0'); -- replace with nulls
-
-                WHEN 5 =>
-                    -- 5. Proof that it didn't overwrite
-                    REPORT "5. Proof that it didn't overwrite";
-
-                    act <= '1';
-                    readwrite <= '0'; -- read
-                    dByte <= (3 => '1', 0 => '1', OTHERS => '0'); -- read first and last byte
-                    addr <= (OTHERS => '0'); -- first array field
-
-                WHEN OTHERS =>
-                    -- Set reset signal to high.
-                    done <= true;
-            END CASE;
-
-            -- Increment counter for next test operation.
-            counter <= counter + 1;
-
-            -- Stop clock if all test operations are executed.
-            IF counter > 6 THEN
-                stop_the_clock <= true;
-            END IF;
-        END IF;
     END PROCESS;
 END spwroutertable_tb_arch;
