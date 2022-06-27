@@ -5,13 +5,12 @@
 -- Create Date: 31.07.2021 12:53
 -- Design Name: SpaceWire Router Top Module
 -- Module Name: spwrouter
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
 -- Target Devices: 
 -- Tool Versions: 
--- Description: Complete router implementation which contains all necessary entities.
--- (Active autostart but no linkstart! Router is waiting for an attemption of an incoming connection)
+-- Description: Top router entity.
 --
--- Dependencies: spwpkg, spwrouterpkg
+-- Dependencies: spwstream (spwpkg), spwrouterpkg
 -- 
 -- Revision:
 ----------------------------------------------------------------------------------
@@ -35,10 +34,10 @@ ENTITY spwrouter IS
         txclkfreq : real := 10.0e6;
 
         -- Selection of receiver front-end implementation.
-        rx_impl : rximpl_array(numports DOWNTO 0) := (others => impl_fast);
+        rx_impl : rximpl_array(numports DOWNTO 0) := (OTHERS => impl_fast);
 
         -- Selection of transmitter implementation.
-        tx_impl : tximpl_array(numports DOWNTO 0) := (others => impl_fast)
+        tx_impl : tximpl_array(numports DOWNTO 0) := (OTHERS => impl_fast)
     );
     PORT (
         -- System clock.
@@ -89,33 +88,41 @@ ENTITY spwrouter IS
 END spwrouter;
 
 ARCHITECTURE spwrouter_arch OF spwrouter IS
-    PACKAGE function_pkg IS NEW work.spwrouterfunc
+    PACKAGE spwrouterfunc IS NEW work.spwrouterfunc
         GENERIC MAP(numports => numports); -- Import package with various functions.
 
         -- Necessary number of bits to represent numport-ports.
         CONSTANT blen : INTEGER RANGE 0 TO 5 := INTEGER(ceil(log2(real(numports))));
 
-        SIGNAL iSelectDestinationPort : array_t(numports DOWNTO 0)(numports DOWNTO 0);
-        SIGNAL iSwitchPortNumber : array_t(numports DOWNTO 0)(numports DOWNTO 0);
+        -- Arbitration-specific signals.
+        SIGNAL s_routing_matrix_transposed : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Transposed routing_matrix from arbiter.
+        SIGNAL s_routing_matrix : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Routing switch matrix: Maps source ports (row) to target ports (column).
+        SIGNAL s_source_port_row : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Copy of routing_matrix.
+        SIGNAL s_request_out : STD_LOGIC_VECTOR(numports DOWNTO 0); -- requestOut -- High if a port transfers a packet.        
+        SIGNAL s_destination_port : array_t(numports DOWNTO 0)(7 DOWNTO 0); -- destinationPort -- First byte of a packet (address byte) with destination port (both physical and logical addressing).
+        --SIGNAL sourcePortOut : array_t(numports DOWNTO 0)(blen DOWNTO 0);
+        SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0); -- granted -- Contains ports that have granted access to the port that is specified in destport.
 
-        SIGNAL requestOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
-        SIGNAL destinationPort : array_t(numports DOWNTO 0)(7 DOWNTO 0);
-        SIGNAL sourcePortOut : array_t(numports DOWNTO 0)(blen DOWNTO 0);
-        SIGNAL granted : STD_LOGIC_VECTOR(numports DOWNTO 0);
-        SIGNAL iReadyIn : STD_LOGIC_VECTOR(numports DOWNTO 0);
-        SIGNAL dataOut : array_t(numports DOWNTO 0)(8 DOWNTO 0);
-        SIGNAL strobeOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
-        SIGNAL iRequestIn : STD_LOGIC_VECTOR(numports DOWNTO 0);
+        -- Port-specific signals.
+        SIGNAL s_ready_in : STD_LOGIC_VECTOR(numports DOWNTO 0); -- readyIn -- High if destination port is ready to accept next N-Char.
+        SIGNAL s_rxdata : array_t(numports DOWNTO 0)(8 DOWNTO 0); -- dataOut -- Received byte and control flag.
+        SIGNAL s_strobe_out : STD_LOGIC_VECTOR(numports DOWNTO 0); -- strobeOut -- High if data byte or EOP/EEP of one port is ready to transfer to destination port.
+        SIGNAL s_request_in : STD_LOGIC_VECTOR(numports DOWNTO 0); -- requestIn -- High as long as a packet is sent via one port.
+        SIGNAL s_txdata : array_t(numports DOWNTO 0)(8 DOWNTO 0); -- iDataIn -- Data byte and flag to transmit.
+        SIGNAL s_strobe_in : STD_LOGIC_VECTOR(numports DOWNTO 0); -- strobeIn -- High if transmission via one port should be performed (new byte still on txdata).
+        SIGNAL s_txrdy : STD_LOGIC_VECTOR(numports DOWNTO 0); -- readyOut -- High if port is ready to accept an N-Char for transmission FIFO.
+        
+        -- Time Code specific signals.
+        SIGNAL s_tick_from_tcc_to_ports : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High for one clock cycle if transmission of Time Code is requested
+        SIGNAL s_tick_from_ports_to_tcc : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High for one clock cycle if Time Code was received
+        SIGNAL s_tc_from_tcc_to_ports : array_t(numports DOWNTO 0)(7 DOWNTO 0); -- Time Code (control flag & counter value) of Time Code to sent
+        SIGNAL s_tc_from_ports_to_tcc : array_t(numports DOWNTO 0)(7 DOWNTO 0); -- Time Code (control flag & coutner value) of received Time Code
+        -- TimeCodes & Register.
+        SIGNAL s_auto_tc : STD_LOGIC_VECTOR(7 DOWNTO 0); -- autoTimeCodeValue
+        SIGNAL s_auto_cycle : STD_LOGIC_VECTOR(31 DOWNTO 0); -- autoTimeCodeCycle
+        SIGNAL s_last_tc : STD_LOGIC_VECTOR(7 DOWNTO 0); -- TODO: Noch nicht korrekt eingebunden, soll das zuletzt empfangene TC speichern.
 
-        SIGNAL iDataIn : array_t(numports DOWNTO 0)(8 DOWNTO 0);
-        SIGNAL iStrobeIn : STD_LOGIC_VECTOR(numports DOWNTO 0);
-        SIGNAL readyOut : STD_LOGIC_VECTOR(numports DOWNTO 0);
-
-        SIGNAL routingSwitch : array_t(numports DOWNTO 0)(numports DOWNTO 0);
-
-        SIGNAL routerTimeCode : STD_LOGIC_VECTOR(7 DOWNTO 0);
-
-        -- Bus System I.
+        -- Bus System I. -- HIER WEITERMACHEN!
         SIGNAL busMasterAddressOut : array_t(numports DOWNTO 0)(31 DOWNTO 0);
         SIGNAL busMasterDataOut : array_t(numports DOWNTO 0)(31 DOWNTO 0);
         SIGNAL busMasterByteEnableOut : array_t(numports DOWNTO 0)(3 DOWNTO 0);
@@ -141,15 +148,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         -- All ports that are in running state.
         SIGNAL iLinkUp : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-        -- Time Codes.
-        SIGNAL s_tick_from_tcc_to_ports : std_logic_vector(numports downto 0); -- High for one clock cycle if transmission of Time Code is requested
-        signal s_tick_from_ports_to_tcc : std_logic_vector(numports downto 0); -- High for one clock cycle if Time Code was received
-        signal s_tc_from_tcc_to_ports : array_t(numports downto 0)(7 downto 0); -- Time Code (control flag & counter value) of Time Code to sent
-        signal s_tc_from_ports_to_tcc : array_t(numports downto 0)(7 downto 0); -- Time Code (control flag & coutner value) of received Time Code
 
-        -- TimeCodes & Register.
-        SIGNAL autoTimeCodeValue : STD_LOGIC_VECTOR(7 DOWNTO 0);
-        SIGNAL autoTimeCodeCycleTime : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
         -- Eigene Signale
         SIGNAL s_running : STD_LOGIC_VECTOR(numports DOWNTO 0);
@@ -157,9 +156,9 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         -- Drive outputs.
         running <= s_running;
         iLinkUp <= s_running;
-        
-        -- Crossbar Switch - Router Arbiter.
-        arb : spwrouterarb
+
+        -- Router arbiter (crossbar switch).
+        roundrobin_arbiter : spwrouterarb
         GENERIC MAP(
             numports => numports,
             blen => blen
@@ -167,35 +166,13 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
         PORT MAP(
             clk => clk,
             rst => rst,
-            destport => destinationPort,
-            request => requestOut,
-            granted => granted,
-            routing_matrix => routingSwitch
+            destport => s_destination_port,
+            request => s_request_out,
+            granted => s_granted,
+            routing_matrix => s_routing_matrix
         );
 
-        -- The destination PortNo regarding to the source PortNo (creates transposed matrix of routingSwitch).
-        rowloop : FOR i IN 0 TO numports GENERATE
-            columnloop : FOR j IN 0 TO numports GENERATE
-                iSelectDestinationPort(i)(j) <= routingSwitch(j)(i);
-            END GENERATE columnloop;
-        END GENERATE rowloop;
-
-        -- The source to the destination PortNo PortNo.
-        srcPort : FOR i IN 0 TO numports GENERATE
-            iSwitchPortNumber(i) <= routingSwitch(i);
-        END GENERATE srcPort;
-
-        -- Routing process: Assigns information to ports from the routing process.
-        spx : FOR i IN 0 TO numports GENERATE
-            iReadyIn(i) <= function_pkg.select1(iSelectDestinationPort(i), readyOut);
-            iRequestIn(i) <= function_pkg.select1(iSwitchPortNumber(i), requestOut);
-            --iSourcePortIn(i) <= select7x1xVector8(iSwitchPortNumber(i), sourcePortOut); -- wohl nur für RMAP nötig
-            iDataIn(i) <= function_pkg.select9(iSwitchPortNumber(i), dataOut);
-            iStrobeIn(i) <= function_pkg.select1(iSwitchPortNumber(i), strobeOut);
-        END GENERATE spx;
-        -- SpaceWirePort LinkUP Signal. (dropped)
-
-        -- Internal Configuration Port.
+        -- Internal configuration port 0.
         port0 : spwrouterport
         GENERIC MAP(
             numports => numports,
@@ -215,16 +192,16 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             autostart => '1',
             linkstart => '0',
             linkdis => '0',
-            txdivcnt => "00000001",
-            tick_in => s_tick_from_tcc_to_ports(0),--tick_in(0),
-            time_in => s_tc_from_tcc_to_ports(0),--time_in(0),
-            txdata => iDataIn(0),
-            txhalff => open,
-            tick_out => s_tick_from_ports_to_tcc(0),--tick_out(0),
-            time_out => s_tc_from_ports_to_tcc(0),--time_out(0),
-            txrdy => readyOut(0),
-            rxhalff => open,
-            rxdata => dataOut(0),
+            txdivcnt => "00000001", -- via register
+            tick_in => s_tick_from_tcc_to_ports(0), --tick_in(0),
+            time_in => s_tc_from_tcc_to_ports(0), --time_in(0),
+            txdata => s_txdata(0),
+            txhalff => OPEN,
+            tick_out => s_tick_from_ports_to_tcc(0), --tick_out(0),
+            time_out => s_tc_from_ports_to_tcc(0), --time_out(0),
+            txrdy => s_txrdy(0),
+            rxhalff => OPEN,
+            rxdata => s_rxdata(0),
             started => started(0),
             connecting => connecting(0),
             running => s_running(0),
@@ -235,16 +212,16 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             spw_di => spw_di(0),
             spw_si => spw_si(0),
             spw_do => spw_do(0),
-            spw_so => spw_so(0),            
+            spw_so => spw_so(0),
             linkstatus => iLinkUp,
-            request_in => iRequestIn(0),
-            request_out => requestOut(0),
-            destination_port => destinationPort(0),
+            request_in => s_request_in(0),
+            request_out => s_request_out(0),
+            destination_port => s_destination_port(0),
             --sourcePortOut => sourcePortOut(0),
-            arb_granted => granted(0),
-            strobe_out => strobeOut(0),
-            strobe_in => iStrobeIn(0),
-            ready_in => iReadyIn(0),
+            arb_granted => s_granted(0),
+            strobe_out => s_strobe_out(0),
+            strobe_in => s_strobe_in(0),
+            ready_in => s_ready_in(0),
             --readyOut => readyOut(0),
             bus_address => busMasterAddressOut(0),
             bus_data_in => busSlaveDataOut,
@@ -256,9 +233,9 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             bus_ack_in => busMasterAcknowledgeIn(0)
         );
 
-        -- Other ports (numport-1)-ports.
-        spwports : FOR i IN 1 TO numports GENERATE
-            spwport : spwrouterport GENERIC MAP(
+        -- Remaining (normal) SpaceWire ports.
+        ports : FOR i IN 1 TO numports GENERATE
+            port_i : spwrouterport GENERIC MAP(
                 numports => numports,
                 blen => blen,
                 --pnum => i,
@@ -276,16 +253,16 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 autostart => '1', -- active autostart but none linkstart! Router is waiting for incoming connection attempt.
                 linkstart => '0',
                 linkdis => '0',
-                txdivcnt => "00000001",
-                tick_in => s_tick_from_tcc_to_ports(i),--tick_in(i),
-                time_in => s_tc_from_tcc_to_ports(i),--time_in(i),
-                txhalff => open,
-                txdata => iDataIn(i),
-                tick_out => s_tick_from_ports_to_tcc(i),--tick_out(i),
-                time_out => s_tc_from_ports_to_tcc(i),--time_out(i),
-                txrdy => readyOut(i),
-                rxhalff => open,
-                rxdata => dataOut(i),
+                txdivcnt => "00000001", -- via register
+                tick_in => s_tick_from_tcc_to_ports(i), --tick_in(i),
+                time_in => s_tc_from_tcc_to_ports(i), --time_in(i),
+                txhalff => OPEN,
+                txdata => s_txdata(i),
+                tick_out => s_tick_from_ports_to_tcc(i), --tick_out(i),
+                time_out => s_tc_from_ports_to_tcc(i), --time_out(i),
+                txrdy => s_txrdy(i),
+                rxhalff => OPEN,
+                rxdata => s_rxdata(i),
                 started => started(i),
                 connecting => connecting(i),
                 running => s_running(i),
@@ -298,14 +275,14 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 spw_do => spw_do(i),
                 spw_so => spw_so(i),
                 linkstatus => iLinkUp,
-                request_out => requestOut(i),
-                request_in => iRequestIn(i),
-                destination_port => destinationPort(i),
+                request_out => s_request_out(i),
+                request_in => s_request_in(i),
+                destination_port => s_destination_port(i),
                 --sourcePortOut => sourcePortOut(i),
-                arb_granted => granted(i),
-                strobe_out => strobeOut(i),
-                strobe_in => iStrobeIn(i),
-                ready_in => iReadyIn(i),
+                arb_granted => s_granted(i),
+                strobe_out => s_strobe_out(i),
+                strobe_in => s_strobe_in(i),
+                ready_in => s_ready_in(i),
                 bus_address => busMasterAddressOut(i),
                 bus_data_in => busSlaveDataOut,
                 --busMasterDataOut => busMasterDataOut(i),
@@ -317,8 +294,8 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             );
         END GENERATE;
 
-        -- Router Link Control, Status Register and Routing Table
-        routerControlRegister : spwrouterregs
+        -- Contains router link control, port status register and routing table.
+        Reg : spwrouterregs
         GENERIC MAP(
             numports => numports
         )
@@ -334,13 +311,13 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             strobe => iBusSlaveStrobeIn,
             cycle => iBusSlaveCycleIn,
             portstatus => (OTHERS => (OTHERS => '0')), -- TODO!
-            receiveTimeCode => routerTimeCode,
-            autoTimeCodeValue => autoTimeCodeValue,
-            autoTimeCodeCycleTime => autoTimeCodeCycleTime
+            receiveTimeCode => s_last_tc,
+            autoTimeCodeValue => s_auto_tc,
+            autoTimeCodeCycleTime => s_auto_cycle
         );
 
-        -- Bus arbiter & Router table arbiter
-        arb_table : spwrouterarb_table
+        -- Bus arbiter & routing table arbiter
+        internalbus_routingtable_arbiter : spwrouterarb_table
         GENERIC MAP(
             numports => numports
         )
@@ -350,6 +327,47 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             request => busMasterRequestOut,
             granted => busMasterGranted
         );
+
+        -- Time code control.
+        timecode_control : spwroutertcc
+        GENERIC MAP(
+            numports => numports
+        )
+        PORT MAP(
+            clk => clk,
+            rst => rst,
+            running => iLinkUp,
+            tc_enable => (OTHERS => '1'), -- Time Codes are always activated on all available ports
+            tc_last => s_last_tc,
+            tick_out => s_tick_from_tcc_to_ports, --tick_out,
+            tick_in => s_tick_from_ports_to_tcc, --tick_in,
+            tc_out => s_tc_from_tcc_to_ports, --time_out,
+            tc_in => s_tc_from_ports_to_tcc, --time_in,
+            auto_tc_out => s_auto_tc,
+            auto_interval => s_auto_cycle
+        );
+
+        -- Creates transposed matrix of s_routing_matrix: Shows for every port (row) which port (column) requests access to it.
+        routing_matrix_row : FOR i IN 0 TO numports GENERATE
+            routing_matrix_column : FOR j IN 0 TO numports GENERATE
+                s_routing_matrix_transposed(i)(j) <= s_routing_matrix(j)(i);
+            END GENERATE routing_matrix_column;
+        END GENERATE routing_matrix_row;
+
+        -- Stores every row of s_routing_matrix which maps source ports (row) to destination ports (column)
+        source_port_rows : FOR i IN 0 TO numports GENERATE
+            s_source_port_row(i) <= s_routing_matrix(i);
+        END GENERATE source_port_rows;
+
+        -- Routing process: Assigns information to ports from the routing process.
+        spx : FOR i IN 0 TO numports GENERATE
+            s_ready_in(i) <= spwrouterfunc.select_port(s_routing_matrix_transposed(i), s_txrdy);
+            s_request_in(i) <= spwrouterfunc.select_port(s_source_port_row(i), s_request_out);
+            --iSourcePortIn(i) <= select7x1xVector8(s_source_port_row(i), sourcePortOut); -- wohl nur für RMAP nötig
+            s_txdata(i) <= spwrouterfunc.select_nchar(s_source_port_row(i), s_rxdata);
+            s_strobe_in(i) <= spwrouterfunc.select_port(s_source_port_row(i), s_strobe_out);
+        END GENERATE spx;
+        -- SpaceWirePort LinkUP Signal. (dropped)
 
         -- Timing adjustment. BusSlaveAccessSelector
         PROCESS (clk)
@@ -370,7 +388,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                     END IF;
                 END LOOP;
 
-                -- Port0 is special case so handling outside for loop
+                -- Port0 is special case so handling outside of for-loop.
                 IF (busMasterGranted(0) = '1') THEN
                     iBusSlaveStrobeIn <= busMasterStrobeOut(0);
                     iBusSlaveAddressIn <= busMasterAddressOut(0);
@@ -383,23 +401,4 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 busSlaveDataOut <= ibusMasterDataOut;
             END IF;
         END PROCESS;
-        
-        -- Time Code Control.
-        TimeCodeControl : spwroutertcc
-        GENERIC MAP(
-            numports => numports
-        )
-        PORT MAP(
-            clk => clk,
-            rst => rst,
-            running => iLinkUp,
-            tc_enable => (OTHERS => '1'), -- Time Codes are always activated on all available ports
-            tc_last => routerTimeCode,            
-            tick_out => s_tick_from_tcc_to_ports,--tick_out,
-            tick_in => s_tick_from_ports_to_tcc,--tick_in,
-            tc_out => s_tc_from_tcc_to_ports,--time_out,
-            tc_in => s_tc_from_ports_to_tcc,--time_in,
-            auto_tc_out => autoTimeCodeValue,
-            auto_interval => autoTimeCodeCycleTime
-        );
     END ARCHITECTURE spwrouter_arch;

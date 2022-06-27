@@ -85,7 +85,7 @@ ENTITY UARTSpWAdapter IS
         -- SpW port transmit clock (only for impl_fast).
         txclk : IN STD_LOGIC; -- Standard implementation with impl_fast, therefore txclk = clk must apply !
 
-        -- Reset.
+        -- Synchronous reset.
         rst : IN STD_LOGIC;
 
         -- Enables atomatic link start for SpW ports on receipt of a NULL character.
@@ -213,6 +213,9 @@ ARCHITECTURE UARTSpWAdapter_config_arch OF UARTSpWAdapter IS
     END COMPONENT;
 
     -- Signals.
+    -- Command-based reset.
+    SIGNAL s_cmdrst : STD_LOGIC;
+    
     -- Uart Recv (belong to corresponding ports in uart entities).
     SIGNAL s_rx_rdy : STD_LOGIC;
     SIGNAL s_rx_ack : STD_LOGIC;
@@ -335,7 +338,7 @@ BEGIN
             clk => clk,
             rxclk => rxclk,
             txclk => txclk,
-            rst => rst,
+            rst => (rst or s_cmdrst),
             autostart => s_autostart(n),
             linkstart => s_linkstart(n),
             linkdis => linkdis(n),
@@ -392,6 +395,7 @@ BEGIN
                 s_info1 <= '0';
                 s_info2 <= '0';
                 s_info3 <= '0';
+                s_cmdrst <= '0';
                 --s_spw_buffer <= (8 => '1', others => '0');
                 istate <= s_Idle;
             ELSE
@@ -401,6 +405,7 @@ BEGIN
                         s_info1 <= '0';
                         s_info2 <= '0';
                         s_info3 <= '0';
+                        s_cmdrst <= '0';
                         s_txwrite <= (OTHERS => '0');
                         s_txflag <= (OTHERS => '0');
                         s_txdata <= (OTHERS => (OTHERS => '0'));
@@ -438,6 +443,7 @@ BEGIN
                                         -- List everything that should be reset here...
                                         s_port_input <= init_input_port;
                                         s_port_output <= init_output_port;
+                                        s_cmdrst <= '1';
 
                                     WHEN "01" =>
                                         -- Output Info1
@@ -586,7 +592,7 @@ BEGIN
                             s_uart_output(3) <= s_running(s_port_input);
                             s_uart_output(2) <= s_errdisc(s_port_input) OR s_errpar(s_port_input);
                             s_uart_output(1) <= s_erresc(s_port_input) OR s_errcred(s_port_input);
-                            s_uart_output(0) <= s_rxhalff(s_port_output) OR s_txhalff(s_port_input); -- input / output !
+                            s_uart_output(0) <= s_rxhalff(s_port_input) OR s_txhalff(s_port_input); -- output / input !
 
                             ostate <= s_Wait;
                         END IF;

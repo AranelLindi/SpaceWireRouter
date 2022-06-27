@@ -24,14 +24,19 @@ USE IEEE.NUMERIC_STD.ALL;
 USE WORK.SPWPKG.ALL;
 USE WORK.SPWROUTERPKG.ALL;
 
-ENTITY routertest_adapter_single_top IS
+library unisim;
+use unisim.vcomponents.all;
+
+
+ENTITY routertest_adapter_single_top_ZYNQ IS
     GENERIC (
         -- Number of SpaceWire ports in router & adapter.
         numports : INTEGER RANGE 0 TO 31 := 3
     );
     PORT (
         -- System clock.
-        clk : IN STD_LOGIC;
+        SYSCLK_P : IN STD_LOGIC;        
+        SYSCLK_N : IN STD_LOGIC;
 
         -- Reset.
         rst : IN STD_LOGIC;
@@ -46,24 +51,24 @@ ENTITY routertest_adapter_single_top IS
         clear : IN STD_LOGIC;
 
         -- HIGH if link of adapter SpW ports is in run state, indicating that link is operational.
-        adapt_running : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+        adapt_running : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
 
         -- HIGH if errdisc (disconnect error), errpar (parity error), erresc (invalid escape sequence) or errcred (credit error) were detected.
         -- Triggers link reset. Must be acknowledged with a 'rst' or 'clear'.
-        adapt_error : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+        adapt_error : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
 
         -- HIGH if link of router SpW ports is in run state, indicating that link is operational. 
-        router_running : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+        router_running : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
 
         -- HIGH if errdisc (disconnect error), errpar (parity error), erresc (invalid escape sequence) or errcred (credit error) were detected.
         -- Triggers link reset. Must be acknowledged with a 'rst' or 'clear'.
-        router_error : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+        router_error : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
     );
-END routertest_adapter_single_top;
+END routertest_adapter_single_top_ZYNQ;
 
-ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top IS
+ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top_ZYNQ IS
     -- Constants
-    CONSTANT sysfreq : real := 100.0e6; -- 100 MHz Digilent Basys3 Board !
+    CONSTANT sysfreq : real := 100.0e6; -- clk period
 
     COMPONENT UARTSpWAdapter
         GENERIC (
@@ -220,12 +225,43 @@ ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top
     SIGNAL s_spw_s_to_router : STD_LOGIC_VECTOR(numports DOWNTO 0);
     SIGNAL s_spw_d_from_router : STD_LOGIC_VECTOR(numports DOWNTO 0);
     SIGNAL s_spw_s_from_router : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    
+    signal clk_ibufg : std_logic;
+    signal clk : std_logic;
+    signal boardclk : std_logic;
 BEGIN
     -- Drive outputs.
-    adapt_error <= s_adapt_error;
-    router_error <= s_router_error;
-    adapt_running <= s_adapt_running;
-    router_running <= s_router_running;
+    adapt_error <= s_adapt_error(0 downto 0);
+    router_error <= s_router_error(0 downto 0);
+    adapt_running <= s_adapt_running(0 downto 0);
+    router_running <= s_router_running(0 downto 0);
+
+
+    -- Differential input clock buffer.
+    bufgds: IBUFDS port map (I => SYSCLK_P, IB => SYSCLK_N, O => clk_ibufg); -- eventuell auch IBUFGDS, mal schauen ob Fehler auftreten
+    
+    -- Creates a 100 MHz clock.
+    dcm0: DCM_SP
+    	generic map (
+    		CLKFX_DIVIDE => 20,
+    		CLKFX_MULTIPLY => 2,
+    		CLK_FEEDBACK => "NONE",
+    		CLKIN_DIVIDE_BY_2 => true,
+    		CLKIN_PERIOD => 5.0,
+    		CLKOUT_PHASE_SHIFT => "NONE",
+    		DESKEW_ADJUST => "SYSTEM_SYNCHRONOUS",
+    		DFS_FREQUENCY_MODE => "LOW",
+    		DUTY_CYCLE_CORRECTION => true,
+    		STARTUP_WAIT => true
+    	)
+    	port map (
+    		CLKIN => clk_ibufg,
+    		RST => '0',
+    		CLKFX => clk
+    	);
+    	    	
+    -- Buffer clock.
+    bufg0: BUFG port map (I => clk, O => boardclk);
 
     -- UARTSpWAdapter
     -- Contains numports-SpaceWire ports.
@@ -246,9 +282,9 @@ BEGIN
         txfifosize_bits => 11
     )
     PORT MAP(
-        clk => clk,
-        rxclk => clk,
-        txclk => clk,
+        clk => boardclk,
+        rxclk => boardclk,
+        txclk => boardclk,
         rst => rst,
         autostart => (OTHERS => '1'),
         linkstart => (OTHERS => '1'),
@@ -281,9 +317,9 @@ BEGIN
         tx_impl => (OTHERS => impl_fast)
     )
     PORT MAP(
-        clk => clk,
-        rxclk => clk,
-        txclk => clk,
+        clk => boardclk,
+        rxclk => boardclk,
+        txclk => boardclk,
         rst => rst,
         started => OPEN,
         connecting => OPEN,
