@@ -34,9 +34,16 @@ ENTITY routertest_adapter_single_top_ZYNQ IS
         numports : INTEGER RANGE 0 TO 31 := 3
     );
     PORT (
+        SYSCLK_P : in std_logic;
+        
+        SYSCLK_N : in std_logic;
+    
+    
+        -- Uart clock.
+        --uclk : in std_logic;
+    
         -- System clock.
-        SYSCLK_P : IN STD_LOGIC;        
-        SYSCLK_N : IN STD_LOGIC;
+        --spwclk : in std_logic;
 
         -- Reset.
         rst : IN STD_LOGIC;
@@ -121,8 +128,11 @@ ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top
             txfifosize_bits : INTEGER RANGE 2 TO 14 := 11
         );
         PORT (
+            -- Uart clock.
+            uclk : IN STD_LOGIC;
+        
             -- System clock.
-            clk : IN STD_LOGIC;
+            spwclk : IN STD_LOGIC;
 
             -- SpW port receive sample clock (only for impl_fast).
             rxclk : IN STD_LOGIC;
@@ -225,10 +235,15 @@ ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top
     SIGNAL s_spw_s_to_router : STD_LOGIC_VECTOR(numports DOWNTO 0);
     SIGNAL s_spw_d_from_router : STD_LOGIC_VECTOR(numports DOWNTO 0);
     SIGNAL s_spw_s_from_router : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    
+
     signal clk_ibufg : std_logic;
     signal clk : std_logic;
-    signal boardclk : std_logic;
+    --signal boardclk : std_logic;
+    
+    signal s_clk_toggle : std_logic;
+    
+    type clkdivstates is (S_Mode1, S_Mode2);
+    signal clkdivstate : clkdivstates := S_Mode1;
 BEGIN
     -- Drive outputs.
     adapt_error <= s_adapt_error(0 downto 0);
@@ -239,100 +254,120 @@ BEGIN
 
     -- Differential input clock buffer.
     bufgds: IBUFDS port map (I => SYSCLK_P, IB => SYSCLK_N, O => clk_ibufg); -- eventuell auch IBUFGDS, mal schauen ob Fehler auftreten
+
+    -- Creates 100 MHz clock.
+    BUFGCE_inst : BUFGCE
+    port map (O => clk, CE => s_clk_toggle, I => clk_ibufg);
+    -- Toggles enable signal for BUFGCE every two cycles of input clk to divide by 2.
+    process(clk_ibufg)
+    begin
+        if rising_edge(clk_ibufg) then
+            case clkdivstate is
+                when S_Mode1 =>
+                    clkdivstate <= S_Mode2;
+                
+                when S_Mode2 =>
+                    s_clk_toggle <= not s_clk_toggle;
+                    clkdivstate <= S_Mode1;
+            end case;
+        end if;
+    end process;
     
-    -- Creates a 100 MHz clock.
-    dcm0: DCM_SP
-    	generic map (
-    		CLKFX_DIVIDE => 20,
-    		CLKFX_MULTIPLY => 2,
-    		CLK_FEEDBACK => "NONE",
-    		CLKIN_DIVIDE_BY_2 => true,
-    		CLKIN_PERIOD => 5.0,
-    		CLKOUT_PHASE_SHIFT => "NONE",
-    		DESKEW_ADJUST => "SYSTEM_SYNCHRONOUS",
-    		DFS_FREQUENCY_MODE => "LOW",
-    		DUTY_CYCLE_CORRECTION => true,
-    		STARTUP_WAIT => true
-    	)
-    	port map (
-    		CLKIN => clk_ibufg,
-    		RST => '0',
-    		CLKFX => clk
-    	);
-    	    	
-    -- Buffer clock.
-    bufg0: BUFG port map (I => clk, O => boardclk);
+
+--    -- Creates a 100 MHz clock.
+--    dcm0: DCM_SP
+--        generic map (
+--            CLKFX_DIVIDE => 2,
+--            CLKFX_MULTIPLY => 2,
+--            CLK_FEEDBACK => "NONE",
+--            CLKIN_DIVIDE_BY_2 => true,
+--            CLKIN_PERIOD => 5.0,
+--            CLKOUT_PHASE_SHIFT => "NONE",
+--            DESKEW_ADJUST => "SYSTEM_SYNCHRONOUS",
+--            DFS_FREQUENCY_MODE => "LOW",
+--            DUTY_CYCLE_CORRECTION => true,
+--            STARTUP_WAIT => true
+--        )
+--        port map (
+--            CLKIN => clk_ibufg,
+--            RST => '0',
+--            CLKFX => clk
+--        );
+
+--    -- Buffer clock.
+--    bufg0: BUFG port map (I => clk, O => boardclk);
 
     -- UARTSpWAdapter
     -- Contains numports-SpaceWire ports.
     Adapter : UARTSpWAdapter
-    GENERIC MAP(
-        clk_cycles_per_bit => 868, -- 100_000_000 (Hz) / 115_200 (baud rate) = 868
-        numports => numports,
-        init_input_port => 1,
-        init_output_port => 1,
-        activate_commands => true, -- define adapter variant (command (true) / non-command version (false))
-        sysfreq => sysfreq,
-        txclkfreq => sysfreq,
-        rximpl => impl_fast,
-        rxchunk => 1,
-        WIDTH => 2,
-        tximpl => impl_fast,
-        rxfifosize_bits => 11,
-        txfifosize_bits => 11
-    )
-    PORT MAP(
-        clk => boardclk,
-        rxclk => boardclk,
-        txclk => boardclk,
-        rst => rst,
-        autostart => (OTHERS => '1'),
-        linkstart => (OTHERS => '1'),
-        linkdis => (0 => '0', OTHERS => '0'),
-        txdivcnt => "00000001",
-        started => OPEN,
-        connecting => OPEN,
-        running => s_adapt_running,
-        errdisc => s_adapt_errdisc,
-        errpar => s_adapt_errpar,
-        erresc => s_adapt_erresc,
-        errcred => s_adapt_errcred,
-        txhalff => OPEN,
-        rxhalff => OPEN,
-        spw_di => s_spw_d_from_router,
-        spw_si => s_spw_s_from_router,
-        spw_do => s_spw_d_to_router,
-        spw_so => s_spw_s_to_router,
-        rx => rx,
-        tx => tx
-    );
+        GENERIC MAP(
+            clk_cycles_per_bit => 868, -- 100_000_000 (Hz) / 115_200 (baud rate) = 868
+            numports => numports,
+            init_input_port => 1,
+            init_output_port => 1,
+            activate_commands => true, -- define adapter variant (command (true) / non-command version (false))
+            sysfreq => sysfreq,
+            txclkfreq => sysfreq,
+            rximpl => impl_fast,
+            rxchunk => 1,
+            WIDTH => 2,
+            tximpl => impl_fast,
+            rxfifosize_bits => 11,
+            txfifosize_bits => 11
+        )
+        PORT MAP(
+            uclk => clk,
+            spwclk => clk,
+            rxclk => clk,
+            txclk => clk,
+            rst => rst,
+            autostart => (OTHERS => '1'),
+            linkstart => (OTHERS => '1'),
+            linkdis => (0 => '0', OTHERS => '0'),
+            txdivcnt => "00000001",
+            started => OPEN,
+            connecting => OPEN,
+            running => s_adapt_running,
+            errdisc => s_adapt_errdisc,
+            errpar => s_adapt_errpar,
+            erresc => s_adapt_erresc,
+            errcred => s_adapt_errcred,
+            txhalff => OPEN,
+            rxhalff => OPEN,
+            spw_di => s_spw_d_from_router,
+            spw_si => s_spw_s_from_router,
+            spw_do => s_spw_d_to_router,
+            spw_so => s_spw_s_to_router,
+            rx => rx,
+            tx => tx
+        );
 
     -- SpaceWire router.
     Router : spwrouter
-    GENERIC MAP(
-        numports => numports,
-        sysfreq => sysfreq,
-        txclkfreq => sysfreq,
-        rx_impl => (OTHERS => impl_fast),
-        tx_impl => (OTHERS => impl_fast)
-    )
-    PORT MAP(
-        clk => boardclk,
-        rxclk => boardclk,
-        txclk => boardclk,
-        rst => rst,
-        started => OPEN,
-        connecting => OPEN,
-        running => s_router_running,
-        errdisc => s_router_errdisc,
-        errpar => s_router_errpar,
-        erresc => s_router_erresc,
-        errcred => s_router_errcred,
-        spw_di => s_spw_d_to_router,
-        spw_si => s_spw_s_to_router,
-        spw_do => s_spw_d_from_router,
-        spw_so => s_spw_s_from_router
-    );
+        GENERIC MAP(
+            numports => numports,
+            sysfreq => sysfreq,
+            txclkfreq => sysfreq,
+            rx_impl => (OTHERS => impl_fast),
+            tx_impl => (OTHERS => impl_fast)
+        )
+        PORT MAP(
+            clk => clk,
+            rxclk => clk,
+            txclk => clk,
+            rst => rst,
+            started => OPEN,
+            connecting => OPEN,
+            running => s_router_running,
+            errdisc => s_router_errdisc,
+            errpar => s_router_errpar,
+            erresc => s_router_erresc,
+            errcred => s_router_errcred,
+            spw_di => s_spw_d_to_router,
+            spw_si => s_spw_s_to_router,
+            spw_do => s_spw_d_from_router,
+            spw_so => s_spw_s_from_router
+        );
 
     -- Error outputs.
     PROCESS (clk)

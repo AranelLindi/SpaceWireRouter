@@ -3,10 +3,10 @@
 <!--                                                         -->
 <!-- Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="60" Path="/home/stl56jc/Dokumente/Code/SpaceWireRouter/SpaceWireRouter_ZYNQ.xpr">
+<Project Version="7" Minor="60" Path="/home/stl56jc/Dokumente/Code/SpaceWireRouter/SpaceWireRouterZYNQ.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
-    <Option Name="Id" Val="2da71e25732b48e695dbd1bc443f715e"/>
+    <Option Name="Id" Val="d51f2fe520484ec081e92d4e7aec2727"/>
     <Option Name="Part" Val="xc7z045ffg900-2"/>
     <Option Name="CompiledLibDir" Val="$PCACHEDIR/compile_simlib"/>
     <Option Name="CompiledLibDirXSim" Val=""/>
@@ -46,11 +46,12 @@
     <Option Name="SimulatorLanguage" Val="VHDL"/>
     <Option Name="BoardPart" Val="xilinx.com:zc706:part0:1.4"/>
     <Option Name="SourceMgmtMode" Val="DisplayOnly"/>
-    <Option Name="ActiveSimSet" Val="sim_2"/>
+    <Option Name="ActiveSimSet" Val="sim_1"/>
     <Option Name="DefaultLib" Val="xil_defaultlib"/>
     <Option Name="ProjectType" Val="Default"/>
+    <Option Name="IPRepoPath" Val="$PPRDIR/trunk"/>
     <Option Name="IPOutputRepo" Val="$PCACHEDIR/ip"/>
-    <Option Name="IPDefaultOutputPath" Val="$PGENDIR/sources_2"/>
+    <Option Name="IPDefaultOutputPath" Val="$PGENDIR/sources_1"/>
     <Option Name="IPCachePermission" Val="read"/>
     <Option Name="IPCachePermission" Val="write"/>
     <Option Name="EnableCoreContainer" Val="FALSE"/>
@@ -67,13 +68,13 @@
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="0"/>
-    <Option Name="WTModelSimExportSim" Val="0"/>
-    <Option Name="WTQuestaExportSim" Val="0"/>
+    <Option Name="WTXSimExportSim" Val="4"/>
+    <Option Name="WTModelSimExportSim" Val="4"/>
+    <Option Name="WTQuestaExportSim" Val="4"/>
     <Option Name="WTIesExportSim" Val="0"/>
-    <Option Name="WTVcsExportSim" Val="0"/>
-    <Option Name="WTRivieraExportSim" Val="0"/>
-    <Option Name="WTActivehdlExportSim" Val="0"/>
+    <Option Name="WTVcsExportSim" Val="4"/>
+    <Option Name="WTRivieraExportSim" Val="4"/>
+    <Option Name="WTActivehdlExportSim" Val="4"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -89,15 +90,9 @@
     <Option Name="LocalIPRepoLeafDirName" Val="ip_repo"/>
   </Configuration>
   <FileSets Version="1" Minor="31">
-    <FileSet Name="sources_2" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_2" RelGenDir="$PGENDIR/sources_2">
+    <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
       <Filter Type="Srcs"/>
-      <File Path="$PPRDIR/trunk/syn/Adapter/uart/uart_rx.vhd">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/syn/Adapter/uart/uart_tx.vhd">
+      <File Path="$PPRDIR/trunk/rtl/vhdl/spwram.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -121,19 +116,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/trunk/syn/xc7z045-2ffg900c_ZC706/routertest_adapter_single_top.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/trunk/rtl/vhdl/spwlink.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/rtl/vhdl/spwram.vhd">
         <FileInfo SFType="VHDL2008">
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -147,7 +130,6 @@
       </File>
       <File Path="$PPRDIR/trunk/rtl/vhdl/spwrecvfront_clkrec.vhd">
         <FileInfo SFType="VHDL2008">
-          <Attr Name="Library" Val="work"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -242,96 +224,28 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/trunk/syn/Adapter/uart/uart_rx.vhd">
+        <FileInfo SFType="VHDL2008">
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/syn/Adapter/uart/uart_tx.vhd">
+        <FileInfo SFType="VHDL2008">
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/syn/xc7z045-2ffg900c_ZC706/routertest_adapter_single_top.vhd">
+        <FileInfo SFType="VHDL2008">
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/trunk/rtl/vhdl/streamtest.vhd">
         <FileInfo SFType="VHDL2008">
           <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/bench/vhdl/spwrouterarb_round_tb.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/bench/vhdl/adapter_tb.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/bench/vhdl/streamtest_tb.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/bench/vhdl/spwrouterarb_table_tb.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/bench/vhdl/routertest_top_single_tb.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/bench/vhdl/spwlink_tb_all.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/bench/vhdl/spwrouterarb_tb.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/bench/vhdl/spwlink_tb.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/bench/vhdl/spwroutertcc_tb.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/bench/vhdl/spwroutertable_tb.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/bench/vhdl/spwrouterport_tb.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/bench/vhdl/routertest_tb.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/bench/vhdl/spwrecvfront_clkrec_tb.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="Library" Val="work"/>
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/trunk/bench/vhdl/spwrouterregs_tb.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
@@ -340,7 +254,7 @@
         <Option Name="TopModule" Val="routertest_adapter_single_top_ZYNQ"/>
       </Config>
     </FileSet>
-    <FileSet Name="constrs_2" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_2" RelGenDir="$PGENDIR/constrs_2">
+    <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1" RelGenDir="$PGENDIR/constrs_1">
       <Filter Type="Constrs"/>
       <File Path="$PPRDIR/trunk/syn/xc7z045-2ffg900c_ZC706/routertest_adapter_single_top_constr.xdc">
         <FileInfo>
@@ -353,11 +267,77 @@
         <Option Name="ConstrsType" Val="XDC"/>
       </Config>
     </FileSet>
-    <FileSet Name="sim_2" Type="SimulationSrcs" RelSrcDir="$PSRCDIR/sim_2" RelGenDir="$PGENDIR/sim_2">
+    <FileSet Name="sim_1" Type="SimulationSrcs" RelSrcDir="$PSRCDIR/sim_1" RelGenDir="$PGENDIR/sim_1">
       <Filter Type="Srcs"/>
+      <File Path="$PPRDIR/trunk/bench/vhdl/spwlink_tb.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/bench/vhdl/spwlink_tb_all.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/bench/vhdl/adapter_tb.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/bench/vhdl/spwrecvfront_clkrec_tb.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/bench/vhdl/spwrouterarb_round_tb.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/bench/vhdl/spwrouterarb_table_tb.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/bench/vhdl/spwrouterarb_tb.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/bench/vhdl/spwrouterport_tb.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/bench/vhdl/spwrouterregs_tb.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/bench/vhdl/spwroutertable_tb.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/bench/vhdl/spwroutertcc_tb.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="adapter_tb"/>
+        <Option Name="TopModule" Val="spwlink_tb_all"/>
         <Option Name="TopLib" Val="xil_defaultlib"/>
         <Option Name="TopAutoSet" Val="TRUE"/>
         <Option Name="TransportPathDelay" Val="0"/>
@@ -367,11 +347,19 @@
         <Option Name="PamDutBypassFile" Val="xil_dut_bypass"/>
         <Option Name="PamSignalDriverFile" Val="xil_bypass_driver"/>
         <Option Name="PamPseudoTop" Val="pseudo_tb"/>
-        <Option Name="SrcSet" Val="sources_2"/>
+        <Option Name="SrcSet" Val="sources_1"/>
       </Config>
     </FileSet>
-    <FileSet Name="utils_2" Type="Utils" RelSrcDir="$PSRCDIR/utils_2" RelGenDir="$PGENDIR/utils_2">
+    <FileSet Name="utils_1" Type="Utils" RelSrcDir="$PSRCDIR/utils_1" RelGenDir="$PGENDIR/utils_1">
       <Filter Type="Utils"/>
+      <File Path="$PSRCDIR/utils_1/imports/synth_1/routertest_adapter_single_top_ZYNQ.dcp">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedInSteps" Val="synth_1"/>
+          <Attr Name="AutoDcp" Val="1"/>
+        </FileInfo>
+      </File>
       <Config>
         <Option Name="TopAutoSet" Val="TRUE"/>
       </Config>
@@ -399,7 +387,7 @@
     </Simulator>
   </Simulators>
   <Runs Version="1" Minor="19">
-    <Run Id="synth_2" Type="Ft3:Synth" SrcSet="sources_2" Part="xc7z045ffg900-2" ConstrsSet="constrs_2" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="true" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/synth_2" IncludeInArchive="true" IsChild="false" AutoIncrementalDir="$PSRCDIR/utils_2/imports/synth_2" AutoRQSDir="$PSRCDIR/utils_2/imports/synth_2">
+    <Run Id="synth_1" Type="Ft3:Synth" SrcSet="sources_1" Part="xc7z045ffg900-2" ConstrsSet="constrs_1" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="true" IncrementalCheckpoint="$PSRCDIR/utils_1/imports/synth_1/routertest_adapter_single_top_ZYNQ.dcp" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/synth_1" IncludeInArchive="true" IsChild="false" AutoIncrementalDir="$PSRCDIR/utils_1/imports/synth_1" AutoRQSDir="$PSRCDIR/utils_1/imports/synth_1">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2022"/>
         <Step Id="synth_design"/>
@@ -409,7 +397,7 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="constrs_2" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/impl_1" SynthRun="synth_2" IncludeInArchive="true" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_2/imports/impl_1" AutoRQSDir="$PSRCDIR/utils_2/imports/impl_1">
+    <Run Id="impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="constrs_1" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/impl_1" SynthRun="synth_1" IncludeInArchive="true" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_1/imports/impl_1" AutoRQSDir="$PSRCDIR/utils_1/imports/impl_1">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2022"/>
         <Step Id="init_design"/>
@@ -435,24 +423,24 @@
     <Dashboards>
       <Dashboard Name="default_dashboard">
         <Gadgets>
-          <Gadget Name="drc_2" Type="drc" Version="1" Row="2" Column="0">
+          <Gadget Name="drc_1" Type="drc" Version="1" Row="2" Column="0">
             <GadgetParam Name="REPORTS" Type="string_list" Value="impl_1#impl_1_route_report_drc_0 "/>
           </Gadget>
-          <Gadget Name="methodology_2" Type="methodology" Version="1" Row="2" Column="1">
+          <Gadget Name="methodology_1" Type="methodology" Version="1" Row="2" Column="1">
             <GadgetParam Name="REPORTS" Type="string_list" Value="impl_1#impl_1_route_report_methodology_0 "/>
           </Gadget>
-          <Gadget Name="power_2" Type="power" Version="1" Row="1" Column="0">
+          <Gadget Name="power_1" Type="power" Version="1" Row="1" Column="0">
             <GadgetParam Name="REPORTS" Type="string_list" Value="impl_1#impl_1_route_report_power_0 "/>
           </Gadget>
-          <Gadget Name="timing_2" Type="timing" Version="1" Row="0" Column="1">
+          <Gadget Name="timing_1" Type="timing" Version="1" Row="0" Column="1">
             <GadgetParam Name="REPORTS" Type="string_list" Value="impl_1#impl_1_route_report_timing_summary_0 "/>
           </Gadget>
-          <Gadget Name="utilization_2" Type="utilization" Version="1" Row="0" Column="0">
+          <Gadget Name="utilization_1" Type="utilization" Version="1" Row="0" Column="0">
             <GadgetParam Name="REPORTS" Type="string_list" Value="synth_1#synth_1_synth_report_utilization_0 "/>
             <GadgetParam Name="RUN.STEP" Type="string" Value="synth_design"/>
             <GadgetParam Name="RUN.TYPE" Type="string" Value="synthesis"/>
           </Gadget>
-          <Gadget Name="utilization_3" Type="utilization" Version="1" Row="1" Column="1">
+          <Gadget Name="utilization_2" Type="utilization" Version="1" Row="1" Column="1">
             <GadgetParam Name="REPORTS" Type="string_list" Value="impl_1#impl_1_place_report_utilization_0 "/>
           </Gadget>
         </Gadgets>

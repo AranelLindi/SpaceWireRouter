@@ -76,8 +76,11 @@ ENTITY UARTSpWAdapter IS
         txfifosize_bits : INTEGER RANGE 2 TO 14 := 11
     );
     PORT (
-        -- System clock.
-        clk : IN STD_LOGIC;
+        -- SpaceWire ports clock (inclusive fsm).
+        spwclk : IN STD_LOGIC;
+        
+        -- UART clock (uart recv and xmit).
+        uclk : in std_logic;
 
         -- SpW port receiver sample clock (only for impl_fast).
         rxclk : IN STD_LOGIC; -- Standard implementation with impl_fast, therefore rxclk = clk must apply !
@@ -299,7 +302,7 @@ BEGIN
         clk_cycles_per_bit => clk_cycles_per_bit
     )
     PORT MAP(
-        clk => clk,
+        clk => uclk,
         rst => rst,
         rx_port => rx, -- uart rx stream
         rx_rdy => s_rx_rdy,
@@ -313,7 +316,7 @@ BEGIN
         clk_cycles_per_bit => clk_cycles_per_bit
     )
     PORT MAP(
-        clk => clk,
+        clk => uclk,
         rst => rst,
         tx_port => tx, -- uart tx stream
         tx_ack => s_tx_ack,
@@ -335,7 +338,7 @@ BEGIN
             WIDTH => WIDTH
         )
         PORT MAP(
-            clk => clk,
+            clk => spwclk,
             rxclk => rxclk,
             txclk => txclk,
             rst => (rst or s_cmdrst),
@@ -374,9 +377,9 @@ BEGIN
     END GENERATE SpW_Ports;
 
     -- UART -> SpaceWire
-    uart2spw : PROCESS (clk)
+    uart2spw : PROCESS (spwclk)
     BEGIN
-        IF rising_edge(clk) THEN
+        IF rising_edge(spwclk) THEN
             IF rst = '1' THEN
                 -- Synchronous reset.
                 -- UART signals.
@@ -534,9 +537,9 @@ BEGIN
     END PROCESS uart2spw;
 
     -- SpaceWire -> UART.
-    spw2uart : PROCESS (clk)
+    spw2uart : PROCESS (spwclk)
     BEGIN
-        IF rising_edge(clk) THEN
+        IF rising_edge(spwclk) THEN
             IF rst = '1' THEN
                 -- Synchronous reset.
                 s_rxread <= (OTHERS => '0');
