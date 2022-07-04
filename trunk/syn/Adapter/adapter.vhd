@@ -76,7 +76,7 @@ ENTITY UARTSpWAdapter IS
         txfifosize_bits : INTEGER RANGE 2 TO 14 := 11
     );
     PORT (
-        -- SpaceWire ports clock (inclusive fsm).
+        -- SpaceWire ports clock (includes fsm).
         spwclk : IN STD_LOGIC;
         
         -- UART clock (uart recv and xmit).

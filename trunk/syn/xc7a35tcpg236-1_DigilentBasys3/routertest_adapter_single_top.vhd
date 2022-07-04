@@ -119,8 +119,11 @@ ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top
             txfifosize_bits : INTEGER RANGE 2 TO 14 := 11
         );
         PORT (
-            -- System clock.
-            clk : IN STD_LOGIC;
+            -- SpaceWire ports clock (includes fsm)
+            spwclk : IN STD_LOGIC;
+            
+            -- UART clock (uart_recv and xmit).
+            uclk : in std_logic;
 
             -- SpW port receive sample clock (only for impl_fast).
             rxclk : IN STD_LOGIC;
@@ -196,6 +199,7 @@ ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top
             tx : OUT STD_LOGIC
         );
     END COMPONENT;
+    
     -- Adapter signals.
     SIGNAL s_adapt_error : STD_LOGIC_VECTOR(numports DOWNTO 0); -- error flag    
     SIGNAL s_adapt_started : STD_LOGIC_VECTOR(numports DOWNTO 0);
@@ -223,40 +227,18 @@ ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top
     SIGNAL s_spw_s_to_router : STD_LOGIC_VECTOR(numports DOWNTO 0);
     SIGNAL s_spw_d_from_router : STD_LOGIC_VECTOR(numports DOWNTO 0);
     SIGNAL s_spw_s_from_router : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    
-    signal slowclk : std_logic;
 BEGIN
     -- Drive outputs.
     adapt_error <= s_adapt_error;
     router_error <= s_router_error;
     adapt_running <= s_adapt_running;
     router_running <= s_router_running;
-    
-    
-    
-    -- Generate 10 MHz slow clock.
-    dcm1: DCM_SP
-        generic map (
-            CLKFX_DIVIDE        => 10,
-            CLKFX_MULTIPLY      => 1,
-            CLK_FEEDBACK        => "NONE",
-            CLKIN_DIVIDE_BY_2   => false,
-            CLKIN_PERIOD        => 10.0,
-            CLKOUT_PHASE_SHIFT  => "NONE",
-            DESKEW_ADJUST       => "SYSTEM_SYNCHRONOUS",
-            DFS_FREQUENCY_MODE  => "LOW",
-            DUTY_CYCLE_CORRECTION => true,
-            STARTUP_WAIT        => true )
-        port map (
-            CLKIN       => clk,
-            RST         => '0',
-            CLKFX       => slowclk );
             
     -- UARTSpWAdapter
     -- Contains numports-SpaceWire ports.
     Adapter : UARTSpWAdapter
     GENERIC MAP(
-        clk_cycles_per_bit => 87, -- 100_000_000 (Hz) / 115_200 (baud rate) = 868
+        clk_cycles_per_bit => 868, -- 100_000_000 (Hz) / 115_200 (baud rate) = 868
         numports => numports,
         init_input_port => 1,
         init_output_port => 1,
@@ -271,7 +253,8 @@ BEGIN
         txfifosize_bits => 11
     )
     PORT MAP(
-        clk => slowclk, -- DEBUG: Hier wieder zu clk ändern!
+        spwclk => clk,
+        uclk => clk,
         rxclk => clk,
         txclk => clk,
         rst => rst,

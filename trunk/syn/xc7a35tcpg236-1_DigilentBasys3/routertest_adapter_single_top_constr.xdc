@@ -31,8 +31,8 @@ set_property -dict { PACKAGE_PIN T18   IOSTANDARD LVCMOS33 } [get_ports clear]
 
 
 ##USB-RS232 Interface # rx -> B18; tx -> A18
-set_property -dict { PACKAGE_PIN J2   IOSTANDARD LVCMOS33 } [get_ports rx]
-set_property -dict { PACKAGE_PIN L2   IOSTANDARD LVCMOS33 } [get_ports tx]
+set_property -dict { PACKAGE_PIN B18   IOSTANDARD LVCMOS33 } [get_ports rx]
+set_property -dict { PACKAGE_PIN A18   IOSTANDARD LVCMOS33 } [get_ports tx]
 
 
 ## Configuration options, can be used for all designs
