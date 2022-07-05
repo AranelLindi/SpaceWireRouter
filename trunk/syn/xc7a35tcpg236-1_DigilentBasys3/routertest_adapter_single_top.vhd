@@ -119,11 +119,8 @@ ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top
             txfifosize_bits : INTEGER RANGE 2 TO 14 := 11
         );
         PORT (
-            -- SpaceWire ports clock (includes fsm)
-            spwclk : IN STD_LOGIC;
-            
-            -- UART clock (uart_recv and xmit).
-            uclk : in std_logic;
+            -- System clock.
+            clk : in std_logic;
 
             -- SpW port receive sample clock (only for impl_fast).
             rxclk : IN STD_LOGIC;
@@ -253,8 +250,7 @@ BEGIN
         txfifosize_bits => 11
     )
     PORT MAP(
-        spwclk => clk,
-        uclk => clk,
+        clk => clk,
         rxclk => clk,
         txclk => clk,
         rst => rst,

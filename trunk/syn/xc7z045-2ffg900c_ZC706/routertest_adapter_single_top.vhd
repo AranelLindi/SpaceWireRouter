@@ -128,11 +128,8 @@ ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top
             txfifosize_bits : INTEGER RANGE 2 TO 14 := 11
         );
         PORT (
-            -- Uart clock.
-            uclk : IN STD_LOGIC;
-        
             -- System clock.
-            spwclk : IN STD_LOGIC;
+            clk : IN STD_LOGIC;
 
             -- SpW port receive sample clock (only for impl_fast).
             rxclk : IN STD_LOGIC;
@@ -316,8 +313,7 @@ BEGIN
             txfifosize_bits => 11
         )
         PORT MAP(
-            uclk => clk,
-            spwclk => clk,
+            clk => clk,
             rxclk => clk,
             txclk => clk,
             rst => rst,
