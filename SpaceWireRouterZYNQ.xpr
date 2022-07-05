@@ -249,6 +249,12 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/trunk/syn/xc7z045-2ffg900c_ZC706/router_implementation.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
         <Option Name="TopModule" Val="routertest_adapter_single_top_ZYNQ"/>
@@ -256,14 +262,22 @@
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1" RelGenDir="$PGENDIR/constrs_1">
       <Filter Type="Constrs"/>
-      <File Path="$PPRDIR/trunk/syn/xc7z045-2ffg900c_ZC706/routertest_adapter_single_top_constr.xdc">
+      <File Path="$PSRCDIR/constrs_1/imports/xc7z045-2ffg900c_ZC706/routertest_adapter_single_top_constr.xdc">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/trunk/syn/xc7z045-2ffg900c_ZC706/routertest_adapter_single_top_constr.xdc"/>
+          <Attr Name="ImportTime" Val="1656949212"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/syn/xc7z045-2ffg900c_ZC706/router_implementation_constr.xdc">
+        <FileInfo RelPath="router_implementation_constr.xdc">
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
       </File>
       <Config>
-        <Option Name="TargetConstrsFile" Val="$PPRDIR/trunk/syn/xc7z045-2ffg900c_ZC706/routertest_adapter_single_top_constr.xdc"/>
+        <Option Name="TargetConstrsFile" Val="$PSRCDIR/constrs_1/imports/xc7z045-2ffg900c_ZC706/routertest_adapter_single_top_constr.xdc"/>
         <Option Name="ConstrsType" Val="XDC"/>
       </Config>
     </FileSet>
