@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company: University of Wuerzburg
+-- Engineer: Stefan Lindoerfer
 -- 
 -- Create Date: 07/05/2022 10:10:21 AM
 -- Design Name: 

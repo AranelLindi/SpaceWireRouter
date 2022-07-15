@@ -1,79 +1,73 @@
 ----------------------------------------------------------------------------------
--- Company: University of Wuerzburg 
+-- Company: University of Wuerzburg
 -- Engineer: Stefan Lindoerfer
 -- 
--- Create Date: 06/01/2022 09:52:34 AM
--- Design Name: routertest_adapter_single_top
--- Module Name: 
--- Project Name: SpaceWire Router - Test environment
--- Target Devices: Digilent Basys3
--- Tool Versions: -/-
--- Description: Implements UART-SpaceWire Adapter (4 SpW Ports) and corresponding
--- router to test both the router and adapter functionality.
+-- Create Date: 07/15/2022 11:08:52 AM
+-- Design Name: 
+-- Module Name: routertest_adapter_loop_top_ZYNQ - routertest_adapter_loop_top_ZYNQ_arch
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: spwrouter implementation with 5 ports (0 - 4). Ports 0 to 3 are 
+-- mapped to FMC Board and could be looped (0 -> 3, 1 -> 2). Port 4 is connected
+-- to UART-SpaceWire Adapter and able to receive/send data through UART (PC)
+-- Thereby it is possible to send packets via uart to router and cross every
+-- SpaceWire port 
 -- 
 -- Dependencies: 
 -- 
 -- Revision:
+-- Revision 0.01 - File Created
 -- Additional Comments:
 -- 
 ----------------------------------------------------------------------------------
 
-LIBRARY IEEE;
-USE IEEE.STD_LOGIC_1164.ALL;
-USE IEEE.NUMERIC_STD.ALL;
-USE WORK.SPWPKG.ALL;
-USE WORK.SPWROUTERPKG.ALL;
 
-library unisim;
-use unisim.vcomponents.all;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
 
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
 
-ENTITY routertest_adapter_single_top_ZYNQ IS
-    GENERIC (
-        -- Number of SpaceWire ports in router & adapter.
-        numports : INTEGER RANGE 0 TO 31 := 3
-    );
-    PORT (
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+library UNISIM;
+use UNISIM.VComponents.all;
+
+use work.spwrouterpkg.all;
+use work.spwpkg.all;
+
+entity routertest_adapter_loop_top_ZYNQ is
+    Port (
+        -- Differential board clock (200 MHz).
         SYSCLK_P : in std_logic;
-        
         SYSCLK_N : in std_logic;
-    
-    
-        -- Uart clock.
-        --uclk : in std_logic;
-    
-        -- System clock.
-        --spwclk : in std_logic;
 
-        -- Reset.
-        rst : IN STD_LOGIC;
+        -- Synchronous reset.
+        rst : in std_logic;
+        
+        -- To clear error flags.
+        clear : in std_logic;
 
-        -- Uart rx stream.
-        rx : IN STD_LOGIC;
+        -- SpaceWire signals.
+        spw_di : in std_logic_vector(3 downto 0);
+        spw_si : in std_logic_vector(3 downto 0);
+        spw_do : out std_logic_vector(3 downto 0);
+        spw_so : out std_logic_vector(3 downto 0);
+        
+        adapt_running : out std_logic_vector(0 downto 0);
+        adapt_error : out std_logic_vector(0 downto 0);
+        router_running : out std_logic_vector(0 downto 0); -- 4 downto 0
+        router_error : out std_logic_vector(0 downto 0); -- 4 downto 0
 
-        -- Uart tx stream.
-        tx : OUT STD_LOGIC;
-
-        -- Clear signal to reset error flags.
-        clear : IN STD_LOGIC;
-
-        -- HIGH if link of adapter SpW ports is in run state, indicating that link is operational.
-        adapt_running : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-
-        -- HIGH if errdisc (disconnect error), errpar (parity error), erresc (invalid escape sequence) or errcred (credit error) were detected.
-        -- Triggers link reset. Must be acknowledged with a 'rst' or 'clear'.
-        adapt_error : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-
-        -- HIGH if link of router SpW ports is in run state, indicating that link is operational. 
-        router_running : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-
-        -- HIGH if errdisc (disconnect error), errpar (parity error), erresc (invalid escape sequence) or errcred (credit error) were detected.
-        -- Triggers link reset. Must be acknowledged with a 'rst' or 'clear'.
-        router_error : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
+        -- Uart signals.
+        rx : in std_logic;
+        tx : out std_logic
     );
-END routertest_adapter_single_top_ZYNQ;
+end routertest_adapter_loop_top_ZYNQ;
 
-ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top_ZYNQ IS
+architecture routertest_adapter_loop_top_ZYNQ_arch of routertest_adapter_loop_top_ZYNQ is
     -- Constants
     CONSTANT sysfreq : real := 100.0e6; -- clk period
 
@@ -205,105 +199,121 @@ ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top
             tx : OUT STD_LOGIC
         );
     END COMPONENT;
-    
+
     -- Adapter signals.
-    SIGNAL s_adapt_error : STD_LOGIC_VECTOR(numports DOWNTO 0); -- error flag    
-    SIGNAL s_adapt_started : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_adapt_connecting : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_adapt_running : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_adapt_errdisc : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_adapt_errpar : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_adapt_erresc : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_adapt_errcred : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_adapt_txhalff : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_adapt_rxhalff : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    SIGNAL s_adapt_error : STD_LOGIC_VECTOR(0 DOWNTO 0); -- error flag    
+    SIGNAL s_adapt_started : STD_LOGIC_VECTOR(0 DOWNTO 0);
+    SIGNAL s_adapt_connecting : STD_LOGIC_VECTOR(0 DOWNTO 0);
+    SIGNAL s_adapt_running : STD_LOGIC_VECTOR(0 DOWNTO 0);
+    SIGNAL s_adapt_errdisc : STD_LOGIC_VECTOR(0 DOWNTO 0);
+    SIGNAL s_adapt_errpar : STD_LOGIC_VECTOR(0 DOWNTO 0);
+    SIGNAL s_adapt_erresc : STD_LOGIC_VECTOR(0 DOWNTO 0);
+    SIGNAL s_adapt_errcred : STD_LOGIC_VECTOR(0 DOWNTO 0);
+    SIGNAL s_adapt_txhalff : STD_LOGIC_VECTOR(0 DOWNTO 0);
+    SIGNAL s_adapt_rxhalff : STD_LOGIC_VECTOR(0 DOWNTO 0);
 
     -- Router signals.
-    SIGNAL s_router_error : STD_LOGIC_VECTOR(numports DOWNTO 0); -- error flag
-    SIGNAL s_router_started : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_router_connecting : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_router_running : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_router_errdisc : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_router_errpar : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_router_erresc : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_router_errcred : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    SIGNAL s_router_error : STD_LOGIC_VECTOR(4 DOWNTO 0); -- error flag
+    SIGNAL s_router_started : STD_LOGIC_VECTOR(4 DOWNTO 0);
+    SIGNAL s_router_connecting : STD_LOGIC_VECTOR(4 DOWNTO 0);
+    SIGNAL s_router_running : STD_LOGIC_VECTOR(4 DOWNTO 0);
+    SIGNAL s_router_errdisc : STD_LOGIC_VECTOR(4 DOWNTO 0);
+    SIGNAL s_router_errpar : STD_LOGIC_VECTOR(4 DOWNTO 0);
+    SIGNAL s_router_erresc : STD_LOGIC_VECTOR(4 DOWNTO 0);
+    SIGNAL s_router_errcred : STD_LOGIC_VECTOR(4 DOWNTO 0);
 
-    -- SpaceWire signals.
-    SIGNAL s_spw_d_to_router : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_spw_s_to_router : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_spw_d_from_router : STD_LOGIC_VECTOR(numports DOWNTO 0);
-    SIGNAL s_spw_s_from_router : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    -- Clock buffer.
+    signal s_clk_ibufg : std_logic;
 
-    signal clk_ibufg : std_logic;
-    signal clk : std_logic;
-    --signal boardclk : std_logic;
-    
+    -- Toggle signal to generate 100 MHz clock.
     signal s_clk_toggle : std_logic;
-    
+
+    -- FSM states to divide board clock by 2.
     type clkdivstates is (S_Mode1, S_Mode2);
-    signal clkdivstate : clkdivstates := S_Mode1;
-BEGIN
+    signal s_clkdivstate : clkdivstates := S_Mode1;
+
+    -- 100 MHz clock.
+    signal clk : std_logic;
+
+
+    -- Internal SpaceWire signals.
+    signal s_spw_d_from_router_to_port : std_logic_vector(4 downto 0);
+    signal s_spw_s_from_router_to_port : std_logic_vector(4 downto 0);
+    signal s_spw_d_from_port_to_router : std_logic_vector(4 downto 0);
+    signal s_spw_s_from_port_to_router : std_logic_vector(4 downto 0);
+begin
     -- Drive outputs.
+    spw_do <= s_spw_d_from_router_to_port(3 downto 0);
+    spw_so <= s_spw_s_from_router_to_port(3 downto 0);
+    
     adapt_error <= s_adapt_error(0 downto 0);
-    router_error <= s_router_error(0 downto 0);
+    router_error <= s_router_error(0 downto 0); -- 4 downto 0
     adapt_running <= s_adapt_running(0 downto 0);
-    router_running <= s_router_running(0 downto 0);
+    router_running <= s_router_running(0 downto 0); -- 4 downto 0
+
+    -- Read inputs.
+    s_spw_d_from_port_to_router(3 downto 0) <= spw_di;
+    s_spw_s_from_port_to_router(3 downto 0) <= spw_si;
 
 
     -- Differential input clock buffer.
-    bufgds: IBUFDS port map (I => SYSCLK_P, IB => SYSCLK_N, O => clk_ibufg); -- eventuell auch IBUFGDS, mal schauen ob Fehler auftreten
+    bufgds : IBUFDS port map (I => SYSCLK_P, IB => SYSCLK_N, O => s_clk_ibufg);
 
-    -- Creates 100 MHz clock.
+    -- Create 100 MHz clock by dividing board clock by 2.
     BUFGCE_inst : BUFGCE
-    port map (O => clk, CE => s_clk_toggle, I => clk_ibufg);
+        port map (O => clk, CE => s_clk_toggle, I => s_clk_ibufg);
+
     -- Toggles enable signal for BUFGCE every two cycles of input clk to divide by 2.
-    process(clk_ibufg)
+    process(s_clk_ibufg)
     begin
-        if rising_edge(clk_ibufg) then
-            case clkdivstate is
+        if rising_edge(clk) then
+            case s_clkdivstate is
                 when S_Mode1 =>
-                    clkdivstate <= S_Mode2;
-                
+                    s_clkdivstate <= S_Mode2;
+
                 when S_Mode2 =>
                     s_clk_toggle <= not s_clk_toggle;
-                    clkdivstate <= S_Mode1;
+                    s_clkdivstate <= S_Mode1;
             end case;
         end if;
     end process;
     
 
---    -- Creates a 100 MHz clock.
---    dcm0: DCM_SP
---        generic map (
---            CLKFX_DIVIDE => 2,
---            CLKFX_MULTIPLY => 2,
---            CLK_FEEDBACK => "NONE",
---            CLKIN_DIVIDE_BY_2 => true,
---            CLKIN_PERIOD => 5.0,
---            CLKOUT_PHASE_SHIFT => "NONE",
---            DESKEW_ADJUST => "SYSTEM_SYNCHRONOUS",
---            DFS_FREQUENCY_MODE => "LOW",
---            DUTY_CYCLE_CORRECTION => true,
---            STARTUP_WAIT => true
---        )
---        port map (
---            CLKIN => clk_ibufg,
---            RST => '0',
---            CLKFX => clk
---        );
+    -- SpaceWire router TODO: Ports haben kein autostart! Bei Loop also darauf achten das das zuvor in spwrouter händisch auf 1 gesetzt wird!
+    RouterImpl : spwrouter
+        generic map (numports => 4, -- 4 downto 0
+                    sysfreq => sysfreq,
+                    txclkfreq => sysfreq,
+                    rx_impl => (others => impl_fast),
+                    tx_impl => (others => impl_fast)
+                   )
+        port map (
+            clk => clk,
+            rxclk => clk,
+            txclk => clk,
+            rst => rst,
+            started => s_router_started,
+            connecting => s_router_connecting,
+            running => s_router_running, -- TODO: Eventuell auf die LEDs am FMC Board legen!
+            errdisc => s_router_errdisc,
+            errpar => s_router_errpar,
+            erresc => s_router_erresc,
+            errcred => s_router_errcred,
+            spw_di => s_spw_d_from_port_to_router,
+            spw_si => s_spw_s_from_port_to_router,
+            spw_do => s_spw_d_from_router_to_port,
+            spw_so => s_spw_s_from_router_to_port
+        );
+        
 
---    -- Buffer clock.
---    bufg0: BUFG port map (I => clk, O => boardclk);
-
-    -- UARTSpWAdapter
-    -- Contains numports-SpaceWire ports.
+    -- UART-SpaceWire Adapter        
     Adapter : UARTSpWAdapter
-        GENERIC MAP(
+        generic map (
             clk_cycles_per_bit => 868, -- 100_000_000 (Hz) / 115_200 (baud rate) = 868
-            numports => numports,
-            init_input_port => 1,
-            init_output_port => 1,
-            activate_commands => true, -- define adapter variant (command (true) / non-command version (false))
+            numports => 0, -- 0 downto 0
+            init_input_port => 0,
+            init_output_port => 0,
+            activate_commands => true,
             sysfreq => sysfreq,
             txclkfreq => sysfreq,
             rximpl => impl_fast,
@@ -313,61 +323,37 @@ BEGIN
             rxfifosize_bits => 11,
             txfifosize_bits => 11
         )
-        PORT MAP(
+        port map (
             clk => clk,
             rxclk => clk,
             txclk => clk,
             rst => rst,
-            autostart => (OTHERS => '1'),
-            linkstart => (OTHERS => '1'),
-            linkdis => (0 => '0', OTHERS => '0'),
+            autostart => (others => '1'),
+            linkstart => (others => '1'),
+            linkdis => (others => '0'),
             txdivcnt => "00000001",
-            started => OPEN,
-            connecting => OPEN,
+            started => s_adapt_started,
+            connecting => s_adapt_connecting,
             running => s_adapt_running,
             errdisc => s_adapt_errdisc,
             errpar => s_adapt_errpar,
             erresc => s_adapt_erresc,
             errcred => s_adapt_errcred,
-            txhalff => OPEN,
-            rxhalff => OPEN,
-            spw_di => s_spw_d_from_router,
-            spw_si => s_spw_s_from_router,
-            spw_do => s_spw_d_to_router,
-            spw_so => s_spw_s_to_router,
+            txhalff => s_adapt_txhalff,
+            rxhalff => s_adapt_rxhalff,
+            spw_di => s_spw_d_from_router_to_port(4 downto 4),
+            spw_si => s_spw_s_from_router_to_port(4 downto 4),
+            spw_do => s_spw_d_from_port_to_router(4 downto 4),
+            spw_so => s_spw_s_from_port_to_router(4 downto 4),
             rx => rx,
             tx => tx
         );
-
-    -- SpaceWire router.
-    Router : spwrouter
-        GENERIC MAP(
-            numports => numports,
-            sysfreq => sysfreq,
-            txclkfreq => sysfreq,
-            rx_impl => (OTHERS => impl_fast),
-            tx_impl => (OTHERS => impl_fast)
-        )
-        PORT MAP(
-            clk => clk,
-            rxclk => clk,
-            txclk => clk,
-            rst => rst,
-            started => OPEN,
-            connecting => OPEN,
-            running => s_router_running,
-            errdisc => s_router_errdisc,
-            errpar => s_router_errpar,
-            erresc => s_router_erresc,
-            errcred => s_router_errcred,
-            spw_di => s_spw_d_to_router,
-            spw_si => s_spw_s_to_router,
-            spw_do => s_spw_d_from_router,
-            spw_so => s_spw_s_from_router
-        );
+        
 
     -- Error outputs.
     PROCESS (clk)
+        variable v_adapt_clear : std_logic_vector(0 downto 0);
+        variable v_router_clear : std_logic_vector(4 downto 0);
     BEGIN
         IF rising_edge(clk) THEN
             IF rst = '1' THEN
@@ -375,9 +361,13 @@ BEGIN
                 s_adapt_error <= (OTHERS => '0');
                 s_router_error <= (OTHERS => '0');
             ELSE
-                s_adapt_error <= (s_adapt_error OR s_adapt_errdisc OR s_adapt_errpar OR s_adapt_erresc OR s_adapt_errcred) AND (NOT clear);
-                s_router_error <= (s_router_error OR s_router_errdisc OR s_router_errpar OR s_router_erresc OR s_router_errcred) AND (NOT clear);
+                -- Get clear-value
+                v_adapt_clear := (others => clear);
+                v_router_clear := (others => clear);
+            
+                s_adapt_error <= (s_adapt_error OR s_adapt_errdisc OR s_adapt_errpar OR s_adapt_erresc OR s_adapt_errcred) AND (NOT v_adapt_clear);
+                s_router_error <= (s_router_error OR s_router_errdisc OR s_router_errpar OR s_router_erresc OR s_router_errcred) AND (NOT v_router_clear);
             END IF;
         END IF;
     END PROCESS;
-END ARCHITECTURE routertest_adapter_single_top_arch;
+end routertest_adapter_loop_top_ZYNQ_arch;

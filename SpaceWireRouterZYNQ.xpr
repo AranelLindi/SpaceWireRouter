@@ -238,6 +238,7 @@
       </File>
       <File Path="$PPRDIR/trunk/syn/xc7z045-2ffg900c_ZC706/routertest_adapter_single_top.vhd">
         <FileInfo SFType="VHDL2008">
+          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -251,13 +252,20 @@
       </File>
       <File Path="$PPRDIR/trunk/syn/xc7z045-2ffg900c_ZC706/router_implementation.vhd">
         <FileInfo>
+          <Attr Name="UserDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/trunk/syn/xc7z045-2ffg900c_ZC706/routertest_adapter_loop_top_ZYNQ.vhd">
+        <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="routertest_adapter_single_top_ZYNQ"/>
+        <Option Name="TopModule" Val="routertest_adapter_loop_top_ZYNQ"/>
       </Config>
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1" RelGenDir="$PGENDIR/constrs_1">
@@ -276,8 +284,14 @@
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/trunk/syn/xc7z045-2ffg900c_ZC706/routertest_adapter_loop_top_constr.xdc">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
       <Config>
-        <Option Name="TargetConstrsFile" Val="$PSRCDIR/constrs_1/imports/xc7z045-2ffg900c_ZC706/routertest_adapter_single_top_constr.xdc"/>
+        <Option Name="TargetConstrsFile" Val="$PPRDIR/trunk/syn/xc7z045-2ffg900c_ZC706/routertest_adapter_loop_top_constr.xdc"/>
         <Option Name="ConstrsType" Val="XDC"/>
       </Config>
     </FileSet>
