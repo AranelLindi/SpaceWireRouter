@@ -1,6 +1,4 @@
-# Clock
-
-#set_property IOSTANDARD LVDS [get_ports clk_100MHz]
+# Board Clock
 set_property DIFF_TERM TRUE [get_ports SYSCLK_P]
 set_property DIFF_TERM TRUE [get_ports SYSCLK_N]
 set_property PACKAGE_PIN H9 [get_ports SYSCLK_P]
@@ -9,7 +7,7 @@ set_property IOSTANDARD LVDS [get_ports SYSCLK_P]
 set_property IOSTANDARD LVDS [get_ports SYSCLK_N]
 create_clock -name SYSCLK_P -period 5.000 -waveform {0 2.500} [get_ports SYSCLK_P]
 
-
+# Used System Clock (100 MHz)
 create_generated_clock -divide_by 2 -source [get_ports SYSCLK_P] [get_pins BUFGCE_inst/O]
 
 # Port 1:

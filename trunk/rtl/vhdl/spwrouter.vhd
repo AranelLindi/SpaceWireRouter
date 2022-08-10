@@ -13,6 +13,11 @@
 -- Dependencies: spwstream (spwpkg), spwrouterpkg
 -- 
 -- Revision:
+--
+-- CAUTION ! As a result of development work, default value of 'linkstart' for all 
+-- spwports was set to HIGH so that they will start a connection atempt themselves.
+-- In release version, this value MUST set to LOW again (standard
+-- register value) ! (Is changeable through registers or Link Interface)
 ----------------------------------------------------------------------------------
 
 LIBRARY IEEE;
@@ -271,7 +276,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 txclk => txclk, -- I
                 rst => rst, -- I
                 autostart => '1', -- I -- active autostart but none linkstart! Router is waiting for incoming connection attempt.
-                linkstart => '0', -- I
+                linkstart => '1', -- I
                 linkdis => '0', -- I
                 txdivcnt => "00000001", -- I -- via register
                 tick_in => s_tick_from_tcc_to_ports(i), -- I --tick_in(i),

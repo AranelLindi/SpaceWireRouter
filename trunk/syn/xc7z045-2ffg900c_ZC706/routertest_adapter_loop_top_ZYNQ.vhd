@@ -247,9 +247,9 @@ begin
     spw_so <= s_spw_s_from_router_to_port(3 downto 0);
     
     adapt_error <= s_adapt_error(0 downto 0);
-    router_error <= s_router_error(0 downto 0); -- 4 downto 0
+    router_error <= s_router_error(1 downto 1); -- 4 downto 4 (für UART-SpWAdapter-Port)
     adapt_running <= s_adapt_running(0 downto 0);
-    router_running <= s_router_running(0 downto 0); -- 4 downto 0
+    router_running <= s_router_running(1 downto 1); -- 4 downto 4 (für UART-SpWAdapter-Port)
 
     -- Read inputs.
     s_spw_d_from_port_to_router(3 downto 0) <= spw_di;
@@ -266,7 +266,7 @@ begin
     -- Toggles enable signal for BUFGCE every two cycles of input clk to divide by 2.
     process(s_clk_ibufg)
     begin
-        if rising_edge(clk) then
+        if rising_edge(s_clk_ibufg) then
             case s_clkdivstate is
                 when S_Mode1 =>
                     s_clkdivstate <= S_Mode2;
@@ -310,7 +310,7 @@ begin
     Adapter : UARTSpWAdapter
         generic map (
             clk_cycles_per_bit => 868, -- 100_000_000 (Hz) / 115_200 (baud rate) = 868
-            numports => 0, -- 0 downto 0
+            numports => 0, -- 0 downto 0 == 1 spwport
             init_input_port => 0,
             init_output_port => 0,
             activate_commands => true,
