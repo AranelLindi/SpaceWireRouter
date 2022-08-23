@@ -44,17 +44,17 @@ entity routertest_adapter_loop_top_ZYNQ is
         SYSCLK_P : in std_logic;
         SYSCLK_N : in std_logic;
 
-        -- Synchronous reset.
+        -- Synchronous reset (active-high).
         rst : in std_logic;
         
         -- To clear error flags.
         clear : in std_logic;
 
         -- SpaceWire signals.
-        spw_di : in std_logic_vector(3 downto 0);
-        spw_si : in std_logic_vector(3 downto 0);
-        spw_do : out std_logic_vector(3 downto 0);
-        spw_so : out std_logic_vector(3 downto 0);
+        spw_di : in std_logic_vector(4 downto 1);
+        spw_si : in std_logic_vector(4 downto 1);
+        spw_do : out std_logic_vector(4 downto 1);
+        spw_so : out std_logic_vector(4 downto 1);
         
         adapt_running : out std_logic_vector(0 downto 0);
         adapt_error : out std_logic_vector(0 downto 0);
@@ -243,8 +243,8 @@ architecture routertest_adapter_loop_top_ZYNQ_arch of routertest_adapter_loop_to
     signal s_spw_s_from_port_to_router : std_logic_vector(4 downto 0);
 begin
     -- Drive outputs.
-    spw_do <= s_spw_d_from_router_to_port(3 downto 0);
-    spw_so <= s_spw_s_from_router_to_port(3 downto 0);
+    spw_do <= s_spw_d_from_router_to_port(4 downto 1);
+    spw_so <= s_spw_s_from_router_to_port(4 downto 1);
     
     adapt_error <= s_adapt_error(0 downto 0);
     router_error <= s_router_error(1 downto 1); -- 4 downto 4 (für UART-SpWAdapter-Port)
@@ -252,8 +252,8 @@ begin
     router_running <= s_router_running(1 downto 1); -- 4 downto 4 (für UART-SpWAdapter-Port)
 
     -- Read inputs.
-    s_spw_d_from_port_to_router(3 downto 0) <= spw_di;
-    s_spw_s_from_port_to_router(3 downto 0) <= spw_si;
+    s_spw_d_from_port_to_router(4 downto 1) <= spw_di(4 downto 1);
+    s_spw_s_from_port_to_router(4 downto 1) <= spw_si(4 downto 1);
 
 
     -- Differential input clock buffer.
@@ -341,10 +341,10 @@ begin
             errcred => s_adapt_errcred,
             txhalff => s_adapt_txhalff,
             rxhalff => s_adapt_rxhalff,
-            spw_di => s_spw_d_from_router_to_port(4 downto 4),
-            spw_si => s_spw_s_from_router_to_port(4 downto 4),
-            spw_do => s_spw_d_from_port_to_router(4 downto 4),
-            spw_so => s_spw_s_from_port_to_router(4 downto 4),
+            spw_di => s_spw_d_from_router_to_port(0 downto 0),
+            spw_si => s_spw_s_from_router_to_port(0 downto 0),
+            spw_do => s_spw_d_from_port_to_router(0 downto 0),
+            spw_so => s_spw_s_from_port_to_router(0 downto 0),
             rx => rx,
             tx => tx
         );
