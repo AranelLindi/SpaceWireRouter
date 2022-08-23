@@ -229,14 +229,28 @@ architecture routertest_adapter_loop_top_BASYS3_arch of routertest_adapter_loop_
     signal s_spw_s_from_router_to_port : std_logic_vector(4 downto 0);
     signal s_spw_d_from_port_to_router : std_logic_vector(4 downto 0);
     signal s_spw_s_from_port_to_router : std_logic_vector(4 downto 0);
+    
+    signal s_clear_vector : std_logic_vector(4 downto 0);
+    signal s_error_vector : std_logic_vector(4 downto 0);
+    signal s_error : std_logic;
 begin
     -- Drive outputs.
-    spw_do(4 downto 1) <= s_spw_d_from_router_to_port(3 downto 0);
-    spw_so(4 downto 1) <= s_spw_s_from_router_to_port(3 downto 0);
+    spw_do(4 downto 1) <= s_spw_d_from_router_to_port(4 downto 1);
+    spw_so(4 downto 1) <= s_spw_s_from_router_to_port(4 downto 1);
     
     -- Read inputs.
-    s_spw_d_from_port_to_router(3 downto 0) <= spw_di(4 downto 1);
-    s_spw_s_from_port_to_router(3 downto 0) <= spw_si(4 downto 1);   
+    s_spw_d_from_port_to_router(4 downto 1) <= spw_di(4 downto 1);
+    s_spw_s_from_port_to_router(4 downto 1) <= spw_si(4 downto 1);
+    
+    started <= s_router_started;
+    connecting <= s_router_connecting;
+    running <= s_router_running;
+    
+    s_clear_vector <= (others => clear);
+    s_error_vector <= (s_error_vector or (s_router_errdisc or s_router_erresc or s_router_errcred or s_router_errpar)) and (not s_clear_vector);
+    s_error <= or s_error_vector;
+    
+    
 
     -- SpaceWire router TODO: Ports haben kein autostart! Bei Loop also darauf achten das das zuvor in spwrouter händisch auf 1 gesetzt wird!
     RouterImpl : spwrouter
