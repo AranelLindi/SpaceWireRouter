@@ -8,8 +8,8 @@
 -- Project Name: 
 -- Target Devices: 
 -- Tool Versions: 
--- Description: spwrouter implementation with 5 ports (0 - 4). Ports 0 to 3 are 
--- mapped to FMC Board and could be looped (0 -> 3, 1 -> 2). Port 4 is connected
+-- Description: spwrouter implementation with 5 ports (0 - 4). Ports 1 to 4 are 
+-- mapped to FMC Board and could be looped (1 -> 2, 3 -> 4). Port 0 is connected
 -- to UART-SpaceWire Adapter and able to receive/send data through UART (PC)
 -- Thereby it is possible to send packets via uart to router and cross every
 -- SpaceWire port 
@@ -267,7 +267,7 @@ begin
             rst => rst,
             started => s_router_started,
             connecting => s_router_connecting,
-            running => s_router_running, -- TODO: Eventuell auf die LEDs am FMC Board legen!
+            running => s_router_running,
             errdisc => s_router_errdisc,
             errpar => s_router_errpar,
             erresc => s_router_erresc,

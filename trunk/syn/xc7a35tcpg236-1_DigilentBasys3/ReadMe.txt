@@ -15,3 +15,4 @@ Eine Implementierung, bei der lediglich ein einzelner SpaceWire Port implementie
 Weitere Dateien:
 updatemem cmd.txt - Gedächnitstütze für das Vivado-interne Kommando.
 RouterTable.mem - Skizze eines Memory-Files für Vivado.
+routertest_adapter_single_top.mmi - Versuch der entwicklung eines MMI-Files (bis zur Fertigstellung aufgehoben)
