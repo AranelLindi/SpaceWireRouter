@@ -3,16 +3,16 @@
 -- Engineer: Stefan Lindoerfer
 -- 
 -- Create Date: 26.09.2021 17:54
--- Design Name: SpaceWire Router Function Package
+-- Design Name: SpaceWire Router - Function Package
 -- Module Name: spwrouterfunc
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
 -- Target Devices: Xilinx FPGAs
 -- Tool Versions: -/-
 -- Description: Contains filtering generic functions.
 --
--- Dependencies: array_t (spwrouterpkg)
+-- Dependencies: spwrouterpkg
 -- 
--- Revision: 1.0
+-- Revision:
 ----------------------------------------------------------------------------------
 
 LIBRARY IEEE;

@@ -3,7 +3,7 @@
 -- Engineer: Stefan Lindoerfer
 -- 
 -- Create Date: 03.08.2021 20:15
--- Design Name: SpaceWire Router Table Arbiter
+-- Design Name: SpaceWire Router - Table Arbiter
 -- Module Name: spwrouterarb_table
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
 -- Target Devices: Xilinx FPGAs
@@ -32,20 +32,20 @@ ENTITY spwrouterarb_table IS
         rst : IN STD_LOGIC;
 
         -- Requests from all ports. (Bit corresponds to port)
-        request : IN STD_LOGIC_VECTOR(numports DOWNTO 0); -- req
+        request : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
 
         -- Containts which port gets access.
-        granted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0) -- grnt
+        granted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
     );
 END spwrouterarb_table;
 
 ARCHITECTURE spwrouterarb_table_arch OF spwrouterarb_table IS
     SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0);
 BEGIN
-    -- Drive output
+    -- Drive output.
     granted <= s_granted;
 
-    -- Arbitration process
+    -- Arbitration process.
     PROCESS (clk)
     BEGIN
         IF rising_edge(clk) THEN
@@ -60,7 +60,7 @@ BEGIN
                 -- that order must be reversed to keep same priority list if-elsif-conditions would have.
                 -- Example: Port4: 5..6..7..0..1..2..3 --> 1..0..7..6..5
 
-                -- To have the right priority the order was changed in unusual order
+                -- To have the right priority the order was changed in unusual order.
 
                 Arbitration_Access : FOR i IN numports DOWNTO 0 LOOP
                     IF (s_granted(i) = '1' AND request(i) = '0') THEN
@@ -70,7 +70,7 @@ BEGIN
                             END IF;
                         END LOOP pre_ports;
 
-                        -- (except current port i)
+                        -- (except current port i !)
 
                         seq_ports : FOR k IN numports DOWNTO (i + 1) LOOP -- [numports <= k <= (i+1)]
                             IF (request(k) = '1') THEN

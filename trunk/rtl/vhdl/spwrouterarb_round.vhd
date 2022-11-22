@@ -8,10 +8,10 @@
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
 -- Target Devices: Xilinx FPGAs
 -- Tool Versions: -/-
--- Description: A ring is constructed that contains all (source) ports and,
--- starting from a specific port, gives next higher priority in ascending order
--- (0..numports..0). The starting point is always the last port to which 
--- access was granted.
+-- Description: A ring is constructed that contains all (source) ports.
+-- Starting from a specific port, it gives next higher priority in ascending order
+-- (0..numports..0). The starting point is always the port to which 
+-- access was granted last.
 --
 -- Dependencies: none
 -- 
@@ -37,15 +37,14 @@ ENTITY spwrouterarb_round IS
         -- Synchronous reset.
         rst : IN STD_LOGIC;
 
-        -- High if this port is already being occupied,
-        -- low when the port is unused.
-        occupied : IN STD_LOGIC; -- occ
+        -- High if this port is already being occupied, low when the port is unused.
+        occupied : IN STD_LOGIC;
 
         -- Shows which ports making an transfer request to this port.
-        request : IN STD_LOGIC_VECTOR(numports DOWNTO 0); -- req
+        request : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
 
         -- Shows which port has been guaranteed access to this port.
-        granted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0) -- grnt
+        granted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
     );
 END spwrouterarb_round;
 
@@ -85,16 +84,14 @@ BEGIN
 
                         lowerpriority : FOR j IN i DOWNTO 0 LOOP -- [i <= j <= 0]
                             IF (s_request(j) = '1' AND s_occupied = '0') THEN
-                                s_granted <= std_logic_vector(to_unsigned(2 ** j, s_granted'length)); -- Test, should do same
-                                --s_granted <= (j => '1', OTHERS => '0'); -- works ! Procudes warnings in ModelSim
+                                s_granted <= std_logic_vector(to_unsigned(2 ** j, s_granted'length));
                                 s_last_granted <= STD_LOGIC_VECTOR(to_unsigned(j, s_last_granted'length));
                             END IF;
                         END LOOP lowerpriority;
                         
                         higherpriority : FOR k IN numports DOWNTO (i + 1) LOOP -- [numports <= k <= (i+1)]
                             IF (s_request(k) = '1' AND s_occupied = '0') THEN
-                                s_granted <= std_logic_vector(to_unsigned(2 ** k, s_granted'length)); -- look at lowerpriority !
-                                --s_granted <= (k => '1', OTHERS => '0'); -- works !
+                                s_granted <= std_logic_vector(to_unsigned(2 ** k, s_granted'length));
                                 s_last_granted <= STD_LOGIC_VECTOR(to_unsigned(k, s_last_granted'length));
                             END IF;
                         END LOOP higherpriority;
@@ -110,5 +107,4 @@ BEGIN
             END IF;
         END IF;
     END PROCESS;
-
 END ARCHITECTURE spwrouterarb_round_arch;

@@ -4,8 +4,8 @@
 -- 
 -- Create Date: 25.05.2022 12:29
 -- Design Name: UART - SpaceWire Adapter (both directions (UART -> SpW; SpW -> UART)
--- Module Name: UART2SpW
--- Project Name: SpaceWire Router
+-- Module Name: UARTSpWAdapter
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
 -- Target Devices: xc7a35tcpg236-1 (tested);
 -- Tool Versions:
 -- Description: Raw version of UART SpaceWire adapter. Contains UART Receiver and
@@ -42,38 +42,39 @@ entity UARTSpWAdapter is
         -- Determines whether commands are permitted or data bytes are sent only. 
         activate_commands : boolean;
         
+        
         -- SpaceWire Ports:
         
         -- System clock frequency in Hz.
-		-- This must be set to the frequency of "clk". It is used to setup
-		-- counters for reset timing, disconnect timeout and to transmit
-		-- at 10 Mbit/s during the link handshake.
-		sysfreq : real;
+	-- This must be set to the frequency of "clk". It is used to setup
+	-- counters for reset timing, disconnect timeout and to transmit
+	-- at 10 Mbit/s during the link handshake.
+	sysfreq : real;
 
-		-- Transmit clock frequency in Hz (only if tximpl = impl_fast).
-		-- This must be set to the frequency of "txclk". It is used to
-		-- transmit at 10 Mbit/s during the link handshake.
-		txclkfreq : real := 0.0;
+	-- Transmit clock frequency in Hz (only if tximpl = impl_fast).
+	-- This must be set to the frequency of "txclk". It is used to
+	-- transmit at 10 Mbit/s during the link handshake.
+	txclkfreq : real := 0.0;
 
-		-- Selection of a receiver front-end implementation.
-		rximpl : spw_implementation_type_rec;
+	-- Selection of a receiver front-end implementation.
+	rximpl : spw_implementation_type_rec;
 
-		-- Maximum number of bits received per system clock
-		-- (must be 1 in case of impl_generic).
-		rxchunk : INTEGER RANGE 1 TO 4 := 1;
+	-- Maximum number of bits received per system clock
+	-- (must be 1 in case of impl_generic).
+	rxchunk : INTEGER RANGE 1 TO 4 := 1;
 
-		-- Width of shift registers in clock recovery front-end; added: SL
-		WIDTH : INTEGER RANGE 1 TO 3 := 2;
+	-- Width of shift registers in clock recovery front-end; added: SL
+	WIDTH : INTEGER RANGE 1 TO 3 := 2;
 
-		-- Selection of a transmitter implementation.
-		tximpl : spw_implementation_type_xmit;
+	-- Selection of a transmitter implementation.
+	tximpl : spw_implementation_type_xmit;
 
-		-- Size of the receive FIFO as the 2-logarithm of the number of bytes.
-		-- Must be at least 6 (64 bytes).
-		rxfifosize_bits : INTEGER RANGE 6 TO 14 := 11;
+	-- Size of the receive FIFO as the 2-logarithm of the number of bytes.
+	-- Must be at least 6 (64 bytes).
+	rxfifosize_bits : INTEGER RANGE 6 TO 14 := 11;
 
-		-- Size of the transmit FIFO as the 2-logarithm of the number of bytes.
-		txfifosize_bits : INTEGER RANGE 2 TO 14 := 11
+	-- Size of the transmit FIFO as the 2-logarithm of the number of bytes.
+	txfifosize_bits : INTEGER RANGE 2 TO 14 := 11
     );
     port (
         -- System clock.
@@ -85,7 +86,7 @@ entity UARTSpWAdapter is
         -- SpW port transmit clock (only for impl_fast).
         txclk : in std_logic; -- Standard implementation with impl_fast, therefore txclk = clk must apply !
         
-        -- Reset.
+        -- Synchronous reset.
         rst : in std_logic;
 
         -- Enables atomatic link start for SpW ports on receipt of a NULL character.
@@ -155,7 +156,7 @@ entity UARTSpWAdapter is
 end UARTSpWAdapter;
 
 architecture UARTSpWAdapter_config_arch of UARTSpWAdapter is
-    -- Constants and general definitions
+    -- Constants and general definitions.
     -- Array definition for SpW port assignment.
     type array_t is array(natural range<>) of std_logic_vector;    
     -- SpaceWire port component is defined in spwpkg !
@@ -269,17 +270,17 @@ architecture UARTSpWAdapter_config_arch of UARTSpWAdapter is
     signal s_port_output : integer range 0 to numports := init_output_port;
     
     -- Intern infos request.
-    signal s_info1 : std_logic := '0'; -- SpW input port.
-    signal s_info2 : std_logic := '0'; -- SpW output port.
-    signal s_info3 : std_logic := '0'; -- SpW error codes.
+    signal s_info1 : std_logic := '0'; -- SpW input port
+    signal s_info2 : std_logic := '0'; -- SpW output port
+    signal s_info3 : std_logic := '0'; -- SpW error codes
 begin
-    -- Sample inputs
+    -- Sample inputs.
     s_autostart <= autostart;
     s_linkstart <= linkstart;
     s_linkdis <= linkdis;
     s_txdivcnt <= txdivcnt;
     
-    -- Drive outputs
+    -- Drive outputs.
     started <= s_started;
     connecting <= s_connecting;
     running <= s_running;
@@ -318,7 +319,7 @@ begin
             tx_data => s_tx_data
         );
                 
-    -- Port 0 to numports
+    -- Port 0 to numports.
     SpW_Ports : for n in 0 to numports generate
         port_n : spwstream
 		GENERIC MAP(
@@ -370,7 +371,7 @@ begin
 		);   
     end generate SpW_Ports;    
     
-    -- UART -> SpaceWire
+    -- UART -> SpaceWire.
     uart2spw : process(clk)
     begin
         if rising_edge(clk) then
@@ -392,7 +393,6 @@ begin
                 s_info1 <= '0';
                 s_info2 <= '0';
                 s_info3 <= '0';
-                --s_spw_buffer <= (8 => '1', others => '0');
                 istate <= s_Idle;
             else
                 case istate is
@@ -420,10 +420,10 @@ begin
                     
                         -- Decide what was received.
                         if s_uart_buffer(7) = '1' and activate_commands = true then -- Commands are allowed only activated in config adapter !
-                            -- Command
+                            -- Command.
                             istate <= s_Cmd;
                         else
-                            -- Data (N-Char / TimeCode)
+                            -- Data (N-Char / TimeCode).
                             istate <= s_Data;
                         end if;
                     
@@ -440,54 +440,50 @@ begin
                                         s_port_output <= init_output_port;
                                         
                                     when "01" =>
-                                        -- Output Info1
+                                        -- Output Info1.
                                         s_info1 <= '1';                                        
                                         
                                     when "10" =>
-                                        -- Output Info2
+                                        -- Output Info2.
                                         s_info2 <= '1';                                        
                                         
                                     when "11" =>
-                                        -- Output Info3
+                                        -- Output Info3.
                                         s_info3 <= '1';
                                         
                                     when others => -- just for simulation
                                         null;                                        
                                     
                                 end case;
-                                
-                                --istate <= s_Idle;
                             
                             when "01" =>
                                 -- Set router input port
                                 if (to_integer(unsigned(s_uart_buffer(4 downto 0))) <= numports) then -- If number is bigger than numports, port remains unchanged.
                                     s_port_input <= to_integer(unsigned(s_uart_buffer(4 downto 0)));
                                 end if;
-                                --istate <= s_Idle;
                             
                             when "10" =>
                                 -- Set router output port
                                 if (to_integer(unsigned(s_uart_buffer(4 downto 0))) <= numports) then -- If number is bigger that numports, port remains unchanged.
                                     s_port_output <= to_integer(unsigned(s_uart_buffer(4 downto 0)));
                                 end if;
-                                --istate <= s_Idle;
                             
                             when "11" =>
-                                -- End of Packet / Error End of Packet
+                                -- End of Packet / Error End of Packet.
                                 if s_uart_buffer(4) = '1' then
-                                    -- EEP (Error End of Packet)
+                                    -- EEP (Error End of Packet).
                                     s_txdata(s_port_input) <= x"01";
                                     s_txflag(s_port_input) <= '1';
                                 else
-                                    -- EOP (End of Packet)
+                                    -- EOP (End of Packet).
                                     s_txdata(s_port_input) <= x"00";
                                     s_txflag(s_port_input) <= '1';
                                 end if;
                                 
                                 s_txwrite(s_port_input) <= '1';
-                                istate <= s_Idle;
+                                --istate <= s_Idle; -- TODO: Check ! Necessary?
                                 
-                            when others => -- just for simulation
+                            when others => -- for simulation necessary
                                 null;                         
                                                             
                         end case;
@@ -496,19 +492,19 @@ begin
 
                     when s_Data =>
                         if s_uart_buffer(6) = '1' and activate_commands = true then -- Sending Time Code is allowed only when Commands are activated !
-                            -- TimeCode
+                            -- Time Code.
                             s_time_in(s_port_input) <= s_uart_buffer(5 downto 0);
                             s_tick_in(s_port_input) <= '1';
                         else
                             -- N-Char
-                            if s_uart_buffer = "11111111" and activate_commands = false then -- Only active if no commands are allowed to close packet.
-                                -- Create EOP
+                            if s_uart_buffer = "11111111" and activate_commands = false then -- Only active if no commands are allowed to close packet
+                                -- Create EOP.
                                 s_txdata(s_port_input) <= x"00";
                                 s_txflag(s_port_input) <= '1';
                                 
                                 s_txwrite(s_port_input) <= '1';                            
                             else
-                                -- Normal N-Char (default chase)
+                                -- Normal N-Char (default chase).
                                 if activate_commands = true then
                                     s_txdata(s_port_input) <= "00" & s_uart_buffer(5 downto 0);
                                 else
@@ -547,19 +543,19 @@ begin
                             ostate <= s_Wait;
                         elsif s_rxvalid(s_port_output) = '1' then
                             if s_rxflag(s_port_output) = '1' then
-                                -- EOP / EEP
+                                -- EOP / EEP.
                                 if s_rxdata(s_port_output) = x"01" then
-                                    -- EEP
+                                    -- EEP.
                                     s_uart_output <= x"fe"; -- 11111110                                    
                                 else
-                                    -- EOP
+                                    -- EOP.
                                     s_uart_output <= x"ff"; -- 11111111                                    
                                 end if;
                                 
                                 s_rxread(s_port_output) <= '1';
                                 ostate <= s_NChar;
                             else
-                                -- Data byte
+                                -- Data byte.
                                 if activate_commands = true then
                                     s_uart_output <= "00" & s_rxdata(s_port_output)(5 downto 0);
                                 else

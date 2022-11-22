@@ -3,15 +3,15 @@
 -- Engineer: Stefan Lindoerfer
 -- 
 -- Create Date: 04.08.2021 14:28
--- Design Name: SpaceWire Control Register
+-- Design Name: SpaceWire Router - Control Register
 -- Module Name: spwrouterregs
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
--- Target Devices: 
--- Tool Versions: 
--- Description: Manages internal registers and controls reading and writing
--- process. 
+-- Target Devices: Xilinx FPGAs
+-- Tool Versions: -/-
+-- Description: Contains internal registers and manages reading and writing
+-- operations. 
 --
--- Dependencies: spwrouterpkg (spwram)
+-- Dependencies: spwrouterpkg
 -- 
 -- Revision:
 ----------------------------------------------------------------------------------

@@ -5,7 +5,7 @@
 -- Create Date: 29.07.2021 10:50
 -- Design Name: Receiver for Uart
 -- Module Name: uart_rx
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on an FPGA
 -- Target Devices: 
 -- Tool Versions: based on code from: https://www.nandland.com/vhdl/modules/module-uart-serial-port-rs232.html
 -- Description: This file contains the Uart Receiver. It is able to receive 8 bits of serial data,
@@ -14,7 +14,6 @@
 -- Dependencies: none
 -- 
 -- Revision:
--- Revision 1.0 - Implementation tested with uart_impl on Hardware
 ----------------------------------------------------------------------------------
 
 LIBRARY IEEE;
@@ -31,6 +30,7 @@ ENTITY uart_rx IS
         -- System clock.
         clk : IN STD_LOGIC;
 
+	-- Synchronous reset.
         rst : IN STD_LOGIC;
 
         -- Incoming data bits (serial stream).
