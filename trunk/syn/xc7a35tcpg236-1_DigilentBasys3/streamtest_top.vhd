@@ -5,7 +5,7 @@
 -- Create Date: 02.09.2021 22:36
 -- Design Name: Board implementation of streamtest
 -- Module Name: streamtest_top
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on an FPGA
 -- Target Devices: Digilent Basys 3
 -- Tool Versions: 
 -- Description: 
