@@ -24,17 +24,26 @@ USE IEEE.NUMERIC_STD.ALL;
 USE WORK.SPWPKG.ALL;
 USE WORK.SPWROUTERPKG.ALL;
 
-LIBRARY UNISIM;
-USE UNISIM.VCOMPONENTS.ALL;
+library unisim;
+use unisim.vcomponents.all;
 
-ENTITY routertest_adapter_single_top IS
+
+ENTITY routertest_adapter_single_top_ZYNQ IS
     GENERIC (
         -- Number of SpaceWire ports in router & adapter.
         numports : INTEGER RANGE 0 TO 31 := 3
     );
     PORT (
+        SYSCLK_P : in std_logic;
+        
+        SYSCLK_N : in std_logic;
+    
+    
+        -- Uart clock.
+        --uclk : in std_logic;
+    
         -- System clock.
-        clk : IN STD_LOGIC;
+        --spwclk : in std_logic;
 
         -- Reset.
         rst : IN STD_LOGIC;
@@ -49,24 +58,24 @@ ENTITY routertest_adapter_single_top IS
         clear : IN STD_LOGIC;
 
         -- HIGH if link of adapter SpW ports is in run state, indicating that link is operational.
-        adapt_running : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+        adapt_running : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
 
         -- HIGH if errdisc (disconnect error), errpar (parity error), erresc (invalid escape sequence) or errcred (credit error) were detected.
         -- Triggers link reset. Must be acknowledged with a 'rst' or 'clear'.
-        adapt_error : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+        adapt_error : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
 
         -- HIGH if link of router SpW ports is in run state, indicating that link is operational. 
-        router_running : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+        router_running : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
 
         -- HIGH if errdisc (disconnect error), errpar (parity error), erresc (invalid escape sequence) or errcred (credit error) were detected.
         -- Triggers link reset. Must be acknowledged with a 'rst' or 'clear'.
-        router_error : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+        router_error : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
     );
-END routertest_adapter_single_top;
+END routertest_adapter_single_top_ZYNQ;
 
-ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top IS
+ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top_ZYNQ IS
     -- Constants
-    CONSTANT sysfreq : real := 100.0e6; -- 100 MHz Digilent Basys3 Board !
+    CONSTANT sysfreq : real := 100.0e6; -- clk period
 
     COMPONENT UARTSpWAdapter
         GENERIC (
@@ -120,7 +129,7 @@ ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top
         );
         PORT (
             -- System clock.
-            clk : in std_logic;
+            clk : IN STD_LOGIC;
 
             -- SpW port receive sample clock (only for impl_fast).
             rxclk : IN STD_LOGIC;
@@ -224,89 +233,145 @@ ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top
     SIGNAL s_spw_s_to_router : STD_LOGIC_VECTOR(numports DOWNTO 0);
     SIGNAL s_spw_d_from_router : STD_LOGIC_VECTOR(numports DOWNTO 0);
     SIGNAL s_spw_s_from_router : STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+    signal clk_ibufg : std_logic;
+    signal clk : std_logic;
+    --signal boardclk : std_logic;
+    
+    signal s_clk_toggle : std_logic;
+    
+    type clkdivstates is (S_Mode1, S_Mode2);
+    signal clkdivstate : clkdivstates := S_Mode1;
 BEGIN
     -- Drive outputs.
-    adapt_error <= s_adapt_error;
-    router_error <= s_router_error;
-    adapt_running <= s_adapt_running;
-    router_running <= s_router_running;
-            
+    adapt_error <= s_adapt_error(0 downto 0);
+    router_error <= s_router_error(0 downto 0);
+    adapt_running <= s_adapt_running(0 downto 0);
+    router_running <= s_router_running(0 downto 0);
+
+
+    -- Differential input clock buffer.
+    bufgds: IBUFDS port map (I => SYSCLK_P, IB => SYSCLK_N, O => clk_ibufg); -- eventuell auch IBUFGDS, mal schauen ob Fehler auftreten
+
+    -- Creates 100 MHz clock.
+    BUFGCE_inst : BUFGCE
+    port map (O => clk, CE => s_clk_toggle, I => clk_ibufg);
+    -- Toggles enable signal for BUFGCE every two cycles of input clk to divide by 2.
+    process(clk_ibufg)
+    begin
+        if rising_edge(clk_ibufg) then
+            case clkdivstate is
+                when S_Mode1 =>
+                    clkdivstate <= S_Mode2;
+                
+                when S_Mode2 =>
+                    s_clk_toggle <= not s_clk_toggle;
+                    clkdivstate <= S_Mode1;
+            end case;
+        end if;
+    end process;
+    
+
+--    -- Creates a 100 MHz clock.
+--    dcm0: DCM_SP
+--        generic map (
+--            CLKFX_DIVIDE => 2,
+--            CLKFX_MULTIPLY => 2,
+--            CLK_FEEDBACK => "NONE",
+--            CLKIN_DIVIDE_BY_2 => true,
+--            CLKIN_PERIOD => 5.0,
+--            CLKOUT_PHASE_SHIFT => "NONE",
+--            DESKEW_ADJUST => "SYSTEM_SYNCHRONOUS",
+--            DFS_FREQUENCY_MODE => "LOW",
+--            DUTY_CYCLE_CORRECTION => true,
+--            STARTUP_WAIT => true
+--        )
+--        port map (
+--            CLKIN => clk_ibufg,
+--            RST => '0',
+--            CLKFX => clk
+--        );
+
+--    -- Buffer clock.
+--    bufg0: BUFG port map (I => clk, O => boardclk);
+
     -- UARTSpWAdapter
     -- Contains numports-SpaceWire ports.
     Adapter : UARTSpWAdapter
-    GENERIC MAP(
-        clk_cycles_per_bit => 868, -- 100_000_000 (Hz) / 115_200 (baud rate) = 868
-        numports => numports,
-        init_input_port => 1,
-        init_output_port => 1,
-        activate_commands => true, -- define adapter variant (command (true) / non-command version (false))
-        sysfreq => sysfreq,
-        txclkfreq => sysfreq,
-        rximpl => impl_fast,
-        rxchunk => 1,
-        WIDTH => 2,
-        tximpl => impl_fast,
-        rxfifosize_bits => 11,
-        txfifosize_bits => 11
-    )
-    PORT MAP(
-        clk => clk,
-        rxclk => clk,
-        txclk => clk,
-        rst => rst,
-        autostart => (OTHERS => '1'),
-        linkstart => (OTHERS => '1'),
-        linkdis => (0 => '0', OTHERS => '0'),
-        txdivcnt => "00000001",
-        started => OPEN,
-        connecting => OPEN,
-        running => s_adapt_running,
-        errdisc => s_adapt_errdisc,
-        errpar => s_adapt_errpar,
-        erresc => s_adapt_erresc,
-        errcred => s_adapt_errcred,
-        txhalff => OPEN,
-        rxhalff => OPEN,
-        spw_di => s_spw_d_from_router,
-        spw_si => s_spw_s_from_router,
-        spw_do => s_spw_d_to_router,
-        spw_so => s_spw_s_to_router,
-        rx => rx,
-        tx => tx
-    );
+        GENERIC MAP(
+            clk_cycles_per_bit => 868, -- 100_000_000 (Hz) / 115_200 (baud rate) = 868
+            numports => numports,
+            init_input_port => 1,
+            init_output_port => 1,
+            activate_commands => true, -- define adapter variant (command (true) / non-command version (false))
+            sysfreq => sysfreq,
+            txclkfreq => sysfreq,
+            rximpl => impl_fast,
+            rxchunk => 1,
+            WIDTH => 2,
+            tximpl => impl_fast,
+            rxfifosize_bits => 11,
+            txfifosize_bits => 11
+        )
+        PORT MAP(
+            clk => clk,
+            rxclk => clk,
+            txclk => clk,
+            rst => rst,
+            autostart => (OTHERS => '1'),
+            linkstart => (OTHERS => '1'),
+            linkdis => (0 => '0', OTHERS => '0'),
+            txdivcnt => "00000001",
+            started => OPEN,
+            connecting => OPEN,
+            running => s_adapt_running,
+            errdisc => s_adapt_errdisc,
+            errpar => s_adapt_errpar,
+            erresc => s_adapt_erresc,
+            errcred => s_adapt_errcred,
+            txhalff => OPEN,
+            rxhalff => OPEN,
+            spw_di => s_spw_d_from_router,
+            spw_si => s_spw_s_from_router,
+            spw_do => s_spw_d_to_router,
+            spw_so => s_spw_s_to_router,
+            rx => rx,
+            tx => tx
+        );
 
     -- SpaceWire router.
     Router : spwrouter
-    GENERIC MAP(
-        numports => numports,
-        sysfreq => sysfreq,
-        txclkfreq => sysfreq,
-        rx_impl => (OTHERS => impl_fast),
-        tx_impl => (OTHERS => impl_fast)
-    )
-    PORT MAP(
-        clk => clk,
-        rxclk => clk,
-        txclk => clk,
-        rst => rst,
-        started => OPEN,
-        connecting => OPEN,
-        running => s_router_running,
-        errdisc => s_router_errdisc,
-        errpar => s_router_errpar,
-        erresc => s_router_erresc,
-        errcred => s_router_errcred,
-        spw_di => s_spw_d_to_router,
-        spw_si => s_spw_s_to_router,
-        spw_do => s_spw_d_from_router,
-        spw_so => s_spw_s_from_router
-    );
+        GENERIC MAP(
+            numports => numports,
+            sysfreq => sysfreq,
+            txclkfreq => sysfreq,
+            rx_impl => (OTHERS => impl_fast),
+            tx_impl => (OTHERS => impl_fast)
+        )
+        PORT MAP(
+            clk => clk,
+            rxclk => clk,
+            txclk => clk,
+            rst => rst,
+            started => OPEN,
+            connecting => OPEN,
+            running => s_router_running,
+            errdisc => s_router_errdisc,
+            errpar => s_router_errpar,
+            erresc => s_router_erresc,
+            errcred => s_router_errcred,
+            spw_di => s_spw_d_to_router,
+            spw_si => s_spw_s_to_router,
+            spw_do => s_spw_d_from_router,
+            spw_so => s_spw_s_from_router
+        );
 
     -- Error outputs.
     PROCESS (clk)
     BEGIN
         IF rising_edge(clk) THEN
             IF rst = '1' THEN
+                -- Synchronous reset.
                 s_adapt_error <= (OTHERS => '0');
                 s_router_error <= (OTHERS => '0');
             ELSE

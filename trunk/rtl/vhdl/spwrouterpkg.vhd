@@ -3,7 +3,7 @@
 -- Engineer: Stefan Lindoerfer
 -- 
 -- Create Date: 31.07.2021 14:59
--- Design Name: SpaceWire Router Package
+-- Design Name: SpaceWire Router - Package
 -- Module Name: spwrouterpkg
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
 -- Target Devices: Xilinx FPGAs
@@ -12,7 +12,7 @@
 --
 -- Dependencies: none
 -- 
--- Revision: 1.0
+-- Revision:
 ----------------------------------------------------------------------------------
 
 LIBRARY IEEE;
@@ -65,7 +65,7 @@ PACKAGE spwrouterpkg IS
         S_Dummy2
     ); -- 14
 
-    -- Pre-defined arrays for implementation types (front-end of receiver/transmitter)
+    -- Pre-defined arrays for implementation types (front-end of receiver/transmitter).
     TYPE rximpl_array IS ARRAY (NATURAL RANGE <>) OF spw_implementation_type_rec;
     TYPE tximpl_array IS ARRAY (NATURAL RANGE <>) OF spw_implementation_type_xmit;
 
@@ -106,7 +106,7 @@ PACKAGE spwrouterpkg IS
     END COMPONENT;
 
     -- Time Code controller (spwroutertcc.vhd).
-    COMPONENT spwroutertcc IS -- geändert am 04.06.2022
+    COMPONENT spwroutertcc IS
         GENERIC (
             numports : INTEGER RANGE 0 TO 31
         );
@@ -126,7 +126,7 @@ PACKAGE spwrouterpkg IS
     END COMPONENT;
 
     -- Router table (spwroutertable.vhd).
-    COMPONENT spwroutertable IS -- geändert am 07.06.2022
+    COMPONENT spwroutertable IS
         GENERIC (
             numports : INTEGER RANGE 0 TO 31
         );
@@ -159,7 +159,7 @@ PACKAGE spwrouterpkg IS
             proc : OUT STD_LOGIC;
             strobe : IN STD_LOGIC;
             cycle : IN STD_LOGIC;
-            portstatus : IN array_t(0 TO 31)(31 DOWNTO 0); -- hier ersten Index umgedreht
+            portstatus : IN array_t(0 TO 31)(31 DOWNTO 0);
             receiveTimecode : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
             autoTimeCodeValue : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
             autoTimeCodeCycleTime : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
@@ -184,7 +184,6 @@ PACKAGE spwrouterpkg IS
         GENERIC (
             numports : INTEGER RANGE 0 TO 31;
             blen : INTEGER RANGE 0 TO 5;
-            --pnum : INTEGER RANGE 0 TO 31;
             sysfreq : real;
             txclkfreq : real := 0.0;
             rximpl : spw_implementation_type_rec;
@@ -227,15 +226,12 @@ PACKAGE spwrouterpkg IS
             request_out : OUT STD_LOGIC;
             request_in : IN STD_LOGIC;
             destination_port : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-            --sourcePortOut : OUT STD_LOGIC_VECTOR(blen DOWNTO 0);
             arb_granted : IN STD_LOGIC;
             strobe_out : OUT STD_LOGIC;
             strobe_in : IN STD_LOGIC;
             ready_in : IN STD_LOGIC;
-            --readyOut : OUT STD_LOGIC;
             bus_address : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             bus_data_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-            --busMasterDataOut : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             bus_dByte : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
             bus_readwrite : OUT STD_LOGIC;
             bus_strobe : OUT STD_LOGIC;
@@ -244,7 +240,7 @@ PACKAGE spwrouterpkg IS
         );
     END COMPONENT;
 
-    -- Router Entity
+    -- Router Entity.
     COMPONENT spwrouter IS
         GENERIC (
             numports : INTEGER RANGE 0 TO 31;

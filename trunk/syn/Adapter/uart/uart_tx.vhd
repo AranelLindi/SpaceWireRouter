@@ -5,7 +5,7 @@
 -- Create Date: 29.07.2021 18:24
 -- Design Name: Transmiter for Uart
 -- Module Name: uart_tx
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on a FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router Switch on an FPGA
 -- Target Devices: 
 -- Tool Versions: based on code from: https://www.nandland.com/vhdl/modules/module-uart-serial-port-rs232.html
 -- Description: This file contains the Uart Transmitter. This transmitter is able to transmit
@@ -14,7 +14,6 @@
 -- Dependencies: none
 -- 
 -- Revision:
--- Revision 0.1 - Code implementation, formatting, commenting; not yet tested or simulated!
 ----------------------------------------------------------------------------------
 
 LIBRARY IEEE;
@@ -31,6 +30,7 @@ ENTITY uart_tx IS
         -- System clock.
         clk : IN STD_LOGIC;
 
+	-- Synchronous reset.
         rst : IN STD_LOGIC;
 
         -- 'High' if transmitter shall start to send tx_byte.
@@ -46,10 +46,6 @@ ENTITY uart_tx IS
 
         -- Outgoing serial data stream.
         tx_port : OUT STD_LOGIC := '1'
-
-        -- 'High' if transmitting process for one byte is complete.
-        -- 'Low' when transmitter is in idle or transmitting mode.
-        --txdone : OUT STD_LOGIC
     );
 END uart_tx;
 
@@ -66,11 +62,7 @@ ARCHITECTURE uart_tx_arch OF uart_tx IS
 
     -- Initialize outputs with standard values.
     SIGNAL s_tx_data : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
-    --SIGNAL s_txdone : STD_LOGIC := '0';
 BEGIN
-    -- Drive other output.
-    --txdone <= s_txdone;
-
     PROCESS (clk, rst)
     BEGIN
         IF rising_edge(clk) THEN
@@ -80,16 +72,10 @@ BEGIN
                 s_bit_index <= 0;
                 s_tx_data <= (OTHERS => '0');
                 tx_port <= '1';
-                --s_txdone <= '0';
                 state <= S_Idle;
             ELSE
                 CASE state IS
                     WHEN S_Idle =>
-                        --tx_rdy <= '1';
-                        --tx_port <= '1'; -- Drive line 'High' for Idle.
-                        --s_txdone <= '0';
-                        --s_clk_count <= 0;
-                        --s_bit_index <= 0;
                         IF (tx_ack = '1') THEN
                             tx_rdy <= '0';
                             s_tx_data <= tx_data;
@@ -100,7 +86,6 @@ BEGIN
 
                         -- Send out Start Bit. Start bit = 0
                     WHEN S_Tx_Start_Bit =>
-                        --tx_rdy <= '0'; -- ist glaub bei s_Idle (if) besser
                         tx_port <= '0';
 
                         -- Wait (clk_cycles_per_bit - 1) clock cycles for start bit to finish.
@@ -149,7 +134,6 @@ BEGIN
                         -- Stay here for one clk cycle.
                     WHEN S_Cleanup =>
                         tx_rdy <= '1';
-                        --s_txdone <= '1';
                         state <= S_Idle;
 
                 END CASE;

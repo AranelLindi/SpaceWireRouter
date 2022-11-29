@@ -11,7 +11,7 @@
 -- Description: Framework of a round robin arbiter which controls access between
 -- the ports.
 --
--- Dependencies: array_t, matrix_t (spwrouterpkg)
+-- Dependencies: spwrouterpkg
 -- 
 -- Revision:
 ----------------------------------------------------------------------------------
@@ -34,25 +34,25 @@ ENTITY spwrouterarb IS
         -- System clock.
         clk : IN STD_LOGIC;
 
-        -- Synchronous reset (spwrouterarb_round).
+        -- Synchronous reset.
         rst : IN STD_LOGIC;
 
-        -- Contains desired destination port for each port (number coded in binary !)
-        destport : IN array_t(numports DOWNTO 0)(7 DOWNTO 0); -- dest
+        -- Contains desired destination port for each port (number coded in binary !).
+        destport : IN array_t(numports DOWNTO 0)(7 DOWNTO 0);
 
         -- Shows for each port whether access to another port is required.
-        request : IN STD_LOGIC_VECTOR(numports DOWNTO 0); -- req
+        request : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
 
         -- Contains ports that have granted access to the port that is specified in destport.
-        granted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- grnt
+        granted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
         -- Routing switch matrix: Maps source ports (row) to target ports (column)
-        routing_matrix : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0) -- rout
+        routing_matrix : OUT array_t(numports DOWNTO 0)(numports DOWNTO 0)
     );
 END spwrouterarb;
 
 ARCHITECTURE spwrouterarb_arch OF spwrouterarb IS
-    -- Routing switch matrix: Containts decision ultimately made byte the arbiter as to which port is allowed to send over another port.
+    -- Routing switch matrix: Containts arbiters final decision which port may send over another port.
     SIGNAL s_routing : array_t(numports DOWNTO 0)(numports DOWNTO 0);
 
     -- Shows which ports are currently occupied.
@@ -68,12 +68,12 @@ BEGIN
     granted <= s_granted;
     routing_matrix <= s_routing;
 
-    -- Checks for each port whether one or more ports want to access it. If so, this port is occupied.
+    -- Checks for each port whether one or more ports want access it. If so, this port is occupied.
     Occupation : FOR i IN 0 TO numports GENERATE
         s_occupied(i) <= OR s_routing(i); -- Operator overloading (or)
     END GENERATE Occupation;
 
-    -- Maps which ports make requests to other ports
+    -- Maps which ports make requests to other ports.
     Request_Column : FOR i IN 0 TO numports GENERATE
         Request_Row : FOR j IN 0 TO numports GENERATE
             s_request(j, i) <= '1' WHEN request(i) = '1' AND to_integer(unsigned(destport(i))) = j ELSE

@@ -3,19 +3,16 @@
 -- Engineer: Stefan Lindoerfer
 -- 
 -- Create Date: 06/01/2022 09:52:34 AM
--- Design Name: adapter_top
--- Module Name: 
--- Project Name: SpaceWire Router - UART-SpaceWire Adapter
+-- Design Name: 
+-- Module Name: adapter_top
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
 -- Target Devices: Xilinx FPGAs
 -- Tool Versions: -/-
 -- Description: UART-SpaceWire Adapter.
 -- 
--- Dependencies: spwpkg (spwstream)
+-- Dependencies: spwstream
 -- 
 -- Revision:
--- Revision 1.0 - File Created (Hardwaretest pending)
--- Additional Comments: -
--- 
 ----------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
@@ -27,7 +24,7 @@ ENTITY adapter_top IS
         -- System clock.
         clk : IN STD_LOGIC;
 
-        -- Reset.
+        -- Synchronous reset.
         rst : IN STD_LOGIC;
 
         -- Uart rx stream.
@@ -73,7 +70,7 @@ ENTITY adapter_top IS
 END adapter_top;
 
 ARCHITECTURE adapter_top_arch OF adapter_top IS
-    -- Constants
+    -- Constants.
     CONSTANT sysfreq : real := 100.0e6; -- 100 MHz Digilent Basys3 Board !
 
     COMPONENT UARTSpWAdapter
@@ -136,7 +133,7 @@ ARCHITECTURE adapter_top_arch OF adapter_top IS
             -- SpW port transmit clock (only for impl_fast).
             txclk : IN STD_LOGIC;
 
-            -- Reset.
+            -- Synchronouse reset.
             rst : IN STD_LOGIC;
 
             -- Enables automatic link start for SpW ports on receipt of a NULL character.
@@ -234,6 +231,7 @@ BEGIN
     spw_so <= s_spw_s_to_router(0);
     s_spw_d_from_router(0) <= spw_di;
     s_spw_s_from_router(0) <= spw_si;
+    
     -- UARTSpWAdapter
     Adapter : UARTSpWAdapter
     GENERIC MAP(
@@ -277,6 +275,7 @@ BEGIN
         tx => tx
     );
 
+    -- Produces error flags to make errors visible on LEDs.
     PROCESS (clk)
     BEGIN
         IF rising_edge(clk) THEN

@@ -3,7 +3,7 @@
 -- Engineer: Stefan Lindoerfer
 -- 
 -- Create Date: 11.08.2021 21:27
--- Design Name: SpaceWire Router -- SpaceWire Port (Container for spwstream)
+-- Design Name: SpaceWire Router - SpaceWire Port (Container for spwstream)
 -- Module Name: spwrouterport
 -- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
 -- Target Devices: Xilinx FPGAs
@@ -11,9 +11,9 @@
 -- Description: Container of SpaceWire IP Core Light (spwstream) for SpaceWire
 -- Router Implementation.
 --
--- Dependencies: spwstream (spwpkg), spwrouterportstates (spwrouterpkg)
+-- Dependencies: spwpkg, spwrouterpkg
 -- 
--- Revision: 0.9
+-- Revision:
 ----------------------------------------------------------------------------------
 
 LIBRARY IEEE;
@@ -29,9 +29,6 @@ ENTITY spwrouterport IS
 
         -- Bit length to map number of ports (ceil(log2(numports))).
         blen : INTEGER RANGE 0 TO 5; -- (max 5 bits for 0-31 ports)
-
-        -- Number of this port (0 to numports).
-        --pnum : INTEGER RANGE 0 TO 31;
 
         -- System clock frequency in Hz.
         -- This must be set to the frequency of "clk". It is used to setup
@@ -78,7 +75,7 @@ ENTITY spwrouterport IS
         -- Transmit clock (only for impl_fast).
         txclk : IN STD_LOGIC;
 
-        -- Synchronous reset (active-high).
+        -- Synchronous reset.
         rst : IN STD_LOGIC;
 
         -- Enables automatic link start on receipt of a NULL character.
@@ -169,121 +166,105 @@ ENTITY spwrouterport IS
         -- ====================================
         --           ROUTER SIGNALS
         -- ====================================
-        -- Shows which port is in running state (is able to receive or transmit data).
-        linkstatus : IN STD_LOGIC_VECTOR(numports DOWNTO 0); -- linkUp
+        -- Shows which port is in running-state.
+        linkstatus : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-        -- High as long as a packet is sent from this port via the router to another port.
-        request_out : OUT STD_LOGIC; -- requestOut
+        -- High as long as a packet is sent from this port to another.
+        request_out : OUT STD_LOGIC;
 
-        -- High as long as packet ist sent via this port.
-        request_in : IN STD_LOGIC; -- requestIn
+        -- High as long as packet ist sent to this port.
+        request_in : IN STD_LOGIC;
 
-        -- First byte of a packet (address byte) with destination port (both physical
-        -- and logical addressing).
-        destination_port : OUT STD_LOGIC_VECTOR(7 DOWNTO 0); -- destinationPortOut
-
-        -- The binary form (number) of the this port.
-        --source_port : OUT STD_LOGIC_VECTOR(blen DOWNTO 0); -- sourcePortOut
+        -- First byte of a packet (address byte) with destination port (both physical and logical addressing).
+        destination_port : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 
         -- High if the port gets permission from router arbiter for data transfer.
-        arb_granted : IN STD_LOGIC; -- grantedIn
+        arb_granted : IN STD_LOGIC;
 
         -- High if data byte or EOP/EEP is ready to transfer to destination port.
-        strobe_out : OUT STD_LOGIC; -- strobeOut
+        strobe_out : OUT STD_LOGIC;
 
         -- High if transmission via this port should be performed (new byte still on txdata).
-        strobe_in : IN STD_LOGIC; -- strobeIn
+        strobe_in : IN STD_LOGIC;
 
         -- High if destination port is ready to accept next N-Char.
-        ready_in : IN STD_LOGIC; -- readyIn
+        ready_in : IN STD_LOGIC;
 
         -- ====================================
         --            INTERNAL BUS
         -- ====================================
-        -- The address to access the router control register.
-        bus_address : OUT STD_LOGIC_VECTOR(31 DOWNTO 0); -- busMasterAddressOut
+        -- The memory address to access the router register.
+        bus_address : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 
         -- Routing table entry for requested logical port.
-        bus_data_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0); -- busMasterDataIn
-
-        -- Data to be written into router control register. Is always 0x0000_0000.
-        --bus_data_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0); -- busMasterDataOut (wenn ausblenden nicht funktioniert oder undurchsichtig ist, wieder entkommentieren und einfach 'open' machen)
+        bus_data_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
         -- Defines which byte (1-4) in the router control register is to be read.
-        bus_dByte : OUT STD_LOGIC_VECTOR(3 DOWNTO 0); -- busMasterByteEnableOut
+        bus_dByte : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
 
-        -- High if a write process; low is a read process shall be performed
-        -- in router registers.
-        bus_readwrite : OUT STD_LOGIC; -- busMasterWriteEnableOut
+        -- High if a write process; low is a read process should be performed into router registers.
+        bus_readwrite : OUT STD_LOGIC;
 
         -- Strobe signal to routing table.
-        bus_strobe : OUT STD_LOGIC; -- busMasterStrobeOut
+        bus_strobe : OUT STD_LOGIC;
 
         -- In this context also strobe signal to routing table.
-        bus_request : OUT STD_LOGIC; -- busMasterRequestOut
+        bus_request : OUT STD_LOGIC;
 
-        -- Acknowledgment to get access to routing table.
-        bus_ack_in : IN STD_LOGIC -- busMasterAcknowledgeIn
+        -- Acknowledgment for granted access to routing table.
+        bus_ack_in : IN STD_LOGIC
     );
 END spwrouterport;
 
 ARCHITECTURE spwrouterport_arch OF spwrouterport IS
     -- Finite state machine state.
-    SIGNAL state : spwrouterportstates := S_Idle; -- check 
+    SIGNAL state : spwrouterportstates := S_Idle;
 
     -- Packet cargo (excluding first byte (address byte)).
     -- According to spwstream: flag = 0 -> data byte
     --                         flag = 1 -> EOP / EEP
-    SIGNAL s_packet_cargo : STD_LOGIC_VECTOR(8 DOWNTO 0) := (OTHERS => '0'); -- iDataOut
+    SIGNAL s_packet_cargo : STD_LOGIC_VECTOR(8 DOWNTO 0) := (OTHERS => '0'); -- Contains every byte (and flag) of current packet
 
     -- Routing table.
-    SIGNAL s_logical_address : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0'); -- iRoutingTableAddress -- Contains logical port address (32-254)
-    SIGNAL s_routing_table_request : STD_LOGIC; -- iRoutingTableRequest -- High if data from router table is requested. Is maintained until routing table has confirmed via handshake that data is available
+    SIGNAL s_logical_address : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0'); -- Contains logical port address (32-254)
+    SIGNAL s_routing_table_request : STD_LOGIC; -- High if data from router table is requested. Is hold until routing table has confirmed that data is available by handshake
 
-    -- Xmit signals.
-    SIGNAL s_txwrite : STD_LOGIC; -- txwrite -- Set High to write a character to transmit FIFO of the port.
-    --SIGNAL s_txdata : STD_LOGIC_VECTOR(8 DOWNTO 0) := (OTHERS => '0'); -- txdata -- Contains control flag (txflag) and data byte (txdata) (for more information see spwstream). (Wird augenscheinlich nicht benötigt, direkt vom Eingangsport lesen!)
-    SIGNAL s_txrdy : STD_LOGIC; -- iTransmitFIFOReady gelöscht! -- High if spwstream is ready to accept a character for transmit FIFO.
-    SIGNAL s_txhalff : STD_LOGIC;
+    -- xmit signals.
+    SIGNAL s_txwrite : STD_LOGIC; -- Set High to write a character to Tx-FIFO of the port.
+    SIGNAL s_txrdy : STD_LOGIC; -- High if spwstream is ready to accept a character for transmit FIFO.
+    SIGNAL s_txhalff : STD_LOGIC; -- s. txhalff port of spwstream
 
     -- Recv signals.
-    SIGNAL s_rxread : STD_LOGIC; -- rxread -- Set High to accept a received character. A character is removed from the receive FIFO.
-    SIGNAL s_rxvalid : STD_LOGIC; -- rxvalid -- High if rxflag and rxdata contain valid data.
-    SIGNAL s_rxdata : STD_LOGIC_VECTOR(8 DOWNTO 0); -- rxdata -- Used to identify received data (single EOP/EEP, N-Char, ...)
+    SIGNAL s_rxread : STD_LOGIC; -- Set High to accept a received character. A character is removed also from the Rx-FIFO
+    SIGNAL s_rxvalid : STD_LOGIC; -- High if rxflag and rxdata contain valid data
+    SIGNAL s_rxdata : STD_LOGIC_VECTOR(8 DOWNTO 0); -- Used to identify received data (single EOP/EEP, N-Char, ...)
     SIGNAL s_rxflag_buffer : STD_LOGIC; -- Buffers flag of received N-chars
     SIGNAL s_rxdata_buffer : STD_LOGIC_VECTOR(7 DOWNTO 0); -- Fetches received bytes from the port and buffers them
-    SIGNAL s_rxhalff : STD_LOGIC; --
+    SIGNAL s_rxhalff : STD_LOGIC; -- s. rxhalff port of spwstream
 
     -- Bus & router signals.
-    SIGNAL s_strobe_out : STD_LOGIC; -- iStrobeOut -- Strobe signal to destination port when cargo/EOP/EEP byte need to be transmitted.
-    --SIGNAL s_ready_out : STD_LOGIC; -- iReadyOut -- Scheint das gleiche wie s_txrdy zu sein. (erstmal gestrichen, wegoptimiert, mal schauen ob das ein fehler war)
-    SIGNAL s_request_out : STD_LOGIC; -- iRequestOut -- High as long as a packet is started and sent, not yet completed.
-    SIGNAL s_destination_port : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0'); -- iDestinationPortOut -- Contains first byte of a packet (address byte)
+    SIGNAL s_strobe_out : STD_LOGIC; -- Strobe signal to destination port when cargo/EOP/EEP byte need to be transmitted
+    SIGNAL s_request_out : STD_LOGIC; -- High as long as a packet is started and sent but not yet completed
+    SIGNAL s_destination_port : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0'); -- Contains first byte of a packet (address byte)
 BEGIN
     -- Drive outputs.
     -- Bus & router signals.
-    --source_port <= STD_LOGIC_VECTOR(to_unsigned(pnum, source_port'length));
     destination_port <= s_destination_port;
     request_out <= s_request_out;
     strobe_out <= s_strobe_out;
-    rxdata <= s_packet_cargo; -- dataOut
+    rxdata <= s_packet_cargo;
     bus_request <= s_routing_table_request;
     bus_strobe <= s_routing_table_request;
     bus_address <= (9 DOWNTO 2 => s_logical_address, OTHERS => '0'); -- Necessary so that the correct entry is addressed in router table
-    bus_readwrite <= '0'; -- perform read operations only
+    bus_readwrite <= '0'; -- performs read operations only
     bus_dByte <= (OTHERS => '1'); -- always select all four bytes
-    --bus_data_out <= (OTHERS => '0'); -- Keine Ahnung wieso das nötig ist (wird mal auf null gesetzt)
     -- Port signals.
     rxhalff <= s_rxhalff;
     txhalff <= s_txhalff;    
-    --txrdy <= s_txrdy;
     
-    -- Read inputs.
+    -- Read input.
     s_txwrite <= strobe_in WHEN request_in = '1' ELSE
         '0';
-    --s_txdata <= txdata; -- dataIn
-    --iTransmitFIFOReady <= s_txrdy;
-    --s_ready_out <= s_txrdy;
 
     -- SpaceWire port.
     spwport : spwstream
@@ -335,15 +316,15 @@ BEGIN
         spw_so => spw_so
     );
     
-    -- Infers a latch, but is necessary to maintain the signal so that the FSM of receiving port has enough time to react to it. TODO: Bad design, either rebuild in future or test thoroughly !
+    -- Infers a latch, but is necessary to hold the signal so that the FSM of receiving port has enough time to react to it. TODO: Bad design, either rebuild in future or test thoroughly !
     PROCESS (clk)
     BEGIN
         IF rising_edge(clk) THEN
-            txrdy <= s_txrdy;--s_ready_out; -- s_ready_out
+            txrdy <= s_txrdy;
         END IF;
     END PROCESS;
 
-    -- Finite state machine.
+    -- Port state machine.
     PROCESS (clk)
         VARIABLE v_validport : STD_LOGIC; -- S_Dest2; for boolean operationen
         VARIABLE v_reqports : STD_LOGIC; -- S_RT1
@@ -368,7 +349,7 @@ BEGIN
                         s_strobe_out <= '0';
 
                         IF (s_rxvalid = '1') THEN
-                            s_rxread <= '1'; -- rxread
+                            s_rxread <= '1';
                             state <= S_Dest0;
                         END IF;
 
@@ -377,15 +358,15 @@ BEGIN
 
                         s_rxdata(8) <= s_rxflag_buffer;
                         s_rxdata(7 DOWNTO 0) <= s_rxdata_buffer;
-                        s_rxread <= '0'; -- rxread -- take over via handshake
+                        s_rxread <= '0'; -- take over via handshake
                         state <= S_Dest1;
 
                     WHEN S_Dest1 =>
-                        -- Look at first byte of a packet.
+                        -- Look at first byte of new packet.
 
-                        IF (s_rxdata(8) = '0') THEN -- vorher: receiveFIFODataOut(8) -- Data byte
-                            IF (s_rxdata(7 DOWNTO 5) = "000") THEN -- DestPort <= 31 (physical port)
-                                -- Physical port addressed.
+                        IF (s_rxdata(8) = '0') THEN -- Data byte
+                            IF (s_rxdata(7 DOWNTO 5) = "000") THEN -- [DestPort] < 32 (physical port)
+                                -- Physical port is addressed.
                                 s_destination_port <= s_rxdata(7 DOWNTO 0); -- Destination port number (first byte of packet)
 
                                 IF (unsigned(s_rxdata(7 DOWNTO 0)) > numports) THEN
@@ -395,7 +376,7 @@ BEGIN
                                     -- Destination port exists, packet can be delivered.
                                     state <= S_Dest2;
                                 END IF;
-                            ELSE -- DestPort > 31 (logical port)
+                            ELSE -- DestPort >= 32 (logical port)
                                 -- Logical port is addressed: Send request to routing table to get port assignment.
                                 s_logical_address <= s_rxdata(7 DOWNTO 0);
                                 s_routing_table_request <= '1';
@@ -407,10 +388,9 @@ BEGIN
                         END IF;
 
                     WHEN S_Dest2 =>
-                        -- (Reset variable for new iteration.)
-                        v_validport := '0';
+                        v_validport := '0'; -- (Reset variable for next iteration)
 
-                        -- Transmit request to destination port.
+                        -- Check if target port is addressable.
                         FOR i IN 1 TO numports LOOP -- Auf Port0 kann hiernach nicht gesendet werden, bitte überprüfen!
                             IF (linkstatus(i) = '1' AND s_destination_port(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(i, blen + 1))) THEN
                                 v_validport := '1'; -- potenzielle Fehlerquelle mit blen+1 !! Im Original Code werden hier 5 Bits (4 downto 0) abgefragt. falls blen == 4 ist, muss folglich blen+1 für 5 gelten!
@@ -427,23 +407,20 @@ BEGIN
                         END IF;
 
                     WHEN S_RT0 =>
-                        -- Wait acknowledge. (Hat wohl was damit zu tun, dass die gewünschte Information von der RT eingetroffen ist)
-
+                        -- Wait for acknowledgement from routing table.
                         IF (bus_ack_in = '1') THEN
-                            state <= S_RT1; -- RT == Routing table
+                            state <= S_RT1;
                         END IF;
 
                     WHEN S_RT1 =>
-                        -- (Reset variable for new iteration.)
-                        v_reqports := '0';
+                        v_reqports := '0'; -- (Reset variable for new iteration)
 
-                        -- Logical addressing: Request to data which is read from routing table.
-
+                        -- Withdraw routing table request signal.
                         s_routing_table_request <= '0';
 
-                        -- Changed priority! Normal order with If...Elsif would be from zero ascending.
-                        -- Since only single unconnected if queries can be generated, the order must be
-                        -- reversed (descending), since the last if query has the highes priority. (Can
+                        -- Changed priority ! Usual order with If...Elsif would be from zero ascending.
+                        -- Since only single unconnected if statements can be generated, the order must be
+                        -- reversed (descending), therefore the last if query has the highes priority. (Can
                         -- overwrite result again.)
                         FOR i IN numports DOWNTO 0 LOOP
                             IF (linkstatus(i) = '1' AND bus_data_in(i) = '1') THEN
@@ -451,25 +428,23 @@ BEGIN
                                 s_request_out <= '1';
                                 state <= S_RT2;
 
-                                -- Variable to compare in same cycle whether a port can be selected at all.
+                                -- Check if mapped physical port is addressable.
                                 v_reqports := '1';
                             END IF;
                         END LOOP;
 
-                        IF (v_reqports = '0') THEN -- discard invalid addressed packet if none 'if-statement' before was executed.
+                        IF (v_reqports = '0') THEN -- discard invalid addressed packet
                             state <= S_Dummy0;
                         END IF;
 
                     WHEN S_RT2 =>
                         -- Wait for permission from arbiter (logical addresses access only).
-
                         IF (arb_granted = '1') THEN
                             state <= S_Data2;
                         END IF;
 
                     WHEN S_Data0 =>
                         -- Wait for permission from arbiter and/or for new received N-chars of current packet (physical addresses only).
-
                         s_strobe_out <= '0';
 
                         IF (arb_granted = '1' AND s_rxvalid = '1') THEN
@@ -486,16 +461,16 @@ BEGIN
                         state <= S_Data2;
 
                     WHEN S_Data2 =>
-                        -- Send data which is read from rx buffer to destination port.
-
+                        -- Send data that is read from rx buffer to destination port.
                         IF (ready_in = '1') THEN
                             s_strobe_out <= '1';
                             s_packet_cargo <= s_rxdata;
+                            
                             IF (s_rxdata(8) = '1') THEN
-                                -- EOP/EEP, means packet is complete.
+                                -- EOP/EEP means packet is complete.
                                 state <= S_Data3;
                             ELSIF (arb_granted = '1' AND s_rxvalid = '1') THEN
-                                -- Continue reading bytes according to this packet.
+                                -- Continue reading bytes according to current packet.
                                 s_rxread <= '1';
                                 state <= S_Data1;
                             ELSE
@@ -505,16 +480,14 @@ BEGIN
                         END IF;
 
                     WHEN S_Data3 =>
-                        -- Complete sending to destination port.
-
+                        -- Completed transferring packet to destination port.
                         s_strobe_out <= '0';
                         s_request_out <= '0';
                         state <= S_Idle;
 
                     WHEN S_Dummy0 =>
                         -- Dummie states are there to throw away a packet that cannot be delivered.
-                        -- dummy read (may block forever) (Wie kann hier ein Deadlock konstruiert werden?)
-
+                        -- dummy read (may block forever) -- TODO: Evaluate risk of deadlock !
                         s_request_out <= '0';
 
                         IF (s_rxvalid = '1') THEN
@@ -524,7 +497,6 @@ BEGIN
 
                     WHEN S_Dummy1 =>
                         -- Wait to read data from receive buffer.
-
                         s_rxdata(8) <= s_rxflag_buffer; -- take over by handshake mechanism
                         s_rxdata(7 DOWNTO 0) <= s_rxdata_buffer;
                         s_rxread <= '0';
@@ -532,14 +504,13 @@ BEGIN
 
                     WHEN S_Dummy2 =>
                         -- Read data from receive buffer until the control flag is '1' (means EOP/EEP).
-
-                        IF (s_rxdata(8) = '1') THEN -- vorher: receiveFIFODataOut(8)
+                        IF (s_rxdata(8) = '1') THEN
                             state <= S_Idle;
                         ELSE
                             state <= S_Dummy0;
                         END IF;
 
-                    WHEN OTHERS => -- Because of unused state problem.
+                    WHEN OTHERS => -- (Necessary because of unused state problem)
                         state <= S_Idle;
                 END CASE;
             END IF;

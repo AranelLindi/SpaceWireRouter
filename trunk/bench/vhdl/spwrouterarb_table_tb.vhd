@@ -5,10 +5,10 @@
 -- Create Date: 05.08.2021 19:14
 -- Design Name: Testbench for SpaceWire Router Table Arbiter
 -- Module Name: spwrouterarb_table_tb
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on a FPGA
--- Target Devices: 
--- Tool Versions: 
--- Description: Simulation time: 55 ns.
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
+-- Target Devices: Xiling FPGAs
+-- Tool Versions: -/-
+-- Description: Simulation time:
 --
 -- Dependencies: none
 -- 
@@ -31,63 +31,84 @@ ARCHITECTURE spwrouterarb_table_tb_arch OF spwrouterarb_table_tb IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            req : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-            grnt : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+            request : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            granted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
         );
     END COMPONENT;
 
     -- Number of SpaceWire ports.
-    CONSTANT numports : INTEGER RANGE 0 TO 31 := 2;
+    CONSTANT numports : INTEGER RANGE 0 TO 31 := 2; -- 3 ports (0 - 2)
 
     -- System clock.
     SIGNAL clk : STD_LOGIC;
 
     -- Asynchronous reset.
-    SIGNAL rst : STD_LOGIC := '1'; -- Caution! It may be necessary to set rst at beginning to high for short period of time. 
+    SIGNAL s_rst : STD_LOGIC; -- Caution! It may be necessary to set rst at beginning to high for short period of time. 
 
     -- Requests from all ports. (Bit corresponds to port)
-    SIGNAL req : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0'); -- No access request was made from any port.
+    SIGNAL s_request : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
     -- Contains which port gets access.
-    SIGNAL grnt : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0);
 
-    -- Clock period. (10 MHz)
-    CONSTANT clock_period : TIME := 100 ns;
+    -- Clock period. (100 MHz)
+    CONSTANT clock_period : TIME := 10 ns;
 BEGIN
     -- Design under test.
-    dut : spwrouterarb_table GENERIC MAP(numports => numports)
+    dut : spwrouterarb_table
+    GENERIC MAP(
+        numports => numports
+    )
     PORT MAP(
         clk => clk,
-        rst => rst,
-        req => req,
-        grnt => grnt);
+        rst => s_rst,
+        request => s_request,
+        granted => s_granted);
 
     -- Simulation.
     stimulus : PROCESS
     BEGIN
-        WAIT FOR clock_period;
+        -- Initialization
+        s_rst <= '1', '0' after clock_period;
+        s_request <= (others => '0');
 
-        -- Set initial values for simulation.
-        rst <= '0';
-        req <= (OTHERS => '0'); -- No port wants access.
+        wait for 2 * clock_period; -- nothing should happen
 
-        WAIT FOR clock_period;
+        -- Start simulation
 
-        req <= (1 => '1', 0 => 'U', 2 => '0'); -- Port0 requieres access.
+        s_request(0) <= '1';
+        wait for clock_period; -- port 0 requests access, should be granted
 
-        WAIT FOR clock_period;
+        s_request <= (others => '0'); -- reset signal
+        wait for clock_period;
 
-        req <= (1 => '1', 2 => '1', OTHERS => '0'); -- More ports wants access, watch control logic.
+        s_request <= (others => '1'); -- all ports requests access. last granted port was port 0 so granted shouldn't change
+        wait for clock_period;
 
-        WAIT FOR clock_period;
+        s_request(0) <= '0'; -- Port 0 has finished its access. Next granted port should be port 1
+        wait for clock_period;
 
-        req <= (OTHERS => '1'); -- All ports ask for access. No change should take place.
+        s_request(1) <= '0'; -- Port 1 has finished its access, port 2 is now the turn
+        wait for clock_period;
 
-        WAIT FOR clock_period;
+        s_request(2) <= '0'; -- No port is requesting access
+        wait for 2 * clock_period;
 
-        req <= (2 => '1', OTHERS => '0'); -- Port2 wants access, system should grant it.
+        s_rst <= '1', '0' after clock_period; -- reset intern s_granted signal (last granted port is now port 0)
 
-        WAIT;
+        s_request <= (1 => '0', others => '1'); -- all ports except port 1 request access therefore port 0 gets granted
+        wait for clock_period;
+
+        s_request(0) <= '0'; -- Port 0 withdraws its request, now port 2 should get access
+        wait for clock_period;
+
+        s_request(1) <= '1'; -- Port 1 wants request now but port 2 got already 
+        wait for clock_period;
+
+        s_request(2) <= '0'; -- Port 2 withdraws request now port 1 should get access
+        wait for clock_period;
+
+        s_request <= (others => '0'); -- Fin !
     END PROCESS;
 
     -- Creates clock.
