@@ -391,14 +391,14 @@ BEGIN
                         v_validport := '0'; -- (Reset variable for next iteration)
 
                         -- Check if target port is addressable.
-                        FOR i IN 0 TO numports LOOP -- TODO: Check!
-                            IF (linkstatus(i) = '1' AND s_destination_port = STD_LOGIC_VECTOR(to_unsigned(i, s_destination_port'length-1))) THEN
-                                v_validport := '1';
+                        FOR i IN 1 TO numports LOOP -- Auf Port0 kann hiernach nicht gesendet werden, bitte überprüfen!
+                            IF (linkstatus(i) = '1' AND s_destination_port(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(i, blen + 1))) THEN
+                                v_validport := '1'; -- potenzielle Fehlerquelle mit blen+1 !! Im Original Code werden hier 5 Bits (4 downto 0) abgefragt. falls blen == 4 ist, muss folglich blen+1 für 5 gelten!
                             END IF;
                         END LOOP;
 
-                        IF v_validport = '1' THEN
-                            -- Exit port is available, packet can be send.
+                        IF ((s_destination_port(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(0, blen + 1))) OR (v_validport = '1')) THEN
+                            -- Packet address matches available physical ports, packet can be sent through router.
                             s_request_out <= '1';
                             state <= S_Data0;
                         ELSE
