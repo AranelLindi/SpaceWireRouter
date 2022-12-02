@@ -39,6 +39,9 @@ ENTITY spwrouter IS
         -- txclk frequency in Hz (if tximpl = impl_fast)
         txclkfreq : real;
 
+        -- True if extended register and Port A shall be used, False if original register is sufficient.
+        externPort : boolean := True;
+
         -- Selection of receiver front-end implementation.
         rx_impl : rximpl_array(numports DOWNTO 0);-- := (OTHERS => impl_fast);
 
@@ -89,7 +92,29 @@ ENTITY spwrouter IS
         spw_do : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
 
         -- Strobe Out signals from SpaceWire bus.
-        spw_so : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+        spw_so : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+
+        -- PORTA
+        -- Clock of port A.
+        clka : in std_logic := '0';
+
+        -- Addresses the memory spaces for port A. Read and write operations.
+        addra : in std_logic_vector(31 downto 0) := (others => '0');
+
+        -- Data input to be written into the memory through port A.
+        dina : in std_logic_vector(31 downto 0) := (others => '0');
+
+        -- Data output from read operations through port A.
+        douta : out std_logic_vector(31 downto 0);
+
+        -- Enables read, write and reset operations through port A.
+        ena : in std_logic := '0';
+
+        -- Resets the port A memory output latch or output register
+        rsta : in std_logic := '0';
+
+        -- Enables write operations through port A.
+        wea : in std_logic_vector(3 downto 0) := (others => '0')
     );
 END spwrouter;
 
@@ -97,87 +122,93 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
     PACKAGE spwrouterfunc IS NEW work.spwrouterfunc
         GENERIC MAP(numports => numports); -- Import package with various functions.
 
-        -- ====================================
-        -- General constants and signals.
-        -- ====================================
-        CONSTANT blen : INTEGER RANGE 0 TO 5 := INTEGER(ceil(log2(real(numports)))); -- Necessary number of bits to represent [numport]-ports
+    -- ====================================
+    -- General constants and signals.
+    -- ====================================
+    CONSTANT blen : INTEGER RANGE 0 TO 5 := INTEGER(ceil(log2(real(numports)))); -- Necessary number of bits to represent [numport]-ports
 
 
-        -- ====================================
-        -- TIME CODES (Bus I)
-        -- ====================================
+    -- ====================================
+    -- TIME CODES (Bus I)
+    -- ====================================
 
-        -- Time Code specific signals.
-        -- Time Codes are routed via separate bus and have highest priority.
-        SIGNAL s_tick_from_tcc_to_ports : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High for one clock cycle if transmission of Time Code is requested
-        SIGNAL s_tick_from_ports_to_tcc : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High for one clock cycle if Time Code was received
-        SIGNAL s_tc_from_tcc_to_ports : array_t(numports DOWNTO 0)(7 DOWNTO 0); -- Time Code (control flag & counter value) of Time Code to sent
-        SIGNAL s_tc_from_ports_to_tcc : array_t(numports DOWNTO 0)(7 DOWNTO 0); -- Time Code (control flag & coutner value) of received Time Code
+    -- Time Code specific signals.
+    -- Time Codes are routed via separate bus and have highest priority.
+    SIGNAL s_tick_from_tcc_to_ports : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High for one clock cycle if transmission of Time Code is requested
+    SIGNAL s_tick_from_ports_to_tcc : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High for one clock cycle if Time Code was received
+    SIGNAL s_tc_from_tcc_to_ports : array_t(numports DOWNTO 0)(7 DOWNTO 0); -- Time Code (control flag & counter value) of Time Code to sent
+    SIGNAL s_tc_from_ports_to_tcc : array_t(numports DOWNTO 0)(7 DOWNTO 0); -- Time Code (control flag & coutner value) of received Time Code
 
-        -- Time Codes & Register.
-        SIGNAL s_auto_tc : STD_LOGIC_VECTOR(7 DOWNTO 0); -- Contains last automatically generated Time Code
-        SIGNAL s_auto_cycle : STD_LOGIC_VECTOR(31 DOWNTO 0); -- Time period for automatically Time Code generation
-        SIGNAL s_last_tc : STD_LOGIC_VECTOR(7 DOWNTO 0); -- Contains last received (valid) Time Code -- TODO: Noch nicht korrekt eingebunden, soll das zuletzt empfangene TC speichern
-
-
-        -- ====================================
-        -- ARBITRATION (physical addressing, Bus II)
-        -- ====================================
-
-        -- Arbitration-specific signals (spwrouterarb).
-        SIGNAL s_routing_matrix_transposed : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Transposed routing_matrix from arbiter
-        SIGNAL s_routing_matrix : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Routing switch matrix: Maps source ports (row) to target ports (column)
-        SIGNAL s_source_port_row : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Copy of routing_matrix for easier further processing
-        SIGNAL s_request_out : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High for any port currently transferring data
-        SIGNAL s_destination_port : array_t(numports DOWNTO 0)(7 DOWNTO 0); -- First byte of packet (address byte) with destination port (both physical and logical addressing (after mapping to physical port))
-        SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Contains ports that have granted access to port that is specified in destport
-        
-        -- SpaceWire-port-specific signals (spwrouterport).
-        SIGNAL s_ready_in : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High if destination port is ready to accept next N-Char
-        SIGNAL s_rxdata : array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Received byte (7 downto 0) and control flag (8)
-        SIGNAL s_strobe_out : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High if data byte or EOP/EEP of one port is ready to transfer to destination port
-        SIGNAL s_request_in : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High as long as a packet is sent via any port
-        SIGNAL s_txdata : array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Data byte and flag to transmit
-        SIGNAL s_strobe_in : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High if transmission via one port should be performed (new byte still on txdata)
-        SIGNAL s_txrdy : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High if port is ready to accept an N-Char for transmission FIFO
-        SIGNAL s_running : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High if any port is in running-state
+    -- Time Codes & Register.
+    SIGNAL s_auto_tc : STD_LOGIC_VECTOR(7 DOWNTO 0); -- Contains last automatically generated Time Code
+    SIGNAL s_auto_cycle : STD_LOGIC_VECTOR(31 DOWNTO 0); -- Time period for automatically Time Code generation
+    SIGNAL s_last_tc : STD_LOGIC_VECTOR(7 DOWNTO 0); -- Contains last received (valid) Time Code -- TODO: Noch nicht korrekt eingebunden, soll das zuletzt empfangene TC speichern
 
 
-        -- ====================================
-        -- INTERNAL BUS (logical addressing & register, Bus III)
-        -- ====================================
+    -- ====================================
+    -- ARBITRATION (physical addressing, Bus II)
+    -- ====================================
 
-        -- Master (m) bus signals.
-        -- Each port acts as a master. An internal arbiter controls access to registers and routing table (logical addressing only !).
-        SIGNAL s_bus_m_address : array_t(numports DOWNTO 0)(31 DOWNTO 0); -- Contains register destination address (routing table only) for each port
-        SIGNAL s_bus_m_data : array_t(numports DOWNTO 0)(31 DOWNTO 0); -- Contains data word to be written into register for each port (currently unused !)
-        SIGNAL s_bus_m_dByte : array_t(numports DOWNTO 0)(3 DOWNTO 0); -- Determines for each port which byte (1-4) is to be written into register or read from it
-        SIGNAL s_bus_m_readwrite : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Determines for each port whether a read (0) or write (1) operation into register should be performed
-        SIGNAL s_bus_m_request : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Contains for each port whether there is a request to access routing table
-        SIGNAL s_bus_m_granted : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Contains for each port whether requested access to routing table is granted
-        SIGNAL s_bus_m_ack : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Contains for each port whether there is an acknowledgement of register for its operation
-        SIGNAL s_bus_m_strobe : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Contains strobe signal for each port related to register access/routing table
+    -- Arbitration-specific signals (spwrouterarb).
+    SIGNAL s_routing_matrix_transposed : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Transposed routing_matrix from arbiter
+    SIGNAL s_routing_matrix : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Routing switch matrix: Maps source ports (row) to target ports (column)
+    SIGNAL s_source_port_row : array_t(numports DOWNTO 0)(numports DOWNTO 0); -- Copy of routing_matrix for easier further processing
+    SIGNAL s_request_out : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High for any port currently transferring data
+    SIGNAL s_destination_port : array_t(numports DOWNTO 0)(7 DOWNTO 0); -- First byte of packet (address byte) with destination port (both physical and logical addressing (after mapping to physical port))
+    SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Contains ports that have granted access to port that is specified in destport
 
-        -- Slave (s) bus signals.
-        -- The access_control-process controls which master (port) has granted access to internal bus from round robin arbiter and is allowed
-        -- to take control of the slave. The slave takes over communication with register and/or routing table.
-        SIGNAL s_bus_s_address : STD_LOGIC_VECTOR(31 DOWNTO 0); -- Copy of allowed port destination address (s_bus_m_address)
-        SIGNAL s_bus_s_request : STD_LOGIC; -- High if access to internal bus is required from any port
-        SIGNAL s_bus_s_strobe : STD_LOGIC; -- High if any port performs an operation in register/routing table
+    -- SpaceWire-port-specific signals (spwrouterport).
+    SIGNAL s_ready_in : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High if destination port is ready to accept next N-Char
+    SIGNAL s_rxdata : array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Received byte (7 downto 0) and control flag (8)
+    SIGNAL s_strobe_out : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High if data byte or EOP/EEP of one port is ready to transfer to destination port
+    SIGNAL s_request_in : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High as long as a packet is sent via any port
+    SIGNAL s_txdata : array_t(numports DOWNTO 0)(8 DOWNTO 0); -- Data byte and flag to transmit
+    SIGNAL s_strobe_in : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High if transmission via one port should be performed (new byte still on txdata)
+    SIGNAL s_txrdy : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High if port is ready to accept an N-Char for transmission FIFO
+    SIGNAL s_running : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High if any port is in running-state
 
-        SIGNAL s_bus_s_register_data_out : STD_LOGIC_VECTOR(31 DOWNTO 0); -- Contains data word from data_out_buffer
-        SIGNAL s_register_data_out_buffer : STD_LOGIC_VECTOR(31 DOWNTO 0); -- Word taken from routing table (register) with current address of granted port
-        SIGNAL s_bus_s_register_data_in : STD_LOGIC_VECTOR(31 DOWNTO 0); -- Data word to write into register of current granted port
-        SIGNAL s_bus_s_ack : STD_LOGIC; -- Contains acknowledgment from register (mapping to port is done in access_control)
-        SIGNAL s_bus_s_readwrite : STD_LOGIC; -- Contains which kind of operation shall be performed in register (0 : read, 1 : write)
-        SIGNAL s_bus_s_dByte : STD_LOGIC_VECTOR(3 DOWNTO 0); -- Determines which byte (1-4) of data word in register should be read or overwritten
-        --SIGNAL iBusSlaveOriginalPortIn : STD_LOGIC_VECTOR(7 DOWNTO 0); -- TODO: diesen Port mal noch dort lassen, wird in aktueller Version nicht verwendet, ist aber nützlich um Registerzugriff neu zu regeln
-    BEGIN
-        -- Drive outputs.
-        running <= s_running;
+    SIGNAL s_watchcycle : STD_LOGIC_VECTOR(31 DOWNTO 0); -- Contains watchdog time period to break up an inactive wormhole connection
 
-        -- Router arbiter (crossbar switch).
-        roundrobin_arbiter : spwrouterarb
+    SIGNAL s_portstatus : array_t(numports DOWNTO 0)(31 DOWNTO 0); -- Contains status of every port
+    SIGNAL s_portcontrol : array_t(numports DOWNTO 0)(31 DOWNTO 0); -- Contains control information for every port
+
+
+    -- ====================================
+    -- INTERNAL BUS (logical addressing & register, Bus III)
+    -- ====================================
+
+    -- Master (m) bus signals.
+    -- Each port acts as a master. An internal arbiter controls access to registers and routing table (logical addressing only !).
+    SIGNAL s_bus_m_address : array_t(numports DOWNTO 0)(31 DOWNTO 0); -- Contains register destination address (routing table only) for each port
+    SIGNAL s_bus_m_data : array_t(numports DOWNTO 0)(31 DOWNTO 0); -- Contains data word to be written into register for each port (currently unused !)
+    SIGNAL s_bus_m_dByte : array_t(numports DOWNTO 0)(3 DOWNTO 0); -- Determines for each port which byte (1-4) is to be written into register or read from it
+    SIGNAL s_bus_m_readwrite : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Determines for each port whether a read (0) or write (1) operation into register should be performed
+    SIGNAL s_bus_m_request : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Contains for each port whether there is a request to access routing table
+    SIGNAL s_bus_m_granted : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Contains for each port whether requested access to routing table is granted
+    SIGNAL s_bus_m_ack : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Contains for each port whether there is an acknowledgement of register for its operation
+    SIGNAL s_bus_m_strobe : STD_LOGIC_VECTOR(numports DOWNTO 0); -- Contains strobe signal for each port related to register access/routing table
+
+    -- Slave (s) bus signals.
+    -- The access_control-process controls which master (port) has granted access to internal bus from round robin arbiter and is allowed
+    -- to take control of the slave. The slave takes over communication with register and/or routing table.
+    SIGNAL s_bus_s_address : STD_LOGIC_VECTOR(31 DOWNTO 0); -- Copy of allowed port destination address (s_bus_m_address)
+    SIGNAL s_bus_s_request : STD_LOGIC; -- High if access to internal bus is required from any port
+    SIGNAL s_bus_s_strobe : STD_LOGIC; -- High if any port performs an operation in register/routing table
+
+    SIGNAL s_bus_s_register_data_out : STD_LOGIC_VECTOR(31 DOWNTO 0); -- Contains data word from data_out_buffer
+    SIGNAL s_register_data_out_buffer : STD_LOGIC_VECTOR(31 DOWNTO 0); -- Word taken from routing table (register) with current address of granted port
+    SIGNAL s_bus_s_register_data_in : STD_LOGIC_VECTOR(31 DOWNTO 0); -- Data word to write into register of current granted port
+    SIGNAL s_bus_s_ack : STD_LOGIC; -- Contains acknowledgment from register (mapping to port is done in access_control)
+    SIGNAL s_bus_s_readwrite : STD_LOGIC; -- Contains which kind of operation shall be performed in register (0 : read, 1 : write)
+    SIGNAL s_bus_s_dByte : STD_LOGIC_VECTOR(3 DOWNTO 0); -- Determines which byte (1-4) of data word in register should be read or overwritten
+    --SIGNAL iBusSlaveOriginalPortIn : STD_LOGIC_VECTOR(7 DOWNTO 0); -- TODO: diesen Port mal noch dort lassen, wird in aktueller Version nicht verwendet, ist aber nützlich um Registerzugriff neu zu regeln
+BEGIN
+    -- Drive outputs.
+    running <= s_running;
+
+
+    -- Router arbiter (crossbar switch).
+    roundrobin_arbiter : spwrouterarb
         GENERIC MAP(
             numports => numports,
             blen => blen
@@ -191,9 +222,10 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             routing_matrix => s_routing_matrix
         );
 
-        -- (numports)-SpaceWire ports.
-        ports : FOR i IN 0 TO numports GENERATE
-            port_i : spwrouterport GENERIC MAP(
+
+    -- (numports)-SpaceWire ports.
+    ports : FOR i IN 0 TO numports GENERATE
+        port_i : spwrouterport GENERIC MAP(
                 numports => numports,
                 blen => blen,
                 sysfreq => sysfreq,
@@ -250,32 +282,65 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
                 bus_request => s_bus_m_request(i), -- O
                 bus_ack_in => s_bus_m_ack(i) -- I
             );
-        END GENERATE ports;
+    END GENERATE ports;
 
+
+    router_registers : if externPort = True generate
+        -- Contains router link control, port status and routing table additional extern port for extern cpu bus system.
+        reg_extended : spwrouterregs_extended
+            generic map (
+                numports => numports
+            )
+            port map (
+                clk => clk, -- I
+                rst => rst, -- I
+                readTable => s_register_data_out_buffer, -- O
+                addrTable => s_bus_s_address, -- I
+                ackTable => s_bus_s_ack, -- O
+                strobeTable => s_bus_s_strobe, -- I
+                cycleTable => s_bus_s_request, -- I
+                portstatus => s_portstatus, -- I
+                portcontrol => s_portcontrol, -- O
+                running => std_logic_vector(resize(unsigned(s_running), 32)), -- I
+                watchcycle => s_watchcycle, -- O
+                timecycle => s_auto_cycle, -- O
+                lasttime => s_last_tc, -- I
+                lastautotime => s_auto_tc, -- I
+                clka => clka, -- I
+                addra => addra, -- I
+                dina => dina, -- I
+                douta => douta, -- O
+                ena => ena, -- I
+                rsta => rsta, -- I
+                wea => wea -- I
+            );
+    else generate
         -- Contains router link control, port status register and routing table.
-        router_reg : spwrouterregs -- TODO: Überarbeiten!
-        GENERIC MAP(
-            numports => numports
-        )
-        PORT MAP(
-            clk => clk, -- I
-            rst => rst, -- I
-            writeData => s_bus_s_register_data_in, -- I
-            readData => s_register_data_out_buffer, -- O
-            readwrite => s_bus_s_readwrite, -- I
-            dByte => s_bus_s_dByte, -- I
-            addr => s_bus_s_address, -- I
-            proc => s_bus_s_ack, -- O
-            strobe => s_bus_s_strobe, -- I
-            cycle => s_bus_s_request, -- I
-            portstatus => (OTHERS => (OTHERS => '0')), -- I -- TODO!
-            receiveTimeCode => s_last_tc, -- I
-            autoTimeCodeValue => s_auto_tc, -- I
-            autoTimeCodeCycleTime => s_auto_cycle -- O
-        );
+        reg_original : spwrouterregs
+            GENERIC MAP(
+                numports => numports
+            )
+            PORT MAP(
+                clk => clk, -- I
+                rst => rst, -- I
+                writeData => s_bus_s_register_data_in, -- I
+                readData => s_register_data_out_buffer, -- O
+                readwrite => s_bus_s_readwrite, -- I
+                dByte => s_bus_s_dByte, -- I
+                addr => s_bus_s_address, -- I
+                proc => s_bus_s_ack, -- O
+                strobe => s_bus_s_strobe, -- I
+                cycle => s_bus_s_request, -- I
+                portstatus => (OTHERS => (OTHERS => '0')), -- I -- TODO!
+                receiveTimeCode => s_last_tc, -- I
+                autoTimeCodeValue => s_auto_tc, -- I
+                autoTimeCodeCycleTime => s_auto_cycle -- O
+            );
+    end generate router_registers;
 
-        -- Bus arbiter & routing table arbiter
-        internalbus_arbiter : spwrouterarb_table
+
+    -- Bus arbiter & routing table arbiter
+    internalbus_arbiter : spwrouterarb_table
         GENERIC MAP(
             numports => numports
         )
@@ -286,8 +351,9 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             granted => s_bus_m_granted -- O
         );
 
-        -- Time Code control.
-        timecode_control : spwroutertcc
+
+    -- Time Code control.
+    timecode_control : spwroutertcc
         GENERIC MAP(
             numports => numports
         )
@@ -305,50 +371,54 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
             auto_interval => s_auto_cycle -- I
         );
 
-        -- Creates transposed matrix of s_routing_matrix: Shows for every port (row) which port (column) requests access to it.
-        routing_matrix_row : FOR i IN 0 TO numports GENERATE
-            routing_matrix_column : FOR j IN 0 TO numports GENERATE
-                s_routing_matrix_transposed(i)(j) <= s_routing_matrix(j)(i);
-            END GENERATE routing_matrix_column;
-        END GENERATE routing_matrix_row;
 
-        -- Stores every row of s_routing_matrix which maps source ports (row) to destination ports (column).
-        source_port_rows : FOR i IN 0 TO numports GENERATE
-            s_source_port_row(i) <= s_routing_matrix(i);
-        END GENERATE source_port_rows;
+    -- Creates transposed matrix of s_routing_matrix: Shows for every port (row) which port (column) requests access to it.
+    routing_matrix_row : FOR i IN 0 TO numports GENERATE
+        routing_matrix_column : FOR j IN 0 TO numports GENERATE
+            s_routing_matrix_transposed(i)(j) <= s_routing_matrix(j)(i);
+        END GENERATE routing_matrix_column;
+    END GENERATE routing_matrix_row;
 
-        -- Routing process: Assigns information from source ports to destination ports to ports.
-        crossbar : FOR i IN 0 TO numports GENERATE
-            s_ready_in(i) <= spwrouterfunc.select_port(s_routing_matrix_transposed(i), s_txrdy);
-            s_request_in(i) <= spwrouterfunc.select_port(s_source_port_row(i), s_request_out);
-            s_txdata(i) <= spwrouterfunc.select_nchar(s_source_port_row(i), s_rxdata);
-            s_strobe_in(i) <= spwrouterfunc.select_port(s_source_port_row(i), s_strobe_out);
-        END GENERATE crossbar;
 
-        -- Controls which master gets access to bus.
-        access_control : PROCESS (clk)
-        BEGIN
-            IF rising_edge(clk) THEN
-                s_bus_s_request <= OR s_bus_m_request;
-                s_bus_s_register_data_out <= s_register_data_out_buffer;
+    -- Stores every row of s_routing_matrix which maps source ports (row) to destination ports (column).
+    source_port_rows : FOR i IN 0 TO numports GENERATE
+        s_source_port_row(i) <= s_routing_matrix(i);
+    END GENERATE source_port_rows;
 
-                -- Caution ! Reversed priority conditioned through if-statements !
-                -- For loop first rolls out numports downto 0. Since no if..elsif statements
-                -- can be generated via GENERATE-keyword, the block has to be translated into
-                -- independent if statements. The order is reversed because of the changed 
-                -- priority: previously, first if statement had highes priority (the first
-                -- elsif, etc.). Now hightest priority must be at the end in order to be able
-                -- to overwrite a previously made decision.
-                FOR i IN numports DOWNTO 0 LOOP
-                    IF (s_bus_m_granted(i) = '1') THEN
-                        s_bus_s_strobe <= s_bus_m_strobe(i);
-                        s_bus_s_address <= s_bus_m_address(i);
-                        s_bus_s_dByte <= s_bus_m_dByte(i);
-                        s_bus_s_readwrite <= s_bus_m_readwrite(i);
-                        s_bus_s_register_data_in <= s_bus_m_data(i);
-                        s_bus_m_ack <= (i => s_bus_s_ack, OTHERS => '0');
-                    END IF;
-                END LOOP;
-            END IF;
-        END PROCESS access_control;
-    END ARCHITECTURE spwrouter_arch;
+
+    -- Routing process: Assigns information from source ports to destination ports to ports.
+    crossbar : FOR i IN 0 TO numports GENERATE
+        s_ready_in(i) <= spwrouterfunc.select_port(s_routing_matrix_transposed(i), s_txrdy);
+        s_request_in(i) <= spwrouterfunc.select_port(s_source_port_row(i), s_request_out);
+        s_txdata(i) <= spwrouterfunc.select_nchar(s_source_port_row(i), s_rxdata);
+        s_strobe_in(i) <= spwrouterfunc.select_port(s_source_port_row(i), s_strobe_out);
+    END GENERATE crossbar;
+
+
+    -- Controls which master gets access to bus.
+    access_control : PROCESS (clk)
+    BEGIN
+        IF rising_edge(clk) THEN
+            s_bus_s_request <= OR s_bus_m_request;
+            s_bus_s_register_data_out <= s_register_data_out_buffer;
+
+            -- Caution ! Reversed priority conditioned through if-statements !
+            -- For loop first rolls out numports downto 0. Since no if..elsif statements
+            -- can be generated via GENERATE-keyword, the block has to be translated into
+            -- independent if statements. The order is reversed because of the changed 
+            -- priority: previously, first if statement had highes priority (the first
+            -- elsif, etc.). Now hightest priority must be at the end in order to be able
+            -- to overwrite a previously made decision.
+            FOR i IN numports DOWNTO 0 LOOP
+                IF (s_bus_m_granted(i) = '1') THEN
+                    s_bus_s_strobe <= s_bus_m_strobe(i);
+                    s_bus_s_address <= s_bus_m_address(i);
+                    s_bus_s_dByte <= s_bus_m_dByte(i);
+                    s_bus_s_readwrite <= s_bus_m_readwrite(i);
+                    s_bus_s_register_data_in <= s_bus_m_data(i);
+                    s_bus_m_ack <= (i => s_bus_s_ack, OTHERS => '0');
+                END IF;
+            END LOOP;
+        END IF;
+    END PROCESS access_control;
+END ARCHITECTURE spwrouter_arch;

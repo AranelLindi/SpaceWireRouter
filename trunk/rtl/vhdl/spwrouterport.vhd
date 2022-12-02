@@ -486,7 +486,7 @@ BEGIN
                         state <= S_Idle;
 
                     WHEN S_Dummy0 =>
-                        -- Dummie states are there to throw away a packet that cannot be delivered.
+                        -- Dummie states exist to throw away a packet that cannot be delivered.
                         -- dummy read (may block forever) -- TODO: Evaluate risk of deadlock !
                         s_request_out <= '0';
 

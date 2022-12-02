@@ -166,6 +166,36 @@ PACKAGE spwrouterpkg IS
         );
     END COMPONENT;
 
+    -- Extended control register (spwrouterregs_ext.vhd)
+    COMPONENT spwrouterregs_extended IS
+        GENERIC (
+            numports : INTEGER RANGE 0 TO 31
+        );
+        PORT (
+            clk : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
+            readTable : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            addrTable : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            ackTable : OUT STD_LOGIC;
+            strobeTable : IN STD_LOGIC;
+            cycleTable : IN STD_LOGIC;
+            portstatus : IN array_t(numports DOWNTO 0)(31 DOWNTO 0);
+            portcontrol : OUT array_t(numports DOWNTO 0)(31 DOWNTO 0);
+            running : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            watchcycle : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            timecycle : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            lasttime : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+            lastautotime : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+            clka : IN STD_LOGIC;
+            addra : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            dina : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            douta : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            ena : IN STD_LOGIC;
+            rsta : IN STD_LOGIC;
+            wea : IN STD_LOGIC_VECTOR(3 DOWNTO 0)
+        );
+    END COMPONENT;
+
     -- Arbiter for routing table and registers.
     COMPONENT spwrouterarb_table IS
         GENERIC (

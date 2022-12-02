@@ -171,21 +171,21 @@ BEGIN
 
     -- Decides what data was requested and writes it in general output port.
     s_readData <= s_dataRoutingTable WHEN s_selectRoutingTable = '1' ELSE
-        s_DataOutBuffer;
+                  s_DataOutBuffer;
 
     -- Address decoding and table selection.
     -- Routing table: logic addressing with ports 32 to 254 (saved in routing table)
     --s_selectRoutingTable <= '1' WHEN (addr(13 DOWNTO 2) > "000000011111" AND addr(13 DOWNTO 2) < "000100000000") ELSE '0';
     s_selectRoutingTable <= '1' WHEN to_integer(unsigned(addr(13 DOWNTO 2))) > 31 AND to_integer(unsigned(addr(13 DOWNTO 2))) < 256 ELSE
-        '0';
+                            '0';
 
     -- ROM table (defines memory address).
     s_table_4 <= '1' WHEN addr(13 DOWNTO 8) = "000100" ELSE
-        '0'; -- (0x0000_0400)
+                 '0'; -- (0x0000_0400)
     s_table_5 <= '1' WHEN addr(13 DOWNTO 8) = "000101" ELSE
-        '0'; -- (0x0000_0500)
+                 '0'; -- (0x0000_0500)
     s_table_6 <= '1' WHEN addr(13 DOWNTO 8) = "000110" ELSE
-        '0'; -- (0x0000_0600)
+                 '0'; -- (0x0000_0600)
     --s_table_7 <= '1' when addr(13 downto 8) = "000111" else '0'; -- (0x0000_0700)
     --s_table_8 <= '1' when addr(13 downto 8) = "001000" else '0'; -- (0x0000_0800)
     --s_table_9 <= '1' when addr(13 downto 8) = "001001" else '0'; -- (0x0000_0900)
@@ -193,140 +193,140 @@ BEGIN
 
     -- ROM table entry (defines cell in table).
     s_addr_00 <= '1' WHEN addr (7 DOWNTO 2) = "000000" ELSE
-        '0'; -- 00 (00)
+                 '0'; -- 00 (00)
     s_addr_04 <= '1' WHEN addr (7 DOWNTO 2) = "000001" ELSE
-        '0'; -- 04 (01)
+                 '0'; -- 04 (01)
     s_addr_08 <= '1' WHEN addr (7 DOWNTO 2) = "000010" ELSE
-        '0'; -- 08 (02)
+                 '0'; -- 08 (02)
     s_addr_0C <= '1' WHEN addr (7 DOWNTO 2) = "000011" ELSE
-        '0'; -- 0C (03)
+                 '0'; -- 0C (03)
     s_addr_10 <= '1' WHEN addr (7 DOWNTO 2) = "000100" ELSE
-        '0'; -- 10 (04)
+                 '0'; -- 10 (04)
     s_addr_14 <= '1' WHEN addr (7 DOWNTO 2) = "000101" ELSE
-        '0'; -- 14 (05)
+                 '0'; -- 14 (05)
     s_addr_18 <= '1' WHEN addr (7 DOWNTO 2) = "000110" ELSE
-        '0'; -- 18 (06)
+                 '0'; -- 18 (06)
     s_addr_1C <= '1' WHEN addr (7 DOWNTO 2) = "000111" ELSE
-        '0'; -- 1C (07)
+                 '0'; -- 1C (07)
     s_addr_20 <= '1' WHEN addr (7 DOWNTO 2) = "001000" ELSE
-        '0'; -- 20 (08)
+                 '0'; -- 20 (08)
     s_addr_24 <= '1' WHEN addr (7 DOWNTO 2) = "001001" ELSE
-        '0'; -- 24 (09)
+                 '0'; -- 24 (09)
     s_addr_28 <= '1' WHEN addr (7 DOWNTO 2) = "001010" ELSE
-        '0'; -- 28 (10)
+                 '0'; -- 28 (10)
     s_addr_2C <= '1' WHEN addr (7 DOWNTO 2) = "001011" ELSE
-        '0'; -- 2C (11)
+                 '0'; -- 2C (11)
     s_addr_30 <= '1' WHEN addr (7 DOWNTO 2) = "001100" ELSE
-        '0'; -- 30 (12)
+                 '0'; -- 30 (12)
     s_addr_34 <= '1' WHEN addr (7 DOWNTO 2) = "001101" ELSE
-        '0'; -- 34 (13)
+                 '0'; -- 34 (13)
     s_addr_38 <= '1' WHEN addr (7 DOWNTO 2) = "001110" ELSE
-        '0'; -- 38 (14)
+                 '0'; -- 38 (14)
     s_addr_3C <= '1' WHEN addr (7 DOWNTO 2) = "001111" ELSE
-        '0'; -- 3C (15)
+                 '0'; -- 3C (15)
     s_addr_40 <= '1' WHEN addr (7 DOWNTO 2) = "010000" ELSE
-        '0'; -- 40 (16)
+                 '0'; -- 40 (16)
     s_addr_44 <= '1' WHEN addr (7 DOWNTO 2) = "010001" ELSE
-        '0'; -- 44 (17)
+                 '0'; -- 44 (17)
     s_addr_48 <= '1' WHEN addr (7 DOWNTO 2) = "010010" ELSE
-        '0'; -- 48 (18)
+                 '0'; -- 48 (18)
     s_addr_4C <= '1' WHEN addr (7 DOWNTO 2) = "010011" ELSE
-        '0'; -- 4c (19)
+                 '0'; -- 4c (19)
     s_addr_50 <= '1' WHEN addr (7 DOWNTO 2) = "010100" ELSE
-        '0'; -- 50 (20)
+                 '0'; -- 50 (20)
     s_addr_54 <= '1' WHEN addr (7 DOWNTO 2) = "010101" ELSE
-        '0'; -- 54 (21)
+                 '0'; -- 54 (21)
     s_addr_58 <= '1' WHEN addr (7 DOWNTO 2) = "010110" ELSE
-        '0'; -- 58 (22)
+                 '0'; -- 58 (22)
     s_addr_5C <= '1' WHEN addr (7 DOWNTO 2) = "010111" ELSE
-        '0'; -- 5C (23)
+                 '0'; -- 5C (23)
     s_addr_60 <= '1' WHEN addr (7 DOWNTO 2) = "011000" ELSE
-        '0'; -- 60 (24)
+                 '0'; -- 60 (24)
     s_addr_64 <= '1' WHEN addr (7 DOWNTO 2) = "011001" ELSE
-        '0'; -- 64 (25)
+                 '0'; -- 64 (25)
     s_addr_68 <= '1' WHEN addr (7 DOWNTO 2) = "011010" ELSE
-        '0'; -- 68 (26)
+                 '0'; -- 68 (26)
     s_addr_6C <= '1' WHEN addr (7 DOWNTO 2) = "011011" ELSE
-        '0'; -- 6C (27)
+                 '0'; -- 6C (27)
     s_addr_70 <= '1' WHEN addr (7 DOWNTO 2) = "011100" ELSE
-        '0'; -- 70 (28)
+                 '0'; -- 70 (28)
     s_addr_74 <= '1' WHEN addr (7 DOWNTO 2) = "011101" ELSE
-        '0'; -- 74 (29)
+                 '0'; -- 74 (29)
     s_addr_78 <= '1' WHEN addr (7 DOWNTO 2) = "011110" ELSE
-        '0'; -- 78 (30)
+                 '0'; -- 78 (30)
     s_addr_7C <= '1' WHEN addr (7 DOWNTO 2) = "011111" ELSE
-        '0'; -- 7C (31)
+                 '0'; -- 7C (31)
 
 
     -- Routing table (0x0000_0080 - 0x0000_03F8)
     RoutingTable : spwroutertable
-    GENERIC MAP(
-        numports => numports
-    )
-    PORT MAP(
-        clk => clk,
-        rst => rst,
-        ack_in => s_strobeRoutingTable,
-        readwrite => readwrite,
-        dByte => dByte,
-        addr => addr(9 DOWNTO 2), -- maps hexadecimal numbers to decimals beginning with 0 step 1.
-        wdata => writeData,
-        rdata => s_dataRoutingTable,
-        ack_out => s_procRoutingTable
-    );
+        GENERIC MAP(
+            numports => numports
+        )
+        PORT MAP(
+            clk => clk,
+            rst => rst,
+            ack_in => s_strobeRoutingTable,
+            readwrite => readwrite,
+            dByte => dByte,
+            addr => addr(9 DOWNTO 2), -- maps hexadecimal numbers to decimals beginning with 0 step 1.
+            wdata => writeData,
+            rdata => s_dataRoutingTable,
+            ack_out => s_procRoutingTable
+        );
 
     -- Port status register (0x0000_0400 - 0x0000_0480)
     -- Even if fewer that maximum possible 31 ports are created (numports), 
     -- 32 entries are still generated. These unused only contain initial value.
     StatusRegister : spwram
-    GENERIC MAP(
-        abits => abits_table4, -- 32 cells; 6 bit address
-        dbits => 32 -- word size
-    )
-    PORT MAP(
-        rclk => clk,
-        wclk => clk,
-        ren => '1',
-        raddr => s_addr_table4,
-        rdata => s_read_table4,
-        wen => readwrite, -- ODER: Zugriff immer erlauben (mit '1'), da sonst bei Änderungen eines Ports, diese gar nicht in das Register geschrieben werden könnte, wenn readwrite nicht '1' ist?
-        waddr => s_addr_table4,
-        wdata => s_write_table4
-    );
+        GENERIC MAP(
+            abits => abits_table4, -- 32 cells; 6 bit address
+            dbits => 32 -- word size
+        )
+        PORT MAP(
+            rclk => clk,
+            wclk => clk,
+            ren => '1',
+            raddr => s_addr_table4,
+            rdata => s_read_table4,
+            wen => readwrite, -- ODER: Zugriff immer erlauben (mit '1'), da sonst bei Änderungen eines Ports, diese gar nicht in das Register geschrieben werden könnte, wenn readwrite nicht '1' ist?
+            waddr => s_addr_table4,
+            wdata => s_write_table4
+        );
 
     -- TimeCode register (0x0000_0500 - 0x0000_050C)
     TimeCodeRegister : spwram
-    GENERIC MAP(
-        abits => abits_table5, -- 4 cells; 3 bit address
-        dbits => 32 -- word size
-    )
-    PORT MAP(
-        rclk => clk,
-        wclk => clk,
-        ren => '1',
-        raddr => s_addr_table5,
-        rdata => s_read_table5,
-        wen => readwrite,
-        waddr => s_addr_table5,
-        wdata => s_write_table5
-    );
+        GENERIC MAP(
+            abits => abits_table5, -- 4 cells; 3 bit address
+            dbits => 32 -- word size
+        )
+        PORT MAP(
+            rclk => clk,
+            wclk => clk,
+            ren => '1',
+            raddr => s_addr_table5,
+            rdata => s_read_table5,
+            wen => readwrite,
+            waddr => s_addr_table5,
+            wdata => s_write_table5
+        );
 
     -- Info register (0x0000_0600 - 0x0000_0604)
     InfoRegister : spwram
-    GENERIC MAP(
-        abits => abits_table6, -- 1 cell; 1 bit address
-        dbits => 32 -- word size
-    )
-    PORT MAP(
-        rclk => clk,
-        wclk => clk,
-        ren => '1',
-        raddr => s_addr_table6,
-        rdata => s_read_table6,
-        wen => readwrite,
-        waddr => s_addr_table6,
-        wdata => s_write_table6
-    );
+        GENERIC MAP(
+            abits => abits_table6, -- 1 cell; 1 bit address
+            dbits => 32 -- word size
+        )
+        PORT MAP(
+            rclk => clk,
+            wclk => clk,
+            ren => '1',
+            raddr => s_addr_table6,
+            rdata => s_read_table6,
+            wen => readwrite,
+            waddr => s_addr_table6,
+            wdata => s_write_table6
+        );
 
 
     -- FSM. Controls read/write access to registers.
@@ -343,7 +343,7 @@ BEGIN
                 --                         x"0BEBC200" (alle 2 sec wird ein neues automatisches Time Code generiert)
                 s_autoTimeCodeCycleTime <= x"00000000"; -- ACHTUNG ! WERT HIER UNBEDINGT WIEDER AUF x"00000000" ABÄNDERN! NUR ZU TESTZWECKEN SO IMPLEMENTIERT !
                 s_autoTimeCodeValue <= (OTHERS => '0');
-                -- TODO: Built-in async reset for spwrams!
+            -- TODO: Built-in async reset for spwrams!
             ELSE
 
                 CASE state IS
@@ -493,7 +493,7 @@ BEGIN
                             -- TimeCode receive register
                             s_addr_table5 <= STD_LOGIC_VECTOR(to_unsigned(0, s_addr_table5'length));
                             s_DataOutBuffer <= s_read_table5;
-                            -- (1) N/A
+                        -- (1) N/A
                         ELSIF (s_table_5 = '1' AND s_addr_08 = '1') THEN
                             -- Automatic TimeCode value
                             s_addr_table5 <= STD_LOGIC_VECTOR(to_unsigned(2, s_addr_table5'length));
@@ -530,19 +530,19 @@ BEGIN
                                 END IF;
                             END LOOP;
 
-                            -- to... (example)
-                            --                        IF (dByte(0) = '1') THEN
-                            --                            s_write_table4(7 DOWNTO 0) <= portstatus(0)(7 DOWNTO 0);
-                            --                        END IF;
-                            --                        IF (dByte(1) = '1') THEN
-                            --                            s_write_table4(15 DOWNTO 8) <= portstatus(0)(15 DOWNTO 8);
-                            --                        END IF;
-                            --                        IF (dByte(2) = '1') THEN
-                            --                            s_write_table4(23 DOWNTO 16) <= portstatus(0)(23 DOWNTO 16);
-                            --                        END IF;
-                            --                        IF (dByte(3) = '1') THEN
-                            --                            s_write_table4(31 DOWNTO 24) <= portstatus(0)(31 DOWNTO 24);
-                            --                        END IF;
+                        -- to... (example)
+                        --                        IF (dByte(0) = '1') THEN
+                        --                            s_write_table4(7 DOWNTO 0) <= portstatus(0)(7 DOWNTO 0);
+                        --                        END IF;
+                        --                        IF (dByte(1) = '1') THEN
+                        --                            s_write_table4(15 DOWNTO 8) <= portstatus(0)(15 DOWNTO 8);
+                        --                        END IF;
+                        --                        IF (dByte(2) = '1') THEN
+                        --                            s_write_table4(23 DOWNTO 16) <= portstatus(0)(23 DOWNTO 16);
+                        --                        END IF;
+                        --                        IF (dByte(3) = '1') THEN
+                        --                            s_write_table4(31 DOWNTO 24) <= portstatus(0)(31 DOWNTO 24);
+                        --                        END IF;
 
                         ELSIF (s_table_4 = '1' AND s_addr_04 = '1') THEN
                             -- Status Port 1
@@ -895,7 +895,7 @@ BEGIN
                         state <= S_Write1;
 
                     WHEN S_Write1 => -- Write Register END.
-                        -- iSoftwareLinkResetx <= '0'; x == PortNr.
+                    -- iSoftwareLinkResetx <= '0'; x == PortNr.
                         s_proc_out <= '0';
                         state <= S_Wait0;
 

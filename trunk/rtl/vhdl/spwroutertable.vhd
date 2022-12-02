@@ -80,43 +80,22 @@ BEGIN
     ack_out <= s_ack_out;
     rdata <= s_rdata;
 
-<<<<<<< HEAD
-    -- Creates 32x256 routing table in BRAM. (Xilinx synthesizer infers to use ROM Block)
---    ramXilinx : spwram
---    GENERIC MAP(
---        abits => 8, -- ((2**8) - 1) rows
---        dbits => 32 -- 32 bit size
---    )
---    PORT MAP(
---        rclk => clk,
---        wclk => clk,
---        ren => '1',
---        raddr => addr,
---        rdata => s_mem_data,
---        wen => s_write_enable,
---        waddr => addr,
---        wdata => s_wdata
---    );
-
-    
-=======
     -- Creates 32x256 routing table in BRAM. (Xilinx synthesizer infers to use RAM Block)
     ramXilinx : spwram
-    GENERIC MAP(
-        abits => 8, -- ((2**8) - 1) rows
-        dbits => 32 -- 32 bit word width
-    )
-    PORT MAP(
-        rclk => clk,
-        wclk => clk,
-        ren => '1',
-        raddr => addr,
-        rdata => s_mem_data,
-        wen => s_write_enable,
-        waddr => addr,
-        wdata => s_wdata
-    );
->>>>>>> master
+        GENERIC MAP(
+            abits => 8, -- ((2**8) - 1) rows
+            dbits => 32 -- 32 bit word width
+        )
+        PORT MAP(
+            rclk => clk,
+            wclk => clk,
+            ren => '1',
+            raddr => addr,
+            rdata => s_mem_data,
+            wen => s_write_enable,
+            waddr => addr,
+            wdata => s_wdata
+        );
 
     -- Finite state machine.
     fsm : PROCESS (clk)
@@ -182,7 +161,7 @@ BEGIN
                         state <= S_Wait0;
 
                     WHEN S_Wait0 => -- Wait time for master change a signal to low. -- TODO: Check ! (Necessary?)
-                        -- Reset signal.
+                    -- Reset signal.
                         s_ack_out <= '0';
                         state <= S_Wait1;
 
