@@ -101,15 +101,15 @@ end spwrouterregs_extended;
 architecture spwrouterregs_extended_arch of spwrouterregs_extended is
     -- Routing table memory.
     type table_ram_type is array(32 to 254) of std_logic_vector(31 downto 0);
-    signal table_ram : table_ram_type;
+    shared variable table_ram : table_ram_type;
 
     -- Port registers.
     type port_ram_type is array(0 to (2 * numports) + 1) of std_logic_vector(31 downto 0);
-    signal port_ram : port_ram_type;
+    shared variable port_ram : port_ram_type;
 
     -- Router registers.
     type router_ram_type is array(0 to 6) of std_logic_vector(31 downto 0);
-    signal router_ram : router_ram_type;
+    shared variable router_ram : router_ram_type;
 
     -- Routing table signals.
     signal state : spwroutertablestates := S_Idle;
@@ -129,7 +129,7 @@ begin
         if rising_edge(clk) then
             for i in 0 to numports loop
                 portcontrol(i) <= port_ram(i * 2);
-                port_ram(i * 2 + 1) <= portstatus(i);
+                port_ram(i * 2 + 1) := portstatus(i);
             end loop;
         end if;
     end process;
@@ -138,11 +138,11 @@ begin
     begin
         if rising_edge(clk) then
             -- read only
-            router_ram(0) <= std_logic_vector(to_unsigned(numports, router_ram(0)'length)); -- Numports register (0x0500)
-            router_ram(1) <= running; -- Running ports register (0x0504)
-            router_ram(4) <= x"000000" & lasttime; -- Last time code register (0x0510)
-            router_ram(5) <= x"000000" & lastautotime; -- Last auto time code register (0x0514)
-            router_ram(6) <= x"534C3232"; -- Info register (0x0518)
+            router_ram(0) := std_logic_vector(to_unsigned(numports, router_ram(0)'length)); -- Numports register (0x0500)
+            router_ram(1) := running; -- Running ports register (0x0504)
+            router_ram(4) := x"000000" & lasttime; -- Last time code register (0x0510)
+            router_ram(5) := x"000000" & lastautotime; -- Last auto time code register (0x0514)
+            router_ram(6) := x"534C3232"; -- Info register (0x0518)
 
             -- read/write
             watchcycle <= router_ram(2); -- Watchdog cycle register (0x0508)
@@ -162,7 +162,7 @@ begin
                     -- Routing table (all read/write !)
                     for i in 0 to 3 loop
                         if wea(i) = '1' then
-                            table_ram(v_index)((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
+                            table_ram(v_index)((((i + 1) * 8) - 1) downto (i * 8)) := dina((((i + 1) * 8) - 1) downto (i * 8));
                         end if;
                     end loop;
 
@@ -174,7 +174,7 @@ begin
                         -- read/write
                         for i in 0 to 3 loop
                             if wea(i) = '1' then
-                                port_ram(v_index)((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
+                                port_ram(v_index)((((i + 1) * 8) - 1) downto (i * 8)) := dina((((i + 1) * 8) - 1) downto (i * 8));
                             end if;
                         end loop;
 
@@ -196,7 +196,7 @@ begin
                         when 2 => -- Watchdog cycle register (0x0508 - read/write)
                             for i in 0 to 3 loop
                                 if wea(i) = '1' then
-                                    router_ram(2)((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
+                                    router_ram(2)((((i + 1) * 8) - 1) downto (i * 8)) := dina((((i + 1) * 8) - 1) downto (i * 8));
                                 end if;
                             end loop;
 
@@ -205,7 +205,7 @@ begin
                         when 3 => -- Automatic time code cycle register (0x050C - read/write)
                             for i in 0 to 3 loop
                                 if wea(i) = '1' then
-                                    router_ram(3)((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
+                                    router_ram(3)((((i + 1) * 8) - 1) downto (i * 8)) := dina((((i + 1) * 8) - 1) downto (i * 8));
                                 end if;
                             end loop;
 
