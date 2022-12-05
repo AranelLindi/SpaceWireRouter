@@ -30,36 +30,47 @@ set_property IOSTANDARD LVCMOS25 [get_ports spw_so[0]]
 
 # Port 2:
 # Input
-set_property PACKAGE_PIN R30 [get_ports spw_di[1]]
-set_property IOSTANDARD LVCMOS25 [get_ports spw_di[1]]
-set_property PACKAGE_PIN P30 [get_ports spw_si[1]]
-set_property IOSTANDARD LVCMOS25 [get_ports spw_si[1]]
-# Output
-set_property PACKAGE_PIN U29 [get_ports spw_do[1]]
-set_property IOSTANDARD LVCMOS25 [get_ports spw_do[1]]
-set_property PACKAGE_PIN T29 [get_ports spw_so[1]]
-set_property IOSTANDARD LVCMOS25 [get_ports spw_so[1]]
+#set_property PACKAGE_PIN R30 [get_ports spw_di[1]]
+#set_property IOSTANDARD LVCMOS25 [get_ports spw_di[1]]
+#set_property PACKAGE_PIN P30 [get_ports spw_si[1]]
+#set_property IOSTANDARD LVCMOS25 [get_ports spw_si[1]]
+## Output
+#set_property PACKAGE_PIN U29 [get_ports spw_do[1]]
+#set_property IOSTANDARD LVCMOS25 [get_ports spw_do[1]]
+#set_property PACKAGE_PIN T29 [get_ports spw_so[1]]
+#set_property IOSTANDARD LVCMOS25 [get_ports spw_so[1]]
 
-# Port 3:
-# Input
-set_property PACKAGE_PIN T28 [get_ports spw_di[2]]
-set_property IOSTANDARD LVCMOS25 [get_ports spw_di[2]]
-set_property PACKAGE_PIN R28 [get_ports spw_si[2]]
-set_property IOSTANDARD LVCMOS25 [get_ports spw_si[2]]
-# Output
-set_property PACKAGE_PIN U30 [get_ports spw_do[2]]
-set_property IOSTANDARD LVCMOS25 [get_ports spw_do[2]]
-set_property PACKAGE_PIN T30 [get_ports spw_so[2]]
-set_property IOSTANDARD LVCMOS25 [get_ports spw_so[2]]
+## Port 3:
+## Input
+#set_property PACKAGE_PIN T28 [get_ports spw_di[2]]
+#set_property IOSTANDARD LVCMOS25 [get_ports spw_di[2]]
+#set_property PACKAGE_PIN R28 [get_ports spw_si[2]]
+#set_property IOSTANDARD LVCMOS25 [get_ports spw_si[2]]
+## Output
+#set_property PACKAGE_PIN U30 [get_ports spw_do[2]]
+#set_property IOSTANDARD LVCMOS25 [get_ports spw_do[2]]
+#set_property PACKAGE_PIN T30 [get_ports spw_so[2]]
+#set_property IOSTANDARD LVCMOS25 [get_ports spw_so[2]]
 
-# Port 4:
-# Input
-set_property PACKAGE_PIN V26 [get_ports spw_di[3]]
-set_property IOSTANDARD LVCMOS25 [get_ports spw_di[3]]
-set_property PACKAGE_PIN V27 [get_ports spw_si[3]]
-set_property IOSTANDARD LVCMOS25 [get_ports spw_si[3]]
-# Output
-set_property PACKAGE_PIN W30 [get_ports spw_do[3]]
-set_property IOSTANDARD LVCMOS25 [get_ports spw_do[3]]
-set_property PACKAGE_PIN W29 [get_ports spw_so[3]]
-set_property IOSTANDARD LVCMOS25 [get_ports spw_so[3]]
+## Port 4:
+## Input
+#set_property PACKAGE_PIN V26 [get_ports spw_di[3]]
+#set_property IOSTANDARD LVCMOS25 [get_ports spw_di[3]]
+#set_property PACKAGE_PIN V27 [get_ports spw_si[3]]
+#set_property IOSTANDARD LVCMOS25 [get_ports spw_si[3]]
+## Output
+#set_property PACKAGE_PIN W30 [get_ports spw_do[3]]
+#set_property IOSTANDARD LVCMOS25 [get_ports spw_do[3]]
+#set_property PACKAGE_PIN W29 [get_ports spw_so[3]]
+#set_property IOSTANDARD LVCMOS25 [get_ports spw_so[3]]
+
+
+set_property PACKAGE_PIN K15 [get_ports rst]
+set_property IOSTANDARD LVCMOS15 [get_ports rst]
+
+
+# UART (Pmod Pins)
+set_property PACKAGE_PIN AA20 [get_ports tx]
+set_property IOSTANDARD LVCMOS25 [get_ports tx]
+set_property PACKAGE_PIN AC18 [get_ports rx]
+set_property IOSTANDARD LVCMOS25 [get_ports rx]

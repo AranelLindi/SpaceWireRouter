@@ -276,6 +276,7 @@ PACKAGE spwrouterpkg IS
             numports : INTEGER RANGE 0 TO 31;
             sysfreq : real;
             txclkfreq : real;
+            externPort : boolean := True;
             rx_impl : rximpl_array(numports DOWNTO 0);
             tx_impl : tximpl_array(numports DOWNTO 0)
         );
@@ -294,7 +295,14 @@ PACKAGE spwrouterpkg IS
             spw_di : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             spw_si : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             spw_do : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-            spw_so : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+            spw_so : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            clka : in std_logic := '0';
+            addra : in std_logic_vector(31 downto 0) := (others => '0');
+            dina : in std_logic_vector(31 downto 0) := (others => '0');
+            douta : out std_logic_vector(31 downto 0);
+            ena : in std_logic := '0';
+            rsta : in std_logic := '0';
+            wea : in std_logic_vector(3 downto 0) := (others => '0')
         );
     END COMPONENT;
 END PACKAGE;
