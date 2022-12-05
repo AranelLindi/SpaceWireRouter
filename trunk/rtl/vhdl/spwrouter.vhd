@@ -242,7 +242,7 @@ BEGIN
                 rst => rst, -- I
                 autostart => '1', -- I -- active autostart but none linkstart! Router is waiting for incoming connection attempt.
                 linkstart => '1', -- I
-                linkdis => '0', -- I
+                linkdis => s_portcontrol(i)(1),--'0', -- I
                 txdivcnt => "00000001", -- I -- via register
                 tick_in => s_tick_from_tcc_to_ports(i), -- I
                 time_in => s_tc_from_tcc_to_ports(i), -- I
