@@ -20,6 +20,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
+USE IEEE.MATH_REAL.ALL;
 use WORK.SPWROUTERPKG.ALL;
 use WORK.SPWPKG.ALL;
 
@@ -117,11 +118,78 @@ architecture spwrouterregs_extended_arch of spwrouterregs_extended is
     signal s_ack_in : std_logic;
     signal s_ack_out : std_logic;
     signal s_selectRoutingTable : std_logic;
+
+
+
+    -- Ab hier: neu! --
+    CONSTANT blen : INTEGER RANGE 0 TO 5 := INTEGER(ceil(log2(real(numports)))); -- Necessary number of bits to represent [numport]-ports
+
+    -- Portstatus/-control.
+    signal s_portcounter : integer range 0 to numports := 0;
+
+    -- Ram signals.
+    signal s_portaddress : std_logic_vector(blen-1 downto 0); -- Funktioniert das so mit blen-1? Falls ja, dann kann in den Routerfiles theoretisch auch auf eine Stelle verzichtet werden - Checken!
+    signal s_portwe : std_logic_vector(7 downto 0) := x"f0";
+    signal s_portdata : 
 begin
     s_selectRoutingTable <= '1' when to_integer(unsigned(addrTable(13 downto 2))) > 31 and to_integer(unsigned(addrTable(13 downto 2))) < 256 else '0';
     s_ack_in <= cycleTable and strobeTable and s_selectRoutingTable;
 
     ackTable <= s_ack_out;
+
+
+
+    -- Dran denken: Wortbreite des Speichers muss 64 Bit betragen damit die Abfrage effizienter verläuft!
+    process(clk)
+    begin
+        if rising_edge(clk) then
+            if rst = '1' then
+                -- Synchronous reset.
+                s_portcounter <= 0;
+            else
+                s_portaddress <= std_logic_vector(to_unsigned(s_portcounter, s_portaddress'length));
+                s_portcontrol(i) <= s_portrdata(32 downto 0);
+
+                s_portwdata <= s_portstatus & x"00000000"; -- Hier genauestens prüfen, ob wirklich auch der gleiche Port die Zuweisung bekommt!! (Und nicht der vorhergehende/nachfolgende)
+
+
+                -- Increment counter.
+                if s_portcounter = numports then
+                    s_portcounter <= 0;
+                else
+                    s_portcounter <= s_portcounter + 1;
+                end if;
+            end if;
+        end if;
+    end process;
+
+    process(clka)
+    begin
+        if rising_edge(clka) then
+            if rsta = '1' then
+                -- Synchronous reset.
+            else
+
+            end if;
+        end if;
+    end process;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     port_registers : process(clk)
@@ -174,7 +242,7 @@ begin
                         -- read/write
                         for i in 0 to 3 loop
                             if wea(i) = '1' then
-                                port_ram(v_index)((((i + 1) * 8) - 1) downto (i * 8)) := dina((((i + 1) * 8) - 1) downto (i * 8));
+                                port_ram(v_index)((((i + 1) * 8) - 1) downto (i * 8)) := dina((((i + 1) * 8) - 1) downto (i * 8)); -- hier muss noch was hin, damit die mapping auf 64 wortbreite korrekt funktioniert!
                             end if;
                         end loop;
 
