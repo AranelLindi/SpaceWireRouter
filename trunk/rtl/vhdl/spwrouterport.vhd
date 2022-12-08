@@ -212,7 +212,16 @@ ENTITY spwrouterport IS
         bus_request : OUT STD_LOGIC;
 
         -- Acknowledgment for granted access to routing table.
-        bus_ack_in : IN STD_LOGIC
+        bus_ack_in : IN STD_LOGIC;
+        
+        -- ====================================
+        --      PORT STATUS & CONTROL BUS
+        -- ====================================
+        -- Contains port status (see manual).
+        portstatus : out std_logic_vector(31 downto 0);
+        
+        -- Control information for port (see manual).
+        portcontrol : in std_logic_vector(31 downto 0)
     );
 END spwrouterport;
 
@@ -265,6 +274,19 @@ BEGIN
     -- Read input.
     s_txwrite <= strobe_in WHEN request_in = '1' ELSE
         '0';
+        
+    -- Drive port status.
+    portstatus(0) <= started;
+    portstatus(1) <= connecting;
+    portstatus(2) <= running;
+    portstatus(3) <= s_txrdy; -- Not sure this signal is right here ...
+    portstatus(4) <= errdisc;
+    portstatus(5) <= errpar;
+    portstatus(6) <= erresc;
+    portstatus(7) <= errcred;
+    portstatus(31 downto 8) <= (others => '0');
+    
+        
 
     -- SpaceWire port.
     spwport : spwstream

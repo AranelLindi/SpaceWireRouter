@@ -280,7 +280,9 @@ BEGIN
                 bus_readwrite => s_bus_m_readwrite(i), -- O
                 bus_strobe => s_bus_m_strobe(i), -- O
                 bus_request => s_bus_m_request(i), -- O
-                bus_ack_in => s_bus_m_ack(i) -- I
+                bus_ack_in => s_bus_m_ack(i), -- I
+                portstatus => s_portstatus(i), -- O
+                portcontrol => s_portcontrol(i) -- I
             );
     END GENERATE ports;
 

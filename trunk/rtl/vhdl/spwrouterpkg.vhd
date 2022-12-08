@@ -179,8 +179,8 @@ PACKAGE spwrouterpkg IS
             ackTable : OUT STD_LOGIC;
             strobeTable : IN STD_LOGIC;
             cycleTable : IN STD_LOGIC;
-            portstatus : IN array_t(numports DOWNTO 0)(31 DOWNTO 0);
-            portcontrol : OUT array_t(numports DOWNTO 0)(31 DOWNTO 0);
+            portstatus : IN array_t(0 TO NUMPORTS)(31 DOWNTO 0);
+            portcontrol : OUT array_t(0 TO NUMPORTS)(31 DOWNTO 0);
             running : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             watchcycle : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             timecycle : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -266,7 +266,9 @@ PACKAGE spwrouterpkg IS
             bus_readwrite : OUT STD_LOGIC;
             bus_strobe : OUT STD_LOGIC;
             bus_request : OUT STD_LOGIC;
-            bus_ack_in : IN STD_LOGIC
+            bus_ack_in : IN STD_LOGIC;
+            portstatus : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            portcontrol : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
     END COMPONENT;
 

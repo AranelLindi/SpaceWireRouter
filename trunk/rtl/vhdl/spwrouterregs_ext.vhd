@@ -119,23 +119,6 @@ architecture spwrouterregs_extended_arch of spwrouterregs_extended is
     signal s_ack_out : std_logic;
     signal s_selectRoutingTable : std_logic;
 
-
-
-    -- Ab hier: neu! --
-    CONSTANT blen : INTEGER RANGE 0 TO 5 := INTEGER(ceil(log2(real(numports)))); -- Necessary number of bits to represent [numport]-ports
-
-    -- Portstatus/-control.
-    signal s_portcounter : integer range 0 to numports := 0;
-
-    -- Ram signals.
-    signal s_portaddress : std_logic_vector(blen-1 downto 0); -- Funktioniert das so mit blen-1? Falls ja, dann kann in den Routerfiles theoretisch auch auf eine Stelle verzichtet werden - Checken!
-    signal s_portwe : std_logic_vector(7 downto 0) := x"f0";
-    --signal s_portdata :
-
-
-
-
-
     -- Slave registers.
     signal slv_reg_routingTable : array_t(32 to 255)(31 downto 0);
     signal slv_reg_portstatus : array_t(0 to numports)(31 downto 0);
@@ -207,26 +190,30 @@ begin
         if v_index >= 32 and v_index <= 254 then
             reg_data_out <= slv_reg_routingTable(v_index);
         elsif v_index >= 256 and v_index < 320 then -- VORSICHT !! HIER NOCH EINE BEGRENZUNG EINFÜHREN. WAS PASSIERT ZUM BEISPIEL WENN EIN NICHT VORHANDENER PORT ADRESSIERT WIRD? DAFÜR EXISTIERT KEINE ZEILE IN PORTSTATUS/PORTCONTROL !!
+            if (v_index - 256) <= numports then
             if v_index mod 2 = 0 then
                 reg_data_out <= slv_reg_portcontrol(v_index);
             else
                 reg_data_out <= slv_reg_portstatus(v_index);
             end if;
+            else
+                reg_data_out <= (others => '0');
+            end if;
         elsif v_index >= 320 and v_index < 327 then
             case (v_index - 320) is
-                when 1 => -- Numports
+                when 0 => -- Numports
                     reg_data_out <= slv_reg_numports;
-                when 2 => -- Running ports
+                when 1 => -- Running ports
                     reg_data_out <= slv_reg_running;
-                when 3 => -- Watchdog cycle
+                when 2 => -- Watchdog cycle
                     reg_data_out <= slv_reg_watchcycle;
-                when 4 => -- Automatic Time Code cycle
+                when 3 => -- Automatic Time Code cycle
                     reg_data_out <= slv_reg_autotimecycle;
-                when 5 => -- Last Time Code
+                when 4 => -- Last Time Code
                     reg_data_out <= slv_reg_lasttc;
-                when 6 => -- Last automatic Time Code
+                when 5 => -- Last automatic Time Code
                     reg_data_out <= slv_reg_lastautotc;
-                when 7 => -- Info
+                when 6 => -- Info
                     reg_data_out <= slv_reg_info;
                 when others =>
                     reg_data_out <= (others => '0');
@@ -292,7 +279,11 @@ begin
                                 end loop;
 
                             when others =>
-                                null;
+                                slv_reg_routingTable <= slv_reg_routingTable;
+                                slv_reg_portcontrol <= slv_reg_portcontrol;
+                                slv_reg_watchcycle <= slv_reg_watchcycle;
+                                slv_reg_autotimecycle <= slv_reg_autotimecycle;
+                                
                         end case;
                     else
                         slv_reg_routingTable <= slv_reg_routingTable;
