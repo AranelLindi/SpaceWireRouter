@@ -101,16 +101,16 @@ end spwrouterregs_extended;
 
 architecture spwrouterregs_extended_arch of spwrouterregs_extended is
     -- Routing table memory.
-    type table_ram_type is array(32 to 254) of std_logic_vector(31 downto 0);
-    shared variable table_ram : table_ram_type;
+    --    type table_ram_type is array(32 to 254) of std_logic_vector(31 downto 0);
+    --    shared variable table_ram : table_ram_type;
 
     -- Port registers.
-    type port_ram_type is array(0 to (2 * numports) + 1) of std_logic_vector(31 downto 0);
-    shared variable port_ram : port_ram_type;
+    --    type port_ram_type is array(0 to (2 * numports) + 1) of std_logic_vector(31 downto 0);
+    --    shared variable port_ram : port_ram_type;
 
     -- Router registers.
-    type router_ram_type is array(0 to 6) of std_logic_vector(31 downto 0);
-    shared variable router_ram : router_ram_type;
+    --    type router_ram_type is array(0 to 6) of std_logic_vector(31 downto 0);
+    --    shared variable router_ram : router_ram_type;
 
     -- Routing table signals.
     signal state : spwroutertablestates := S_Idle;
@@ -138,7 +138,7 @@ architecture spwrouterregs_extended_arch of spwrouterregs_extended is
 
 
     -- User-definied signals declaration.
-    signal s_routingTable : array_t(32 to 255)(31 downto 0);
+    --    signal s_routingTable : array_t(32 to 255)(31 downto 0);
     signal s_portstatus : array_t(0 to numports)(31 downto 0);
     signal s_portcontrol : array_t(0 to numports)(31 downto 0);
     signal s_numports : std_logic_vector(31 downto 0);-- := std_logic_vector(to_unsigned(numports, s_numports'length));
@@ -151,8 +151,8 @@ architecture spwrouterregs_extended_arch of spwrouterregs_extended is
     -- Add more registers here!
     -- ...     
 begin
-    s_selectRoutingTable <= '1' when to_integer(unsigned(addrTable(13 downto 2))) > 31 and to_integer(unsigned(addrTable(13 downto 2))) < 256 else '0';
-    s_ack_in <= cycleTable and strobeTable and s_selectRoutingTable;
+    --    s_selectRoutingTable <= '1' when to_integer(unsigned(addrTable(13 downto 2))) > 31 and to_integer(unsigned(addrTable(13 downto 2))) < 256 else '0';
+    s_ack_in <= cycleTable and strobeTable;-- and s_selectRoutingTable;
 
     ackTable <= s_ack_out;
 
@@ -178,11 +178,11 @@ begin
     slv_reg_info <= s_info;
 
 
-    slv_reg_wren <= '1' when wea /= "0000" and ena = '1' else '0';
-    slv_reg_rden <= '1' when wea = "0000" and ena = '1' else '0';
+    --slv_reg_wren <= '1' when wea /= "0000" and ena = '1' else '0';
+    --slv_reg_rden <= '1' when wea = "0000" and ena = '1' else '0';
 
 
-    process(slv_reg_routingTable, slv_reg_portstatus, slv_reg_portcontrol, slv_reg_numports, slv_reg_running, slv_reg_watchcycle, slv_reg_autotimecycle, slv_reg_lasttc, slv_reg_lastautotc, slv_reg_info, slv_reg_rden, rsta) -- Add further registers in sensitivity list!
+    process(slv_reg_routingTable, slv_reg_portstatus, slv_reg_portcontrol, slv_reg_numports, slv_reg_running, slv_reg_watchcycle, slv_reg_autotimecycle, slv_reg_lasttc, slv_reg_lastautotc, slv_reg_info, ena, rsta) -- Add further registers in sensitivity list!
         variable v_index : integer;
     begin
         v_index := to_integer(unsigned(addra(10 downto 2)));
@@ -191,11 +191,11 @@ begin
             reg_data_out <= slv_reg_routingTable(v_index);
         elsif v_index >= 256 and v_index < 320 then -- VORSICHT !! HIER NOCH EINE BEGRENZUNG EINFÜHREN. WAS PASSIERT ZUM BEISPIEL WENN EIN NICHT VORHANDENER PORT ADRESSIERT WIRD? DAFÜR EXISTIERT KEINE ZEILE IN PORTSTATUS/PORTCONTROL !!
             if (v_index - 256) <= numports then
-            if v_index mod 2 = 0 then
-                reg_data_out <= slv_reg_portcontrol(v_index);
-            else
-                reg_data_out <= slv_reg_portstatus(v_index);
-            end if;
+                if v_index mod 2 = 0 then
+                    reg_data_out <= slv_reg_portcontrol(v_index);
+                else
+                    reg_data_out <= slv_reg_portstatus(v_index);
+                end if;
             else
                 reg_data_out <= (others => '0');
             end if;
@@ -227,7 +227,7 @@ begin
     process(clka)
     begin
         if rising_edge(clka) then
-            if slv_reg_rden = '1' then
+            if ena = '1' then
                 douta <= reg_data_out;
             end if;
         end if;
@@ -239,59 +239,59 @@ begin
     begin
         if rising_edge(clka) then
             if ena = '1' then
-                if slv_reg_wren = '1' then
-                    v_index := to_integer(unsigned(addra(10 downto 2)));
+                --if slv_reg_wren = '1' then
+                v_index := to_integer(unsigned(addra(10 downto 2)));
 
-                    if v_index >= 32 and v_index <= 254 then -- 0x080 - 0x3F8
-                        -- Routing table (all read/write !)
+                if v_index >= 32 and v_index <= 254 then -- 0x080 - 0x3F8
+                    -- Routing table (all read/write !)
+                    for i in 0 to 3 loop
+                        if wea(i) = '1' then
+                            slv_reg_routingTable(v_index)((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
+                        end if;
+                    end loop;
+
+                elsif v_index >= 256 and v_index < 320 then -- 0x400 - 0x500
+                    -- Port registers (mixed read/write !)
+                    if v_index mod 2 = 0 then
+                        -- read/write
                         for i in 0 to 3 loop
                             if wea(i) = '1' then
-                                slv_reg_routingTable(v_index)((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
+                                slv_reg_portcontrol(v_index)((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
                             end if;
                         end loop;
+                    end if;
 
-                    elsif v_index >= 256 and v_index < 320 then -- 0x400 - 0x500
-                        -- Port registers (mixed read/write !)
-                        if v_index mod 2 = 0 then
-                            -- read/write
+                elsif v_index >= 320 and v_index < 327 then -- 0x
+                    -- Router registers (mixed read/write !)
+                    case (v_index - 320) is
+                        when 2 => -- Watchdog cycle register (0x0508 - read/write)
                             for i in 0 to 3 loop
                                 if wea(i) = '1' then
-                                    slv_reg_portcontrol(v_index)((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
+                                    slv_reg_watchcycle((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
                                 end if;
                             end loop;
-                        end if;
 
-                    elsif v_index >= 320 and v_index < 327 then -- 0x
-                        -- Router registers (mixed read/write !)
-                        case (v_index - 320) is
-                            when 2 => -- Watchdog cycle register (0x0508 - read/write)
-                                for i in 0 to 3 loop
-                                    if wea(i) = '1' then
-                                        slv_reg_watchcycle((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
-                                    end if;
-                                end loop;
+                        when 3 => -- Automatic time code cycle register (0x050C - read/write)
+                            for i in 0 to 3 loop
+                                if wea(i) = '1' then
+                                    slv_reg_autotimecycle((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
+                                end if;
+                            end loop;
 
-                            when 3 => -- Automatic time code cycle register (0x050C - read/write)
-                                for i in 0 to 3 loop
-                                    if wea(i) = '1' then
-                                        slv_reg_autotimecycle((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
-                                    end if;
-                                end loop;
+                        when others =>
+                            slv_reg_routingTable <= slv_reg_routingTable;
+                            slv_reg_portcontrol <= slv_reg_portcontrol;
+                            slv_reg_watchcycle <= slv_reg_watchcycle;
+                            slv_reg_autotimecycle <= slv_reg_autotimecycle;
 
-                            when others =>
-                                slv_reg_routingTable <= slv_reg_routingTable;
-                                slv_reg_portcontrol <= slv_reg_portcontrol;
-                                slv_reg_watchcycle <= slv_reg_watchcycle;
-                                slv_reg_autotimecycle <= slv_reg_autotimecycle;
-                                
-                        end case;
-                    else
-                        slv_reg_routingTable <= slv_reg_routingTable;
-                        slv_reg_portcontrol <= slv_reg_portcontrol;
-                        slv_reg_watchcycle <= slv_reg_watchcycle;
-                        slv_reg_autotimecycle <= slv_reg_autotimecycle;
-                    end if;
+                    end case;
+                else
+                    slv_reg_routingTable <= slv_reg_routingTable;
+                    slv_reg_portcontrol <= slv_reg_portcontrol;
+                    slv_reg_watchcycle <= slv_reg_watchcycle;
+                    slv_reg_autotimecycle <= slv_reg_autotimecycle;
                 end if;
+                --end if;
             end if;
         end if;
     end process;
@@ -347,36 +347,41 @@ begin
     begin
         if rising_edge(clk) then
             if rst = '1' then
-            -- Synchronous reset.
+                -- Synchronous reset.
+                v_index := 0;
+
+                readTable <= (others => '0');
+                s_ack_out <= '0';
+                state <= S_Idle;
             else
                 case state is
                     when S_Idle =>
                         if s_ack_in = '1' then
-                            v_index := to_integer(unsigned(addrTable(9 downto 2)));
+                            v_index := to_integer(unsigned(addrTable(10 downto 2)));
 
                             state <= S_Read0;
                         end if;
 
                     when S_Read0 =>
-                        if v_index >= 32 then
-                            readTable <= table_ram(v_index-32);
+                        state <= S_Read1;
+
+                    when S_Read1 =>
+                        if v_index >= 32 and v_index <= 254 then
+                            readTable <= slv_reg_routingTable(v_index);
                         else
                             readTable <= (others => '0');
                         end if;
 
-                        s_ack_out <= '1';
-
-                        state <= S_Read1;
-
-                    when S_Read1 =>
-                        s_ack_out <= '0';
-
                         state <= S_Wait0;
 
                     when S_Wait0 =>
+                        s_ack_out <= '1';
+
                         state <= S_Wait1;
 
                     when S_Wait1 =>
+                        s_ack_out <= '0';
+
                         state <= S_Wait2;
 
                     when S_Wait2 =>
