@@ -117,7 +117,7 @@ architecture spwrouterregs_extended_arch of spwrouterregs_extended is
 
     signal s_ack_in : std_logic;
     signal s_ack_out : std_logic;
-    signal s_selectRoutingTable : std_logic;
+--    signal s_selectRoutingTable : std_logic;
 
     -- Slave registers.
     signal slv_reg_routingTable : array_t(32 to 255)(31 downto 0);
@@ -138,7 +138,7 @@ architecture spwrouterregs_extended_arch of spwrouterregs_extended is
 
 
     -- User-definied signals declaration.
-    --    signal s_routingTable : array_t(32 to 255)(31 downto 0);
+    signal s_routingTable : array_t(32 to 255)(31 downto 0);
     signal s_portstatus : array_t(0 to numports)(31 downto 0);
     signal s_portcontrol : array_t(0 to numports)(31 downto 0);
     signal s_numports : std_logic_vector(31 downto 0);-- := std_logic_vector(to_unsigned(numports, s_numports'length));
@@ -162,6 +162,7 @@ begin
         s_portcontrol(i) <= slv_reg_portcontrol(i);
     end generate sig_portcontrol;
 
+    s_routingTable <= slv_reg_routingTable;
     s_watchcycle <= slv_reg_watchcycle;
     s_autotimecycle <= slv_reg_autotimecycle;
 
@@ -356,9 +357,8 @@ begin
             else
                 case state is
                     when S_Idle =>
+                        v_index := to_integer(unsigned(addrTable(10 downto 2)));
                         if s_ack_in = '1' then
-                            v_index := to_integer(unsigned(addrTable(10 downto 2)));
-
                             state <= S_Read0;
                         end if;
 
@@ -367,21 +367,21 @@ begin
 
                     when S_Read1 =>
                         if v_index >= 32 and v_index <= 254 then
-                            readTable <= slv_reg_routingTable(v_index);
+                            readTable <= s_routingTable(v_index);----slv_reg_routingTable(v_index);
                         else
                             readTable <= (others => '0');
                         end if;
 
+                        s_ack_out <= '1';
+
                         state <= S_Wait0;
 
                     when S_Wait0 =>
-                        s_ack_out <= '1';
+                        s_ack_out <= '0';
 
                         state <= S_Wait1;
 
                     when S_Wait1 =>
-                        s_ack_out <= '0';
-
                         state <= S_Wait2;
 
                     when S_Wait2 =>

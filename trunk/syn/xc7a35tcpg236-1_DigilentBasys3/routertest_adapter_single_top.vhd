@@ -239,7 +239,7 @@ BEGIN
         numports => numports,
         init_input_port => 1,
         init_output_port => 1,
-        activate_commands => true, -- define adapter variant (command (true) / non-command version (false))
+        activate_commands => True, -- define adapter variant (command (true) / non-command version (false))
         sysfreq => sysfreq,
         txclkfreq => sysfreq,
         rximpl => impl_fast,
@@ -281,6 +281,7 @@ BEGIN
         numports => numports,
         sysfreq => sysfreq,
         txclkfreq => sysfreq,
+        externPort => True,
         rx_impl => (OTHERS => impl_fast),
         tx_impl => (OTHERS => impl_fast)
     )

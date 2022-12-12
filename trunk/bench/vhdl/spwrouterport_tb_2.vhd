@@ -191,7 +191,7 @@ BEGIN
         linkstart <= '1';
         linkdis <= '0';
 
-        WAIT FOR 80 us;
+        WAIT FOR 40 us;
 
         -- Link should now run!
 
@@ -201,13 +201,13 @@ BEGIN
         strobe_in <= '1';
         request_in <= '1'; -- Right signal?
         txdata <= "0" & x"01"; -- ADDRESS: 0x01
-        WAIT FOR clock_period;
+        WAIT UNTIL rising_edge(clk);
         txdata <= "0" & x"f0"; -- CARGO
-        WAIT FOR clock_period;
+        WAIT UNTIL rising_edge(clk);
         txdata <= "0" & x"0f"; -- CARGO
-        WAIT FOR clock_period;
+        WAIT UNTIL rising_edge(clk);
         txdata <= "1" & x"00"; -- EOP
-        WAIT FOR clock_period;
+        WAIT UNTIL rising_edge(clk);
         request_in <= '0';
         strobe_in <= '0';
 
@@ -218,13 +218,13 @@ BEGIN
         strobe_in <= '1';
         request_in <= '1'; -- Right signal?
         txdata <= "0" & x"32"; -- ADDRESS: 0x32 (50)
-        WAIT FOR clock_period;
+        WAIT UNTIL rising_edge(clk);
         txdata <= "0" & x"f0"; -- CARGO
-        WAIT FOR clock_period;
+        WAIT UNTIL rising_edge(clk);
         txdata <= "0" & x"0f"; -- CARGO
-        WAIT FOR clock_period;
+        WAIT UNTIL rising_edge(clk);
         txdata <= "1" & x"00"; -- EOP
-        WAIT FOR clock_period;
+        WAIT UNTIL rising_edge(clk);
         request_in <= '0';
         strobe_in <= '0';
 
@@ -238,7 +238,7 @@ BEGIN
     BEGIN
         WAIT UNTIL bus_request = '1';
 
-        bus_data_in <= x"00000002";
+        bus_data_in <= x"0000000f";
         bus_ack_in <= '1';
 
         WAIT UNTIL bus_request = '0';
@@ -254,8 +254,10 @@ BEGIN
     begin
         wait until request_out = '1';
         arb_granted <= '1';
-        wait for clock_period;
+        ready_in <= '1';
+        wait until request_out = '0';
         arb_granted <= '0';
+        ready_in <= '0';
     end process;
 
     clocking : PROCESS

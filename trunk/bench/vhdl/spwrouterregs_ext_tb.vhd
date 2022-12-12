@@ -90,13 +90,14 @@ architecture spwrouterregs_ext_tb_arch of spwrouterregs_ext_tb is
     signal ena: std_logic;
     signal rsta: std_logic;
     signal wea: std_logic_vector(3 downto 0) ;
+    signal states : spwroutertablestates;
 
     constant clock_period_logic : time := 10 ns;
     constant clock_period_bus: time := 20 ns;
 begin
 
-    -- Insert values for generic parameters !!
-    uut: spwrouterregs_extended generic map ( numports     =>  numports)
+    -- Design under test.
+    dut: spwrouterregs_extended generic map ( numports     =>  numports)
         port map ( clk          => clk,
                  rst          => rst,
                  readTable    => readTable,
@@ -117,14 +118,16 @@ begin
                  douta        => douta,
                  ena          => ena,
                  rsta         => rsta,
-                 wea          => wea );
+                 wea          => wea);
 
     -- Simulation on router side.
     stimulus_logic: process
     begin
         -- Put initialisation code here...
         rst <= '1', '0' after 2 * clock_period_logic;
-        
+
+        wait until rising_edge(clk);
+
         addrTable <= (others => '0');
         strobeTable <= '0';
         cycleTable <= '0';
@@ -132,60 +135,65 @@ begin
         running <= (others => '0');
         lasttime <= (others => '0');
         lastautotime <= (others => '0');
-        
+
         wait for 2 us;
-        
+        wait until rising_edge(clk);
+
         -- Try to get entry from routing table (line 50) (should be 0x2)
         addrTable <= "00000000000000000000000011001000";
         strobeTable <= '1';
         cycleTable <= '1';
-        
+
         wait for 1 us;
-        
+        wait until rising_edge(clk);
+
         addrTable <= (others => '0');
         strobeTable <= '0';
         cycleTable <= '0';
-        
+
         wait;
     end process;
-    
-    
+
+
     -- Simulation on bus side.
     stimulus_bus: process
     begin
         -- Put initialisation code here...
-        rsta <= '1', '0' after 2 * clock_period_bus;
-        
+        rsta <= '1', '0' after 5 * clock_period_bus;
+
         addra <= (others => '0');
         dina <= (others => '0');
         ena <= '0';
         rsta <= '0';
         wea <= (others => '0');
-        
-        wait for 1 us;        
-        
+
+        wait for 1 us;
+        wait until rising_edge(clka);
+
         -- Write value into routing table (entry 50)
         addra <= x"000000C8";
         dina <= x"00000002";
         ena <= '1';
         wea <= (others => '1');
-        
-        wait for 5 * clock_period_bus;
-        
+
+        wait for 1 us;
+        wait until rising_edge(clka);
+
         -- Write value into routing table (entry 100)
         addra <= std_logic_vector(to_unsigned(400, addra'length));
         dina <= x"00000004";
         ena <= '1';
         wea <= (others => '1');
-        
-        wait for 5 * clock_period_bus;
-        
+
+        wait for 1 us;
+        wait until rising_edge(clka);
+
         addra <= (others => '0');
         dina <= (others => '0');
         ena <= '0';
         wea <= (others => '0');
-        
-        wait;        
+
+        wait;
     end process;
 
     clocking_bus: process
