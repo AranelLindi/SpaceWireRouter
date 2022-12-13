@@ -40,7 +40,9 @@ ENTITY spwrouterarb_table IS
 END spwrouterarb_table;
 
 ARCHITECTURE spwrouterarb_table_arch OF spwrouterarb_table IS
-    SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    CONSTANT c_initValue : STD_LOGIC_VECTOR(numports DOWNTO 0) := (0 => '1', others => '0'); -- Initial value for arbitration algorithm
+
+    SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0) := c_initValue; -- Important that this signal is initialized otherwise a reset is necessary until logical addressing works as expected!
 BEGIN
     -- Drive output.
     granted <= s_granted;
@@ -51,8 +53,7 @@ BEGIN
         IF rising_edge(clk) THEN
             IF rst = '1' THEN
                 -- Synchronous reset.
-                s_granted <= STD_LOGIC_VECTOR(to_unsigned(2 ** 0, s_granted'length)); -- ModelSim prodces warnings with following line so try this instead
-                --s_granted <= (0 => '1', OTHERS => '0'); -- works -- Assign increased priority for port0 (internal configuration port).
+                s_granted <= c_initValue;
             ELSE
                 -- Check each ports (except current) wheather access is required.
                 -- Method: First subsequent ones and then previous ones.

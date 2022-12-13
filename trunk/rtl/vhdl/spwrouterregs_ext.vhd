@@ -100,24 +100,11 @@ entity spwrouterregs_extended is
 end spwrouterregs_extended;
 
 architecture spwrouterregs_extended_arch of spwrouterregs_extended is
-    -- Routing table memory.
-    --    type table_ram_type is array(32 to 254) of std_logic_vector(31 downto 0);
-    --    shared variable table_ram : table_ram_type;
-
-    -- Port registers.
-    --    type port_ram_type is array(0 to (2 * numports) + 1) of std_logic_vector(31 downto 0);
-    --    shared variable port_ram : port_ram_type;
-
-    -- Router registers.
-    --    type router_ram_type is array(0 to 6) of std_logic_vector(31 downto 0);
-    --    shared variable router_ram : router_ram_type;
-
     -- Routing table signals.
     signal state : spwroutertablestates := S_Idle;
 
     signal s_ack_in : std_logic;
-    signal s_ack_out : std_logic;
---    signal s_selectRoutingTable : std_logic;
+    signal s_ack_out : std_logic := '0';
 
     -- Slave registers.
     signal slv_reg_routingTable : array_t(32 to 255)(31 downto 0);
@@ -131,8 +118,6 @@ architecture spwrouterregs_extended_arch of spwrouterregs_extended is
     signal slv_reg_lastautotc : std_logic_vector(31 downto 0);
     signal slv_reg_info : std_logic_vector(31 downto 0);
 
-    signal slv_reg_rden : std_logic;
-    signal slv_reg_wren : std_logic;
 
     signal reg_data_out : std_logic_vector(31 downto 0);
 
@@ -141,18 +126,17 @@ architecture spwrouterregs_extended_arch of spwrouterregs_extended is
     signal s_routingTable : array_t(32 to 255)(31 downto 0);
     signal s_portstatus : array_t(0 to numports)(31 downto 0);
     signal s_portcontrol : array_t(0 to numports)(31 downto 0);
-    signal s_numports : std_logic_vector(31 downto 0);-- := std_logic_vector(to_unsigned(numports, s_numports'length));
+    signal s_numports : std_logic_vector(31 downto 0);
     signal s_running : std_logic_vector(31 downto 0);
     signal s_watchcycle : std_logic_vector(31 downto 0);
     signal s_autotimecycle : std_logic_vector(31 downto 0);
     signal s_lasttc : std_logic_vector(31 downto 0);
     signal s_lastautotc : std_logic_vector(31 downto 0);
     signal s_info : std_logic_vector(31 downto 0);
-    -- Add more registers here!
+    -- Add further registers here!
     -- ...     
 begin
-    --    s_selectRoutingTable <= '1' when to_integer(unsigned(addrTable(13 downto 2))) > 31 and to_integer(unsigned(addrTable(13 downto 2))) < 256 else '0';
-    s_ack_in <= cycleTable and strobeTable;-- and s_selectRoutingTable;
+    s_ack_in <= cycleTable and strobeTable;
 
     ackTable <= s_ack_out;
 
@@ -179,29 +163,33 @@ begin
     slv_reg_info <= s_info;
 
 
-    --slv_reg_wren <= '1' when wea /= "0000" and ena = '1' else '0';
-    --slv_reg_rden <= '1' when wea = "0000" and ena = '1' else '0';
-
 
     process(slv_reg_routingTable, slv_reg_portstatus, slv_reg_portcontrol, slv_reg_numports, slv_reg_running, slv_reg_watchcycle, slv_reg_autotimecycle, slv_reg_lasttc, slv_reg_lastautotc, slv_reg_info, ena, rsta) -- Add further registers in sensitivity list!
-        variable v_index : integer;
+        variable v_index : integer; -- Contains converted address index
+        
+        variable v_index_port : integer; -- Contains index-based address for port selection
+        variable v_index_router : integer; -- Contains index-based address for router register
     begin
         v_index := to_integer(unsigned(addra(10 downto 2)));
 
         if v_index >= 32 and v_index <= 254 then
             reg_data_out <= slv_reg_routingTable(v_index);
-        elsif v_index >= 256 and v_index < 320 then -- VORSICHT !! HIER NOCH EINE BEGRENZUNG EINFÜHREN. WAS PASSIERT ZUM BEISPIEL WENN EIN NICHT VORHANDENER PORT ADRESSIERT WIRD? DAFÜR EXISTIERT KEINE ZEILE IN PORTSTATUS/PORTCONTROL !!
-            if (v_index - 256) <= numports then
+        elsif v_index >= 256 and v_index < 320 then
+            v_index_port := (v_index - 256);
+        
+            if (v_index_port) <= numports then
                 if v_index mod 2 = 0 then
-                    reg_data_out <= slv_reg_portcontrol(v_index);
+                    reg_data_out <= slv_reg_portcontrol(v_index_port);
                 else
-                    reg_data_out <= slv_reg_portstatus(v_index);
+                    reg_data_out <= slv_reg_portstatus(v_index_port);
                 end if;
             else
                 reg_data_out <= (others => '0');
             end if;
         elsif v_index >= 320 and v_index < 327 then
-            case (v_index - 320) is
+            v_index_router := (v_index - 320);
+        
+            case (v_index_router) is
                 when 0 => -- Numports
                     reg_data_out <= slv_reg_numports;
                 when 1 => -- Running ports
@@ -357,8 +345,9 @@ begin
             else
                 case state is
                     when S_Idle =>
-                        v_index := to_integer(unsigned(addrTable(10 downto 2)));
                         if s_ack_in = '1' then
+                            v_index := to_integer(unsigned(addrTable(10 downto 2)));
+                        
                             state <= S_Read0;
                         end if;
 
@@ -367,7 +356,7 @@ begin
 
                     when S_Read1 =>
                         if v_index >= 32 and v_index <= 254 then
-                            readTable <= s_routingTable(v_index);----slv_reg_routingTable(v_index);
+                            readTable <= x"00000002";--s_routingTable(v_index);----slv_reg_routingTable(v_index);
                         else
                             readTable <= (others => '0');
                         end if;
