@@ -409,6 +409,8 @@ BEGIN
                                 END IF;
                             ELSE -- DestPort >= 32 (logical port)
                                 -- Logical port is addressed: Send request to routing table to get port assignment.
+                                -- Because of this evaluation, it is not necessary for routing table or register to 
+                                -- carry out a new interval check. Because an injury is hereby excluded.
                                 s_logical_address <= s_rxdata(7 DOWNTO 0);
                                 s_routing_table_request <= '1';
                                 state <= S_RT0;

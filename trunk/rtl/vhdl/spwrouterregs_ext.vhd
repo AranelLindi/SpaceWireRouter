@@ -41,6 +41,10 @@ entity spwrouterregs_extended is
         readTable : out std_logic_vector(31 downto 0);
 
         -- Routing table address (memory address).
+        -- Internal bus is used only if logical address (> 31)
+        -- was received before. So it is not necessary to carry
+        -- out interval check within the register. An injury is 
+        -- hereby excluded completely!
         addrTable : in std_logic_vector(31 downto 0);
 
         -- High if an operation within routing table is finished.
@@ -103,8 +107,21 @@ architecture spwrouterregs_extended_arch of spwrouterregs_extended is
     -- Routing table signals.
     signal state : spwroutertablestates := S_Idle;
 
+    -- IO signals.
     signal s_ack_in : std_logic;
     signal s_ack_out : std_logic := '0';
+
+    -- Select signals.
+    signal s_table_1 : std_logic; -- Routing Table
+    signal s_table_2 : std_logic; -- Port Status & Control
+    signal s_table_3 : std_logic; -- Router Registers
+
+    -- Addressing signals.
+    signal s_addr_table_1 : std_logic_vector(9 downto 2);
+    signal s_addr_table_2 : std_logic_vector(7 downto 2);
+    signal s_addr_table_3 : std_logic_vector(7 downto 2);
+
+
 
     -- Slave registers.
     signal slv_reg_routingTable : array_t(32 to 255)(31 downto 0);
@@ -136,11 +153,15 @@ architecture spwrouterregs_extended_arch of spwrouterregs_extended is
     -- Add further registers here!
     -- ...     
 begin
+    -- Intermediate signals.
     s_ack_in <= cycleTable and strobeTable;
 
+    -- Drive outputs.
     ackTable <= s_ack_out;
 
-
+    -- ======================
+    --    Internal Busses.
+    -- ======================    
     -- Read/Write registes.
     sig_portcontrol : for i in 0 to numports generate
         s_portcontrol(i) <= slv_reg_portcontrol(i);
@@ -163,133 +184,10 @@ begin
     slv_reg_info <= s_info;
 
 
-
-    process(slv_reg_routingTable, slv_reg_portstatus, slv_reg_portcontrol, slv_reg_numports, slv_reg_running, slv_reg_watchcycle, slv_reg_autotimecycle, slv_reg_lasttc, slv_reg_lastautotc, slv_reg_info, ena, rsta) -- Add further registers in sensitivity list!
-        variable v_index : integer; -- Contains converted address index
-        
-        variable v_index_port : integer; -- Contains index-based address for port selection
-        variable v_index_router : integer; -- Contains index-based address for router register
+    -- Apply r/w register values to IO ports.
+    process(clk)
     begin
-        v_index := to_integer(unsigned(addra(10 downto 2)));
-
-        if v_index >= 32 and v_index <= 254 then
-            reg_data_out <= slv_reg_routingTable(v_index);
-        elsif v_index >= 256 and v_index < 320 then
-            v_index_port := (v_index - 256);
-        
-            if (v_index_port) <= numports then
-                if v_index mod 2 = 0 then
-                    reg_data_out <= slv_reg_portcontrol(v_index_port);
-                else
-                    reg_data_out <= slv_reg_portstatus(v_index_port);
-                end if;
-            else
-                reg_data_out <= (others => '0');
-            end if;
-        elsif v_index >= 320 and v_index < 327 then
-            v_index_router := (v_index - 320);
-        
-            case (v_index_router) is
-                when 0 => -- Numports
-                    reg_data_out <= slv_reg_numports;
-                when 1 => -- Running ports
-                    reg_data_out <= slv_reg_running;
-                when 2 => -- Watchdog cycle
-                    reg_data_out <= slv_reg_watchcycle;
-                when 3 => -- Automatic Time Code cycle
-                    reg_data_out <= slv_reg_autotimecycle;
-                when 4 => -- Last Time Code
-                    reg_data_out <= slv_reg_lasttc;
-                when 5 => -- Last automatic Time Code
-                    reg_data_out <= slv_reg_lastautotc;
-                when 6 => -- Info
-                    reg_data_out <= slv_reg_info;
-                when others =>
-                    reg_data_out <= (others => '0');
-            end case;
-        else
-            reg_data_out <= (others => '0');
-        end if;
-    end process;
-
-
-    process(clka)
-    begin
-        if rising_edge(clka) then
-            if ena = '1' then
-                douta <= reg_data_out;
-            end if;
-        end if;
-    end process;
-
-
-    ror_registers : process(clka)
-        variable v_index : integer;
-    begin
-        if rising_edge(clka) then
-            if ena = '1' then
-                --if slv_reg_wren = '1' then
-                v_index := to_integer(unsigned(addra(10 downto 2)));
-
-                if v_index >= 32 and v_index <= 254 then -- 0x080 - 0x3F8
-                    -- Routing table (all read/write !)
-                    for i in 0 to 3 loop
-                        if wea(i) = '1' then
-                            slv_reg_routingTable(v_index)((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
-                        end if;
-                    end loop;
-
-                elsif v_index >= 256 and v_index < 320 then -- 0x400 - 0x500
-                    -- Port registers (mixed read/write !)
-                    if v_index mod 2 = 0 then
-                        -- read/write
-                        for i in 0 to 3 loop
-                            if wea(i) = '1' then
-                                slv_reg_portcontrol(v_index)((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
-                            end if;
-                        end loop;
-                    end if;
-
-                elsif v_index >= 320 and v_index < 327 then -- 0x
-                    -- Router registers (mixed read/write !)
-                    case (v_index - 320) is
-                        when 2 => -- Watchdog cycle register (0x0508 - read/write)
-                            for i in 0 to 3 loop
-                                if wea(i) = '1' then
-                                    slv_reg_watchcycle((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
-                                end if;
-                            end loop;
-
-                        when 3 => -- Automatic time code cycle register (0x050C - read/write)
-                            for i in 0 to 3 loop
-                                if wea(i) = '1' then
-                                    slv_reg_autotimecycle((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
-                                end if;
-                            end loop;
-
-                        when others =>
-                            slv_reg_routingTable <= slv_reg_routingTable;
-                            slv_reg_portcontrol <= slv_reg_portcontrol;
-                            slv_reg_watchcycle <= slv_reg_watchcycle;
-                            slv_reg_autotimecycle <= slv_reg_autotimecycle;
-
-                    end case;
-                else
-                    slv_reg_routingTable <= slv_reg_routingTable;
-                    slv_reg_portcontrol <= slv_reg_portcontrol;
-                    slv_reg_watchcycle <= slv_reg_watchcycle;
-                    slv_reg_autotimecycle <= slv_reg_autotimecycle;
-                end if;
-                --end if;
-            end if;
-        end if;
-    end process;
-
-
-    -- Apply r/w register values to io ports.
-    process(clka)
-    begin
-        if rising_edge(clka) then
+        if rising_edge(clk) then
             -- Port control.
             for i in 0 to numports loop
                 portcontrol(i) <= s_portcontrol(i);
@@ -302,11 +200,12 @@ begin
             timecycle <= s_autotimecycle;
         end if;
     end process;
+    
 
     -- Write values to read-only registers.
-    process(clka)
+    process(clk)
     begin
-        if rising_edge(clka) then
+        if rising_edge(clk) then
             -- Port status.
             for i in 0 to numports loop
                 s_portstatus(i) <= portstatus(i);
@@ -328,9 +227,9 @@ begin
             s_info <= x"534C3232";
         end if;
     end process;
-
-
-    -- Routing table fsm
+    
+    
+    -- Routing table fsm. Manages internal bus access.
     table_fsm : process(clk)
         variable v_index : integer;
     begin
@@ -347,7 +246,7 @@ begin
                     when S_Idle =>
                         if s_ack_in = '1' then
                             v_index := to_integer(unsigned(addrTable(10 downto 2)));
-                        
+
                             state <= S_Read0;
                         end if;
 
@@ -356,7 +255,7 @@ begin
 
                     when S_Read1 =>
                         if v_index >= 32 and v_index <= 254 then
-                            readTable <= x"00000002";--s_routingTable(v_index);----slv_reg_routingTable(v_index);
+                            readTable <= s_routingTable(v_index);----slv_reg_routingTable(v_index);
                         else
                             readTable <= (others => '0');
                         end if;
@@ -381,6 +280,99 @@ begin
 
                     when others => state <= S_Idle;
                 end case;
+            end if;
+        end if;
+    end process;
+
+
+    -- ======================
+    --    Extern (CPU) Bus.
+    -- ======================  
+    -- Process that allows external port access to router registers (read and write).
+    process(clka)
+    begin
+        if rising_edge(clka) then
+            if rsta = '1' then
+                douta <= (others => '0');
+            else
+                if ena = '1' then
+                    case addra(11 downto 10) is
+                        when "00" => -- Routing Table
+                            if addra(9 downto 7) /= "000" then -- Check if requested routing table entry is > 31 !
+                                for i in 0 to 3 loop
+                                    if wea(i) = '1' then
+                                        slv_reg_routingTable(to_integer(unsigned(addra(9 downto 2))))((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
+                                    end if;
+                                end loop;
+
+                                douta <= slv_reg_routingTable(to_integer(unsigned(addra(9 downto 2))));
+                            else
+                                douta <= (others => '0');
+                            end if;
+
+                        when "01" => -- Router Registers
+                            case addra(9 downto 8) is
+                                when "00" => -- Port register (Control & Status)
+                                    if to_unsigned(addra(7 downto 2)) <= to_unsigned(2 * (numports + 1), 6) then -- Interval check
+                                        if addra(2) = '0' then
+                                            -- Even number: Control
+                                            for i in 0 to 3 loop
+                                                if wea(i) = '1' then
+                                                    slv_reg_portcontrol(to_integer(unsigned(addra(7 downto 2))))((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
+                                                end if;
+                                            end loop;
+
+                                            douta <= slv_reg_portcontrol(to_integer(unsigned(addra(7 downto 2))));
+                                        else
+                                            -- Odd number: Status
+                                            douta <= slv_reg_portstatus(to_integer(unsigned(addra(7 downto 2))));
+                                        end if;
+                                    else
+                                        douta <= (others => '0');
+                                    end if;
+
+                                when "10" => -- Router Register
+                                    case to_integer(unsigned(addra(7 downto 2))) is
+                                        when 0 => -- Numports register
+                                            douta <= slv_reg_numports;
+                                        when 1 => -- Running register
+                                            douta <= slv_reg_running;
+                                        when 2 => -- Watchdog cycle register
+                                            for i in 0 to 3 loop
+                                                if wea(i) = '1' then
+                                                    slv_reg_watchcycle((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
+                                                end if;
+                                            end loop;
+
+                                            douta <= slv_reg_watchcycle;
+                                        when 3 => -- Auto Time Code cycle register
+                                            for i in 0 to 3 loop
+                                                if wea(i) = '1' then
+                                                    slv_reg_autotimecycle((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
+                                                end if;
+                                            end loop;
+
+                                            douta <= slv_reg_autotimecycle;
+                                        when 4 => -- Last Time Code register
+                                            douta <= slv_reg_lasttc;
+                                            
+                                        when 5 => -- Last automatic Time Code register
+                                            douta <= slv_reg_lastautotc;
+                                            
+                                        when 6 => -- Info register
+                                            douta <= slv_reg_info;
+                                            
+                                        when others => douta <= (others => '0');
+                                    end case;
+
+                                when others => douta <= (others => '0');
+                            end case;
+
+                        when others =>
+                            douta <= (others => '0');
+
+                    end case;
+                end if;
             end if;
         end if;
     end process;
