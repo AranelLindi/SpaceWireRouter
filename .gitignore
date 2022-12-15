@@ -40,6 +40,8 @@ SpaceWireLight*
 !*.ooc
 #All pdf files
 !*.pdf
+#Temp: LibreOffice-Files
+!*.odt
 #########
 #System Generator
 #########
