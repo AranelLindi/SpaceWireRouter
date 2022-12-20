@@ -88,8 +88,8 @@ SpaceWireLight*
 #########
 #C-files
 #########
-#!*.c
-#!*.h
+!*.c
+!*.h
 #!*.elf
 #!*.bmm
 #!*.xmp
