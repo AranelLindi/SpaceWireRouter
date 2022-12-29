@@ -327,15 +327,15 @@ BEGIN
                 rst => rst, -- I
                 writeData => s_bus_s_register_data_in, -- I
                 readData => s_register_data_out_buffer, -- O
-                readwrite => s_bus_s_readwrite, -- I
-                dByte => s_bus_s_dByte, -- I
+--                readwrite => s_bus_s_readwrite, -- I
+--                dByte => s_bus_s_dByte, -- I
                 addr => s_bus_s_address, -- I
                 proc => s_bus_s_ack, -- O
                 strobe => s_bus_s_strobe, -- I
                 cycle => s_bus_s_request, -- I
-                portstatus => (OTHERS => (OTHERS => '0')), -- I -- TODO!
-                receiveTimeCode => s_last_tc, -- I
-                autoTimeCodeValue => s_auto_tc, -- I
+--                portstatus => (OTHERS => (OTHERS => '0')), -- I -- TODO!
+--                receiveTimeCode => s_last_tc, -- I
+--                autoTimeCodeValue => s_auto_tc, -- I
                 autoTimeCodeCycleTime => s_auto_cycle -- O
             );
     end generate router_registers;

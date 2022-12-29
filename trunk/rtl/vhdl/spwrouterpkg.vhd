@@ -41,11 +41,11 @@ PACKAGE spwrouterpkg IS
         S_Idle,
         S_Read0,
         S_Read1,
-        S_Write0,
-        S_Write1,
+--        S_Write0,
+--        S_Write1,
         S_Wait0,
         S_Wait1
-    ); -- 7
+    ); -- 5
 
     -- Finite state machine used in spwstream container.
     TYPE spwrouterportstates IS (
@@ -134,10 +134,10 @@ PACKAGE spwrouterpkg IS
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
             ack_in : IN STD_LOGIC;
-            readwrite : IN STD_LOGIC;
-            dByte : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+--            readwrite : IN STD_LOGIC;
+--            dByte : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
             addr : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-            wdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+--            wdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             rdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             ack_out : OUT STD_LOGIC
         );
@@ -153,15 +153,15 @@ PACKAGE spwrouterpkg IS
             rst : IN STD_LOGIC;
             writeData : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             readData : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            readwrite : IN STD_LOGIC;
-            dByte : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+            --readwrite : IN STD_LOGIC;
+            --dByte : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
             addr : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             proc : OUT STD_LOGIC;
             strobe : IN STD_LOGIC;
             cycle : IN STD_LOGIC;
-            portstatus : IN array_t(0 TO 31)(31 DOWNTO 0);
-            receiveTimecode : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-            autoTimeCodeValue : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+            --portstatus : IN array_t(0 TO 31)(31 DOWNTO 0);
+            --receiveTimecode : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+            --autoTimeCodeValue : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
             autoTimeCodeCycleTime : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
     END COMPONENT;

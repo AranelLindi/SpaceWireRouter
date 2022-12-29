@@ -281,7 +281,7 @@ BEGIN
         numports => numports,
         sysfreq => sysfreq,
         txclkfreq => sysfreq,
-        externPort => True,
+        externPort => False,
         rx_impl => (OTHERS => impl_fast),
         tx_impl => (OTHERS => impl_fast)
     )
