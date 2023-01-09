@@ -37,7 +37,7 @@ END spwrouterport_tb;
 
 ARCHITECTURE spwrouterport_tb_arch OF spwrouterport_tb IS
 	-- Generic constants.
-	CONSTANT numports : INTEGER RANGE 0 TO 31 := 0;
+	CONSTANT numports : integer range 1 to 32 := 0;
 	CONSTANT blen : INTEGER RANGE 0 TO 4 := 0;
 	CONSTANT pnum : INTEGER RANGE 0 TO 31 := 0;
 
@@ -75,7 +75,7 @@ ARCHITECTURE spwrouterport_tb_arch OF spwrouterport_tb IS
 	SIGNAL errpar : STD_LOGIC;
 	SIGNAL erresc : STD_LOGIC;
 	SIGNAL errcred : STD_LOGIC;
-	SIGNAL linkUp : STD_LOGIC_VECTOR(numports DOWNTO 0) := (pnum => '1', OTHERS => '0'); -- bluff
+	SIGNAL linkUp : STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (pnum => '1', OTHERS => '0'); -- bluff
 
 	SIGNAL requestOut : STD_LOGIC;
 	SIGNAL destinationPortOut : STD_LOGIC_VECTOR(7 DOWNTO 0);

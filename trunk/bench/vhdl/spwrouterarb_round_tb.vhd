@@ -27,23 +27,23 @@ ARCHITECTURE spwrouterarb_round_tb_arch OF spwrouterarb_round_tb IS
     -- Design under test.
     COMPONENT spwrouterarb_round
         GENERIC (
-            numports : INTEGER RANGE 0 TO 31;
+            numports : integer range 1 to 32;
             blen : INTEGER RANGE 0 TO 5
         );
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
             occupied : IN STD_LOGIC;
-            request : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-            granted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+            request : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+            granted : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0)
         );
     END COMPONENT;
 
     -- Number of SpaceWire ports.
-    CONSTANT numports : INTEGER RANGE 0 TO 31 := 2; -- 3 ports (0 - 2)
+    CONSTANT numports : integer range 1 to 32 := 2; -- 3 ports (0 - 2)
 
     -- Bit length to map all ports.
-    CONSTANT blen : INTEGER RANGE 0 TO 5 := INTEGER(ceil(log2(real(numports))));
+    CONSTANT blen : INTEGER RANGE 0 TO 5 := INTEGER(ceil(log2(real(numports-1))));
 
     -- System clock.
     SIGNAL s_clk : STD_LOGIC;
@@ -55,10 +55,10 @@ ARCHITECTURE spwrouterarb_round_tb_arch OF spwrouterarb_round_tb IS
     SIGNAL s_occupied : STD_LOGIC := '0'; -- Port is not occupied.
 
     -- Corresponding bit is High when respective port sends a request to the port.
-    SIGNAL s_request : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0'); -- No access request was made from any port.
+    SIGNAL s_request : STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (OTHERS => '0'); -- No access request was made from any port.
 
     -- Bit sequence that indicates the access of another port.
-    SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    SIGNAL s_granted : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;

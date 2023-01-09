@@ -27,7 +27,7 @@ ARCHITECTURE spwroutertable_tb_arch OF spwroutertable_tb IS
     -- Design under test.
     COMPONENT spwroutertable
         GENERIC (
-            numports : INTEGER RANGE 0 TO 31
+            numports : integer range 1 to 32
         );
         PORT (
             -- instate : out spwroutertablestates; -- Debug port - uncomment for better simulation results.
@@ -44,7 +44,7 @@ ARCHITECTURE spwroutertable_tb_arch OF spwroutertable_tb IS
     END COMPONENT;
 
     -- Number of SpaceWire ports.
-    CONSTANT numports : INTEGER RANGE 0 TO 31 := 2; -- 3 ports (0 - 2)
+    CONSTANT numports : integer range 1 to 32 := 2; -- 3 ports (0 - 2)
 
     -- System clock.
     SIGNAL clk : STD_LOGIC;

@@ -25,7 +25,7 @@ USE WORK.SPWROUTERPKG.ALL;
 ENTITY spwroutertcc IS
     GENERIC (
         -- Number of SpaceWire ports.
-        numports : INTEGER RANGE 0 TO 31
+        numports : integer range 1 to 32
     );
     PORT (
         -- System clock.
@@ -35,25 +35,25 @@ ENTITY spwroutertcc IS
         rst : IN STD_LOGIC;
 
         -- High if SpaceWire port is in running state or low when its in another state.
-        running : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+        running : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
         -- High if port provides Time Code support. 
-        tc_enable : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+        tc_enable : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
         -- Last Time Code that was received (to store in register).
         tc_last : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 
         -- High if any port requests a Time Code transmission.
-        tick_out : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+        tick_out : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
         -- High if any port received a Time Code.
-        tick_in : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+        tick_in : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
         -- Containts Time Code to be sent for each SpaceWire port (Control Flag & Counter Value).
-        tc_out : OUT array_t(numports DOWNTO 0)(7 DOWNTO 0);
+        tc_out : OUT array_t(numports-1 DOWNTO 0)(7 DOWNTO 0);
 
         -- Received Time Codes from all SpaceWire ports (Control Flag & Counter Value).
-        tc_in : IN array_t(numports DOWNTO 0)(7 DOWNTO 0);
+        tc_in : IN array_t(numports-1 DOWNTO 0)(7 DOWNTO 0);
 
         -- Time Code that is sent from Host (only with automatic generation).
         auto_tc_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -79,11 +79,11 @@ ARCHITECTURE spwroutertcc_arch OF spwroutertcc IS
     SIGNAL s_current_auto_tc_out : STD_LOGIC_VECTOR(7 DOWNTO 0); -- Composite new auto generated Time Code (ctrl flag & counter value)
 
     -- Time Code port selection.
-    SIGNAL s_tc_ports : STD_LOGIC_VECTOR(numports DOWNTO 0); -- All ports except the port that currently received Time Code and should not send any
-    SIGNAL s_tick_out : STD_LOGIC_VECTOR(numports DOWNTO 0); -- All ports that are technically running and selected for sending Time Codes
+    SIGNAL s_tc_ports : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- All ports except the port that currently received Time Code and should not send any
+    SIGNAL s_tick_out : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- All ports that are technically running and selected for sending Time Codes
 
     -- Contains requested or automatically generated Time Code for each port.
-    SIGNAL s_tc_out : array_t(numports DOWNTO 0)(7 DOWNTO 0);
+    SIGNAL s_tc_out : array_t(numports-1 DOWNTO 0)(7 DOWNTO 0);
 
     -- Automatic Time Code generation.
     SIGNAL s_auto_counter : unsigned(31 DOWNTO 0); -- std_logic_vector(31 downto 0) -- -- Counter for automatic Time Code generation
@@ -100,7 +100,7 @@ BEGIN
     s_current_tc_out <= s_current_ctrl_flag & STD_LOGIC_VECTOR(s_current_counter_value);
 
     -- Time Code output.
-    PortSelection : FOR i IN 0 TO numports GENERATE
+    PortSelection : FOR i IN 0 TO numports-1 GENERATE
         -- Determines which port has to send Time Code. To do this, it is checked if the link
         -- is in running state, Time Codes are generelly activated for this port and whether it
         -- has not just received a Time Code. 
@@ -138,7 +138,7 @@ BEGIN
                     s_tc_ports <= (OTHERS => '0'); -- TODO: Check ! Testen ob das nötig ist! Könnte sonst sein, dass in jeder Runde ein neuer Time Code verschickt wird!
 
                     -- Time Code target.
-                    FOR i IN numports DOWNTO 0 LOOP
+                    FOR i IN numports-1 DOWNTO 0 LOOP
                         IF (tick_in(i) = '1') THEN
                             -- Value of received Time Code must be equal to counter value (stored in router) plus one, otherwise Time Code will be ignored.
                             IF (unsigned(tc_in(i)(5 DOWNTO 0)) = (s_current_counter_value + 1)) THEN

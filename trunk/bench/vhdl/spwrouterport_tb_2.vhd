@@ -17,7 +17,7 @@ ARCHITECTURE spwrouterport_tb_2_arch OF spwrouterport_tb_2 IS
 
     COMPONENT spwrouterport
         GENERIC (
-            numports : INTEGER RANGE 0 TO 31;
+            numports : integer range 1 to 32;
             blen : INTEGER RANGE 0 TO 5;
             sysfreq : real;
             txclkfreq : real := 0.0;
@@ -57,7 +57,7 @@ ARCHITECTURE spwrouterport_tb_2_arch OF spwrouterport_tb_2 IS
             spw_si : IN STD_LOGIC;
             spw_do : OUT STD_LOGIC;
             spw_so : OUT STD_LOGIC;
-            linkstatus : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            linkstatus : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
             request_out : OUT STD_LOGIC;
             request_in : IN STD_LOGIC;
             destination_port : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);

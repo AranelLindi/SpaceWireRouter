@@ -25,7 +25,7 @@ END;
 
 ARCHITECTURE spwroutertcc_tb_arch OF spwroutertcc_tb IS
     -- Constants
-    CONSTANT numports : INTEGER RANGE 0 TO 31 := 2; -- Number of SpaceWire ports.
+    CONSTANT numports : integer range 1 to 32 := 2; -- Number of SpaceWire ports.
     CONSTANT clock_period : TIME := 10 ns; -- Clock period. (100 MHz)
 
     -- Clock and reset.
@@ -33,16 +33,16 @@ ARCHITECTURE spwroutertcc_tb_arch OF spwroutertcc_tb IS
     SIGNAL rst : STD_LOGIC := '1'; -- Synchronous reset.
 
     -- Dut control signals.
-    SIGNAL s_running : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High if corresponding port is running or low when its in another state.
-    SIGNAL s_tc_enable : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High if port has enabled Time Code functionality
-    SIGNAL s_tick_in : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High if corresponding port received a TimeCode
-    SIGNAL s_tc_in : array_t(numports DOWNTO 0)(7 DOWNTO 0); -- Received Time Codes from all ports
+    SIGNAL s_running : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- High if corresponding port is running or low when its in another state.
+    SIGNAL s_tc_enable : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- High if port has enabled Time Code functionality
+    SIGNAL s_tick_in : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- High if corresponding port received a TimeCode
+    SIGNAL s_tc_in : array_t(numports-1 DOWNTO 0)(7 DOWNTO 0); -- Received Time Codes from all ports
     SIGNAL s_auto_interval : STD_LOGIC_VECTOR(31 DOWNTO 0); -- Time interval in which an automatically generated Time Code should be sent.
 
     -- Dut output signals.
     SIGNAL s_tc_last : STD_LOGIC_VECTOR(7 DOWNTO 0);     -- Last Timecode that was received.
-    SIGNAL s_tick_out : STD_LOGIC_VECTOR(numports DOWNTO 0); -- High if corresponding port requests a TimeCode transmission
-    SIGNAL s_tc_out : array_t(numports DOWNTO 0)(7 DOWNTO 0); -- Contains for every port TimeCode to send
+    SIGNAL s_tick_out : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- High if corresponding port requests a TimeCode transmission
+    SIGNAL s_tc_out : array_t(numports-1 DOWNTO 0)(7 DOWNTO 0); -- Contains for every port TimeCode to send
     SIGNAL s_auto_tc_out : STD_LOGIC_VECTOR(7 DOWNTO 0); -- TimeCode that is send from Host.
 
 

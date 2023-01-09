@@ -27,7 +27,7 @@ USE STD.TEXTIO.ALL; -- Used for ROM initialization.
 ENTITY spwrouterregs IS
     GENERIC (
         -- Number of SpaceWire ports.
-        numports : INTEGER RANGE 0 TO 31
+        numports : integer range 1 to 32
     );
     PORT (
         -- System clock.
@@ -112,7 +112,7 @@ BEGIN
                   (others => '0');
 
     -- Address decoding and table selection. Logic addressing with ports 32 to 254 (saved in routing table).
-    s_selectRoutingTable <= '1' WHEN unsigned(addr(13 DOWNTO 2)) > to_unsigned(31, 12) AND unsigned(addr(13 DOWNTO 2)) <= to_unsigned(256, 12) ELSE                           '0';
+    s_selectRoutingTable <= '1' WHEN unsigned(addr(13 DOWNTO 2)) > to_unsigned(31, 12) AND unsigned(addr(13 DOWNTO 2)) <= to_unsigned(256, 12) ELSE '0';
 
 
     -- Routing table.

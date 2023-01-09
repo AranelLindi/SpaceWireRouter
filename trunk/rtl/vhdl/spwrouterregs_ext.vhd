@@ -27,7 +27,7 @@ use WORK.SPWPKG.ALL;
 entity spwrouterregs_extended is
     generic (
         -- Number of SpaceWire ports.
-        numports : integer range 0 to 31
+        numports : integer range 1 to 32
     );
     Port (
         -- System clock.
@@ -58,10 +58,10 @@ entity spwrouterregs_extended is
 
         ---- Bus: Port states/control ----
         -- Contains state of every port according to router register manual.
-        portstatus : in array_t(0 to numports)(31 downto 0);
+        portstatus : in array_t(0 to numports-1)(31 downto 0);
 
         -- Control information for every port according to router register manual.
-        portcontrol : out array_t(0 to numports)(31 downto 0);
+        portcontrol : out array_t(0 to numports-1)(31 downto 0);
 
         ---- Bus: Router state/control ----
         -- Register: All ports in run state.
@@ -125,8 +125,8 @@ architecture spwrouterregs_extended_arch of spwrouterregs_extended is
 
     -- Slave registers.
     signal slv_reg_routingTable : array_t(32 to 255)(31 downto 0);
-    signal slv_reg_portstatus : array_t(0 to numports)(31 downto 0);
-    signal slv_reg_portcontrol : array_t(0 to numports)(31 downto 0);
+    signal slv_reg_portstatus : array_t(0 to numports-1)(31 downto 0);
+    signal slv_reg_portcontrol : array_t(0 to numports-1)(31 downto 0);
     signal slv_reg_numports : std_logic_vector(31 downto 0);
     signal slv_reg_running : std_logic_vector(31 downto 0);
     signal slv_reg_watchcycle : std_logic_vector(31 downto 0);
@@ -141,8 +141,8 @@ architecture spwrouterregs_extended_arch of spwrouterregs_extended is
 
     -- User-definied signals declaration.
     signal s_routingTable : array_t(32 to 255)(31 downto 0);
-    signal s_portstatus : array_t(0 to numports)(31 downto 0);
-    signal s_portcontrol : array_t(0 to numports)(31 downto 0);
+    signal s_portstatus : array_t(0 to numports-1)(31 downto 0);
+    signal s_portcontrol : array_t(0 to numports-1)(31 downto 0);
     signal s_numports : std_logic_vector(31 downto 0);
     signal s_running : std_logic_vector(31 downto 0);
     signal s_watchcycle : std_logic_vector(31 downto 0);
@@ -163,7 +163,7 @@ begin
     --    Internal Busses.
     -- ======================    
     -- Read/Write registes.
-    sig_portcontrol : for i in 0 to numports generate
+    sig_portcontrol : for i in 0 to numports-1 generate
         s_portcontrol(i) <= slv_reg_portcontrol(i);
     end generate sig_portcontrol;
 
@@ -173,7 +173,7 @@ begin
 
 
     -- Read only registers.
-    sig_portstatus : for i in 0 to numports generate
+    sig_portstatus : for i in 0 to numports-1 generate
         slv_reg_portstatus(i) <= s_portstatus(i);
     end generate sig_portstatus;
 
@@ -189,7 +189,7 @@ begin
     begin
         if rising_edge(clk) then
             -- Port control.
-            for i in 0 to numports loop
+            for i in 0 to numports-1 loop
                 portcontrol(i) <= s_portcontrol(i);
             end loop;
 
@@ -207,11 +207,11 @@ begin
     begin
         if rising_edge(clk) then
             -- Port status.
-            for i in 0 to numports loop
+            for i in 0 to numports-1 loop
                 s_portstatus(i) <= portstatus(i);
             end loop;
 
-            -- Numports.
+            -- numports-1.
             s_numports <= std_logic_vector(to_unsigned(numports, s_numports'length));
 
             -- Running ports.
@@ -313,7 +313,7 @@ begin
                         when "01" => -- Router Registers
                             case addra(9 downto 8) is
                                 when "00" => -- Port register (Control & Status)
-                                    if unsigned(addra(7 downto 2)) <= to_unsigned(2 * (numports + 1), 6) then -- Interval check
+                                    if unsigned(addra(7 downto 2)) <= to_unsigned(2 * (numports-1 + 1), 6) then -- Interval check
                                         if addra(2) = '0' then
                                             -- Even number: Control
                                             for i in 0 to 3 loop

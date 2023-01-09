@@ -26,18 +26,18 @@ ARCHITECTURE spwrouterarb_table_tb_arch OF spwrouterarb_table_tb IS
     -- Design under test.
     COMPONENT spwrouterarb_table
         GENERIC (
-            numports : INTEGER RANGE 0 TO 31
+            numports : integer range 1 to 32
         );
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            request : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-            granted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+            request : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+            granted : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0)
         );
     END COMPONENT;
 
     -- Number of SpaceWire ports.
-    CONSTANT numports : INTEGER RANGE 0 TO 31 := 2; -- 3 ports (0 - 2)
+    CONSTANT numports : integer range 1 to 32 := 2; -- 3 ports (0 - 2)
 
     -- System clock.
     SIGNAL clk : STD_LOGIC;
@@ -46,10 +46,10 @@ ARCHITECTURE spwrouterarb_table_tb_arch OF spwrouterarb_table_tb IS
     SIGNAL s_rst : STD_LOGIC; -- Caution! It may be necessary to set rst at beginning to high for short period of time. 
 
     -- Requests from all ports. (Bit corresponds to port)
-    SIGNAL s_request : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    SIGNAL s_request : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
     -- Contains which port gets access.
-    SIGNAL s_granted : STD_LOGIC_VECTOR(numports DOWNTO 0);
+    SIGNAL s_granted : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
     -- Clock period. (100 MHz)
     CONSTANT clock_period : TIME := 10 ns;

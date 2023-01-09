@@ -27,7 +27,7 @@ USE STD.TEXTIO.ALL; -- Used for ROM initialization.
 ENTITY spwroutertable IS
     GENERIC (
         -- Number of SpaceWire ports.
-        numports : INTEGER RANGE 0 TO 31
+        numports : integer range 1 to 32
     );
     PORT (
         -- System clock.

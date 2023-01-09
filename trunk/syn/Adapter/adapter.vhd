@@ -32,7 +32,7 @@ entity UARTSpWAdapter is
         clk_cycles_per_bit : Integer;
 
         -- Number of SpaceWire ports in this adapter.
-        numports : integer range 0 to 31;
+        numports : integer range 1 to 32;
 
         -- Initial SpW input port (in chase that no commands are allowed, it cannot be changed !)
         init_input_port : integer range 0 to 31 := 0;
@@ -91,15 +91,15 @@ entity UARTSpWAdapter is
         rst : in std_logic;
 
         -- Enables atomatic link start for SpW ports on receipt of a NULL character.
-        autostart : in std_logic_vector(numports downto 0) := (others => '1');
+        autostart : in std_logic_vector(numports-1 downto 0) := (others => '1');
 
         -- Enables SpW link start once the ready state is reached.
         -- Without autostart or linkstart, the link remains in state ready.
-        linkstart : in std_logic_vector(numports downto 0) := (others => '1');
+        linkstart : in std_logic_vector(numports-1 downto 0) := (others => '1');
 
         -- Do not start SpW link (overrides linkstart and autostart) and/or
         -- disconnect a running link.
-        linkdis : in std_logic_vector(numports downto 0) := (0 => '0', others => '0'); -- to deactivate port 0 set here '1'
+        linkdis : in std_logic_vector(numports-1 downto 0) := (0 => '0', others => '0'); -- to deactivate port 0 set here '1'
 
         -- Scaling factor minus 1, used to scale the SpW transmit base clock into
         -- the transmission bit rate. The system clock (for impl_generic) or
@@ -110,43 +110,43 @@ entity UARTSpWAdapter is
 
         -- Optional outputs:
         -- HIGH if SpW link state machine is in started state.
-        started : out std_logic_vector(numports downto 0);
+        started : out std_logic_vector(numports-1 downto 0);
 
         -- HIGH if link state machine is currently in connecting state.
-        connecting : out std_logic_vector(numports downto 0);
+        connecting : out std_logic_vector(numports-1 downto 0);
 
         -- HIGH if the link state machine is currently in the run state.
-        running : out std_logic_vector(numports downto 0);
+        running : out std_logic_vector(numports-1 downto 0);
 
         -- Disconnect detected in state run. Triggers a reset and reconnect of the link.
-        errdisc : out std_logic_vector(numports downto 0);
+        errdisc : out std_logic_vector(numports-1 downto 0);
 
         -- Parity error detected in state run. Triggers a reset and reconnect of the link.
-        errpar : out std_logic_vector(numports downto 0);
+        errpar : out std_logic_vector(numports-1 downto 0);
 
         -- Invalid escape sequence deteced in state run. Triggers a reset and reconnect of the link.
-        erresc : out std_logic_vector(numports downto 0);
+        erresc : out std_logic_vector(numports-1 downto 0);
 
         -- Credit error detected. Triggers a reset and reconnect of the link.
-        errcred : out std_logic_vector(numports downto 0);
+        errcred : out std_logic_vector(numports-1 downto 0);
 
         -- HIGH if the SpW port transmission queue is at least half full.
-        txhalff : out std_logic_vector(numports downto 0);
+        txhalff : out std_logic_vector(numports-1 downto 0);
 
         -- HIGH if the SpW port receiver FIFO is at least half full.
-        rxhalff : out std_logic_vector(numports downto 0);
+        rxhalff : out std_logic_vector(numports-1 downto 0);
 
         -- SpaceWire Data In.
-        spw_di : in std_logic_vector(numports downto 0);
+        spw_di : in std_logic_vector(numports-1 downto 0);
 
         -- SpaceWire Strobe In.
-        spw_si : in std_logic_vector(numports downto 0);
+        spw_si : in std_logic_vector(numports-1 downto 0);
 
         -- SpaceWire Data Out.
-        spw_do : out std_logic_vector(numports downto 0);
+        spw_do : out std_logic_vector(numports-1 downto 0);
 
         -- SpaceWire Strobe Out.
-        spw_so : out std_logic_vector(numports downto 0);
+        spw_so : out std_logic_vector(numports-1 downto 0);
 
         -- Incoming serial stream (uart).
         rx : in std_logic;
@@ -225,33 +225,33 @@ architecture UARTSpWAdapter_config_arch of UARTSpWAdapter is
     signal s_tx_data : std_logic_vector(7 downto 0);
 
     -- SpaceWire (belong to corresponding ports in spwstream entity).
-    signal s_autostart : std_logic_vector(numports downto 0);
-    signal s_linkstart : std_logic_vector(numports downto 0);
-    signal s_linkdis : std_logic_vector(numports downto 0);
+    signal s_autostart : std_logic_vector(numports-1 downto 0);
+    signal s_linkstart : std_logic_vector(numports-1 downto 0);
+    signal s_linkdis : std_logic_vector(numports-1 downto 0);
     signal s_txdivcnt : std_logic_vector(7 downto 0);
-    signal s_tick_in : std_logic_vector(numports downto 0); -- Caution ! TimeCodes for port 0 are deactivated !
-    signal s_ctrl_in : array_t(numports downto 0)(1 downto 0);
-    signal s_time_in : array_t(numports downto 0)(5 downto 0);
-    signal s_txwrite : std_logic_vector(numports downto 0);
-    signal s_txflag : std_logic_vector(numports downto 0);
-    signal s_txdata : array_t(numports downto 0)(7 downto 0);
-    signal s_txrdy : std_logic_vector(numports downto 0);
-    signal s_txhalff : std_logic_vector(numports downto 0);
-    signal s_tick_out : std_logic_vector(numports downto 0);
-    signal s_ctrl_out : array_t(numports downto 0)(1 downto 0);
-    signal s_time_out : array_t(numports downto 0)(5 downto 0);
-    signal s_rxvalid : std_logic_vector(numports downto 0);
-    signal s_rxhalff : std_logic_vector(numports downto 0);
-    signal s_rxflag : std_logic_vector(numports downto 0);
-    signal s_rxdata : array_t(numports downto 0)(7 downto 0);
-    signal s_rxread : std_logic_vector(numports downto 0);
-    signal s_started : std_logic_vector(numports downto 0);
-    signal s_connecting : std_logic_vector(numports downto 0);
-    signal s_running : std_logic_vector(numports downto 0);
-    signal s_errdisc : std_logic_vector(numports downto 0);
-    signal s_errpar : std_logic_vector(numports downto 0);
-    signal s_erresc : std_logic_vector(numports downto 0);
-    signal s_errcred : std_logic_vector(numports downto 0);
+    signal s_tick_in : std_logic_vector(numports-1 downto 0); -- Caution ! TimeCodes for port 0 are deactivated !
+    signal s_ctrl_in : array_t(numports-1 downto 0)(1 downto 0);
+    signal s_time_in : array_t(numports-1 downto 0)(5 downto 0);
+    signal s_txwrite : std_logic_vector(numports-1 downto 0);
+    signal s_txflag : std_logic_vector(numports-1 downto 0);
+    signal s_txdata : array_t(numports-1 downto 0)(7 downto 0);
+    signal s_txrdy : std_logic_vector(numports-1 downto 0);
+    signal s_txhalff : std_logic_vector(numports-1 downto 0);
+    signal s_tick_out : std_logic_vector(numports-1 downto 0);
+    signal s_ctrl_out : array_t(numports-1 downto 0)(1 downto 0);
+    signal s_time_out : array_t(numports-1 downto 0)(5 downto 0);
+    signal s_rxvalid : std_logic_vector(numports-1 downto 0);
+    signal s_rxhalff : std_logic_vector(numports-1 downto 0);
+    signal s_rxflag : std_logic_vector(numports-1 downto 0);
+    signal s_rxdata : array_t(numports-1 downto 0)(7 downto 0);
+    signal s_rxread : std_logic_vector(numports-1 downto 0);
+    signal s_started : std_logic_vector(numports-1 downto 0);
+    signal s_connecting : std_logic_vector(numports-1 downto 0);
+    signal s_running : std_logic_vector(numports-1 downto 0);
+    signal s_errdisc : std_logic_vector(numports-1 downto 0);
+    signal s_errpar : std_logic_vector(numports-1 downto 0);
+    signal s_erresc : std_logic_vector(numports-1 downto 0);
+    signal s_errcred : std_logic_vector(numports-1 downto 0);
 
     -- Intern used signals.
     -- UART2SpW fsm.
@@ -267,8 +267,8 @@ architecture UARTSpWAdapter_config_arch of UARTSpWAdapter is
     signal s_uart_output : std_logic_vector(7 downto 0) := (others => '0'); -- buffers outgoing bytes (uart)
 
     -- Control.
-    signal s_port_input : integer range 0 to numports := init_input_port;
-    signal s_port_output : integer range 0 to numports := init_output_port;
+    signal s_port_input : integer range 0 to numports-1 := init_input_port;
+    signal s_port_output : integer range 0 to numports-1 := init_output_port;
 
     -- Intern infos request.
     signal s_info1 : std_logic := '0'; -- SpW input port
@@ -320,8 +320,8 @@ begin
             tx_data => s_tx_data
         );
 
-    -- Port 0 to numports.
-    SpW_Ports : for n in 0 to numports generate
+    -- Port 0 to numports-1.
+    SpW_Ports : for n in 0 to numports-1 generate
         port_n : spwstream
             GENERIC MAP(
                 sysfreq => sysfreq,
@@ -459,13 +459,13 @@ begin
 
                             when "01" =>
                                 -- Set router input port
-                                if (to_integer(unsigned(s_uart_buffer(4 downto 0))) <= numports) then -- If number is bigger than numports, port remains unchanged.
+                                if (to_integer(unsigned(s_uart_buffer(4 downto 0))) <= numports-1) then -- If number is bigger than numports-1, port remains unchanged.
                                     s_port_input <= to_integer(unsigned(s_uart_buffer(4 downto 0)));
                                 end if;
 
                             when "10" =>
                                 -- Set router output port
-                                if (to_integer(unsigned(s_uart_buffer(4 downto 0))) <= numports) then -- If number is bigger that numports, port remains unchanged.
+                                if (to_integer(unsigned(s_uart_buffer(4 downto 0))) <= numports-1) then -- If number is bigger that numports-1, port remains unchanged.
                                     s_port_output <= to_integer(unsigned(s_uart_buffer(4 downto 0)));
                                 end if;
 

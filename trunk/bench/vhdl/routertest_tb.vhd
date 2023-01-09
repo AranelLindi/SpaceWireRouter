@@ -26,7 +26,7 @@ END routertest_tb;
 
 ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 	-- TODO: Set router settings. (Predefined simulation procedures requires three ports (port0 is unused)!)
-	CONSTANT numports : INTEGER RANGE 0 TO 31 := 2;
+	CONSTANT numports : integer range 1 to 32 := 2;
 	CONSTANT clock_period : TIME := 100 ns; -- 10 MHz
 	CONSTANT sysfreq : real := 10.0e6;
 	CONSTANT txclkfreq : real := 10.0e6;
@@ -44,7 +44,7 @@ ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 
 	COMPONENT routertest
 		GENERIC (
-			numports : INTEGER RANGE 0 TO 31;
+			numports : integer range 1 to 32;
 			sysfreq : real;
 			txclkfreq : real := 0.0;
 			rximpl : spw_implementation_type_rec;
@@ -59,87 +59,87 @@ ARCHITECTURE routertest_tb_arch OF routertest_tb IS
 			rxclk : IN STD_LOGIC;
 			txclk : IN STD_LOGIC;
 			rst : IN STD_LOGIC;
-			autostart : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-			linkstart : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-			linkdis : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+			autostart : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			linkstart : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			linkdis : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 			txdivcnt : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-			tick_in : IN STD_LOGIC_VECTOR(numports DOWNTO 1);
-			ctrl_in : IN array_t(numports DOWNTO 1)(1 DOWNTO 0);
-			time_in : IN array_t(numports DOWNTO 1)(5 DOWNTO 0);
-			txwrite : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-			txflag : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-			txdata : IN array_t(numports DOWNTO 0)(7 DOWNTO 0);
-			txrdy : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			txhalff : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			tick_out : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			ctrl_out : OUT array_t(numports DOWNTO 1)(1 DOWNTO 0);
-			time_out : OUT array_t(numports DOWNTO 1)(5 DOWNTO 0);
-			rxvalid : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			rxhalff : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			rxflag : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			rxdata : OUT array_t(numports DOWNTO 0)(7 DOWNTO 0);
-			rxread : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
-			pstarted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			rstarted : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			pconnecting : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			rconnecting : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			prunning : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			rrunning : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			perrdisc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			rerrdisc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			perrpar : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			rerrpar : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			perresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			rerresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			perrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			rerrcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-			spw_d_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Data signal from router to external ports
-			--spw_s_r2p : OUT STD_LOGIC_VECTOR(numports DOWNTO 0); -- Strobe signal from router to external ports
-			spw_d_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0) -- Data signal from external ports to router
-			--spw_s_p2r : OUT STD_LOGIC_VECTOR(numports DOWNTO 0) -- Strobe signal from external ports to router
+			tick_in : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 1);
+			ctrl_in : IN array_t(numports-1 DOWNTO 1)(1 DOWNTO 0);
+			time_in : IN array_t(numports-1 DOWNTO 1)(5 DOWNTO 0);
+			txwrite : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			txflag : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			txdata : IN array_t(numports-1 DOWNTO 0)(7 DOWNTO 0);
+			txrdy : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			txhalff : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			tick_out : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			ctrl_out : OUT array_t(numports-1 DOWNTO 1)(1 DOWNTO 0);
+			time_out : OUT array_t(numports-1 DOWNTO 1)(5 DOWNTO 0);
+			rxvalid : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			rxhalff : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			rxflag : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			rxdata : OUT array_t(numports-1 DOWNTO 0)(7 DOWNTO 0);
+			rxread : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			pstarted : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			rstarted : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			pconnecting : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			rconnecting : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			prunning : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			rrunning : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			perrdisc : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			rerrdisc : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			perrpar : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			rerrpar : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			perresc : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			rerresc : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			perrcred : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			rerrcred : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+			spw_d_r2p : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- Data signal from router to external ports
+			--spw_s_r2p : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- Strobe signal from router to external ports
+			spw_d_p2r : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0) -- Data signal from external ports to router
+			--spw_s_p2r : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0) -- Strobe signal from external ports to router
 		);
 	END COMPONENT;
 
 	SIGNAL clk : STD_LOGIC;
 	SIGNAL rst : STD_LOGIC := '1';
-	SIGNAL autostart : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '1');
-	SIGNAL linkstart : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '1');
-	SIGNAL linkdis : STD_LOGIC_VECTOR(numports DOWNTO 0) := (0 => '1', OTHERS => '0'); -- deactivate internal port (overrides linkstart/autostart)
+	SIGNAL autostart : STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (OTHERS => '1');
+	SIGNAL linkstart : STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (OTHERS => '1');
+	SIGNAL linkdis : STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (0 => '1', OTHERS => '0'); -- deactivate internal port (overrides linkstart/autostart)
 	SIGNAL txdivcnt : STD_LOGIC_VECTOR(7 DOWNTO 0) := "00000001";
-	SIGNAL tick_in : STD_LOGIC_VECTOR(numports DOWNTO 1) := (OTHERS => '0');
-	SIGNAL ctrl_in : array_t(numports DOWNTO 1)(1 DOWNTO 0) := (OTHERS => (OTHERS => '0'));
-	SIGNAL time_in : array_t(numports DOWNTO 1)(5 DOWNTO 0) := (OTHERS => (OTHERS => '0'));
-	SIGNAL txwrite : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
-	SIGNAL txflag : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
-	SIGNAL txdata : array_t(numports DOWNTO 0)(7 DOWNTO 0) := (OTHERS => (OTHERS => '0'));
-	SIGNAL txrdy : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
-	SIGNAL txhalff : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL tick_out : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL ctrl_out : array_t(numports DOWNTO 1)(1 DOWNTO 0);
-	SIGNAL time_out : array_t(numports DOWNTO 1)(5 DOWNTO 0);
-	SIGNAL rxvalid : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL rxhalff : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL rxflag : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL rxdata : array_t(numports DOWNTO 0)(7 DOWNTO 0);
-	SIGNAL rxread : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL pstarted : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL rstarted : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL pconnecting : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL rconnecting : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL prunning : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL rrunning : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL perrdisc : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL rerrdisc : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL perrpar : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL rerrpar : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL perresc : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL rerresc : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL perrcred : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL rerrcred : STD_LOGIC_VECTOR(numports DOWNTO 0);
-	SIGNAL spw_d_r2p : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
-	SIGNAL spw_s_r2p : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
-	SIGNAL spw_d_p2r : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
-	SIGNAL spw_s_p2r : STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '0');
+	SIGNAL tick_in : STD_LOGIC_VECTOR(numports-1 DOWNTO 1) := (OTHERS => '0');
+	SIGNAL ctrl_in : array_t(numports-1 DOWNTO 1)(1 DOWNTO 0) := (OTHERS => (OTHERS => '0'));
+	SIGNAL time_in : array_t(numports-1 DOWNTO 1)(5 DOWNTO 0) := (OTHERS => (OTHERS => '0'));
+	SIGNAL txwrite : STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (OTHERS => '0');
+	SIGNAL txflag : STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (OTHERS => '0');
+	SIGNAL txdata : array_t(numports-1 DOWNTO 0)(7 DOWNTO 0) := (OTHERS => (OTHERS => '0'));
+	SIGNAL txrdy : STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (OTHERS => '0');
+	SIGNAL txhalff : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL tick_out : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL ctrl_out : array_t(numports-1 DOWNTO 1)(1 DOWNTO 0);
+	SIGNAL time_out : array_t(numports-1 DOWNTO 1)(5 DOWNTO 0);
+	SIGNAL rxvalid : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL rxhalff : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL rxflag : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL rxdata : array_t(numports-1 DOWNTO 0)(7 DOWNTO 0);
+	SIGNAL rxread : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL pstarted : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL rstarted : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL pconnecting : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL rconnecting : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL prunning : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL rrunning : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL perrdisc : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL rerrdisc : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL perrpar : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL rerrpar : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL perresc : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL rerresc : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL perrcred : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL rerrcred : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+	SIGNAL spw_d_r2p : STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (OTHERS => '0');
+	SIGNAL spw_s_r2p : STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (OTHERS => '0');
+	SIGNAL spw_d_p2r : STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (OTHERS => '0');
+	SIGNAL spw_s_p2r : STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (OTHERS => '0');
 
 	TYPE packetstates IS (S_Address, S_Cargo, S_EOP, S_Null);
 	SIGNAL pstate : packetstates := S_Address;

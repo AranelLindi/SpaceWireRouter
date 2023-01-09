@@ -27,7 +27,7 @@ ARCHITECTURE spwrouterregs_tb_arch OF spwrouterregs_tb IS
 	-- Design under test.
 	COMPONENT spwrouterregs
 		GENERIC (
-			numports : INTEGER RANGE 0 TO 31
+			numports : integer range 1 to 32
 		);
 		PORT (
 			clk : IN STD_LOGIC;
@@ -48,7 +48,7 @@ ARCHITECTURE spwrouterregs_tb_arch OF spwrouterregs_tb IS
 	END COMPONENT;
 
 	-- Number of SpaceWire ports.
-	CONSTANT numports : INTEGER RANGE 0 TO 31 := 5;
+	CONSTANT numports : integer range 1 to 32 := 5;
 
 	-- System clock.
 	SIGNAL clk : STD_LOGIC;

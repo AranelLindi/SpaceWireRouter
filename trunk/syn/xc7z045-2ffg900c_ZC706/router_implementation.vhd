@@ -71,7 +71,7 @@ architecture Behavioral of router_implementation is
             clk_cycles_per_bit : INTEGER;
 
             -- Number of SpaceWire ports in router & adapter.
-            numports : INTEGER RANGE 0 TO 31;
+            numports : INTEGER RANGE 1 TO 32;
 
             -- Initial SpW input port (in chase that no commands are allowed, it cannot be changed !)
             init_input_port : INTEGER RANGE 0 TO 31 := 0;
@@ -127,15 +127,15 @@ architecture Behavioral of router_implementation is
             rst : IN STD_LOGIC;
 
             -- Enables automatic link start for SpW ports on receipt of a NULL character.
-            autostart : IN STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '1');
+            autostart : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (OTHERS => '1');
 
             -- Enables SpW link start once the ready state is reached.
             -- Without autostart or linkstart, the link remains in state ready.
-            linkstart : IN STD_LOGIC_VECTOR(numports DOWNTO 0) := (OTHERS => '1');
+            linkstart : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (OTHERS => '1');
 
             -- Do not start SpW link (overrides linkstart and autostart) and/or
             -- disconnect a running link.
-            linkdis : IN STD_LOGIC_VECTOR(numports DOWNTO 0) := (0 => '0', OTHERS => '0'); -- to deactivate port 1 set here '1'
+            linkdis : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (0 => '0', OTHERS => '0'); -- to deactivate port 1 set here '1'
 
             -- Scaling factor minus 1, used to scale the SpW transmit base clock into
             -- the transmission bit rate. The system clock (for impl_generic) or
@@ -146,43 +146,43 @@ architecture Behavioral of router_implementation is
 
             -- Optional outputs:
             -- HIGH if SpW link state machine is in started state.
-            started : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            started : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
             -- HIGH if link state machine is currently in connecting state.
-            connecting : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            connecting : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
             -- HIGH if the link state machine is currently in the run state.
-            running : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            running : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
             -- Disconnect detected in state run. Triggers a reset and reconnect of the link.
-            errdisc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            errdisc : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
             -- Parity error detected in state run. Triggers a reset and reconnect of the link.
-            errpar : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            errpar : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
             -- Invalid escape sequence deteced in state run. Triggers a reset and reconnect of the link.
-            erresc : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            erresc : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
             -- Credit error detected. Triggers a reset and reconnect of the link.
-            errcred : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            errcred : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
             -- HIGH if the SpW port transmission queue is at least half full.
-            txhalff : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            txhalff : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
             -- HIGH if the SpW port receiver FIFO is at least half full.
-            rxhalff : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            rxhalff : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
             -- SpaceWire Data In.
-            spw_di : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            spw_di : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
             -- SpaceWire Strobe In.
-            spw_si : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
+            spw_si : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
             -- SpaceWire Data Out.
-            spw_do : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            spw_do : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
             -- SpaceWire Strobe Out.
-            spw_so : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            spw_so : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
             -- Incoming serial stream (uart).
             rx : IN STD_LOGIC;
@@ -238,7 +238,7 @@ begin
 
     RouterImpl : spwrouter
         generic map (
-            numports => 3,
+            numports => 4,
             sysfreq => 100.0e6,
             txclkfreq => 100.0e6,
             rx_impl => (others => impl_fast),
@@ -275,7 +275,7 @@ begin
     Adapter : UARTSpWAdapter
         GENERIC MAP(
             clk_cycles_per_bit => 868, -- 100_000_000 (Hz) / 115_200 (baud rate) = 868
-            numports => 2,
+            numports => 3,
             init_input_port => 1,
             init_output_port => 1,
             activate_commands => true, -- define adapter variant (command (true) / non-command version (false))
