@@ -41,11 +41,11 @@ PACKAGE spwrouterpkg IS
         S_Idle,
         S_Read0,
         S_Read1,
-        S_Write0,
-        S_Write1,
+--        S_Write0,
+--        S_Write1,
         S_Wait0,
         S_Wait1
-    ); -- 7
+    ); -- 5
 
     -- Finite state machine used in spwstream container.
     TYPE spwrouterportstates IS (
@@ -134,10 +134,7 @@ PACKAGE spwrouterpkg IS
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
             ack_in : IN STD_LOGIC;
-            readwrite : IN STD_LOGIC;
-            dByte : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
             addr : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-            wdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             rdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             ack_out : OUT STD_LOGIC
         );
@@ -153,16 +150,41 @@ PACKAGE spwrouterpkg IS
             rst : IN STD_LOGIC;
             writeData : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             readData : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            readwrite : IN STD_LOGIC;
-            dByte : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
             addr : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-            proc : OUT STD_LOGIC;
+            ack : OUT STD_LOGIC;
             strobe : IN STD_LOGIC;
-            cycle : IN STD_LOGIC;
-            portstatus : IN array_t(0 TO 31)(31 DOWNTO 0);
-            receiveTimecode : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-            autoTimeCodeValue : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+            request : IN STD_LOGIC;
             autoTimeCodeCycleTime : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        );
+    END COMPONENT;
+
+    -- Extended control register (spwrouterregs_ext.vhd)
+    COMPONENT spwrouterregs_extended IS
+        GENERIC (
+            numports : INTEGER RANGE 0 TO 31
+        );
+        PORT (
+            clk : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
+            readTable : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            addrTable : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            ackTable : OUT STD_LOGIC;
+            strobeTable : IN STD_LOGIC;
+            cycleTable : IN STD_LOGIC;
+            portstatus : IN array_t(0 TO NUMPORTS)(31 DOWNTO 0);
+            portcontrol : OUT array_t(0 TO NUMPORTS)(31 DOWNTO 0);
+            running : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            watchcycle : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            timecycle : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            lasttime : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+            lastautotime : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+            clka : IN STD_LOGIC;
+            addra : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            dina : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            douta : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            ena : IN STD_LOGIC;
+            rsta : IN STD_LOGIC;
+            wea : IN STD_LOGIC_VECTOR(3 DOWNTO 0)
         );
     END COMPONENT;
 
@@ -236,7 +258,9 @@ PACKAGE spwrouterpkg IS
             bus_readwrite : OUT STD_LOGIC;
             bus_strobe : OUT STD_LOGIC;
             bus_request : OUT STD_LOGIC;
-            bus_ack_in : IN STD_LOGIC
+            bus_ack_in : IN STD_LOGIC;
+            portstatus : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            portcontrol : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
     END COMPONENT;
 
@@ -246,6 +270,7 @@ PACKAGE spwrouterpkg IS
             numports : INTEGER RANGE 0 TO 31;
             sysfreq : real;
             txclkfreq : real;
+            externPort : boolean := True;
             rx_impl : rximpl_array(numports DOWNTO 0);
             tx_impl : tximpl_array(numports DOWNTO 0)
         );
@@ -264,7 +289,14 @@ PACKAGE spwrouterpkg IS
             spw_di : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             spw_si : IN STD_LOGIC_VECTOR(numports DOWNTO 0);
             spw_do : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
-            spw_so : OUT STD_LOGIC_VECTOR(numports DOWNTO 0)
+            spw_so : OUT STD_LOGIC_VECTOR(numports DOWNTO 0);
+            clka : in std_logic := '0';
+            addra : in std_logic_vector(31 downto 0) := (others => '0');
+            dina : in std_logic_vector(31 downto 0) := (others => '0');
+            douta : out std_logic_vector(31 downto 0);
+            ena : in std_logic := '0';
+            rsta : in std_logic := '0';
+            wea : in std_logic_vector(3 downto 0) := (others => '0')
         );
     END COMPONENT;
 END PACKAGE;

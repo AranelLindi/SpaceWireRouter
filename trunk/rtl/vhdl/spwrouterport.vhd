@@ -197,7 +197,7 @@ ENTITY spwrouterport IS
         bus_address : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 
         -- Routing table entry for requested logical port.
-        bus_data_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        bus_data_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0); -- TODO: For debugging purposes only ! 
 
         -- Defines which byte (1-4) in the router control register is to be read.
         bus_dByte : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -212,7 +212,16 @@ ENTITY spwrouterport IS
         bus_request : OUT STD_LOGIC;
 
         -- Acknowledgment for granted access to routing table.
-        bus_ack_in : IN STD_LOGIC
+        bus_ack_in : IN STD_LOGIC;
+        
+        -- ====================================
+        --      PORT STATUS & CONTROL BUS
+        -- ====================================
+        -- Contains port status (see manual).
+        portstatus : out std_logic_vector(31 downto 0);
+        
+        -- Control information for port (see manual).
+        portcontrol : in std_logic_vector(31 downto 0)
     );
 END spwrouterport;
 
@@ -223,10 +232,10 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
     -- Packet cargo (excluding first byte (address byte)).
     -- According to spwstream: flag = 0 -> data byte
     --                         flag = 1 -> EOP / EEP
-    SIGNAL s_packet_cargo : STD_LOGIC_VECTOR(8 DOWNTO 0) := (OTHERS => '0'); -- Contains every byte (and flag) of current packet
+    SIGNAL s_packet_cargo : STD_LOGIC_VECTOR(8 DOWNTO 0); -- Contains every byte (and flag) of current packet
 
     -- Routing table.
-    SIGNAL s_logical_address : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0'); -- Contains logical port address (32-254)
+    SIGNAL s_logical_address : STD_LOGIC_VECTOR(7 DOWNTO 0); -- Contains logical port address (32-254)
     SIGNAL s_routing_table_request : STD_LOGIC; -- High if data from router table is requested. Is hold until routing table has confirmed that data is available by handshake
 
     -- xmit signals.
@@ -245,7 +254,10 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
     -- Bus & router signals.
     SIGNAL s_strobe_out : STD_LOGIC; -- Strobe signal to destination port when cargo/EOP/EEP byte need to be transmitted
     SIGNAL s_request_out : STD_LOGIC; -- High as long as a packet is started and sent but not yet completed
-    SIGNAL s_destination_port : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0'); -- Contains first byte of a packet (address byte)
+    SIGNAL s_destination_port : STD_LOGIC_VECTOR(7 DOWNTO 0); -- Contains first byte of a packet (address byte)
+    
+    -- Register status signals.
+    signal s_discardedcounter : unsigned(17 downto 0);
 BEGIN
     -- Drive outputs.
     -- Bus & router signals.
@@ -265,6 +277,22 @@ BEGIN
     -- Read input.
     s_txwrite <= strobe_in WHEN request_in = '1' ELSE
         '0';
+        
+    -- Drive port status (register).
+    portstatus(0) <= started;
+    portstatus(1) <= connecting;
+    portstatus(2) <= running;
+    portstatus(3) <= s_request_out; -- Not sure this signal is right here ...
+    portstatus(4) <= errdisc;
+    portstatus(5) <= errpar;
+    portstatus(6) <= erresc;
+    portstatus(7) <= errcred;
+    portstatus(9) <= rxhalff;
+    portstatus(12) <= txhalff;
+    portstatus(31 downto 14) <= std_logic_vector(s_discardedcounter);
+    --portstatus(31 downto 8) <= (others => '0');
+    
+        
 
     -- SpaceWire port.
     spwport : spwstream
@@ -332,6 +360,8 @@ BEGIN
         IF rising_edge(clk) THEN
             IF (rst = '1') THEN
                 -- Synchronous reset.
+                v_validport := '0';
+                v_reqports := '0';
                 s_destination_port <= (OTHERS => '0');
                 s_packet_cargo <= (OTHERS => '0');
                 s_logical_address <= (OTHERS => '0');
@@ -340,6 +370,7 @@ BEGIN
                 s_request_out <= '0';
                 s_routing_table_request <= '0';
                 s_strobe_out <= '0';
+                s_discardedcounter <= (others => '0');
                 state <= S_Idle;
             ELSE
                 CASE state IS
@@ -378,6 +409,8 @@ BEGIN
                                 END IF;
                             ELSE -- DestPort >= 32 (logical port)
                                 -- Logical port is addressed: Send request to routing table to get port assignment.
+                                -- Because of this evaluation, it is not necessary for routing table or register to 
+                                -- carry out a new interval check. Because an injury is hereby excluded.
                                 s_logical_address <= s_rxdata(7 DOWNTO 0);
                                 s_routing_table_request <= '1';
                                 state <= S_RT0;
@@ -486,11 +519,12 @@ BEGIN
                         state <= S_Idle;
 
                     WHEN S_Dummy0 =>
-                        -- Dummie states are there to throw away a packet that cannot be delivered.
+                        -- Dummie states exist to throw away a packet that cannot be delivered.
                         -- dummy read (may block forever) -- TODO: Evaluate risk of deadlock !
                         s_request_out <= '0';
 
                         IF (s_rxvalid = '1') THEN
+                            s_discardedcounter <= s_discardedcounter + 1;
                             s_rxread <= '1';
                             state <= S_Dummy1;
                         END IF;
@@ -512,6 +546,7 @@ BEGIN
 
                     WHEN OTHERS => -- (Necessary because of unused state problem)
                         state <= S_Idle;
+                        
                 END CASE;
             END IF;
         END IF;
