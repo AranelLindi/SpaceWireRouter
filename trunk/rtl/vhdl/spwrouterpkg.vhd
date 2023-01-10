@@ -127,9 +127,6 @@ PACKAGE spwrouterpkg IS
 
     -- Router table (spwroutertable.vhd).
     COMPONENT spwroutertable IS
-        GENERIC (
-            numports : integer range 1 to 32
-        );
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
@@ -142,9 +139,6 @@ PACKAGE spwrouterpkg IS
 
     -- Control register (spwrouterregs.vhd).
     COMPONENT spwrouterregs IS
-        GENERIC (
-            numports : integer range 1 to 32
-        );
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
@@ -170,7 +164,7 @@ PACKAGE spwrouterpkg IS
             addrTable : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             ackTable : OUT STD_LOGIC;
             strobeTable : IN STD_LOGIC;
-            cycleTable : IN STD_LOGIC;
+            requestTable : IN STD_LOGIC;
             portstatus : IN array_t(0 TO numports-1)(31 DOWNTO 0);
             portcontrol : OUT array_t(0 TO numports-1)(31 DOWNTO 0);
             running : IN STD_LOGIC_VECTOR(31 DOWNTO 0);

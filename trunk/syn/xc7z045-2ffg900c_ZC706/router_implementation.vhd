@@ -45,10 +45,26 @@ entity router_implementation is
         rst : in std_logic;
         rx : in std_logic := '0';
         tx : out std_logic;
-        spw_di : in std_logic;
-        spw_si : in std_logic;
-        spw_do : out std_logic;
-        spw_so : out std_logic;
+        spw_di_0 : in std_logic;
+        spw_si_0 : in std_logic;
+        spw_do_0 : out std_logic;
+        spw_so_0 : out std_logic;
+        spw_di_1 : in std_logic;
+        spw_si_1 : in std_logic;
+        spw_do_1 : out std_logic;
+        spw_so_1 : out std_logic;
+        spw_di_2 : in std_logic;
+        spw_si_2 : in std_logic;
+        spw_do_2 : out std_logic;
+        spw_so_2 : out std_logic;
+        spw_di_3 : in std_logic;
+        spw_si_3 : in std_logic;
+        spw_do_3 : out std_logic;
+        spw_so_3 : out std_logic;
+        spw_di_4 : in std_logic;
+        spw_si_4 : in std_logic;
+        spw_do_4 : out std_logic;
+        spw_so_4 : out std_logic;                                
         clka : in std_logic;
         addra : in std_logic_vector(31 downto 0);
         dina : in std_logic_vector(31 downto 0);
@@ -74,10 +90,10 @@ architecture Behavioral of router_implementation is
             numports : INTEGER RANGE 1 TO 32;
 
             -- Initial SpW input port (in chase that no commands are allowed, it cannot be changed !)
-            init_input_port : INTEGER RANGE 0 TO 31 := 0;
+            init_input_port : INTEGER RANGE 1 TO 32 := 1;
 
             -- Initial SpW output port (in chase that no commands are allowed, it cannot be changed !)
-            init_output_port : INTEGER RANGE 0 TO 31 := 0;
+            init_output_port : INTEGER RANGE 1 TO 32 := 1;
 
             -- Determines whether commands are permitted or data are sent only.
             activate_commands : BOOLEAN;
@@ -201,21 +217,39 @@ architecture Behavioral of router_implementation is
 
 --    signal clk : std_logic;
 
-    signal s_spw_d_to_router : std_logic_vector(3 downto 0);
-    signal s_spw_s_to_router : std_logic_vector(3 downto 0);
-    signal s_spw_d_from_router : std_logic_vector(3 downto 0);
-    signal s_sPw_s_from_router : std_logic_vector(3 downto 0);
+    signal s_spw_d_to_router : std_logic_vector(5 downto 0);
+    signal s_spw_s_to_router : std_logic_vector(5 downto 0);
+    signal s_spw_d_from_router : std_logic_vector(5 downto 0);
+    signal s_sPw_s_from_router : std_logic_vector(5 downto 0);
 begin
     -- Differential input clock buffer.
 --    bufgds: IBUFDS port map (I => SYSCLK_P, IB => SYSCLK_N, O => clk_ibufg); -- eventuell auch IBUFGDS, mal schauen ob Fehler auftreten
 
 
-    s_spw_d_to_router(0) <= spw_di;
-    s_spw_s_to_router(0) <= spw_si;
-    spw_do <= s_spw_d_from_router(0);
-    spw_so <= s_spw_s_from_router(0);
+    s_spw_d_to_router(0) <= spw_di_0;
+    s_spw_s_to_router(0) <= spw_si_0;
+    spw_do_0 <= s_spw_d_from_router(0);
+    spw_so_0 <= s_spw_s_from_router(0);
+    
+    s_spw_d_to_router(1) <= spw_di_1;
+    s_spw_s_to_router(1) <= spw_si_1;
+    spw_do_1 <= s_spw_d_from_router(1);
+    spw_so_1 <= s_spw_s_from_router(1);
+    
+    s_spw_d_to_router(2) <= spw_di_2;
+    s_spw_s_to_router(2) <= spw_si_2;
+    spw_do_2 <= s_spw_d_from_router(2);
+    spw_so_2 <= s_spw_s_from_router(2);
 
+    s_spw_d_to_router(3) <= spw_di_3;
+    s_spw_s_to_router(3) <= spw_si_3;
+    spw_do_3 <= s_spw_d_from_router(3);
+    spw_so_3 <= s_spw_s_from_router(3);
 
+    s_spw_d_to_router(4) <= spw_di_4;
+    s_spw_s_to_router(4) <= spw_si_4;
+    spw_do_4 <= s_spw_d_from_router(4);
+    spw_so_4 <= s_spw_s_from_router(4);
 
 
     -- Creates 100 MHz clock.
@@ -238,7 +272,7 @@ begin
 
     RouterImpl : spwrouter
         generic map (
-            numports => 4,
+            numports => 6,
             sysfreq => 100.0e6,
             txclkfreq => 100.0e6,
             rx_impl => (others => impl_fast),
@@ -275,10 +309,10 @@ begin
     Adapter : UARTSpWAdapter
         GENERIC MAP(
             clk_cycles_per_bit => 868, -- 100_000_000 (Hz) / 115_200 (baud rate) = 868
-            numports => 3,
+            numports => 1,
             init_input_port => 1,
             init_output_port => 1,
-            activate_commands => true, -- define adapter variant (command (true) / non-command version (false))
+            activate_commands => false, -- define adapter variant (command (true) / non-command version (false))
             sysfreq => sysfreq,
             txclkfreq => sysfreq,
             rximpl => impl_fast,
@@ -306,10 +340,10 @@ begin
             errcred => open,
             txhalff => OPEN,
             rxhalff => OPEN,
-            spw_di => s_spw_d_from_router(3 downto 1),
-            spw_si => s_spw_s_from_router(3 downto 1),
-            spw_do => s_spw_d_to_router(3 downto 1),
-            spw_so => s_spw_s_to_router(3 downto 1),
+            spw_di => s_spw_d_from_router(5 downto 5),
+            spw_si => s_spw_s_from_router(5 downto 5),
+            spw_do => s_spw_d_to_router(5 downto 5),
+            spw_so => s_spw_s_to_router(5 downto 5),
             rx => rx,
             tx => tx
         );

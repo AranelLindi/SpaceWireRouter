@@ -300,7 +300,7 @@ BEGIN
                 addrTable => s_bus_s_address, -- I
                 ackTable => s_bus_s_ack, -- O
                 strobeTable => s_bus_s_strobe, -- I
-                cycleTable => s_bus_s_request, -- I
+                requestTable => s_bus_s_request, -- I
                 portstatus => s_portstatus, -- I
                 portcontrol => s_portcontrol, -- O
                 running => std_logic_vector(resize(unsigned(s_running), 32)), -- I
@@ -319,9 +319,6 @@ BEGIN
     else generate
         -- Contains router link control, port status register and routing table.
         reg_original : spwrouterregs
-            GENERIC MAP(
-                numports => numports
-            )
             PORT MAP(
                 clk => clk, -- I
                 rst => rst, -- I

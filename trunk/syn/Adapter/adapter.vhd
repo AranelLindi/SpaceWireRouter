@@ -35,10 +35,10 @@ entity UARTSpWAdapter is
         numports : integer range 1 to 32;
 
         -- Initial SpW input port (in chase that no commands are allowed, it cannot be changed !)
-        init_input_port : integer range 0 to 31 := 0;
+        init_input_port : integer range 1 to 32 := 1;
 
         -- Initial SpW output port (in chase that no commands are allowed, it cannot be changed !)
-        init_output_port : integer range 0 to 31 := 0;
+        init_output_port : integer range 1 to 32 := 1;
 
         -- Determines whether commands are permitted or data bytes are sent only. 
         activate_commands : boolean;
@@ -267,8 +267,8 @@ architecture UARTSpWAdapter_config_arch of UARTSpWAdapter is
     signal s_uart_output : std_logic_vector(7 downto 0) := (others => '0'); -- buffers outgoing bytes (uart)
 
     -- Control.
-    signal s_port_input : integer range 0 to numports-1 := init_input_port;
-    signal s_port_output : integer range 0 to numports-1 := init_output_port;
+    signal s_port_input : integer range 0 to numports-1 := init_input_port-1;
+    signal s_port_output : integer range 0 to numports-1 := init_output_port-1;
 
     -- Intern infos request.
     signal s_info1 : std_logic := '0'; -- SpW input port
@@ -389,8 +389,8 @@ begin
                 s_ctrl_in <= (others => (others => '0'));
                 s_time_in <= (others => (others => '0'));
                 -- Intern signals.
-                s_port_input <= init_input_port;
-                s_port_output <= init_output_port;
+                s_port_input <= init_input_port-1;
+                s_port_output <= init_output_port-1;
                 s_info1 <= '0';
                 s_info2 <= '0';
                 s_info3 <= '0';
@@ -437,8 +437,8 @@ begin
                                     when "00" =>
                                         -- Reset of all state variables (no global reset !)
                                         -- List everything that should be reset here...
-                                        s_port_input <= init_input_port;
-                                        s_port_output <= init_output_port;
+                                        s_port_input <= init_input_port-1;
+                                        s_port_output <= init_output_port-1;
 
                                     when "01" =>
                                         -- Output Info1.

@@ -25,10 +25,6 @@ USE WORK.SPWROUTERPKG.ALL;
 USE STD.TEXTIO.ALL; -- Used for ROM initialization.
 
 ENTITY spwroutertable IS
-    GENERIC (
-        -- Number of SpaceWire ports.
-        numports : integer range 1 to 32
-    );
     PORT (
         -- System clock.
         clk : IN STD_LOGIC;

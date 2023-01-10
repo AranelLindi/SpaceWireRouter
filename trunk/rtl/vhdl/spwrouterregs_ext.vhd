@@ -53,8 +53,8 @@ entity spwrouterregs_extended is
         -- Strobe signal indicating that routing table is being used.
         strobeTable : in std_logic;
 
-        -- ??? what does cycle
-        cycleTable : in std_logic;
+        -- Request signal indicating that access to routing table is requested.
+        requestTable : in std_logic;
 
         ---- Bus: Port states/control ----
         -- Contains state of every port according to router register manual.
@@ -154,7 +154,7 @@ architecture spwrouterregs_extended_arch of spwrouterregs_extended is
     -- ...     
 begin
     -- Intermediate signals.
-    s_ack_in <= cycleTable and strobeTable;
+    s_ack_in <= requestTable and strobeTable;
 
     -- Drive outputs.
     ackTable <= s_ack_out;
@@ -313,7 +313,7 @@ begin
                         when "01" => -- Router Registers
                             case addra(9 downto 8) is
                                 when "00" => -- Port register (Control & Status)
-                                    if unsigned(addra(7 downto 2)) <= to_unsigned(2 * (numports-1 + 1), 6) then -- Interval check
+                                    if unsigned(addra(7 downto 2)) <= to_unsigned(2 * numports, 6) then -- Interval check
                                         if addra(2) = '0' then
                                             -- Even number: Control
                                             for i in 0 to 3 loop

@@ -25,10 +25,6 @@ USE WORK.SPWPKG.ALL;
 USE STD.TEXTIO.ALL; -- Used for ROM initialization.
 
 ENTITY spwrouterregs IS
-    GENERIC (
-        -- Number of SpaceWire ports.
-        numports : integer range 1 to 32
-    );
     PORT (
         -- System clock.
         clk : IN STD_LOGIC;
@@ -117,9 +113,6 @@ BEGIN
 
     -- Routing table.
     RoutingTable : spwroutertable
-        GENERIC MAP(
-            numports => numports
-        )
         PORT MAP(
             clk => clk,
             rst => rst,
