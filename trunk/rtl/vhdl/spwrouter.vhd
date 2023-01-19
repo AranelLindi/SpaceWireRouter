@@ -169,8 +169,8 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
 
     SIGNAL s_watchcycle : STD_LOGIC_VECTOR(31 DOWNTO 0); -- Contains watchdog time period to break up an inactive wormhole connection
 
-    SIGNAL s_portstatus : array_t(numports-1 DOWNTO 0)(31 DOWNTO 0); -- Contains status of every port
-    SIGNAL s_portcontrol : array_t(numports-1 DOWNTO 0)(31 DOWNTO 0); -- Contains control information for every port
+    SIGNAL s_portstatus : array_t(0 TO numports-1)(31 DOWNTO 0); -- Contains status of every port
+    SIGNAL s_portcontrol : array_t(0 TO numports-1)(31 DOWNTO 0); -- Contains control information for every port
 
 
     -- ====================================

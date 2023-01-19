@@ -312,7 +312,7 @@ begin
             numports => 1,
             init_input_port => 1,
             init_output_port => 1,
-            activate_commands => false, -- define adapter variant (command (true) / non-command version (false))
+            activate_commands => True, -- define adapter variant (command (true) / non-command version (false))
             sysfreq => sysfreq,
             txclkfreq => sysfreq,
             rximpl => impl_fast,

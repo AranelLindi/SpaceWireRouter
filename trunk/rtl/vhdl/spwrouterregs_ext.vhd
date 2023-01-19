@@ -313,8 +313,8 @@ begin
                         when "01" => -- Router Registers
                             case addra(9 downto 8) is
                                 when "00" => -- Port register (Control & Status)
-                                    if unsigned(addra(7 downto 2)) <= to_unsigned(2 * numports, 6) then -- Interval check
-                                        if addra(2) = '0' then
+                                    if to_integer(unsigned(addra(7 downto 2))) <= ((2 * numports) - 1) then -- Interval check
+                                        if (to_integer(unsigned(addra(7 downto 2))) mod 2) = 0 then
                                             -- Even number: Control
                                             for i in 0 to 3 loop
                                                 if wea(i) = '1' then
@@ -330,7 +330,7 @@ begin
                                     else
                                         douta <= (others => '0');
                                     end if;
-
+                                    
                                 when "01" => -- Router Register
                                     case to_integer(unsigned(addra(7 downto 2))) is
                                         when 0 => -- Numports register
