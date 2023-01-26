@@ -59,20 +59,20 @@ END spwrouterregs;
 ARCHITECTURE spwrouterregs_arch OF spwrouterregs IS
     -- Function to initialize automatically Time Code generation interval. (Time Code Cycle)
     -- Text file must not contain more than one line with a 32 bit word (8 digits of a hexadecimal number) !
-    impure function init_auto_cycle return std_logic_vector is
-        file text_file : text open read_mode is "../../syn/MemFiles/TimeCodeCycle_mem.txt";
+    IMPURE FUNCTION init_auto_cycle RETURN STD_LOGIC_VECTOR IS
+        FILE text_file : text OPEN read_mode IS "../../syn/MemFiles/TimeCodeCycle_mem.txt";
 
-        variable text_line : line;
-        variable content : std_logic_vector(31 downto 0);
-    begin
+        VARIABLE text_line : line;
+        VARIABLE content : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    BEGIN
         readline(text_file, text_line);
         hread(text_line, content);
 
-        return content;
-    end function;
+        RETURN content;
+    END FUNCTION;
 
     -- Automatic Time-Code Cycle.
-    constant c_auto_cycle : std_logic_vector(31 downto 0) := init_auto_cycle;
+    CONSTANT c_auto_cycle : STD_LOGIC_VECTOR(31 DOWNTO 0) := init_auto_cycle;
 
     -- Buffer for output ports.
     SIGNAL s_readData : STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -105,24 +105,23 @@ BEGIN
 
     -- Decides what data was requested and writes it in general output port.
     s_readData <= s_dataRoutingTable WHEN s_selectRoutingTable = '1' ELSE
-                  (others => '0');
+        (OTHERS => '0');
 
     -- Address decoding and table selection. Logic addressing with ports 32 to 254 (saved in routing table).
-    s_selectRoutingTable <= '1' WHEN unsigned(addr(13 DOWNTO 2)) > to_unsigned(31, 12) AND unsigned(addr(13 DOWNTO 2)) <= to_unsigned(256, 12) ELSE '0';
-
+    s_selectRoutingTable <= '1' WHEN unsigned(addr(13 DOWNTO 2)) > to_unsigned(31, 12) AND unsigned(addr(13 DOWNTO 2)) <= to_unsigned(256, 12) ELSE
+        '0';
 
     -- Routing table.
     RoutingTable : spwroutertable
-        PORT MAP(
-            clk => clk,
-            rst => rst,
-            ack_in => s_strobeRoutingTable,
-            addr => addr(9 DOWNTO 2), -- maps hexadecimal numbers to decimals beginning with 0 step 1.
-            rdata => s_dataRoutingTable,
-            ack_out => s_ackRoutingTable
-        );
-
-
+    PORT MAP(
+        clk => clk,
+        rst => rst,
+        ack_in => s_strobeRoutingTable,
+        addr => addr(9 DOWNTO 2), -- maps hexadecimal numbers to decimals beginning with 0 step 1.
+        rdata => s_dataRoutingTable,
+        ack_out => s_ackRoutingTable
+    );
+    
     -- FSM - controls read access to registers.
     PROCESS (clk)
     BEGIN
@@ -131,7 +130,7 @@ BEGIN
                 -- Synchronous reset.
                 s_ack_out <= '0';
                 state <= S_Idle;
-            -- x"0BEBC200" (alle 2 sec wird ein neues automatisches Time Code generiert)
+                -- x"0BEBC200" (alle 2 sec wird ein neues automatisches Time Code generiert)
             ELSE
 
                 CASE state IS

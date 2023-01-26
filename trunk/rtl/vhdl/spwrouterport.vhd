@@ -25,7 +25,7 @@ USE WORK.SPWPKG.ALL;
 ENTITY spwrouterport IS
     GENERIC (
         -- Number of SpaceWire ports.
-        numports : integer range 1 to 32;
+        numports : INTEGER RANGE 1 TO 32;
 
         -- Bit length to map number of ports (ceil(log2((numports-1)))).
         blen : INTEGER RANGE 0 TO 5; -- (max 5 bits for 0-31 ports)
@@ -167,7 +167,7 @@ ENTITY spwrouterport IS
         --           ROUTER SIGNALS
         -- ====================================
         -- Shows which port is in running-state.
-        linkstatus : IN STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
+        linkstatus : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
 
         -- High as long as a packet is sent from this port to another.
         request_out : OUT STD_LOGIC;
@@ -213,15 +213,15 @@ ENTITY spwrouterport IS
 
         -- Acknowledgment for granted access to routing table.
         bus_ack_in : IN STD_LOGIC;
-        
+
         -- ====================================
         --      PORT STATUS & CONTROL BUS
         -- ====================================
         -- Contains port status (see manual).
-        portstatus : out std_logic_vector(31 downto 0);
-        
+        portstatus : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+
         -- Control information for port (see manual).
-        portcontrol : in std_logic_vector(31 downto 0)
+        portcontrol : IN STD_LOGIC_VECTOR(31 DOWNTO 0) -- Not used yet inside this entity !
     );
 END spwrouterport;
 
@@ -255,9 +255,9 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
     SIGNAL s_strobe_out : STD_LOGIC; -- Strobe signal to destination port when cargo/EOP/EEP byte need to be transmitted
     SIGNAL s_request_out : STD_LOGIC; -- High as long as a packet is started and sent but not yet completed
     SIGNAL s_destination_port : STD_LOGIC_VECTOR(7 DOWNTO 0); -- Contains first byte of a packet (address byte)
-    
+
     -- Register status signals.
-    signal s_discardedcounter : unsigned(17 downto 0);
+    SIGNAL s_discardedcounter : unsigned(17 DOWNTO 0);
 BEGIN
     -- Drive outputs.
     -- Bus & router signals.
@@ -272,12 +272,12 @@ BEGIN
     bus_dByte <= (OTHERS => '1'); -- always select all four bytes
     -- Port signals.
     rxhalff <= s_rxhalff;
-    txhalff <= s_txhalff;    
-    
+    txhalff <= s_txhalff;
+
     -- Read input.
     s_txwrite <= strobe_in WHEN request_in = '1' ELSE
         '0';
-        
+
     -- Drive port status (register).
     portstatus(0) <= started;
     portstatus(1) <= connecting;
@@ -289,10 +289,8 @@ BEGIN
     portstatus(7) <= errcred;
     portstatus(9) <= rxhalff;
     portstatus(12) <= txhalff;
-    portstatus(31 downto 14) <= std_logic_vector(s_discardedcounter);
+    portstatus(31 DOWNTO 14) <= STD_LOGIC_VECTOR(s_discardedcounter);
     --portstatus(31 downto 8) <= (others => '0');
-    
-        
 
     -- SpaceWire port.
     spwport : spwstream
@@ -343,7 +341,7 @@ BEGIN
         spw_do => spw_do,
         spw_so => spw_so
     );
-    
+
     -- Infers a latch, but is necessary to hold the signal so that the FSM of receiving port has enough time to react to it. TODO: Bad design, either rebuild in future or test thoroughly !
     PROCESS (clk)
     BEGIN
@@ -370,7 +368,7 @@ BEGIN
                 s_request_out <= '0';
                 s_routing_table_request <= '0';
                 s_strobe_out <= '0';
-                s_discardedcounter <= (others => '0');
+                s_discardedcounter <= (OTHERS => '0');
                 state <= S_Idle;
             ELSE
                 CASE state IS
@@ -400,7 +398,7 @@ BEGIN
                                 -- Physical port is addressed.
                                 s_destination_port <= s_rxdata(7 DOWNTO 0); -- Destination port number (first byte of packet)
 
-                                IF (unsigned(s_rxdata(7 DOWNTO 0)) > (numports-1)) THEN
+                                IF (unsigned(s_rxdata(7 DOWNTO 0)) > (numports - 1)) THEN
                                     -- Discard invalid addressed packet (destination port does not exist).
                                     state <= S_Dummy0;
                                 ELSE
@@ -424,7 +422,7 @@ BEGIN
                         v_validport := '0'; -- (Reset variable for next iteration)
 
                         -- Check if target port is addressable.
-                        FOR i IN 1 TO (numports-1) LOOP -- Auf Port0 kann hiernach nicht gesendet werden, bitte überprüfen!
+                        FOR i IN 1 TO (numports - 1) LOOP -- Auf Port0 kann hiernach nicht gesendet werden, bitte überprüfen!
                             IF (linkstatus(i) = '1' AND s_destination_port(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(i, blen + 1))) THEN
                                 v_validport := '1'; -- potenzielle Fehlerquelle mit blen+1 !! Im Original Code werden hier 5 Bits (4 downto 0) abgefragt. falls blen == 4 ist, muss folglich blen+1 für 5 gelten!
                             END IF;
@@ -455,7 +453,7 @@ BEGIN
                         -- Since only single unconnected if statements can be generated, the order must be
                         -- reversed (descending), therefore the last if query has the highes priority. (Can
                         -- overwrite result again.)
-                        FOR i IN (numports-1) DOWNTO 0 LOOP
+                        FOR i IN (numports - 1) DOWNTO 0 LOOP
                             IF (linkstatus(i) = '1' AND bus_data_in(i) = '1') THEN
                                 s_destination_port <= STD_LOGIC_VECTOR(to_unsigned(i, s_destination_port'length));
                                 s_request_out <= '1';
@@ -466,7 +464,7 @@ BEGIN
                             END IF;
                         END LOOP;
 
-                        IF (v_reqports = '0') THEN -- discard invalid addressed packet
+                        IF (v_reqports = '0') THEN -- discard invalid addressed packet (TODO: Warning ! Packet addressed to port which is currently not connected will be deleted ! No usefull behaviour ! Change !)
                             state <= S_Dummy0;
                         END IF;
 
@@ -498,7 +496,7 @@ BEGIN
                         IF (ready_in = '1') THEN
                             s_strobe_out <= '1';
                             s_packet_cargo <= s_rxdata;
-                            
+
                             IF (s_rxdata(8) = '1') THEN
                                 -- EOP/EEP means packet is complete.
                                 state <= S_Data3;
@@ -546,7 +544,7 @@ BEGIN
 
                     WHEN OTHERS => -- (Necessary because of unused state problem)
                         state <= S_Idle;
-                        
+
                 END CASE;
             END IF;
         END IF;

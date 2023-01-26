@@ -49,22 +49,22 @@ END spwroutertable;
 ARCHITECTURE spwroutertable_arch OF spwroutertable IS
     -- Function to initialize Routing Table ROM. Reads hexadecimal numbers from text file. 
     -- Each line in file represents a logical address (beginning with 32, ending with 255).
-    impure function init_routingtable return array_t is
-        file text_file : text open read_mode is "../../syn/MemFiles/RoutingTable_mem.txt";
+    IMPURE FUNCTION init_routingtable RETURN array_t IS
+        FILE text_file : text OPEN read_mode IS "../../syn/MemFiles/RoutingTable_mem.txt";
 
-        variable text_line : line;
-        variable ram_content : array_t(32 to 255)(31 downto 0);
-    begin
-        for i in 32 to 255 loop
+        VARIABLE text_line : line;
+        VARIABLE ram_content : array_t(32 TO 255)(31 DOWNTO 0);
+    BEGIN
+        FOR i IN 32 TO 255 LOOP
             readline(text_file, text_line);
             hread(text_line, ram_content(i));
-        end loop;
+        END LOOP;
 
-        return ram_content;
-    end function;
-    
-        -- Routing table
-    constant c_routingtable : array_t(32 to 255)(31 downto 0) := init_routingtable;
+        RETURN ram_content;
+    END FUNCTION;
+
+    -- Routing table
+    CONSTANT c_routingtable : array_t(32 TO 255)(31 DOWNTO 0) := init_routingtable;
 
     -- Buffer for acknowledge output signal.
     SIGNAL s_ack_out : STD_LOGIC;

@@ -41,8 +41,8 @@ PACKAGE spwrouterpkg IS
         S_Idle,
         S_Read0,
         S_Read1,
---        S_Write0,
---        S_Write1,
+        --        S_Write0,
+        --        S_Write1,
         S_Wait0,
         S_Wait1
     ); -- 5
@@ -77,49 +77,49 @@ PACKAGE spwrouterpkg IS
     -- Round Robin arbiter (spwrouterarb_table.vhd).
     COMPONENT spwrouterarb_round IS
         GENERIC (
-            numports : integer range 1 to 32;
+            numports : INTEGER RANGE 1 TO 32;
             blen : INTEGER RANGE 0 TO 5
         );
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
             occupied : IN STD_LOGIC;
-            request : IN STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            granted : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0)
+            request : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            granted : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0)
         );
     END COMPONENT;
 
     -- Port arbiter (spwrouterarb.vhd).
     COMPONENT spwrouterarb IS
         GENERIC (
-            numports : integer range 1 to 32;
+            numports : INTEGER RANGE 1 TO 32;
             blen : INTEGER RANGE 0 TO 5
         );
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            destport : IN array_t((numports-1) DOWNTO 0)(7 DOWNTO 0);
-            request : IN STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            granted : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            routing_matrix : OUT array_t((numports-1) DOWNTO 0)((numports-1) DOWNTO 0)
+            destport : IN array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0);
+            request : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            granted : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            routing_matrix : OUT array_t((numports - 1) DOWNTO 0)((numports - 1) DOWNTO 0)
         );
     END COMPONENT;
 
     -- Time Code controller (spwroutertcc.vhd).
     COMPONENT spwroutertcc IS
         GENERIC (
-            numports : integer range 1 to 32
+            numports : INTEGER RANGE 1 TO 32
         );
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            running : IN STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            tc_enable : IN STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
+            running : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            tc_enable : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
             tc_last : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-            tick_out : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            tick_in : IN STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            tc_out : OUT array_t((numports-1) DOWNTO 0)(7 DOWNTO 0);
-            tc_in : IN array_t((numports-1) DOWNTO 0)(7 DOWNTO 0);
+            tick_out : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            tick_in : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            tc_out : OUT array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0);
+            tc_in : IN array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0);
             auto_tc_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
             auto_interval : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
@@ -155,7 +155,7 @@ PACKAGE spwrouterpkg IS
     -- Extended control register (spwrouterregs_ext.vhd)
     COMPONENT spwrouterregs_extended IS
         GENERIC (
-            numports : integer range 1 to 32
+            numports : INTEGER RANGE 1 TO 32
         );
         PORT (
             clk : IN STD_LOGIC;
@@ -165,8 +165,8 @@ PACKAGE spwrouterpkg IS
             ackTable : OUT STD_LOGIC;
             strobeTable : IN STD_LOGIC;
             requestTable : IN STD_LOGIC;
-            portstatus : IN array_t((numports-1) downto 0)(31 DOWNTO 0);
-            portcontrol : OUT array_t((numports-1) downto 0)(31 DOWNTO 0);
+            portstatus : IN array_t((numports - 1) DOWNTO 0)(31 DOWNTO 0);
+            portcontrol : OUT array_t((numports - 1) DOWNTO 0)(31 DOWNTO 0);
             running : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             watchcycle : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             timecycle : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -185,20 +185,20 @@ PACKAGE spwrouterpkg IS
     -- Arbiter for routing table and registers.
     COMPONENT spwrouterarb_table IS
         GENERIC (
-            numports : integer range 1 to 32
+            numports : INTEGER RANGE 1 TO 32
         );
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            request : IN STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            granted : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0)
+            request : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            granted : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0)
         );
     END COMPONENT;
 
     -- Router port (spwrouterport.vhd).
     COMPONENT spwrouterport IS
         GENERIC (
-            numports : integer range 1 to 32;
+            numports : INTEGER RANGE 1 TO 32;
             blen : INTEGER RANGE 0 TO 5;
             sysfreq : real;
             txclkfreq : real := 0.0;
@@ -238,7 +238,7 @@ PACKAGE spwrouterpkg IS
             spw_si : IN STD_LOGIC;
             spw_do : OUT STD_LOGIC;
             spw_so : OUT STD_LOGIC;
-            linkstatus : IN STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
+            linkstatus : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
             request_out : OUT STD_LOGIC;
             request_in : IN STD_LOGIC;
             destination_port : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -261,36 +261,36 @@ PACKAGE spwrouterpkg IS
     -- Router Entity.
     COMPONENT spwrouter IS
         GENERIC (
-            numports : integer range 1 to 32;
+            numports : INTEGER RANGE 1 TO 32;
             sysfreq : real;
             txclkfreq : real;
-            externPort : boolean := True;
-            rx_impl : rximpl_array((numports-1) DOWNTO 0);
-            tx_impl : tximpl_array((numports-1) DOWNTO 0)
+            externPort : BOOLEAN := True;
+            rx_impl : rximpl_array((numports - 1) DOWNTO 0);
+            tx_impl : tximpl_array((numports - 1) DOWNTO 0)
         );
         PORT (
             clk : IN STD_LOGIC;
             rxclk : IN STD_LOGIC;
             txclk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            started : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            connecting : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            running : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            errdisc : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            errpar : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            erresc : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            errcred : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            spw_di : IN STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            spw_si : IN STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            spw_do : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            spw_so : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
-            clka : in std_logic := '0';
-            addra : in std_logic_vector(31 downto 0) := (others => '0');
-            dina : in std_logic_vector(31 downto 0) := (others => '0');
-            douta : out std_logic_vector(31 downto 0);
-            ena : in std_logic := '0';
-            rsta : in std_logic := '0';
-            wea : in std_logic_vector(3 downto 0) := (others => '0')
+            started : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            connecting : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            running : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            errdisc : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            errpar : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            erresc : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            errcred : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            spw_di : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            spw_si : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            spw_do : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            spw_so : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            clka : IN STD_LOGIC := '0';
+            addra : IN STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
+            dina : IN STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
+            douta : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            ena : IN STD_LOGIC := '0';
+            rsta : IN STD_LOGIC := '0';
+            wea : IN STD_LOGIC_VECTOR(3 DOWNTO 0) := (OTHERS => '0')
         );
     END COMPONENT;
 END PACKAGE;
