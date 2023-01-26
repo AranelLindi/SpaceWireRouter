@@ -10,7 +10,7 @@
 -- Tool Versions: -/-
 -- Description: A ring is constructed that contains all (source) ports.
 -- Starting from a specific port, it gives next higher priority in ascending order
--- (0..numports-1..0). The starting point is always the port to which 
+-- (0..(numports-1)..0). The starting point is always the port to which 
 -- access was granted last.
 --
 -- Dependencies: none
@@ -41,17 +41,17 @@ ENTITY spwrouterarb_round IS
         occupied : IN STD_LOGIC;
 
         -- Shows which ports making an transfer request to this port.
-        request : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+        request : IN STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
 
         -- Shows which port has been guaranteed access to this port.
-        granted : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0)
+        granted : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0)
     );
 END spwrouterarb_round;
 
 ARCHITECTURE spwrouterarb_round_arch OF spwrouterarb_round IS
     -- Output registers.
-    SIGNAL s_granted : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
-    SIGNAL s_request : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+    SIGNAL s_granted : STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
+    SIGNAL s_request : STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
     SIGNAL s_occupied : STD_LOGIC;
 
     -- Last granted port (for internal purposes).
@@ -73,10 +73,10 @@ BEGIN
                 s_last_granted <= STD_LOGIC_VECTOR(to_unsigned(0, s_last_granted'length));
             ELSE
                 -- Roll-out arbitration logic for every port.
-                arbitration : FOR i IN numports-1 DOWNTO 0 LOOP
+                arbitration : FOR i IN (numports-1) DOWNTO 0 LOOP
                     IF (s_last_granted = STD_LOGIC_VECTOR(to_unsigned(i, s_last_granted'length))) THEN
 
-                        -- The following ports in the line (0..1..numports-1..0) will give prefered access to current
+                        -- The following ports in the line (0..1..(numports-1)..0) will give prefered access to current
                         -- port. Normally in if-statements early conditions takes priority above later.
                         -- Through rolling out for-loops, many seperate if-statements will be
                         -- created. Therefore the highes priority must be listed in the last order to
@@ -89,7 +89,7 @@ BEGIN
                             END IF;
                         END LOOP lowerpriority;
                         
-                        higherpriority : FOR k IN numports-1 DOWNTO (i + 1) LOOP -- [numports-1 <= k <= (i+1)]
+                        higherpriority : FOR k IN (numports-1) DOWNTO (i + 1) LOOP -- [(numports-1) <= k <= (i+1)]
                             IF (s_request(k) = '1' AND s_occupied = '0') THEN
                                 s_granted <= std_logic_vector(to_unsigned(2 ** k, s_granted'length));
                                 s_last_granted <= STD_LOGIC_VECTOR(to_unsigned(k, s_last_granted'length));
@@ -99,7 +99,7 @@ BEGIN
                 END LOOP arbitration;
 
                 -- Revoke previously granted access that is no longer required.
-                FOR i IN 0 TO numports-1 LOOP
+                FOR i IN 0 TO (numports-1) LOOP
                     IF (s_request(i) = '0' AND s_granted(i) = '1') THEN
                         s_granted(i) <= '0';
                     END IF;

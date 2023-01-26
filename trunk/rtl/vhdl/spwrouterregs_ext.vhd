@@ -58,10 +58,10 @@ entity spwrouterregs_extended is
 
         ---- Bus: Port states/control ----
         -- Contains state of every port according to router register manual.
-        portstatus : in array_t(0 to numports-1)(31 downto 0);
+        portstatus : in array_t((numports-1) downto 0)(31 downto 0);
 
         -- Control information for every port according to router register manual.
-        portcontrol : out array_t(0 to numports-1)(31 downto 0);
+        portcontrol : out array_t((numports-1) downto 0)(31 downto 0);
 
         ---- Bus: Router state/control ----
         -- Register: All ports in run state.
@@ -124,9 +124,9 @@ architecture spwrouterregs_extended_arch of spwrouterregs_extended is
 
 
     -- Slave registers.
-    signal slv_reg_routingTable : array_t(32 to 255)(31 downto 0);
-    signal slv_reg_portstatus : array_t(0 to numports-1)(31 downto 0);
-    signal slv_reg_portcontrol : array_t(0 to numports-1)(31 downto 0);
+    signal slv_reg_routingTable : array_t(255 downto 32)(31 downto 0);
+    signal slv_reg_portstatus : array_t((numports-1) downto 0)(31 downto 0);
+    signal slv_reg_portcontrol : array_t((numports-1) downto 0)(31 downto 0);
     signal slv_reg_numports : std_logic_vector(31 downto 0);
     signal slv_reg_running : std_logic_vector(31 downto 0);
     signal slv_reg_watchcycle : std_logic_vector(31 downto 0);
@@ -140,9 +140,9 @@ architecture spwrouterregs_extended_arch of spwrouterregs_extended is
 
 
     -- User-definied signals declaration.
-    signal s_routingTable : array_t(32 to 255)(31 downto 0);
-    signal s_portstatus : array_t(0 to numports-1)(31 downto 0);
-    signal s_portcontrol : array_t(0 to numports-1)(31 downto 0);
+    signal s_routingTable : array_t(255 downto 32)(31 downto 0);
+    signal s_portstatus : array_t((numports-1) downto 0)(31 downto 0);
+    signal s_portcontrol : array_t((numports-1) downto 0)(31 downto 0);
     signal s_numports : std_logic_vector(31 downto 0);
     signal s_running : std_logic_vector(31 downto 0);
     signal s_watchcycle : std_logic_vector(31 downto 0);
@@ -163,7 +163,7 @@ begin
     --    Internal Busses.
     -- ======================    
     -- Read/Write registes.
-    sig_portcontrol : for i in 0 to numports-1 generate
+    sig_portcontrol : for i in 0 to (numports-1) generate
         s_portcontrol(i) <= slv_reg_portcontrol(i);
     end generate sig_portcontrol;
 
@@ -173,7 +173,7 @@ begin
 
 
     -- Read only registers.
-    sig_portstatus : for i in 0 to numports-1 generate
+    sig_portstatus : for i in 0 to (numports-1) generate
         slv_reg_portstatus(i) <= s_portstatus(i);
     end generate sig_portstatus;
 
@@ -189,7 +189,7 @@ begin
     begin
         if rising_edge(clk) then
             -- Port control.
-            for i in 0 to numports-1 loop
+            for i in 0 to (numports-1) loop
                 portcontrol(i) <= s_portcontrol(i);
             end loop;
 
@@ -200,18 +200,18 @@ begin
             timecycle <= s_autotimecycle;
         end if;
     end process;
-    
+
 
     -- Write values to read-only registers.
     process(clk)
     begin
         if rising_edge(clk) then
             -- Port status.
-            for i in 0 to numports-1 loop
+            for i in 0 to (numports-1) loop
                 s_portstatus(i) <= portstatus(i);
             end loop;
 
-            -- numports-1.
+            -- (numports-1).
             s_numports <= std_logic_vector(to_unsigned(numports, s_numports'length));
 
             -- Running ports.
@@ -227,8 +227,8 @@ begin
             s_info <= x"534C3232";
         end if;
     end process;
-    
-    
+
+
     -- Routing table fsm. Manages internal bus access.
     table_fsm : process(clk)
         variable v_index : integer;
@@ -313,24 +313,25 @@ begin
                         when "01" => -- Router Registers
                             case addra(9 downto 8) is
                                 when "00" => -- Port register (Control & Status)
-                                    if to_integer(unsigned(addra(7 downto 2))) <= ((2 * numports) - 1) then -- Interval check
-                                        if (to_integer(unsigned(addra(7 downto 2))) mod 2) = 0 then
-                                            -- Even number: Control
-                                            for i in 0 to 3 loop
-                                                if wea(i) = '1' then
-                                                    slv_reg_portcontrol(to_integer(unsigned(addra(7 downto 2))))((((i + 1) * 8) - 1) downto (i * 8)) <= dina((((i + 1) * 8) - 1) downto (i * 8));
+                                    douta <= (others => '0'); -- Set default value to 0 (for index-out-of-range), otherwise is going to be overwritten by requested value
+
+                                    -- Iterate through all ports (see manual p. 3)
+                                    for j in 0 to (numports-1) loop
+                                        if unsigned(addra(7 downto 2)) = (2 * j) then
+                                            -- Even number: port control
+                                            for k in 0 to 3 loop
+                                                if wea(k) = '1' then
+                                                    slv_reg_portcontrol(j)((((k + 1) * 8) - 1) downto (k * 8)) <= dina((((k + 1) * 8) - 1) downto (k * 8));
                                                 end if;
                                             end loop;
 
-                                            douta <= slv_reg_portcontrol(to_integer(unsigned(addra(7 downto 2))));
-                                        else
-                                            -- Odd number: Status
-                                            douta <= slv_reg_portstatus(to_integer(unsigned(addra(7 downto 2))));
+                                            douta <= slv_reg_portcontrol(j);
+                                        elsif unsigned(addra(7 downto 2)) = ((2 * j) + 1) then
+                                            -- Odd number: port status.
+                                            douta <= slv_reg_portstatus(j);
                                         end if;
-                                    else
-                                        douta <= (others => '0');
-                                    end if;
-                                    
+                                    end loop;
+
                                 when "01" => -- Router Register
                                     case to_integer(unsigned(addra(7 downto 2))) is
                                         when 0 => -- Numports register
@@ -355,13 +356,13 @@ begin
                                             douta <= slv_reg_autotimecycle;
                                         when 4 => -- Last Time Code register
                                             douta <= slv_reg_lasttc;
-                                            
+
                                         when 5 => -- Last automatic Time Code register
                                             douta <= slv_reg_lastautotc;
-                                            
+
                                         when 6 => -- Info register
                                             douta <= slv_reg_info;
-                                            
+
                                         when others => douta <= (others => '0');
                                     end case;
 

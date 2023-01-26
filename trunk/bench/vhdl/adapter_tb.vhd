@@ -47,8 +47,8 @@ architecture adapter_tb_arch of adapter_tb is
         generic (
             clk_cycles_per_bit : integer;
             numports : integer range 1 to 32;
-            init_input_port : integer range 0 to numports-1 := 0;
-            init_output_port : integer range 0 to numports-1 := 0;
+            init_input_port : integer range 0 to (numports-1) := 0;
+            init_output_port : integer range 0 to (numports-1) := 0;
             activate_commands : boolean;
             sysfreq : real;
             txclkfreq : real := 0.0;
@@ -64,23 +64,23 @@ architecture adapter_tb_arch of adapter_tb is
             rxclk : in std_logic;
             txclk : in std_logic;
             rst : in std_logic;
-            autostart : in std_logic_vector(numports-1 downto 0) := (others => '1');
-            linkstart : in std_logic_vector(numports-1 downto 0) := (others => '1');
-            linkdis : in std_logic_vector(numports-1 downto 0) := (0 => '0', others => '0');
+            autostart : in std_logic_vector((numports-1) downto 0) := (others => '1');
+            linkstart : in std_logic_vector((numports-1) downto 0) := (others => '1');
+            linkdis : in std_logic_vector((numports-1) downto 0) := (0 => '0', others => '0');
             txdivcnt : in std_logic_vector(7 downto 0) := "00000001";
-            started : out std_logic_vector(numports-1 downto 0);
-            connecting : out std_logic_vector(numports-1 downto 0);
-            running : out std_logic_vector(numports-1 downto 0);
-            errdisc : out std_logic_vector(numports-1 downto 0);
-            errpar : out std_logic_vector(numports-1 downto 0);
-            erresc : out std_logic_vector(numports-1 downto 0);
-            errcred : out std_logic_vector(numports-1 downto 0);
-            txhalff : out std_logic_vector(numports-1 downto 0);
-            rxhalff : out std_logic_vector(numports-1 downto 0);
-            spw_di : in std_logic_vector(numports-1 downto 0);
-            spw_si : in std_logic_vector(numports-1 downto 0);
-            spw_do : out std_logic_vector(numports-1 downto 0);
-            spw_so : out std_logic_vector(numports-1 downto 0);
+            started : out std_logic_vector((numports-1) downto 0);
+            connecting : out std_logic_vector((numports-1) downto 0);
+            running : out std_logic_vector((numports-1) downto 0);
+            errdisc : out std_logic_vector((numports-1) downto 0);
+            errpar : out std_logic_vector((numports-1) downto 0);
+            erresc : out std_logic_vector((numports-1) downto 0);
+            errcred : out std_logic_vector((numports-1) downto 0);
+            txhalff : out std_logic_vector((numports-1) downto 0);
+            rxhalff : out std_logic_vector((numports-1) downto 0);
+            spw_di : in std_logic_vector((numports-1) downto 0);
+            spw_si : in std_logic_vector((numports-1) downto 0);
+            spw_do : out std_logic_vector((numports-1) downto 0);
+            spw_so : out std_logic_vector((numports-1) downto 0);
             rx : in std_logic;
             tx : out std_logic
         );
@@ -108,43 +108,43 @@ architecture adapter_tb_arch of adapter_tb is
     -- Simulation signals.
     signal clk: std_logic;
     signal rst: std_logic := '1';
-    signal autostart: std_logic_vector(numports-1 downto 0) := (others => '1');
-    signal linkstart: std_logic_vector(numports-1 downto 0) := (others => '1');
-    signal linkdis: std_logic_vector(numports-1 downto 0) := (0 => '0', others => '0');
+    signal autostart: std_logic_vector((numports-1) downto 0) := (others => '1');
+    signal linkstart: std_logic_vector((numports-1) downto 0) := (others => '1');
+    signal linkdis: std_logic_vector((numports-1) downto 0) := (0 => '0', others => '0');
     signal txdivcnt: std_logic_vector(7 downto 0) := "00000001";
-    signal started: std_logic_vector(numports-1 downto 0);
-    signal connecting: std_logic_vector(numports-1 downto 0);
-    signal running: std_logic_vector(numports-1 downto 0);
-    signal errdisc: std_logic_vector(numports-1 downto 0);
-    signal errpar: std_logic_vector(numports-1 downto 0);
-    signal erresc: std_logic_vector(numports-1 downto 0);
-    signal errcred: std_logic_vector(numports-1 downto 0);
-    signal txhalff: std_logic_vector(numports-1 downto 0);
-    signal rxhalff: std_logic_vector(numports-1 downto 0);
+    signal started: std_logic_vector((numports-1) downto 0);
+    signal connecting: std_logic_vector((numports-1) downto 0);
+    signal running: std_logic_vector((numports-1) downto 0);
+    signal errdisc: std_logic_vector((numports-1) downto 0);
+    signal errpar: std_logic_vector((numports-1) downto 0);
+    signal erresc: std_logic_vector((numports-1) downto 0);
+    signal errcred: std_logic_vector((numports-1) downto 0);
+    signal txhalff: std_logic_vector((numports-1) downto 0);
+    signal rxhalff: std_logic_vector((numports-1) downto 0);
 
 
     -- Corresponding SpaceWire Port signals.
-    signal s_corr_tick_in : std_logic_vector(numports-1 downto 0) := (others => '0');
-    signal s_corr_ctrl_in : array_t(numports-1 downto 0)(1 downto 0) := (others => (others => '0'));
-    signal s_corr_time_in : array_t(numports-1 downto 0)(5 downto 0) := (others => (others => '0'));
-    signal s_corr_txwrite : std_logic_vector(numports-1 downto 0) := (others => '0');
-    signal s_corr_txflag : std_logic_vector(numports-1 downto 0) := (others => '0');
-    signal s_corr_txdata : array_t(numports-1 downto 0)(7 downto 0) := (others => (others => '0'));
-    signal s_corr_txrdy : std_logic_vector(numports-1 downto 0) := (others => '0');
-    signal s_corr_txhalff : std_logic_vector(numports-1 downto 0) := (others => '0');
-    signal s_corr_tick_out : std_logic_vector(numports-1 downto 0) := (others => '0');
-    signal s_corr_ctrl_out : array_t(numports-1 downto 0)(1 downto 0) := (others => (others => '0'));
-    signal s_corr_time_out : array_t(numports-1 downto 0)(5 downto 0) := (others => (others => '0'));
-    signal s_corr_rxflag : std_logic_vector(numports-1 downto 0) := (others => '0');
-    signal s_corr_rxdata : array_t(numports-1 downto 0)(7 downto 0) := (others => (others => '0'));
-    signal s_corr_rxvalid : std_logic_vector(numports-1 downto 0) := (others => '0');
+    signal s_corr_tick_in : std_logic_vector((numports-1) downto 0) := (others => '0');
+    signal s_corr_ctrl_in : array_t((numports-1) downto 0)(1 downto 0) := (others => (others => '0'));
+    signal s_corr_time_in : array_t((numports-1) downto 0)(5 downto 0) := (others => (others => '0'));
+    signal s_corr_txwrite : std_logic_vector((numports-1) downto 0) := (others => '0');
+    signal s_corr_txflag : std_logic_vector((numports-1) downto 0) := (others => '0');
+    signal s_corr_txdata : array_t((numports-1) downto 0)(7 downto 0) := (others => (others => '0'));
+    signal s_corr_txrdy : std_logic_vector((numports-1) downto 0) := (others => '0');
+    signal s_corr_txhalff : std_logic_vector((numports-1) downto 0) := (others => '0');
+    signal s_corr_tick_out : std_logic_vector((numports-1) downto 0) := (others => '0');
+    signal s_corr_ctrl_out : array_t((numports-1) downto 0)(1 downto 0) := (others => (others => '0'));
+    signal s_corr_time_out : array_t((numports-1) downto 0)(5 downto 0) := (others => (others => '0'));
+    signal s_corr_rxflag : std_logic_vector((numports-1) downto 0) := (others => '0');
+    signal s_corr_rxdata : array_t((numports-1) downto 0)(7 downto 0) := (others => (others => '0'));
+    signal s_corr_rxvalid : std_logic_vector((numports-1) downto 0) := (others => '0');
     
     
     -- SpaceWire signals.
-    signal s_spw_data_to_router : std_logic_vector(numports-1 downto 0) := (others => '0');
-    signal s_spw_strobe_to_router : std_logic_vector(numports-1 downto 0) := (others => '0');
-    signal s_spw_data_from_router : std_logic_vector(numports-1 downto 0) := (others => '0');
-    signal s_spw_strobe_from_router : std_logic_vector(numports-1 downto 0) := (others => '0');
+    signal s_spw_data_to_router : std_logic_vector((numports-1) downto 0) := (others => '0');
+    signal s_spw_strobe_to_router : std_logic_vector((numports-1) downto 0) := (others => '0');
+    signal s_spw_data_from_router : std_logic_vector((numports-1) downto 0) := (others => '0');
+    signal s_spw_strobe_from_router : std_logic_vector((numports-1) downto 0) := (others => '0');
     
     
     -- Input variables

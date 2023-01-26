@@ -32,17 +32,17 @@ ENTITY spwrouterarb_table IS
         rst : IN STD_LOGIC;
 
         -- Requests from all ports. (Bit corresponds to port)
-        request : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+        request : IN STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
 
         -- Containts which port gets access.
-        granted : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0)
+        granted : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0)
     );
 END spwrouterarb_table;
 
 ARCHITECTURE spwrouterarb_table_arch OF spwrouterarb_table IS
-    CONSTANT c_initValue : STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (0 => '1', others => '0'); -- Initial value for arbitration algorithm
+    CONSTANT c_initValue : STD_LOGIC_VECTOR((numports-1) DOWNTO 0) := (0 => '1', others => '0'); -- Initial value for arbitration algorithm
 
-    SIGNAL s_granted : STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := c_initValue; -- Important that this signal is initialized otherwise a reset is necessary until logical addressing works as expected!
+    SIGNAL s_granted : STD_LOGIC_VECTOR((numports-1) DOWNTO 0) := c_initValue; -- Important that this signal is initialized otherwise a reset is necessary until logical addressing works as expected!
 BEGIN
     -- Drive output.
     granted <= s_granted;
@@ -63,7 +63,7 @@ BEGIN
 
                 -- To have the right priority the order was changed in unusual order.
 
-                Arbitration_Access : FOR i IN numports-1 DOWNTO 0 LOOP
+                Arbitration_Access : FOR i IN (numports-1) DOWNTO 0 LOOP
                     IF (s_granted(i) = '1' AND request(i) = '0') THEN
                         pre_ports : FOR j IN (i - 1) DOWNTO 0 LOOP -- [(i-1) <= j <= 0]
                             IF (request(j) = '1') THEN
@@ -73,7 +73,7 @@ BEGIN
 
                         -- (except current port i !)
 
-                        seq_ports : FOR k IN numports-1 DOWNTO (i + 1) LOOP -- [numports-1 <= k <= (i+1)]
+                        seq_ports : FOR k IN (numports-1) DOWNTO (i + 1) LOOP -- [(numports-1) <= k <= (i+1)]
                             IF (request(k) = '1') THEN
                                 s_granted <= STD_LOGIC_VECTOR(to_unsigned(2 ** k, s_granted'length));
                             END IF;

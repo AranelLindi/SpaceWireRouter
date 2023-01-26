@@ -27,7 +27,7 @@ ENTITY spwrouterport IS
         -- Number of SpaceWire ports.
         numports : integer range 1 to 32;
 
-        -- Bit length to map number of ports (ceil(log2(numports-1))).
+        -- Bit length to map number of ports (ceil(log2((numports-1)))).
         blen : INTEGER RANGE 0 TO 5; -- (max 5 bits for 0-31 ports)
 
         -- System clock frequency in Hz.
@@ -167,7 +167,7 @@ ENTITY spwrouterport IS
         --           ROUTER SIGNALS
         -- ====================================
         -- Shows which port is in running-state.
-        linkstatus : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+        linkstatus : IN STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
 
         -- High as long as a packet is sent from this port to another.
         request_out : OUT STD_LOGIC;
@@ -400,7 +400,7 @@ BEGIN
                                 -- Physical port is addressed.
                                 s_destination_port <= s_rxdata(7 DOWNTO 0); -- Destination port number (first byte of packet)
 
-                                IF (unsigned(s_rxdata(7 DOWNTO 0)) > numports-1) THEN
+                                IF (unsigned(s_rxdata(7 DOWNTO 0)) > (numports-1)) THEN
                                     -- Discard invalid addressed packet (destination port does not exist).
                                     state <= S_Dummy0;
                                 ELSE
@@ -424,7 +424,7 @@ BEGIN
                         v_validport := '0'; -- (Reset variable for next iteration)
 
                         -- Check if target port is addressable.
-                        FOR i IN 1 TO numports-1 LOOP -- Auf Port0 kann hiernach nicht gesendet werden, bitte überprüfen!
+                        FOR i IN 1 TO (numports-1) LOOP -- Auf Port0 kann hiernach nicht gesendet werden, bitte überprüfen!
                             IF (linkstatus(i) = '1' AND s_destination_port(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(i, blen + 1))) THEN
                                 v_validport := '1'; -- potenzielle Fehlerquelle mit blen+1 !! Im Original Code werden hier 5 Bits (4 downto 0) abgefragt. falls blen == 4 ist, muss folglich blen+1 für 5 gelten!
                             END IF;
@@ -455,7 +455,7 @@ BEGIN
                         -- Since only single unconnected if statements can be generated, the order must be
                         -- reversed (descending), therefore the last if query has the highes priority. (Can
                         -- overwrite result again.)
-                        FOR i IN numports-1 DOWNTO 0 LOOP
+                        FOR i IN (numports-1) DOWNTO 0 LOOP
                             IF (linkstatus(i) = '1' AND bus_data_in(i) = '1') THEN
                                 s_destination_port <= STD_LOGIC_VECTOR(to_unsigned(i, s_destination_port'length));
                                 s_request_out <= '1';

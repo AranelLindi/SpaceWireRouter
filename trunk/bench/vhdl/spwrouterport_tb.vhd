@@ -75,7 +75,7 @@ ARCHITECTURE spwrouterport_tb_arch OF spwrouterport_tb IS
 	SIGNAL errpar : STD_LOGIC;
 	SIGNAL erresc : STD_LOGIC;
 	SIGNAL errcred : STD_LOGIC;
-	SIGNAL linkUp : STD_LOGIC_VECTOR(numports-1 DOWNTO 0) := (pnum => '1', OTHERS => '0'); -- bluff
+	SIGNAL linkUp : STD_LOGIC_VECTOR((numports-1) DOWNTO 0) := (pnum => '1', OTHERS => '0'); -- bluff
 
 	SIGNAL requestOut : STD_LOGIC;
 	SIGNAL destinationPortOut : STD_LOGIC_VECTOR(7 DOWNTO 0);

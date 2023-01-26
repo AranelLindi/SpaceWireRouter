@@ -52,8 +52,8 @@ architecture spwrouterregs_ext_tb_arch of spwrouterregs_ext_tb is
             ackTable : out std_logic;
             strobeTable : in std_logic;
             cycleTable : in std_logic;
-            portstatus : in array_t(0 to numports-1)(31 downto 0);
-            portcontrol : out array_t(0 to numports-1)(31 downto 0);
+            portstatus : in array_t(0 to (numports-1))(31 downto 0);
+            portcontrol : out array_t(0 to (numports-1))(31 downto 0);
             running : in std_logic_vector(31 downto 0);
             watchcycle : out std_logic_vector(31 downto 0);
             timecycle : out std_logic_vector(31 downto 0);
@@ -76,8 +76,8 @@ architecture spwrouterregs_ext_tb_arch of spwrouterregs_ext_tb is
     signal ackTable: std_logic;
     signal strobeTable: std_logic;
     signal cycleTable: std_logic;
-    signal portstatus: array_t(0 to numports-1)(31 downto 0);
-    signal portcontrol: array_t(0 to numports-1)(31 downto 0);
+    signal portstatus: array_t(0 to (numports-1))(31 downto 0);
+    signal portcontrol: array_t(0 to (numports-1))(31 downto 0);
     signal running: std_logic_vector(31 downto 0);
     signal watchcycle: std_logic_vector(31 downto 0);
     signal timecycle: std_logic_vector(31 downto 0);

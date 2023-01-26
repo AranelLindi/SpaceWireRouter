@@ -38,17 +38,17 @@ ARCHITECTURE spwrouterarb_tb_arch OF spwrouterarb_tb IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            destport : IN array_t(0 DOWNTO numports-1)(7 DOWNTO 0);
-            request : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
-            granted : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
-            routing_matrix : OUT array_t(0 DOWNTO numports-1)(numports-1 DOWNTO 0)
+            destport : IN array_t(0 DOWNTO (numports-1))(7 DOWNTO 0);
+            request : IN STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
+            granted : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
+            routing_matrix : OUT array_t(0 DOWNTO (numports-1))((numports-1) DOWNTO 0)
         );
     END COMPONENT;
 
     -- Number of SpaceWire ports.
     CONSTANT numports : integer range 1 to 32 := 2; -- 3 ports (0 - 2)
     -- Number of bits to represent all ports.
-    CONSTANT blen : INTEGER RANGE 0 TO 5 := INTEGER(ceil(log2(real(numports-1))));
+    CONSTANT blen : INTEGER RANGE 0 TO 5 := INTEGER(ceil(log2(real((numports-1)))));
 
     -- System clock.
     SIGNAL clk : STD_LOGIC;
@@ -57,16 +57,16 @@ ARCHITECTURE spwrouterarb_tb_arch OF spwrouterarb_tb IS
     SIGNAL s_rst : STD_LOGIC;
 
     -- Destination of port x.
-    SIGNAL s_destport : array_t(numports-1 DOWNTO 0)(7 DOWNTO 0);
+    SIGNAL s_destport : array_t((numports-1) DOWNTO 0)(7 DOWNTO 0);
 
     -- Request of port x.
-    SIGNAL s_request : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);-- := (numports-1 => '1', OTHERS => '0');
+    SIGNAL s_request : STD_LOGIC_VECTOR((numports-1) DOWNTO 0);-- := ((numports-1) => '1', OTHERS => '0');
 
     -- Granted to port x.
-    SIGNAL s_granted : STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+    SIGNAL s_granted : STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
 
     -- Routing switch matrix.
-    SIGNAL s_routing_matrix : array_t(numports-1 DOWNTO 0)(numports-1 DOWNTO 0);
+    SIGNAL s_routing_matrix : array_t((numports-1) DOWNTO 0)((numports-1) DOWNTO 0);
 
     -- Clock period. (10 MHz)
     CONSTANT clock_period : TIME := 10 ns; -- 100 MHz

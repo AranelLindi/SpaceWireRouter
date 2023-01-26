@@ -43,10 +43,10 @@ ENTITY spwrouter IS
         externPort : boolean := True;
 
         -- Selection of receiver front-end implementation.
-        rx_impl : rximpl_array(numports-1 DOWNTO 0);-- := (OTHERS => impl_fast);
+        rx_impl : rximpl_array((numports-1) DOWNTO 0);-- := (OTHERS => impl_fast);
 
         -- Selection of transmitter implementation.
-        tx_impl : tximpl_array(numports-1 DOWNTO 0)-- := (OTHERS => impl_fast)
+        tx_impl : tximpl_array((numports-1) DOWNTO 0)-- := (OTHERS => impl_fast)
     );
     PORT (
         -- System clock.
@@ -62,37 +62,37 @@ ENTITY spwrouter IS
         rst : IN STD_LOGIC;
 
         -- Corresponding bit is High if the port is in started state.
-        started : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+        started : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
 
         -- Corresponding bit is High if the port is in connecting state.
-        connecting : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+        connecting : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
 
         -- Corresponding bit is High if the port is in running state.
-        running : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+        running : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
 
         -- High if the corresponding port has a disconnect error.
-        errdisc : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+        errdisc : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
 
         -- High if the corresponding port has a parity error.
-        errpar : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+        errpar : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
 
         -- High if the corresponding port detected an invalid escape sequence.
-        erresc : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+        erresc : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
 
         -- High if the corresponding port detected a credit error.
-        errcred : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+        errcred : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
 
         -- Data In signals from SpaceWire bus.
-        spw_di : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+        spw_di : IN STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
 
         -- Strobe In signals from SpaceWire bus.
-        spw_si : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+        spw_si : IN STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
 
         -- Data Out signals from SpaceWire bus.
-        spw_do : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+        spw_do : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
 
         -- Strobe Out signals from SpaceWire bus.
-        spw_so : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+        spw_so : OUT STD_LOGIC_VECTOR((numports-1) DOWNTO 0);
 
         -- PORTA
         -- Clock of port A.
@@ -125,7 +125,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
     -- ====================================
     -- General constants and signals.
     -- ====================================
-    CONSTANT blen : INTEGER RANGE 0 TO 5 := INTEGER(ceil(log2(real(numports-1)))); -- Necessary number of bits to represent [numport]-ports
+    CONSTANT blen : INTEGER RANGE 0 TO 5 := INTEGER(ceil(log2(real((numports-1))))); -- Necessary number of bits to represent [numport]-ports
 
 
     -- ====================================
@@ -134,10 +134,10 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
 
     -- Time Code specific signals.
     -- Time Codes are routed via separate bus and have highest priority.
-    SIGNAL s_tick_from_tcc_to_ports : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- High for one clock cycle if transmission of Time Code is requested
-    SIGNAL s_tick_from_ports_to_tcc : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- High for one clock cycle if Time Code was received
-    SIGNAL s_tc_from_tcc_to_ports : array_t(numports-1 DOWNTO 0)(7 DOWNTO 0); -- Time Code (control flag & counter value) of Time Code to sent
-    SIGNAL s_tc_from_ports_to_tcc : array_t(numports-1 DOWNTO 0)(7 DOWNTO 0); -- Time Code (control flag & coutner value) of received Time Code
+    SIGNAL s_tick_from_tcc_to_ports : STD_LOGIC_VECTOR((numports-1) DOWNTO 0); -- High for one clock cycle if transmission of Time Code is requested
+    SIGNAL s_tick_from_ports_to_tcc : STD_LOGIC_VECTOR((numports-1) DOWNTO 0); -- High for one clock cycle if Time Code was received
+    SIGNAL s_tc_from_tcc_to_ports : array_t((numports-1) DOWNTO 0)(7 DOWNTO 0); -- Time Code (control flag & counter value) of Time Code to sent
+    SIGNAL s_tc_from_ports_to_tcc : array_t((numports-1) DOWNTO 0)(7 DOWNTO 0); -- Time Code (control flag & coutner value) of received Time Code
 
     -- Time Codes & Register.
     SIGNAL s_auto_tc : STD_LOGIC_VECTOR(7 DOWNTO 0); -- Contains last automatically generated Time Code
@@ -150,27 +150,27 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
     -- ====================================
 
     -- Arbitration-specific signals (spwrouterarb).
-    SIGNAL s_routing_matrix_transposed : array_t(numports-1 DOWNTO 0)(numports-1 DOWNTO 0); -- Transposed routing_matrix from arbiter
-    SIGNAL s_routing_matrix : array_t(numports-1 DOWNTO 0)(numports-1 DOWNTO 0); -- Routing switch matrix: Maps source ports (row) to target ports (column)
-    SIGNAL s_source_port_row : array_t(numports-1 DOWNTO 0)(numports-1 DOWNTO 0); -- Copy of routing_matrix for easier further processing
-    SIGNAL s_request_out : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- High for any port currently transferring data
-    SIGNAL s_destination_port : array_t(numports-1 DOWNTO 0)(7 DOWNTO 0); -- First byte of packet (address byte) with destination port (both physical and logical addressing (after mapping to physical port))
-    SIGNAL s_granted : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- Contains ports that have granted access to port that is specified in destport
+    SIGNAL s_routing_matrix_transposed : array_t((numports-1) DOWNTO 0)((numports-1) DOWNTO 0); -- Transposed routing_matrix from arbiter
+    SIGNAL s_routing_matrix : array_t((numports-1) DOWNTO 0)((numports-1) DOWNTO 0); -- Routing switch matrix: Maps source ports (row) to target ports (column)
+    SIGNAL s_source_port_row : array_t((numports-1) DOWNTO 0)((numports-1) DOWNTO 0); -- Copy of routing_matrix for easier further processing
+    SIGNAL s_request_out : STD_LOGIC_VECTOR((numports-1) DOWNTO 0); -- High for any port currently transferring data
+    SIGNAL s_destination_port : array_t((numports-1) DOWNTO 0)(7 DOWNTO 0); -- First byte of packet (address byte) with destination port (both physical and logical addressing (after mapping to physical port))
+    SIGNAL s_granted : STD_LOGIC_VECTOR((numports-1) DOWNTO 0); -- Contains ports that have granted access to port that is specified in destport
 
     -- SpaceWire-port-specific signals (spwrouterport).
-    SIGNAL s_ready_in : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- High if destination port is ready to accept next N-Char
-    SIGNAL s_rxdata : array_t(numports-1 DOWNTO 0)(8 DOWNTO 0); -- Received byte (7 downto 0) and control flag (8)
-    SIGNAL s_strobe_out : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- High if data byte or EOP/EEP of one port is ready to transfer to destination port
-    SIGNAL s_request_in : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- High as long as a packet is sent via any port
-    SIGNAL s_txdata : array_t(numports-1 DOWNTO 0)(8 DOWNTO 0); -- Data byte and flag to transmit
-    SIGNAL s_strobe_in : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- High if transmission via one port should be performed (new byte still on txdata)
-    SIGNAL s_txrdy : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- High if port is ready to accept an N-Char for transmission FIFO
-    SIGNAL s_running : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- High if any port is in running-state
+    SIGNAL s_ready_in : STD_LOGIC_VECTOR((numports-1) DOWNTO 0); -- High if destination port is ready to accept next N-Char
+    SIGNAL s_rxdata : array_t((numports-1) DOWNTO 0)(8 DOWNTO 0); -- Received byte (7 downto 0) and control flag (8)
+    SIGNAL s_strobe_out : STD_LOGIC_VECTOR((numports-1) DOWNTO 0); -- High if data byte or EOP/EEP of one port is ready to transfer to destination port
+    SIGNAL s_request_in : STD_LOGIC_VECTOR((numports-1) DOWNTO 0); -- High as long as a packet is sent via any port
+    SIGNAL s_txdata : array_t((numports-1) DOWNTO 0)(8 DOWNTO 0); -- Data byte and flag to transmit
+    SIGNAL s_strobe_in : STD_LOGIC_VECTOR((numports-1) DOWNTO 0); -- High if transmission via one port should be performed (new byte still on txdata)
+    SIGNAL s_txrdy : STD_LOGIC_VECTOR((numports-1) DOWNTO 0); -- High if port is ready to accept an N-Char for transmission FIFO
+    SIGNAL s_running : STD_LOGIC_VECTOR((numports-1) DOWNTO 0); -- High if any port is in running-state
 
     SIGNAL s_watchcycle : STD_LOGIC_VECTOR(31 DOWNTO 0); -- Contains watchdog time period to break up an inactive wormhole connection
 
-    SIGNAL s_portstatus : array_t(0 TO numports-1)(31 DOWNTO 0); -- Contains status of every port
-    SIGNAL s_portcontrol : array_t(0 TO numports-1)(31 DOWNTO 0); -- Contains control information for every port
+    SIGNAL s_portstatus : array_t((numports-1) downto 0)(31 DOWNTO 0); -- Contains status of every port
+    SIGNAL s_portcontrol : array_t((numports-1) downto 0)(31 DOWNTO 0); -- Contains control information for every port
 
 
     -- ====================================
@@ -179,14 +179,14 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
 
     -- Master (m) bus signals.
     -- Each port acts as a master. An internal arbiter controls access to registers and routing table (logical addressing only !).
-    SIGNAL s_bus_m_address : array_t(numports-1 DOWNTO 0)(31 DOWNTO 0); -- Contains register destination address (routing table only) for each port
-    SIGNAL s_bus_m_data : array_t(numports-1 DOWNTO 0)(31 DOWNTO 0); -- Contains data word to be written into register for each port (currently unused !)
-    SIGNAL s_bus_m_dByte : array_t(numports-1 DOWNTO 0)(3 DOWNTO 0); -- Determines for each port which byte (1-4) is to be written into register or read from it
-    SIGNAL s_bus_m_readwrite : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- Determines for each port whether a read (0) or write (1) operation into register should be performed
-    SIGNAL s_bus_m_request : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- Contains for each port whether there is a request to access routing table
-    SIGNAL s_bus_m_granted : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- Contains for each port whether requested access to routing table is granted
-    SIGNAL s_bus_m_ack : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- Contains for each port whether there is an acknowledgement of register for its operation
-    SIGNAL s_bus_m_strobe : STD_LOGIC_VECTOR(numports-1 DOWNTO 0); -- Contains strobe signal for each port related to register access/routing table
+    SIGNAL s_bus_m_address : array_t((numports-1) DOWNTO 0)(31 DOWNTO 0); -- Contains register destination address (routing table only) for each port
+    SIGNAL s_bus_m_data : array_t((numports-1) DOWNTO 0)(31 DOWNTO 0); -- Contains data word to be written into register for each port (currently unused !)
+    SIGNAL s_bus_m_dByte : array_t((numports-1) DOWNTO 0)(3 DOWNTO 0); -- Determines for each port which byte (1-4) is to be written into register or read from it
+    SIGNAL s_bus_m_readwrite : STD_LOGIC_VECTOR((numports-1) DOWNTO 0); -- Determines for each port whether a read (0) or write (1) operation into register should be performed
+    SIGNAL s_bus_m_request : STD_LOGIC_VECTOR((numports-1) DOWNTO 0); -- Contains for each port whether there is a request to access routing table
+    SIGNAL s_bus_m_granted : STD_LOGIC_VECTOR((numports-1) DOWNTO 0); -- Contains for each port whether requested access to routing table is granted
+    SIGNAL s_bus_m_ack : STD_LOGIC_VECTOR((numports-1) DOWNTO 0); -- Contains for each port whether there is an acknowledgement of register for its operation
+    SIGNAL s_bus_m_strobe : STD_LOGIC_VECTOR((numports-1) DOWNTO 0); -- Contains strobe signal for each port related to register access/routing table
 
     -- Slave (s) bus signals.
     -- The access_control-process controls which master (port) has granted access to internal bus from round robin arbiter and is allowed
@@ -223,8 +223,8 @@ BEGIN
         );
 
 
-    -- (numports-1)-SpaceWire ports.
-    ports : FOR i IN 0 TO numports-1 GENERATE
+    -- ((numports-1))-SpaceWire ports.
+    ports : FOR i IN 0 TO (numports-1) GENERATE
         port_i : spwrouterport GENERIC MAP(
                 numports => numports,
                 blen => blen,
@@ -367,21 +367,21 @@ BEGIN
 
 
     -- Creates transposed matrix of s_routing_matrix: Shows for every port (row) which port (column) requests access to it.
-    routing_matrix_row : FOR i IN 0 TO numports-1 GENERATE
-        routing_matrix_column : FOR j IN 0 TO numports-1 GENERATE
+    routing_matrix_row : FOR i IN 0 TO (numports-1) GENERATE
+        routing_matrix_column : FOR j IN 0 TO (numports-1) GENERATE
             s_routing_matrix_transposed(i)(j) <= s_routing_matrix(j)(i);
         END GENERATE routing_matrix_column;
     END GENERATE routing_matrix_row;
 
 
     -- Stores every row of s_routing_matrix which maps source ports (row) to destination ports (column).
-    source_port_rows : FOR i IN 0 TO numports-1 GENERATE
+    source_port_rows : FOR i IN 0 TO (numports-1) GENERATE
         s_source_port_row(i) <= s_routing_matrix(i);
     END GENERATE source_port_rows;
 
 
     -- Routing process: Assigns information from source ports to destination ports to ports.
-    crossbar : FOR i IN 0 TO numports-1 GENERATE
+    crossbar : FOR i IN 0 TO (numports-1) GENERATE
         s_ready_in(i) <= spwrouterfunc.select_port(s_routing_matrix_transposed(i), s_txrdy);
         s_request_in(i) <= spwrouterfunc.select_port(s_source_port_row(i), s_request_out);
         s_txdata(i) <= spwrouterfunc.select_nchar(s_source_port_row(i), s_rxdata);
@@ -397,13 +397,13 @@ BEGIN
             s_bus_s_register_data_out <= s_register_data_out_buffer;
 
             -- Caution ! Reversed priority conditioned through if-statements !
-            -- For loop first rolls out numports-1 downto 0. Since no if..elsif statements
+            -- For loop first rolls out (numports-1) downto 0. Since no if..elsif statements
             -- can be generated via GENERATE-keyword, the block has to be translated into
             -- independent if statements. The order is reversed because of the changed 
             -- priority: previously, first if statement had highes priority (the first
             -- elsif, etc.). Now hightest priority must be at the end in order to be able
             -- to overwrite a previously made decision.
-            FOR i IN numports-1 DOWNTO 0 LOOP
+            FOR i IN (numports-1) DOWNTO 0 LOOP
                 IF (s_bus_m_granted(i) = '1') THEN
                     s_bus_s_strobe <= s_bus_m_strobe(i);
                     s_bus_s_address <= s_bus_m_address(i);
