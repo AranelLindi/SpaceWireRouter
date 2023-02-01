@@ -256,12 +256,16 @@ package spwpkg is
             txflag:     in  std_logic;          -- control flag of tx char
             txdata:     in  std_logic_vector(7 downto 0);
             txrdy:      out std_logic;          -- room in tx fifo
+            txfull:     out std_logic;          -- tx fifo full -- Added by SL
             txhalff:    out std_logic;          -- tx fifo half full
+            txempty:    out std_logic;          -- tx fifo empty -- Added by SL
             tick_out:   out std_logic;          -- timecode received
             ctrl_out:   out std_logic_vector(1 downto 0);
             time_out:   out std_logic_vector(5 downto 0);
             rxvalid:    out std_logic;          -- rx fifo not empty
+            rxfull:     out std_logic;          -- rx fifo full -- Added by SL
             rxhalff:    out std_logic;          -- rx fifo half full
+            rxempty:    out std_logic;          -- rx fifo empty -- Added by SL
             rxflag:     out std_logic;          -- control flag of rx char
             rxdata:     out std_logic_vector(7 downto 0);
             rxread:     in  std_logic;          -- accept rx character

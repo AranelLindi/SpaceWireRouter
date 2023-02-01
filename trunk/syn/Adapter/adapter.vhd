@@ -129,12 +129,24 @@ entity UARTSpWAdapter is
 
         -- Credit error detected. Triggers a reset and reconnect of the link.
         errcred : out std_logic_vector((numports-1) downto 0);
+        
+        -- HIGH if the SpW port transmission queue is full.
+        txfull : out std_logic_vector((numports-1) downto 0);
 
         -- HIGH if the SpW port transmission queue is at least half full.
         txhalff : out std_logic_vector((numports-1) downto 0);
+        
+        -- HIGH if the SpW port transmission queue is empty.
+        txempty : out std_logic_vector((numports-1) downto 0);
+        
+        -- HIGH if the SpW port receiver FIFO is full.
+        rxfull : out std_logic_vector((numports-1) downto 0);
 
         -- HIGH if the SpW port receiver FIFO is at least half full.
         rxhalff : out std_logic_vector((numports-1) downto 0);
+        
+        -- HIGH if the SpW port receiver FIFO is empty.
+        rxempty : out std_logic_vector((numports-1) downto 0);
 
         -- SpaceWire Data In.
         spw_di : in std_logic_vector((numports-1) downto 0);
@@ -236,12 +248,16 @@ architecture UARTSpWAdapter_config_arch of UARTSpWAdapter is
     signal s_txflag : std_logic_vector((numports-1) downto 0);
     signal s_txdata : array_t((numports-1) downto 0)(7 downto 0);
     signal s_txrdy : std_logic_vector((numports-1) downto 0);
+    signal s_txfull : std_logic_vector((numports-1) downto 0);
     signal s_txhalff : std_logic_vector((numports-1) downto 0);
+    signal s_txempty : std_logic_vector((numports-1) downto 0);
     signal s_tick_out : std_logic_vector((numports-1) downto 0);
     signal s_ctrl_out : array_t((numports-1) downto 0)(1 downto 0);
     signal s_time_out : array_t((numports-1) downto 0)(5 downto 0);
     signal s_rxvalid : std_logic_vector((numports-1) downto 0);
+    signal s_rxfull : std_logic_vector((numports-1) downto 0);
     signal s_rxhalff : std_logic_vector((numports-1) downto 0);
+    signal s_rxempty : std_logic_vector((numports-1) downto 0);
     signal s_rxflag : std_logic_vector((numports-1) downto 0);
     signal s_rxdata : array_t((numports-1) downto 0)(7 downto 0);
     signal s_rxread : std_logic_vector((numports-1) downto 0);
@@ -289,8 +305,12 @@ begin
     errpar <= s_errpar;
     erresc <= s_erresc;
     errcred <= s_errcred;
+    txfull <= s_txfull;
     txhalff <= s_txhalff;
+    txempty <= s_txempty;
+    rxfull <= s_rxfull;
     rxhalff <= s_rxhalff;
+    rxempty <= s_rxempty;
 
     -- Uart receiver.
     UartRx : uart_rx
@@ -349,12 +369,16 @@ begin
                 txflag => s_txflag(n),
                 txdata => s_txdata(n),
                 txrdy => s_txrdy(n),
+                txfull => s_txfull(n),
                 txhalff => s_txhalff(n),
+                txempty => s_txempty(n),
                 tick_out => s_tick_out(n),
                 ctrl_out => s_ctrl_out(n),
                 time_out => s_time_out(n),
                 rxvalid => s_rxvalid(n),
+                rxfull => s_rxfull(n),
                 rxhalff => s_rxhalff(n),
+                rxempty => s_rxempty(n),
                 rxflag => s_rxflag(n),
                 rxdata => s_rxdata(n),
                 rxread => s_rxread(n),

@@ -170,12 +170,24 @@ ARCHITECTURE routertest_adapter_single_top_arch OF routertest_adapter_single_top
 
             -- Credit error detected. Triggers a reset and reconnect of the link.
             errcred : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+            
+            -- HIGH if the SpW port transmission queue is full
+            txfull : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
             -- HIGH if the SpW port transmission queue is at least half full.
             txhalff : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+            
+            -- HIGH if the SpW port transmission queue is empty.
+            txempty : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+            
+            -- HIGH if the SpW port receive FIFO is full.
+            rxfull : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
-            -- HIGH if the SpW port receiver FIFO is at least half full.
+            -- HIGH if the SpW port receive FIFO is at least half full.
             rxhalff : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
+            
+            -- HIGH if the SpW port receive FIFO is empty
+            rxempty : OUT STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
 
             -- SpaceWire Data In.
             spw_di : IN STD_LOGIC_VECTOR(numports-1 DOWNTO 0);
@@ -265,8 +277,12 @@ BEGIN
         errpar => s_adapt_errpar,
         erresc => s_adapt_erresc,
         errcred => s_adapt_errcred,
+        txfull => OPEN,
         txhalff => OPEN,
+        txempty => OPEN,
+        rxfull => OPEN,
         rxhalff => OPEN,
+        rxempty => OPEN,
         spw_di => s_spw_d_from_router,
         spw_si => s_spw_s_from_router,
         spw_do => s_spw_d_to_router,
@@ -281,7 +297,7 @@ BEGIN
         numports => numports,
         sysfreq => sysfreq,
         txclkfreq => sysfreq,
-        externPort => False,
+        externPort => FALSE,
         rx_impl => (OTHERS => impl_fast),
         tx_impl => (OTHERS => impl_fast)
     )

@@ -111,17 +111,11 @@ ENTITY spwrouterport IS
         -- High if port is ready to accept an N-Char for transmission FIFO.
         txrdy : OUT STD_LOGIC;
 
-        -- High if the transmit FIFO is at least half full.
-        txhalff : OUT STD_LOGIC;
-
         -- High for one clock cycle if a time-code was just received.
         tick_out : OUT STD_LOGIC;
 
         -- Control bits and counter value of last received time-code.
         time_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-
-        -- High if the receive FIFO is at least half full.
-        rxhalff : OUT STD_LOGIC;
 
         -- Received byte and control flag. Control flag is high if the received 
         -- character is EOP (data is 0x00) or EEP (0x01); low if received character
@@ -218,10 +212,10 @@ ENTITY spwrouterport IS
         --      PORT STATUS & CONTROL BUS
         -- ====================================
         -- Contains port status (see manual).
-        portstatus : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        portstatus : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
 
         -- Control information for port (see manual).
-        portcontrol : IN STD_LOGIC_VECTOR(31 DOWNTO 0) -- Not used yet inside this entity !
+        --portcontrol : IN STD_LOGIC_VECTOR(31 DOWNTO 0) -- Not used yet inside this entity !
     );
 END spwrouterport;
 
@@ -241,7 +235,9 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
     -- xmit signals.
     SIGNAL s_txwrite : STD_LOGIC; -- Set High to write a character to Tx-FIFO of the port.
     SIGNAL s_txrdy : STD_LOGIC; -- High if spwstream is ready to accept a character for transmit FIFO.
+    SIGNAL s_txfull : STD_LOGIC; -- s. txfull port of spwstream
     SIGNAL s_txhalff : STD_LOGIC; -- s. txhalff port of spwstream
+    SIGNAL s_txempty : STD_LOGIC; -- s. txempty port of spwstream
 
     -- Recv signals.
     SIGNAL s_rxread : STD_LOGIC; -- Set High to accept a received character. A character is removed also from the Rx-FIFO
@@ -249,7 +245,18 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
     SIGNAL s_rxdata : STD_LOGIC_VECTOR(8 DOWNTO 0); -- Used to identify received data (single EOP/EEP, N-Char, ...)
     SIGNAL s_rxflag_buffer : STD_LOGIC; -- Buffers flag of received N-chars
     SIGNAL s_rxdata_buffer : STD_LOGIC_VECTOR(7 DOWNTO 0); -- Fetches received bytes from the port and buffers them
+    SIGNAL s_rxfull : STD_LOGIC; -- s. rxfull port of spwstream
     SIGNAL s_rxhalff : STD_LOGIC; -- s. rxhalff port of spwstream
+    SIGNAL s_rxempty : STD_LOGIC; -- s. rxempty port of spwstream
+    
+    signal s_started : std_logic;
+    signal s_connecting : std_logic;
+    signal s_running : std_logic;
+    
+    signal s_errdisc : std_logic;
+    signal s_errpar : std_logic;
+    signal s_erresc : std_logic;
+    signal s_errcred : std_logic;
 
     -- Bus & router signals.
     SIGNAL s_strobe_out : STD_LOGIC; -- Strobe signal to destination port when cargo/EOP/EEP byte need to be transmitted
@@ -257,7 +264,7 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
     SIGNAL s_destination_port : STD_LOGIC_VECTOR(7 DOWNTO 0); -- Contains first byte of a packet (address byte)
 
     -- Register status signals.
-    SIGNAL s_discardedcounter : unsigned(17 DOWNTO 0);
+    SIGNAL s_discardedcounter : unsigned(15 DOWNTO 0);
 BEGIN
     -- Drive outputs.
     -- Bus & router signals.
@@ -270,27 +277,35 @@ BEGIN
     bus_address <= (9 DOWNTO 2 => s_logical_address, OTHERS => '0'); -- Necessary so that the correct entry is addressed in router table
     bus_readwrite <= '0'; -- performs read operations only
     bus_dByte <= (OTHERS => '1'); -- always select all four bytes
-    -- Port signals.
-    rxhalff <= s_rxhalff;
-    txhalff <= s_txhalff;
+    
+    started <= s_started;
+    connecting <= s_connecting;
+    running <= s_running;
+    errdisc <= s_errdisc;
+    errpar <= s_errpar;
+    erresc <= s_erresc;
+    errcred <= s_errcred;
 
     -- Read input.
     s_txwrite <= strobe_in WHEN request_in = '1' ELSE
         '0';
 
-    -- Drive port status (register).
-    portstatus(0) <= started;
-    portstatus(1) <= connecting;
-    portstatus(2) <= running;
+    -- Drive port status (register).    
+    portstatus(0) <= s_started;
+    portstatus(1) <= s_connecting;
+    portstatus(2) <= s_running;
     portstatus(3) <= s_request_out; -- Not sure this signal is right here ...
-    portstatus(4) <= errdisc;
-    portstatus(5) <= errpar;
-    portstatus(6) <= erresc;
-    portstatus(7) <= errcred;
-    portstatus(9) <= rxhalff;
-    portstatus(12) <= txhalff;
-    portstatus(31 DOWNTO 14) <= STD_LOGIC_VECTOR(s_discardedcounter);
-    --portstatus(31 downto 8) <= (others => '0');
+    portstatus(4) <= s_errdisc;
+    portstatus(5) <= s_errpar;
+    portstatus(6) <= s_erresc;
+    portstatus(7) <= s_errcred;
+    portstatus(8) <= s_rxempty;
+    portstatus(9) <= s_rxhalff;
+    portstatus(10) <= s_rxfull;
+    portstatus(12) <= s_txempty;
+    portstatus(13) <= s_txhalff;
+    portstatus(14) <= s_txfull;
+    portstatus(31 DOWNTO 16) <= STD_LOGIC_VECTOR(s_discardedcounter);
 
     -- SpaceWire port.
     spwport : spwstream
@@ -320,22 +335,26 @@ BEGIN
         txdata => txdata(7 DOWNTO 0), -- s_txdata(7 downto 0) -- data byte
         txwrite => s_txwrite,
         txrdy => s_txrdy,
+        txfull => s_txfull,
         txhalff => s_txhalff,
+        txempty => s_txempty,
         tick_out => tick_out,
         ctrl_out => time_out(7 DOWNTO 6), -- ctrl flag
         time_out => time_out(5 DOWNTO 0), -- counter value
         rxvalid => s_rxvalid,
+        rxfull => s_rxfull,
         rxhalff => s_rxhalff,
+        rxempty => s_rxempty,
         rxflag => s_rxflag_buffer,
         rxdata => s_rxdata_buffer,
         rxread => s_rxread,
-        started => started,
-        connecting => connecting,
-        running => running,
-        errpar => errpar,
-        erresc => erresc,
-        errcred => errcred,
-        errdisc => errdisc,
+        started => s_started,
+        connecting => s_connecting,
+        running => s_running,
+        errpar => s_errpar,
+        erresc => s_erresc,
+        errcred => s_errcred,
+        errdisc => s_errdisc,
         spw_di => spw_di,
         spw_si => spw_si,
         spw_do => spw_do,
@@ -517,7 +536,7 @@ BEGIN
                         state <= S_Idle;
 
                     WHEN S_Dummy0 =>
-                        -- Dummie states exist to throw away a packet that cannot be delivered.
+                        -- Dummie states exist to throw away packet that cannot be delivered.
                         -- dummy read (may block forever) -- TODO: Evaluate risk of deadlock !
                         s_request_out <= '0';
 

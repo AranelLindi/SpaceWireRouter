@@ -112,9 +112,15 @@ entity spwstream is
 
         -- High if the entity is ready to accept an N-Char for transmission.
         txrdy:      out std_logic;
+        
+        -- High if the transmission queue is full.
+        txfull:     out std_logic; -- Added by SL
 
         -- High if the transmission queue is at least half full.
         txhalff:    out std_logic;
+        
+        -- High if the transmission queue is empty.
+        txempty:    out std_logic; -- Added by SL
 
         -- High for one clock cycle if a TimeCode was just received.
         tick_out:   out std_logic;
@@ -128,9 +134,15 @@ entity spwstream is
         -- High if "rxflag" and "rxdata" contain valid data.
         -- This signal is high unless the receive FIFO is empty.
         rxvalid:    out std_logic;
+        
+        -- High if the receive FIFO is full.
+        rxfull:     out std_logic; -- Added by SL
 
         -- High if the receive FIFO is at least half full.
         rxhalff:    out std_logic;
+        
+        -- High if the receive FIFO is empty.
+        rxempty:    out std_logic; -- Added by SL
 
         -- High if the received character is EOP or EEP; low if the received
         -- character is a data byte. Valid if "rxvalid" is high.
@@ -226,8 +238,10 @@ architecture spwstream_arch of spwstream is
         txfifo_rvalid:  std_logic;      -- '1' if s_txfifo_rdata is valid
         rxfull:         std_logic;      -- '1' if RX fifo is full
         rxhalff:        std_logic;      -- '1' if RX fifo is at least half full
+        rxempty:        std_logic;      -- '1' if RX fifo is empty -- Added by SL
         txfull:         std_logic;      -- '1' if TX fifo is full
         txhalff:        std_logic;      -- '1' if TX fifo is at least half full
+        txempty:        std_logic;      -- '1' if TX fifo is empty -- Added by SL
         rxroom:         std_logic_vector(5 downto 0);
     end record;
 
@@ -244,8 +258,10 @@ architecture spwstream_arch of spwstream is
         txfifo_rvalid   => '0',
         rxfull          => '0',
         rxhalff         => '0',
+        rxempty         => '0', -- Added by SL
         txfull          => '0',
         txhalff         => '0',
+        txempty         => '0', -- Added by SL
         rxroom          => (others => '0') );
 
     signal r: regs_type := regs_reset;
@@ -441,6 +457,7 @@ begin
         v_tmprxroom := unsigned(r.rxfifo_raddr) - unsigned(v.rxfifo_waddr) - 1;
         v.rxfull    := bool_to_logic(v_tmprxroom = 0);
         v.rxhalff   := not v_tmprxroom(v_tmprxroom'high);
+        v.rxempty   := bool_to_logic(v_tmprxroom = ((2 ** rxfifosize_bits) - 1)); -- Added by SL
         if v_tmprxroom > 63 then
             v.rxroom    := (others => '1');
         else
@@ -468,6 +485,7 @@ begin
         v_tmptxroom := unsigned(r.txfifo_raddr) - unsigned(v.txfifo_waddr) - 1;
         v.txfull    := bool_to_logic(v_tmptxroom = 0);
         v.txhalff   := not v_tmptxroom(v_tmptxroom'high);
+        v.txempty   := bool_to_logic(v_tmptxroom = ((2 ** txfifosize_bits) - 1)); -- Added by SL
  
         -- If the link is lost, set a flag to discard the current packet.
         if linko.running = '0' then
@@ -519,12 +537,16 @@ begin
 
         -- Drive outputs.
         txrdy       <= not r.txfull;
+        txfull      <= r.txfull; -- Added by SL
         txhalff     <= r.txhalff;
+        txempty     <= r.txempty; -- Added by SL
         tick_out    <= linko.tick_out;
         ctrl_out    <= linko.ctrl_out;
         time_out    <= linko.time_out;
         rxvalid     <= r.rxfifo_rvalid;
+        rxfull      <= r.rxfull; -- Added by SL
         rxhalff     <= r.rxhalff;
+        rxempty     <= r.rxempty; -- Added by SL
         rxflag      <= s_rxfifo_rdata(8);
         rxdata      <= s_rxfifo_rdata(7 downto 0);
         started     <= linko.started;

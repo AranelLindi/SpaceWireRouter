@@ -222,10 +222,8 @@ PACKAGE spwrouterpkg IS
             time_in : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
             txdata : IN STD_LOGIC_VECTOR(8 DOWNTO 0);
             txrdy : OUT STD_LOGIC;
-            txhalff : OUT STD_LOGIC;
             tick_out : OUT STD_LOGIC;
             time_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-            rxhalff : OUT STD_LOGIC;
             rxdata : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
             started : OUT STD_LOGIC;
             connecting : OUT STD_LOGIC;
@@ -253,8 +251,7 @@ PACKAGE spwrouterpkg IS
             bus_strobe : OUT STD_LOGIC;
             bus_request : OUT STD_LOGIC;
             bus_ack_in : IN STD_LOGIC;
-            portstatus : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            portcontrol : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
+            portstatus : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
     END COMPONENT;
 

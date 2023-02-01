@@ -39,8 +39,6 @@ use unisim.vcomponents.all;
 
 entity router_implementation is
     Port (
-        --SYSCLK_P : in std_logic;
-        --SYSCLK_N : in std_logic;
         clk : in std_logic;
         rst : in std_logic;
         rx : in std_logic := '0';
@@ -220,7 +218,7 @@ architecture Behavioral of router_implementation is
     signal s_spw_d_to_router : std_logic_vector(5 downto 0);
     signal s_spw_s_to_router : std_logic_vector(5 downto 0);
     signal s_spw_d_from_router : std_logic_vector(5 downto 0);
-    signal s_sPw_s_from_router : std_logic_vector(5 downto 0);
+    signal s_spw_s_from_router : std_logic_vector(5 downto 0);
 begin
     -- Differential input clock buffer.
 --    bufgds: IBUFDS port map (I => SYSCLK_P, IB => SYSCLK_N, O => clk_ibufg); -- eventuell auch IBUFGDS, mal schauen ob Fehler auftreten
@@ -312,7 +310,7 @@ begin
             numports => 1,
             init_input_port => 1,
             init_output_port => 1,
-            activate_commands => True, -- define adapter variant (command (true) / non-command version (false))
+            activate_commands => FALSE, -- define adapter variant (command (true) / non-command version (false))
             sysfreq => sysfreq,
             txclkfreq => sysfreq,
             rximpl => impl_fast,

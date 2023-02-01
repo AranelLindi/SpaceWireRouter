@@ -209,13 +209,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
     SIGNAL s_timecode_en : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0); -- Contains time code enable flag for each port
 BEGIN
     -- Drive outputs.
-    started <= s_started;
-    connecting <= s_connecting;
     running <= s_running;
-    errdisc <= s_errdisc;
-    errpar <= s_errpar;
-    errcred <= s_errcred;
-
 
     -- Router arbiter (crossbar switch).
     roundrobin_arbiter : spwrouterarb
@@ -236,7 +230,7 @@ BEGIN
     -- ((numports-1))-SpaceWire ports.
     -- Determine which type of register is to synthesize and how to initialize all ports depending on that (default value (immutable) or register initialization (port control, see manual p. 3))
     spw_port_config : IF externPort = TRUE GENERATE
-        spw_ports_mutable : FOR i IN 0 TO (numports - 1) GENERATE
+        spw_ports : FOR i IN 0 TO (numports - 1) GENERATE
             spw_port : spwrouterport GENERIC MAP(
                 numports => numports,
                 blen => blen,
@@ -252,18 +246,16 @@ BEGIN
                 rxclk => rxclk, -- I
                 txclk => txclk, -- I
                 rst => rst, -- I
-                autostart => s_portcontrol(i)(3), -- I -- via register
-                linkstart => s_portcontrol(i)(2), -- I -- via register
-                linkdis => s_portcontrol(i)(1), --'0', -- I -- via register
-                txdivcnt => s_portcontrol(i)(15 downto 8), -- I -- via register
+                autostart => '1',--s_portcontrol(i)(3), -- I -- via register
+                linkstart => '1',--s_portcontrol(i)(2), -- I -- via register
+                linkdis => '0',--s_portcontrol(i)(1), --'0', -- I -- via register
+                txdivcnt => "00000001", --s_portcontrol(i)(15 downto 8), -- I -- via register
                 tick_in => s_tick_from_tcc_to_ports(i), -- I
                 time_in => s_tc_from_tcc_to_ports(i), -- I
-                txhalff => s_portstatus(i)(12), -- O
                 txdata => s_txdata(i), -- I
                 tick_out => s_tick_from_ports_to_tcc(i), -- O
                 time_out => s_tc_from_ports_to_tcc(i), -- O
                 txrdy => s_txrdy(i), -- O
-                rxhalff => s_portstatus(i)(9), -- O
                 rxdata => s_rxdata(i), -- O
                 started => started(i), -- O
                 connecting => connecting(i), -- O
@@ -294,12 +286,11 @@ BEGIN
                 bus_request => s_bus_m_request(i), -- O
                 bus_ack_in => s_bus_m_ack(i), -- I
                 -- Port Control/Status Bus IO:
-                portstatus => s_portstatus(i), -- O
-                portcontrol => s_portcontrol(i) -- I
+                portstatus => s_portstatus(i) -- O
             );
-        END GENERATE spw_ports_mutable;
+        END GENERATE spw_ports;
     ELSE GENERATE
-        spw_ports_immutable : FOR i IN 0 TO (numports - 1) GENERATE
+        spw_ports_const : FOR i IN 0 TO (numports - 1) GENERATE
             spw_port : spwrouterport GENERIC MAP(
                 numports => numports,
                 blen => blen,
@@ -321,12 +312,10 @@ BEGIN
                 txdivcnt => "00000001", -- I
                 tick_in => s_tick_from_tcc_to_ports(i), -- I
                 time_in => s_tc_from_tcc_to_ports(i), -- I
-                txhalff => OPEN, -- O
                 txdata => s_txdata(i), -- I
                 tick_out => s_tick_from_ports_to_tcc(i), -- O
                 time_out => s_tc_from_ports_to_tcc(i), -- O
                 txrdy => s_txrdy(i), -- O
-                rxhalff => OPEN, -- O
                 rxdata => s_rxdata(i), -- O
                 started => started(i), -- O
                 connecting => connecting(i), -- O
@@ -357,10 +346,9 @@ BEGIN
                 bus_request => s_bus_m_request(i), -- O
                 bus_ack_in => s_bus_m_ack(i), -- I
                 -- Port Control/Status Bus IO:
-                portstatus => s_portstatus(i), -- O
-                portcontrol => s_portcontrol(i) -- I
+                portstatus => OPEN -- O -- wont be needed when externPort = FALSE!
             );
-        END GENERATE spw_ports_immutable;
+        END GENERATE spw_ports_const;
     END GENERATE spw_port_config;
 
 
@@ -424,7 +412,7 @@ BEGIN
     );
 
 
-    timecode_control_config : IF externPort = TRUE THEN GENERATE
+    timecode_control_config : IF externPort = TRUE GENERATE
         -- Collect Time Code enable flag for each port.
         TC_en : FOR i IN 0 TO (numports - 1) GENERATE
             s_timecode_en(i) <= s_portcontrol(i)(5);
@@ -467,7 +455,7 @@ BEGIN
             auto_tc_out => s_auto_tc, -- O
             auto_interval => s_auto_cycle -- I
         );
-    END IF timecode_control_config;
+    END GENERATE timecode_control_config;
 
 
     -- Creates transposed matrix of s_routing_matrix: Shows for every port (row) which port (column) requests access to it.

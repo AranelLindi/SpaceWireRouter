@@ -23,6 +23,8 @@ USE IEEE.MATH_REAL.ALL;
 USE WORK.SPWROUTERPKG.ALL;
 USE WORK.SPWPKG.ALL;
 
+USE STD.TEXTIO.ALL; -- used for port control register initialization
+
 ENTITY spwrouterregs_extended IS
     GENERIC (
         -- Number of SpaceWire ports.
@@ -103,6 +105,22 @@ ENTITY spwrouterregs_extended IS
 END spwrouterregs_extended;
 
 ARCHITECTURE spwrouterregs_extended_arch OF spwrouterregs_extended IS
+    -- Function to initialize Port Control registers. 
+    -- Each line in file represents a physical port (beginning with 0, ending with numport-1).
+    IMPURE FUNCTION init_portcontrol RETURN array_t IS
+        FILE text_file : text OPEN read_mode IS "../../syn/MemFiles/PortControl_mem.txt";
+
+        VARIABLE text_line : line;
+        VARIABLE ram_content : array_t((numports - 1) DOWNTO 0)(31 DOWNTO 0);
+    BEGIN
+        FOR i IN 0 TO (numports - 1) LOOP
+            readline(text_file, text_line);
+            hread(text_line, ram_content(i));
+        END LOOP;
+
+        RETURN ram_content;
+    END FUNCTION;
+
     -- Routing table signals.
     SIGNAL state : spwroutertablestates := S_Idle;
 
@@ -110,20 +128,10 @@ ARCHITECTURE spwrouterregs_extended_arch OF spwrouterregs_extended IS
     SIGNAL s_ack_in : STD_LOGIC;
     SIGNAL s_ack_out : STD_LOGIC := '0';
 
-    -- Select signals.
-    SIGNAL s_table_1 : STD_LOGIC; -- Routing Table
-    SIGNAL s_table_2 : STD_LOGIC; -- Port Status & Control
-    SIGNAL s_table_3 : STD_LOGIC; -- Router Registers
-
-    -- Addressing signals.
-    SIGNAL s_addr_table_1 : STD_LOGIC_VECTOR(9 DOWNTO 2);
-    SIGNAL s_addr_table_2 : STD_LOGIC_VECTOR(7 DOWNTO 2);
-    SIGNAL s_addr_table_3 : STD_LOGIC_VECTOR(7 DOWNTO 2);
-
     -- Slave registers.
     SIGNAL slv_reg_routingTable : array_t(255 DOWNTO 32)(31 DOWNTO 0);
     SIGNAL slv_reg_portstatus : array_t((numports - 1) DOWNTO 0)(31 DOWNTO 0);
-    SIGNAL slv_reg_portcontrol : array_t((numports - 1) DOWNTO 0)(31 DOWNTO 0);
+    SIGNAL slv_reg_portcontrol : array_t((numports - 1) DOWNTO 0)(31 DOWNTO 0) := init_portcontrol;
     SIGNAL slv_reg_numports : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL slv_reg_running : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL slv_reg_watchcycle : STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -131,6 +139,7 @@ ARCHITECTURE spwrouterregs_extended_arch OF spwrouterregs_extended IS
     SIGNAL slv_reg_lasttc : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL slv_reg_lastautotc : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL slv_reg_info : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    
     SIGNAL reg_data_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
     -- User-definied signals declaration.
