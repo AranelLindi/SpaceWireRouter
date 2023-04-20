@@ -40,6 +40,8 @@ use unisim.vcomponents.all;
 entity router_implementation is
     Port (
         clk : in std_logic;
+        rxclk : in std_logic;
+        txclk : in std_logic;
         rst : in std_logic;
         rx : in std_logic := '0';
         tx : out std_logic;
@@ -76,6 +78,11 @@ end router_implementation;
 architecture Behavioral of router_implementation is
     -- Constants
     CONSTANT sysfreq : real := 100.0e6; -- clk period
+    
+    CONSTANT sysfreq_int : integer := INTEGER(sysfreq);
+    CONSTANT baudrate : integer := 115_200;
+    
+    CONSTANT freq_baud_ratio : integer := sysfreq_int / baudrate;
 
     COMPONENT UARTSpWAdapter
         GENERIC (
@@ -278,8 +285,8 @@ begin
         )
         port map (
             clk => clk,
-            rxclk => clk,
-            txclk => clk,
+            rxclk => rxclk,
+            txclk => txclk,
             rst => rst,
             started => open,
             connecting => open,
@@ -306,7 +313,7 @@ begin
     -- Contains numports-SpaceWire ports.
     Adapter : UARTSpWAdapter
         GENERIC MAP(
-            clk_cycles_per_bit => 868, -- 100_000_000 (Hz) / 115_200 (baud rate) = 868
+            clk_cycles_per_bit => freq_baud_ratio, -- 100_000_000 (Hz) / 115_200 (baud rate) = 868
             numports => 1,
             init_input_port => 1,
             init_output_port => 1,
@@ -322,8 +329,8 @@ begin
         )
         PORT MAP(
             clk => clk,
-            rxclk => clk,
-            txclk => clk,
+            rxclk => rxclk,
+            txclk => txclk,
             rst => rst,
             autostart => (OTHERS => '1'),
             linkstart => (OTHERS => '1'),
