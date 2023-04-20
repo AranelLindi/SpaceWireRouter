@@ -78,9 +78,6 @@ SPI1_SS_O,
 SPI1_SS1_O, 
 SPI1_SS2_O, 
 SPI1_SS_T, 
-TTC0_WAVE0_OUT, 
-TTC0_WAVE1_OUT, 
-TTC0_WAVE2_OUT, 
 USB0_PORT_INDCTL, 
 USB0_VBUS_PWRSELECT, 
 USB0_VBUS_PWRFAULT, 
@@ -215,9 +212,6 @@ output SPI1_SS_O;
 output SPI1_SS1_O;
 output SPI1_SS2_O;
 output SPI1_SS_T;
-output TTC0_WAVE0_OUT;
-output TTC0_WAVE1_OUT;
-output TTC0_WAVE2_OUT;
 output [1 : 0] USB0_PORT_INDCTL;
 output USB0_VBUS_PWRSELECT;
 input USB0_VBUS_PWRFAULT;
@@ -270,7 +264,7 @@ output [1 : 0] S_AXI_HP0_BRESP;
 output [1 : 0] S_AXI_HP0_RRESP;
 output [5 : 0] S_AXI_HP0_BID;
 output [5 : 0] S_AXI_HP0_RID;
-output [31 : 0] S_AXI_HP0_RDATA;
+output [63 : 0] S_AXI_HP0_RDATA;
 output [7 : 0] S_AXI_HP0_RCOUNT;
 output [7 : 0] S_AXI_HP0_WCOUNT;
 output [2 : 0] S_AXI_HP0_RACOUNT;
@@ -303,8 +297,8 @@ input [3 : 0] S_AXI_HP0_AWQOS;
 input [5 : 0] S_AXI_HP0_ARID;
 input [5 : 0] S_AXI_HP0_AWID;
 input [5 : 0] S_AXI_HP0_WID;
-input [31 : 0] S_AXI_HP0_WDATA;
-input [3 : 0] S_AXI_HP0_WSTRB;
+input [63 : 0] S_AXI_HP0_WDATA;
+input [7 : 0] S_AXI_HP0_WSTRB;
 input [5 : 0] IRQ_F2P;
 output FCLK_CLK0;
 output FCLK_RESET0_N;
@@ -330,7 +324,7 @@ input PS_SRSTB;
 input PS_CLK;
 input PS_PORB;
 
-  processing_system7_vip_v1_0_15 #(
+  processing_system7_vip_v1_0_14 #(
     .C_USE_M_AXI_GP0(1),
     .C_USE_M_AXI_GP1(0),
     .C_USE_S_AXI_ACP(0),
@@ -340,7 +334,7 @@ input PS_PORB;
     .C_USE_S_AXI_HP1(0),
     .C_USE_S_AXI_HP2(0),
     .C_USE_S_AXI_HP3(0),
-    .C_S_AXI_HP0_DATA_WIDTH(32),
+    .C_S_AXI_HP0_DATA_WIDTH(64),
     .C_S_AXI_HP1_DATA_WIDTH(64),
     .C_S_AXI_HP2_DATA_WIDTH(64),
     .C_S_AXI_HP3_DATA_WIDTH(64),

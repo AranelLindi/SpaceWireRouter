@@ -47,14 +47,14 @@
 -- DO NOT MODIFY THIS FILE.
 
 -- IP VLNV: xilinx.com:ip:axi_mcdma:1.1
--- IP Revision: 8
+-- IP Revision: 7
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
 
-LIBRARY axi_mcdma_v1_1_8;
-USE axi_mcdma_v1_1_8.axi_mcdma;
+LIBRARY axi_mcdma_v1_1_7;
+USE axi_mcdma_v1_1_7.axi_mcdma;
 
 ENTITY main_design_axi_mcdma_0_0 IS
   PORT (

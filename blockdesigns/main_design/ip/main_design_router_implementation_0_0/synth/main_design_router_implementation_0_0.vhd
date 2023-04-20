@@ -132,11 +132,11 @@ ARCHITECTURE main_design_router_implementation_0_0_arch OF main_design_router_im
     );
   END COMPONENT router_implementation;
   ATTRIBUTE X_CORE_INFO : STRING;
-  ATTRIBUTE X_CORE_INFO OF main_design_router_implementation_0_0_arch: ARCHITECTURE IS "router_implementation,Vivado 2022.2";
+  ATTRIBUTE X_CORE_INFO OF main_design_router_implementation_0_0_arch: ARCHITECTURE IS "router_implementation,Vivado 2022.1";
   ATTRIBUTE CHECK_LICENSE_TYPE : STRING;
   ATTRIBUTE CHECK_LICENSE_TYPE OF main_design_router_implementation_0_0_arch : ARCHITECTURE IS "main_design_router_implementation_0_0,router_implementation,{}";
   ATTRIBUTE CORE_GENERATION_INFO : STRING;
-  ATTRIBUTE CORE_GENERATION_INFO OF main_design_router_implementation_0_0_arch: ARCHITECTURE IS "main_design_router_implementation_0_0,router_implementation,{x_ipProduct=Vivado 2022.2,x_ipVendor=xilinx.com,x_ipLibrary=module_ref,x_ipName=router_implementation,x_ipVersion=1.0,x_ipCoreRevision=1,x_ipLanguage=VHDL,x_ipSimLanguage=VHDL}";
+  ATTRIBUTE CORE_GENERATION_INFO OF main_design_router_implementation_0_0_arch: ARCHITECTURE IS "main_design_router_implementation_0_0,router_implementation,{x_ipProduct=Vivado 2022.1,x_ipVendor=xilinx.com,x_ipLibrary=module_ref,x_ipName=router_implementation,x_ipVersion=1.0,x_ipCoreRevision=1,x_ipLanguage=VHDL,x_ipSimLanguage=VHDL}";
   ATTRIBUTE IP_DEFINITION_SOURCE : STRING;
   ATTRIBUTE IP_DEFINITION_SOURCE OF main_design_router_implementation_0_0_arch: ARCHITECTURE IS "module_ref";
   ATTRIBUTE X_INTERFACE_INFO : STRING;

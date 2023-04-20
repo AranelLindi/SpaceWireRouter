@@ -214,14 +214,6 @@ architecture Behavioral of router_implementation is
     END COMPONENT;
 
 
-
---    signal clk_ibufg : std_logic;
---    signal s_clk_toggle : std_logic;
---    type clkdivstates is (S_Mode1, S_Mode2);
---    signal clkdivstate : clkdivstates := S_Mode1;
-
---    signal clk : std_logic;
-
     signal s_spw_d_to_router : std_logic_vector(5 downto 0);
     signal s_spw_s_to_router : std_logic_vector(5 downto 0);
     signal s_spw_d_from_router : std_logic_vector(5 downto 0);

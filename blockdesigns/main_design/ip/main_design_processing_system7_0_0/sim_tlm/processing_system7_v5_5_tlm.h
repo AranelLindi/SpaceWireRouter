@@ -156,9 +156,6 @@ class processing_system7_v5_5_tlm : public sc_core::sc_module   {
     sc_core::sc_out<bool> SPI1_SS1_O;
     sc_core::sc_out<bool> SPI1_SS2_O;
     sc_core::sc_out<bool> SPI1_SS_T;
-    sc_core::sc_out<bool> TTC0_WAVE0_OUT;
-    sc_core::sc_out<bool> TTC0_WAVE1_OUT;
-    sc_core::sc_out<bool> TTC0_WAVE2_OUT;
     sc_core::sc_out<sc_dt::sc_bv<2> >  USB0_PORT_INDCTL;
     sc_core::sc_out<bool> USB0_VBUS_PWRSELECT;
     sc_core::sc_in<bool> USB0_VBUS_PWRFAULT;
@@ -224,7 +221,7 @@ processing_system7_v5_5_tlm(sc_core::sc_module_name name,
     // Bridge's Xtlm wr/rd target sockets binds with 
     // xtlm initiator sockets of processing_system7_tlm and tlm simple initiator 
     // socket with xilinx_zynq's target socket
-    xtlm::xaximm_xtlm2tlm_t<32,32> S_AXI_HP0_xtlm_brdg;
+    xtlm::xaximm_xtlm2tlm_t<64,32> S_AXI_HP0_xtlm_brdg;
     xtlm::xtlm_aximm_fifo *S_AXI_HP0_buff;
 
     // This Bridges converts b_transport to nb_transports and also

@@ -10,7 +10,8 @@
 SpaceWireRouter*
 SpaceWireLight*
 !.gitignore
-!*.srcs/
+blockdesigns/**
+!blockdesigns/**/*.bd
 ###########################################################################
 ##	VIVADO
 ###########################################################################
@@ -19,16 +20,12 @@ SpaceWireLight*
 #########
 #Do NOT ignore VHDL, Verilog, block diagrams or EDIF files.
 !*.vhd
-!*.v
+*.v
 !*.bd
 !*.edif
 !*.mem
 !*.mmi
 !*.txt
-#########
-#Blockdiagram files
-!*.bd
-!*.bda
 #########
 #IP files
 #########
@@ -37,7 +34,7 @@ SpaceWireLight*
 #*.xci(www.spiritconsortium.org)
 !*.xci
 #*.dcp(checkpoint files)
-!*.dcp
+*.dcp
 !*.vds
 !*.pb
 #All bd comments and layout coordinates are stored within .ui
@@ -47,6 +44,7 @@ SpaceWireLight*
 !*.pdf
 #Temp: LibreOffice-Files
 !*.odt
+*.xsci
 #########
 #System Generator
 #########

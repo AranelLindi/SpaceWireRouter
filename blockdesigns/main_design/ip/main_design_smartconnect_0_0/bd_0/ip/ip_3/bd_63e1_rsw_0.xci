@@ -1,529 +1,590 @@
-{
-  "schema": "xilinx.com:schema:json_instance:1.0",
-  "ip_inst": {
-    "xci_name": "bd_63e1_rsw_0",
-    "cell_name": "r_switchboard",
-    "component_reference": "xilinx.com:ip:sc_switchboard:1.0",
-    "ip_revision": "6",
-    "gen_directory": ".",
-    "parameters": {
-      "component_parameters": {
-        "S_PIPELINES": [ { "value": "0", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M_PIPELINES": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "S_LATENCY": [ { "value": "0", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "NUM_SI": [ { "value": "8", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "NUM_MI": [ { "value": "4", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "TESTING_MODE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "PAYLD_WIDTH": [ { "value": "58", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M00_S00_CONNECTIVITY": [ { "value": "0", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M00_S01_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M00_S02_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M00_S03_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M00_S04_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M00_S05_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M00_S06_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M00_S07_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M00_S08_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M00_S09_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M00_S10_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M00_S11_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M00_S12_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M00_S13_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M00_S14_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M00_S15_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M01_S00_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M01_S01_CONNECTIVITY": [ { "value": "0", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M01_S02_CONNECTIVITY": [ { "value": "0", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M01_S03_CONNECTIVITY": [ { "value": "0", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M01_S04_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M01_S05_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M01_S06_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M01_S07_CONNECTIVITY": [ { "value": "0", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M01_S08_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M01_S09_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M01_S10_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M01_S11_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M01_S12_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M01_S13_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M01_S14_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M01_S15_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M02_S00_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M02_S01_CONNECTIVITY": [ { "value": "0", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M02_S02_CONNECTIVITY": [ { "value": "0", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M02_S03_CONNECTIVITY": [ { "value": "0", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M02_S04_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M02_S05_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M02_S06_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M02_S07_CONNECTIVITY": [ { "value": "0", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M02_S08_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M02_S09_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M02_S10_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M02_S11_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M02_S12_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M02_S13_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M02_S14_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M02_S15_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M03_S00_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M03_S01_CONNECTIVITY": [ { "value": "0", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M03_S02_CONNECTIVITY": [ { "value": "0", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M03_S03_CONNECTIVITY": [ { "value": "0", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M03_S04_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M03_S05_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M03_S06_CONNECTIVITY": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M03_S07_CONNECTIVITY": [ { "value": "0", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M03_S08_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M03_S09_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M03_S10_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M03_S11_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M03_S12_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M03_S13_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M03_S14_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M03_S15_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M04_S00_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M04_S01_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M04_S02_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M04_S03_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M04_S04_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M04_S05_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M04_S06_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M04_S07_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M04_S08_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M04_S09_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M04_S10_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M04_S11_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M04_S12_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M04_S13_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M04_S14_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M04_S15_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M05_S00_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M05_S01_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M05_S02_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M05_S03_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M05_S04_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M05_S05_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M05_S06_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M05_S07_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M05_S08_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M05_S09_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M05_S10_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M05_S11_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M05_S12_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M05_S13_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M05_S14_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M05_S15_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M06_S00_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M06_S01_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M06_S02_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M06_S03_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M06_S04_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M06_S05_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M06_S06_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M06_S07_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M06_S08_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M06_S09_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M06_S10_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M06_S11_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M06_S12_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M06_S13_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M06_S14_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M06_S15_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M07_S00_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M07_S01_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M07_S02_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M07_S03_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M07_S04_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M07_S05_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M07_S06_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M07_S07_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M07_S08_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M07_S09_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M07_S10_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M07_S11_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M07_S12_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M07_S13_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M07_S14_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M07_S15_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M08_S00_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M08_S01_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M08_S02_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M08_S03_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M08_S04_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M08_S05_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M08_S06_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M08_S07_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M08_S08_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M08_S09_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M08_S10_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M08_S11_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M08_S12_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M08_S13_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M08_S14_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M08_S15_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M09_S00_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M09_S01_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M09_S02_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M09_S03_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M09_S04_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M09_S05_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M09_S06_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M09_S07_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M09_S08_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M09_S09_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M09_S10_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M09_S11_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M09_S12_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M09_S13_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M09_S14_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M09_S15_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M10_S00_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M10_S01_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M10_S02_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M10_S03_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M10_S04_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M10_S05_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M10_S06_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M10_S07_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M10_S08_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M10_S09_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M10_S10_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M10_S11_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M10_S12_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M10_S13_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M10_S14_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M10_S15_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M11_S00_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M11_S01_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M11_S02_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M11_S03_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M11_S04_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M11_S05_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M11_S06_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M11_S07_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M11_S08_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M11_S09_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M11_S10_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M11_S11_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M11_S12_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M11_S13_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M11_S14_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M11_S15_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M12_S00_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M12_S01_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M12_S02_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M12_S03_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M12_S04_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M12_S05_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M12_S06_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M12_S07_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M12_S08_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M12_S09_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M12_S10_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M12_S11_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M12_S12_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M12_S13_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M12_S14_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M12_S15_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M13_S00_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M13_S01_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M13_S02_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M13_S03_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M13_S04_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M13_S05_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M13_S06_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M13_S07_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M13_S08_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M13_S09_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M13_S10_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M13_S11_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M13_S12_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M13_S13_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M13_S14_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M13_S15_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M14_S00_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M14_S01_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M14_S02_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M14_S03_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M14_S04_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M14_S05_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M14_S06_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M14_S07_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M14_S08_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M14_S09_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M14_S10_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M14_S11_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M14_S12_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M14_S13_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M14_S14_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M14_S15_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M15_S00_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M15_S01_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M15_S02_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M15_S03_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M15_S04_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M15_S05_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M15_S06_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M15_S07_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M15_S08_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M15_S09_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M15_S10_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M15_S11_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M15_S12_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M15_S13_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M15_S14_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "M15_S15_CONNECTIVITY": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "Component_Name": [ { "value": "bd_63e1_rsw_0", "resolve_type": "user", "usage": "all" } ]
-      },
-      "model_parameters": {
-        "C_PAYLD_WIDTH": [ { "value": "58", "resolve_type": "generated", "format": "long", "usage": "all" } ],
-        "K_MAX_INFO_WIDTH": [ { "value": "1", "resolve_type": "generated", "format": "long", "usage": "all" } ],
-        "C_S_PIPELINES": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ],
-        "C_M_PIPELINES": [ { "value": "1", "resolve_type": "generated", "format": "long", "usage": "all" } ],
-        "C_S_LATENCY": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ],
-        "C_NUM_SI": [ { "value": "8", "resolve_type": "generated", "format": "long", "usage": "all" } ],
-        "C_NUM_MI": [ { "value": "4", "resolve_type": "generated", "format": "long", "usage": "all" } ],
-        "C_TESTING_MODE": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ],
-        "C_CONNECTIVITY": [ { "value": "0b00011111111111110001000100011110", "resolve_type": "generated", "format": "bitString", "enabled": false, "usage": "all" } ]
-      },
-      "project_parameters": {
-        "ARCHITECTURE": [ { "value": "zynq" } ],
-        "BASE_BOARD_PART": [ { "value": "xilinx.com:zc706:part0:1.4" } ],
-        "BOARD_CONNECTIONS": [ { "value": "" } ],
-        "DEVICE": [ { "value": "xc7z045" } ],
-        "PACKAGE": [ { "value": "ffg900" } ],
-        "PREFHDL": [ { "value": "VHDL" } ],
-        "SILICON_REVISION": [ { "value": "" } ],
-        "SIMULATOR_LANGUAGE": [ { "value": "VHDL" } ],
-        "SPEEDGRADE": [ { "value": "-2" } ],
-        "STATIC_POWER": [ { "value": "" } ],
-        "TEMPERATURE_GRADE": [ { "value": "" } ],
-        "USE_RDI_CUSTOMIZATION": [ { "value": "TRUE" } ],
-        "USE_RDI_GENERATION": [ { "value": "TRUE" } ]
-      },
-      "runtime_parameters": {
-        "IPCONTEXT": [ { "value": "IP_Integrator" } ],
-        "IPREVISION": [ { "value": "6" } ],
-        "MANAGED": [ { "value": "TRUE" } ],
-        "OUTPUTDIR": [ { "value": "." } ],
-        "SELECTEDSIMMODEL": [ { "value": "" } ],
-        "SHAREDDIR": [ { "value": "../../../../../ipshared" } ],
-        "SWVERSION": [ { "value": "2022.2" } ],
-        "SYNTHESISFLOW": [ { "value": "GLOBAL" } ]
-      }
-    },
-    "boundary": {
-      "ports": {
-        "aclk": [ { "direction": "in" } ],
-        "aclken": [ { "direction": "in", "driver_value": "1" } ],
-        "s_sc_send": [ { "direction": "in", "size_left": "31", "size_right": "0" } ],
-        "s_sc_req": [ { "direction": "in", "size_left": "31", "size_right": "0" } ],
-        "s_sc_info": [ { "direction": "in", "size_left": "31", "size_right": "0" } ],
-        "s_sc_payld": [ { "direction": "in", "size_left": "463", "size_right": "0" } ],
-        "s_sc_recv": [ { "direction": "out", "size_left": "31", "size_right": "0" } ],
-        "m_sc_recv": [ { "direction": "in", "size_left": "31", "size_right": "0" } ],
-        "m_sc_send": [ { "direction": "out", "size_left": "31", "size_right": "0" } ],
-        "m_sc_req": [ { "direction": "out", "size_left": "31", "size_right": "0" } ],
-        "m_sc_info": [ { "direction": "out", "size_left": "31", "size_right": "0" } ],
-        "m_sc_payld": [ { "direction": "out", "size_left": "231", "size_right": "0" } ]
-      },
-      "interfaces": {
-        "aclk": {
-          "vlnv": "xilinx.com:signal:clock:1.0",
-          "abstraction_type": "xilinx.com:signal:clock_rtl:1.0",
-          "mode": "slave",
-          "parameters": {
-            "FREQ_HZ": [ { "value": "50000000", "value_src": "user_prop", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
-            "FREQ_TOLERANCE_HZ": [ { "value": "0", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
-            "PHASE": [ { "value": "0.0", "value_permission": "bd", "resolve_type": "generated", "format": "float", "is_ips_inferred": true, "is_static_object": false } ],
-            "CLK_DOMAIN": [ { "value": "main_design_processing_system7_0_0_FCLK_CLK0", "value_src": "default_prop", "value_permission": "bd", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ],
-            "ASSOCIATED_BUSIF": [ { "value": "M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC:S00_SC:S01_SC:S02_SC:S03_SC:S04_SC:S05_SC:S06_SC:S07_SC:S08_SC:S09_SC:S10_SC:S11_SC:S12_SC:S13_SC:S14_SC:S15_SC", "value_permission": "bd", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ],
-            "ASSOCIATED_PORT": [ { "value": "", "value_permission": "bd", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ],
-            "ASSOCIATED_RESET": [ { "value": "", "value_permission": "bd", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ],
-            "INSERT_VIP": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "simulation.rtl", "is_ips_inferred": true, "is_static_object": false } ]
-          },
-          "port_maps": {
-            "CLK": [ { "physical_name": "aclk" } ]
-          }
-        },
-        "aclken": {
-          "vlnv": "xilinx.com:signal:clockenable:1.0",
-          "abstraction_type": "xilinx.com:signal:clockenable_rtl:1.0",
-          "mode": "slave",
-          "parameters": {
-            "POLARITY": [ { "value": "ACTIVE_LOW", "value_permission": "bd", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ]
-          },
-          "port_maps": {
-            "CE": [ { "physical_name": "aclken" } ]
-          }
-        },
-        "S00_SC": {
-          "vlnv": "xilinx.com:interface:sc:1.0",
-          "abstraction_type": "xilinx.com:interface:sc_rtl:1.0",
-          "mode": "slave",
-          "parameters": {
-            "BRIDGES": [ { "value": "M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC", "value_src": "constant", "value_permission": "bd", "usage": "all" } ]
-          },
-          "port_maps": {
-            "SEND": [ { "physical_name": "s_sc_send", "physical_left": "3", "physical_right": "0" } ],
-            "REQ": [ { "physical_name": "s_sc_req", "physical_left": "3", "physical_right": "0" } ],
-            "INFO": [ { "physical_name": "s_sc_info", "physical_left": "3", "physical_right": "0" } ],
-            "PAYLD": [ { "physical_name": "s_sc_payld", "physical_left": "57", "physical_right": "0" } ],
-            "RECV": [ { "physical_name": "s_sc_recv", "physical_left": "3", "physical_right": "0" } ]
-          }
-        },
-        "M00_SC": {
-          "vlnv": "xilinx.com:interface:sc:1.0",
-          "abstraction_type": "xilinx.com:interface:sc_rtl:1.0",
-          "mode": "master",
-          "port_maps": {
-            "RECV": [ { "physical_name": "m_sc_recv", "physical_left": "7", "physical_right": "0" } ],
-            "SEND": [ { "physical_name": "m_sc_send", "physical_left": "7", "physical_right": "0" } ],
-            "REQ": [ { "physical_name": "m_sc_req", "physical_left": "7", "physical_right": "0" } ],
-            "INFO": [ { "physical_name": "m_sc_info", "physical_left": "7", "physical_right": "0" } ],
-            "PAYLD": [ { "physical_name": "m_sc_payld", "physical_left": "57", "physical_right": "0" } ]
-          }
-        },
-        "S01_SC": {
-          "vlnv": "xilinx.com:interface:sc:1.0",
-          "abstraction_type": "xilinx.com:interface:sc_rtl:1.0",
-          "mode": "slave",
-          "parameters": {
-            "BRIDGES": [ { "value": "M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC", "value_src": "constant", "value_permission": "bd", "usage": "all" } ]
-          },
-          "port_maps": {
-            "SEND": [ { "physical_name": "s_sc_send", "physical_left": "7", "physical_right": "4" } ],
-            "REQ": [ { "physical_name": "s_sc_req", "physical_left": "7", "physical_right": "4" } ],
-            "INFO": [ { "physical_name": "s_sc_info", "physical_left": "7", "physical_right": "4" } ],
-            "PAYLD": [ { "physical_name": "s_sc_payld", "physical_left": "115", "physical_right": "58" } ],
-            "RECV": [ { "physical_name": "s_sc_recv", "physical_left": "7", "physical_right": "4" } ]
-          }
-        },
-        "M01_SC": {
-          "vlnv": "xilinx.com:interface:sc:1.0",
-          "abstraction_type": "xilinx.com:interface:sc_rtl:1.0",
-          "mode": "master",
-          "port_maps": {
-            "RECV": [ { "physical_name": "m_sc_recv", "physical_left": "15", "physical_right": "8" } ],
-            "SEND": [ { "physical_name": "m_sc_send", "physical_left": "15", "physical_right": "8" } ],
-            "REQ": [ { "physical_name": "m_sc_req", "physical_left": "15", "physical_right": "8" } ],
-            "INFO": [ { "physical_name": "m_sc_info", "physical_left": "15", "physical_right": "8" } ],
-            "PAYLD": [ { "physical_name": "m_sc_payld", "physical_left": "115", "physical_right": "58" } ]
-          }
-        },
-        "S02_SC": {
-          "vlnv": "xilinx.com:interface:sc:1.0",
-          "abstraction_type": "xilinx.com:interface:sc_rtl:1.0",
-          "mode": "slave",
-          "parameters": {
-            "BRIDGES": [ { "value": "M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC", "value_src": "constant", "value_permission": "bd", "usage": "all" } ]
-          },
-          "port_maps": {
-            "SEND": [ { "physical_name": "s_sc_send", "physical_left": "11", "physical_right": "8" } ],
-            "REQ": [ { "physical_name": "s_sc_req", "physical_left": "11", "physical_right": "8" } ],
-            "INFO": [ { "physical_name": "s_sc_info", "physical_left": "11", "physical_right": "8" } ],
-            "PAYLD": [ { "physical_name": "s_sc_payld", "physical_left": "173", "physical_right": "116" } ],
-            "RECV": [ { "physical_name": "s_sc_recv", "physical_left": "11", "physical_right": "8" } ]
-          }
-        },
-        "M02_SC": {
-          "vlnv": "xilinx.com:interface:sc:1.0",
-          "abstraction_type": "xilinx.com:interface:sc_rtl:1.0",
-          "mode": "master",
-          "port_maps": {
-            "RECV": [ { "physical_name": "m_sc_recv", "physical_left": "23", "physical_right": "16" } ],
-            "SEND": [ { "physical_name": "m_sc_send", "physical_left": "23", "physical_right": "16" } ],
-            "REQ": [ { "physical_name": "m_sc_req", "physical_left": "23", "physical_right": "16" } ],
-            "INFO": [ { "physical_name": "m_sc_info", "physical_left": "23", "physical_right": "16" } ],
-            "PAYLD": [ { "physical_name": "m_sc_payld", "physical_left": "173", "physical_right": "116" } ]
-          }
-        },
-        "S03_SC": {
-          "vlnv": "xilinx.com:interface:sc:1.0",
-          "abstraction_type": "xilinx.com:interface:sc_rtl:1.0",
-          "mode": "slave",
-          "parameters": {
-            "BRIDGES": [ { "value": "M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC", "value_src": "constant", "value_permission": "bd", "usage": "all" } ]
-          },
-          "port_maps": {
-            "SEND": [ { "physical_name": "s_sc_send", "physical_left": "15", "physical_right": "12" } ],
-            "REQ": [ { "physical_name": "s_sc_req", "physical_left": "15", "physical_right": "12" } ],
-            "INFO": [ { "physical_name": "s_sc_info", "physical_left": "15", "physical_right": "12" } ],
-            "PAYLD": [ { "physical_name": "s_sc_payld", "physical_left": "231", "physical_right": "174" } ],
-            "RECV": [ { "physical_name": "s_sc_recv", "physical_left": "15", "physical_right": "12" } ]
-          }
-        },
-        "M03_SC": {
-          "vlnv": "xilinx.com:interface:sc:1.0",
-          "abstraction_type": "xilinx.com:interface:sc_rtl:1.0",
-          "mode": "master",
-          "port_maps": {
-            "RECV": [ { "physical_name": "m_sc_recv", "physical_left": "31", "physical_right": "24" } ],
-            "SEND": [ { "physical_name": "m_sc_send", "physical_left": "31", "physical_right": "24" } ],
-            "REQ": [ { "physical_name": "m_sc_req", "physical_left": "31", "physical_right": "24" } ],
-            "INFO": [ { "physical_name": "m_sc_info", "physical_left": "31", "physical_right": "24" } ],
-            "PAYLD": [ { "physical_name": "m_sc_payld", "physical_left": "231", "physical_right": "174" } ]
-          }
-        },
-        "S04_SC": {
-          "vlnv": "xilinx.com:interface:sc:1.0",
-          "abstraction_type": "xilinx.com:interface:sc_rtl:1.0",
-          "mode": "slave",
-          "parameters": {
-            "BRIDGES": [ { "value": "M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC", "value_src": "constant", "value_permission": "bd", "usage": "all" } ]
-          },
-          "port_maps": {
-            "SEND": [ { "physical_name": "s_sc_send", "physical_left": "19", "physical_right": "16" } ],
-            "REQ": [ { "physical_name": "s_sc_req", "physical_left": "19", "physical_right": "16" } ],
-            "INFO": [ { "physical_name": "s_sc_info", "physical_left": "19", "physical_right": "16" } ],
-            "PAYLD": [ { "physical_name": "s_sc_payld", "physical_left": "289", "physical_right": "232" } ],
-            "RECV": [ { "physical_name": "s_sc_recv", "physical_left": "19", "physical_right": "16" } ]
-          }
-        },
-        "S05_SC": {
-          "vlnv": "xilinx.com:interface:sc:1.0",
-          "abstraction_type": "xilinx.com:interface:sc_rtl:1.0",
-          "mode": "slave",
-          "parameters": {
-            "BRIDGES": [ { "value": "M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC", "value_src": "constant", "value_permission": "bd", "usage": "all" } ]
-          },
-          "port_maps": {
-            "SEND": [ { "physical_name": "s_sc_send", "physical_left": "23", "physical_right": "20" } ],
-            "REQ": [ { "physical_name": "s_sc_req", "physical_left": "23", "physical_right": "20" } ],
-            "INFO": [ { "physical_name": "s_sc_info", "physical_left": "23", "physical_right": "20" } ],
-            "PAYLD": [ { "physical_name": "s_sc_payld", "physical_left": "347", "physical_right": "290" } ],
-            "RECV": [ { "physical_name": "s_sc_recv", "physical_left": "23", "physical_right": "20" } ]
-          }
-        },
-        "S06_SC": {
-          "vlnv": "xilinx.com:interface:sc:1.0",
-          "abstraction_type": "xilinx.com:interface:sc_rtl:1.0",
-          "mode": "slave",
-          "parameters": {
-            "BRIDGES": [ { "value": "M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC", "value_src": "constant", "value_permission": "bd", "usage": "all" } ]
-          },
-          "port_maps": {
-            "SEND": [ { "physical_name": "s_sc_send", "physical_left": "27", "physical_right": "24" } ],
-            "REQ": [ { "physical_name": "s_sc_req", "physical_left": "27", "physical_right": "24" } ],
-            "INFO": [ { "physical_name": "s_sc_info", "physical_left": "27", "physical_right": "24" } ],
-            "PAYLD": [ { "physical_name": "s_sc_payld", "physical_left": "405", "physical_right": "348" } ],
-            "RECV": [ { "physical_name": "s_sc_recv", "physical_left": "27", "physical_right": "24" } ]
-          }
-        },
-        "S07_SC": {
-          "vlnv": "xilinx.com:interface:sc:1.0",
-          "abstraction_type": "xilinx.com:interface:sc_rtl:1.0",
-          "mode": "slave",
-          "parameters": {
-            "BRIDGES": [ { "value": "M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC", "value_src": "constant", "value_permission": "bd", "usage": "all" } ]
-          },
-          "port_maps": {
-            "SEND": [ { "physical_name": "s_sc_send", "physical_left": "31", "physical_right": "28" } ],
-            "REQ": [ { "physical_name": "s_sc_req", "physical_left": "31", "physical_right": "28" } ],
-            "INFO": [ { "physical_name": "s_sc_info", "physical_left": "31", "physical_right": "28" } ],
-            "PAYLD": [ { "physical_name": "s_sc_payld", "physical_left": "463", "physical_right": "406" } ],
-            "RECV": [ { "physical_name": "s_sc_recv", "physical_left": "31", "physical_right": "28" } ]
-          }
-        }
-      }
-    }
-  }
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<spirit:design xmlns:xilinx="http://www.xilinx.com" xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <spirit:vendor>xilinx.com</spirit:vendor>
+  <spirit:library>xci</spirit:library>
+  <spirit:name>unknown</spirit:name>
+  <spirit:version>1.0</spirit:version>
+  <spirit:componentInstances>
+    <spirit:componentInstance>
+      <spirit:instanceName>bd_63e1_rsw_0</spirit:instanceName>
+      <spirit:componentRef spirit:vendor="xilinx.com" spirit:library="ip" spirit:name="sc_switchboard" spirit:version="1.0"/>
+      <spirit:configurableElementValues>
+        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.ACLK.ASSOCIATED_BUSIF">M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC:S00_SC:S01_SC:S02_SC:S03_SC:S04_SC:S05_SC:S06_SC:S07_SC:S08_SC:S09_SC:S10_SC:S11_SC:S12_SC:S13_SC:S14_SC:S15_SC</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.ACLK.ASSOCIATED_PORT"/>
+        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.ACLK.ASSOCIATED_RESET"/>
+        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.ACLK.CLK_DOMAIN">main_design_processing_system7_0_0_FCLK_CLK0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.ACLK.FREQ_HZ">50000000</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.ACLK.FREQ_TOLERANCE_HZ">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.ACLK.INSERT_VIP">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.ACLK.PHASE">0.0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.ACLKEN.POLARITY">ACTIVE_LOW</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_CONNECTIVITY">0b11110001111111110001000100011110</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_M_PIPELINES">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_NUM_MI">4</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_NUM_SI">8</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_PAYLD_WIDTH">90</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_S_LATENCY">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_S_PIPELINES">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_TESTING_MODE">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.K_MAX_INFO_WIDTH">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.Component_Name">bd_63e1_rsw_0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_S00_CONNECTIVITY">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_S01_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_S02_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_S03_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_S04_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_S05_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_S06_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_S07_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_S08_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_S09_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_S10_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_S11_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_S12_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_S13_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_S14_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_S15_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_S00_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_S01_CONNECTIVITY">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_S02_CONNECTIVITY">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_S03_CONNECTIVITY">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_S04_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_S05_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_S06_CONNECTIVITY">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_S07_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_S08_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_S09_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_S10_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_S11_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_S12_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_S13_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_S14_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_S15_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_S00_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_S01_CONNECTIVITY">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_S02_CONNECTIVITY">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_S03_CONNECTIVITY">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_S04_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_S05_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_S06_CONNECTIVITY">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_S07_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_S08_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_S09_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_S10_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_S11_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_S12_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_S13_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_S14_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_S15_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_S00_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_S01_CONNECTIVITY">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_S02_CONNECTIVITY">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_S03_CONNECTIVITY">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_S04_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_S05_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_S06_CONNECTIVITY">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_S07_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_S08_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_S09_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_S10_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_S11_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_S12_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_S13_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_S14_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_S15_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_S00_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_S01_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_S02_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_S03_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_S04_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_S05_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_S06_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_S07_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_S08_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_S09_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_S10_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_S11_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_S12_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_S13_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_S14_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_S15_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_S00_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_S01_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_S02_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_S03_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_S04_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_S05_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_S06_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_S07_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_S08_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_S09_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_S10_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_S11_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_S12_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_S13_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_S14_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_S15_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_S00_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_S01_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_S02_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_S03_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_S04_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_S05_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_S06_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_S07_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_S08_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_S09_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_S10_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_S11_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_S12_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_S13_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_S14_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_S15_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_S00_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_S01_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_S02_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_S03_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_S04_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_S05_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_S06_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_S07_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_S08_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_S09_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_S10_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_S11_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_S12_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_S13_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_S14_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_S15_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_S00_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_S01_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_S02_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_S03_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_S04_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_S05_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_S06_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_S07_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_S08_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_S09_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_S10_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_S11_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_S12_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_S13_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_S14_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_S15_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_S00_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_S01_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_S02_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_S03_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_S04_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_S05_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_S06_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_S07_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_S08_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_S09_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_S10_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_S11_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_S12_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_S13_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_S14_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_S15_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_S00_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_S01_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_S02_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_S03_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_S04_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_S05_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_S06_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_S07_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_S08_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_S09_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_S10_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_S11_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_S12_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_S13_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_S14_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_S15_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_S00_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_S01_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_S02_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_S03_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_S04_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_S05_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_S06_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_S07_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_S08_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_S09_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_S10_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_S11_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_S12_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_S13_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_S14_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_S15_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_S00_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_S01_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_S02_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_S03_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_S04_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_S05_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_S06_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_S07_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_S08_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_S09_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_S10_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_S11_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_S12_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_S13_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_S14_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_S15_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_S00_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_S01_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_S02_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_S03_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_S04_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_S05_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_S06_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_S07_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_S08_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_S09_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_S10_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_S11_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_S12_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_S13_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_S14_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_S15_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_S00_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_S01_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_S02_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_S03_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_S04_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_S05_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_S06_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_S07_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_S08_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_S09_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_S10_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_S11_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_S12_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_S13_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_S14_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_S15_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_S00_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_S01_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_S02_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_S03_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_S04_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_S05_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_S06_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_S07_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_S08_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_S09_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_S10_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_S11_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_S12_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_S13_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_S14_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_S15_CONNECTIVITY">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M_PIPELINES">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.NUM_MI">4</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.NUM_SI">8</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PAYLD_WIDTH">90</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S_LATENCY">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S_PIPELINES">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.TESTING_MODE">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.ARCHITECTURE">zynq</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.BASE_BOARD_PART">xilinx.com:zc706:part0:1.4</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.BOARD_CONNECTIONS"/>
+        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.DEVICE">xc7z045</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.PACKAGE">ffg900</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.PREFHDL">VHDL</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.SILICON_REVISION"/>
+        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.SIMULATOR_LANGUAGE">VHDL</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.SPEEDGRADE">-2</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.STATIC_POWER"/>
+        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.TEMPERATURE_GRADE"/>
+        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.USE_RDI_CUSTOMIZATION">TRUE</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.USE_RDI_GENERATION">TRUE</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.IPCONTEXT">IP_Integrator</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.IPREVISION">6</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.MANAGED">TRUE</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.OUTPUTDIR">.</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.SELECTEDSIMMODEL"/>
+        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.SHAREDDIR">../../../../../ipshared</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.SWVERSION">2022.1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.SYNTHESISFLOW">GLOBAL</spirit:configurableElementValue>
+      </spirit:configurableElementValues>
+      <spirit:vendorExtensions>
+        <xilinx:componentInstanceExtensions>
+          <xilinx:configElementInfos>
+            <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.ACLK.ASSOCIATED_BUSIF" xilinx:valuePermission="bd"/>
+            <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.ACLK.ASSOCIATED_PORT" xilinx:valuePermission="bd"/>
+            <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.ACLK.ASSOCIATED_RESET" xilinx:valuePermission="bd"/>
+            <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.ACLK.CLK_DOMAIN" xilinx:valueSource="default_prop" xilinx:valuePermission="bd"/>
+            <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.ACLK.FREQ_HZ" xilinx:valueSource="user_prop" xilinx:valuePermission="bd"/>
+            <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.ACLK.FREQ_TOLERANCE_HZ" xilinx:valuePermission="bd"/>
+            <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.ACLK.PHASE" xilinx:valuePermission="bd"/>
+            <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.ACLKEN.POLARITY" xilinx:valuePermission="bd"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M00_S00_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M00_S01_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M00_S02_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M00_S03_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M00_S04_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M00_S05_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M00_S06_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M00_S07_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M01_S00_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M01_S01_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M01_S02_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M01_S03_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M01_S04_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M01_S05_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M01_S06_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M01_S07_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M02_S00_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M02_S01_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M02_S02_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M02_S03_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M02_S04_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M02_S05_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M02_S06_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M02_S07_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M03_S00_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M03_S01_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M03_S02_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M03_S03_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M03_S04_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M03_S05_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M03_S06_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M03_S07_CONNECTIVITY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M_PIPELINES" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.NUM_MI" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.NUM_SI" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PAYLD_WIDTH" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.S_LATENCY" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.S_PIPELINES" xilinx:valueSource="user"/>
+          </xilinx:configElementInfos>
+          <xilinx:boundaryDescriptionInfo>
+            <xilinx:boundaryDescription xilinx:boundaryDescriptionJSON="{
+              &quot;schema&quot;: &quot;xilinx.com:schema:json_boundary:1.0&quot;,
+              &quot;boundary&quot;: {
+                &quot;ports&quot;: {
+                  &quot;aclk&quot;: [ { &quot;direction&quot;: &quot;in&quot; } ],
+                  &quot;aclken&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;driver_value&quot;: &quot;1&quot; } ],
+                  &quot;s_sc_send&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;size_left&quot;: &quot;31&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;s_sc_req&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;size_left&quot;: &quot;31&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;s_sc_info&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;size_left&quot;: &quot;31&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;s_sc_payld&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;size_left&quot;: &quot;719&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;s_sc_recv&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;31&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;m_sc_recv&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;size_left&quot;: &quot;31&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;m_sc_send&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;31&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;m_sc_req&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;31&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;m_sc_info&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;31&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;m_sc_payld&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;359&quot;, &quot;size_right&quot;: &quot;0&quot; } ]
+                },
+                &quot;interfaces&quot;: {
+                  &quot;aclk&quot;: {
+                    &quot;vlnv&quot;: &quot;xilinx.com:signal:clock:1.0&quot;,
+                    &quot;abstraction_type&quot;: &quot;xilinx.com:signal:clock_rtl:1.0&quot;,
+                    &quot;mode&quot;: &quot;slave&quot;,
+                    &quot;parameters&quot;: {
+                      &quot;FREQ_HZ&quot;: [ { &quot;value&quot;: &quot;50000000&quot;, &quot;value_src&quot;: &quot;user_prop&quot;, &quot;value_permission&quot;: &quot;bd&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;long&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
+                      &quot;FREQ_TOLERANCE_HZ&quot;: [ { &quot;value&quot;: &quot;0&quot;, &quot;value_permission&quot;: &quot;bd&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;long&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
+                      &quot;PHASE&quot;: [ { &quot;value&quot;: &quot;0.0&quot;, &quot;value_permission&quot;: &quot;bd&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;float&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
+                      &quot;CLK_DOMAIN&quot;: [ { &quot;value&quot;: &quot;main_design_processing_system7_0_0_FCLK_CLK0&quot;, &quot;value_src&quot;: &quot;default_prop&quot;, &quot;value_permission&quot;: &quot;bd&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
+                      &quot;ASSOCIATED_BUSIF&quot;: [ { &quot;value&quot;: &quot;M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC:S00_SC:S01_SC:S02_SC:S03_SC:S04_SC:S05_SC:S06_SC:S07_SC:S08_SC:S09_SC:S10_SC:S11_SC:S12_SC:S13_SC:S14_SC:S15_SC&quot;, &quot;value_permission&quot;: &quot;bd&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
+                      &quot;ASSOCIATED_PORT&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;value_permission&quot;: &quot;bd&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
+                      &quot;ASSOCIATED_RESET&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;value_permission&quot;: &quot;bd&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
+                      &quot;INSERT_VIP&quot;: [ { &quot;value&quot;: &quot;0&quot;, &quot;resolve_type&quot;: &quot;user&quot;, &quot;format&quot;: &quot;long&quot;, &quot;usage&quot;: &quot;simulation.rtl&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ]
+                    },
+                    &quot;port_maps&quot;: {
+                      &quot;CLK&quot;: [ { &quot;physical_name&quot;: &quot;aclk&quot; } ]
+                    }
+                  },
+                  &quot;aclken&quot;: {
+                    &quot;vlnv&quot;: &quot;xilinx.com:signal:clockenable:1.0&quot;,
+                    &quot;abstraction_type&quot;: &quot;xilinx.com:signal:clockenable_rtl:1.0&quot;,
+                    &quot;mode&quot;: &quot;slave&quot;,
+                    &quot;parameters&quot;: {
+                      &quot;POLARITY&quot;: [ { &quot;value&quot;: &quot;ACTIVE_LOW&quot;, &quot;value_permission&quot;: &quot;bd&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ]
+                    },
+                    &quot;port_maps&quot;: {
+                      &quot;CE&quot;: [ { &quot;physical_name&quot;: &quot;aclken&quot; } ]
+                    }
+                  },
+                  &quot;S00_SC&quot;: {
+                    &quot;vlnv&quot;: &quot;xilinx.com:interface:sc:1.0&quot;,
+                    &quot;abstraction_type&quot;: &quot;xilinx.com:interface:sc_rtl:1.0&quot;,
+                    &quot;mode&quot;: &quot;slave&quot;,
+                    &quot;parameters&quot;: {
+                      &quot;BRIDGES&quot;: [ { &quot;value&quot;: &quot;M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC&quot;, &quot;value_src&quot;: &quot;constant&quot;, &quot;value_permission&quot;: &quot;bd&quot;, &quot;usage&quot;: &quot;all&quot; } ]
+                    },
+                    &quot;port_maps&quot;: {
+                      &quot;SEND&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_send&quot;, &quot;physical_left&quot;: &quot;3&quot;, &quot;physical_right&quot;: &quot;0&quot; } ],
+                      &quot;REQ&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_req&quot;, &quot;physical_left&quot;: &quot;3&quot;, &quot;physical_right&quot;: &quot;0&quot; } ],
+                      &quot;INFO&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_info&quot;, &quot;physical_left&quot;: &quot;3&quot;, &quot;physical_right&quot;: &quot;0&quot; } ],
+                      &quot;PAYLD&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_payld&quot;, &quot;physical_left&quot;: &quot;89&quot;, &quot;physical_right&quot;: &quot;0&quot; } ],
+                      &quot;RECV&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_recv&quot;, &quot;physical_left&quot;: &quot;3&quot;, &quot;physical_right&quot;: &quot;0&quot; } ]
+                    }
+                  },
+                  &quot;M00_SC&quot;: {
+                    &quot;vlnv&quot;: &quot;xilinx.com:interface:sc:1.0&quot;,
+                    &quot;abstraction_type&quot;: &quot;xilinx.com:interface:sc_rtl:1.0&quot;,
+                    &quot;mode&quot;: &quot;master&quot;,
+                    &quot;port_maps&quot;: {
+                      &quot;RECV&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_recv&quot;, &quot;physical_left&quot;: &quot;7&quot;, &quot;physical_right&quot;: &quot;0&quot; } ],
+                      &quot;SEND&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_send&quot;, &quot;physical_left&quot;: &quot;7&quot;, &quot;physical_right&quot;: &quot;0&quot; } ],
+                      &quot;REQ&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_req&quot;, &quot;physical_left&quot;: &quot;7&quot;, &quot;physical_right&quot;: &quot;0&quot; } ],
+                      &quot;INFO&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_info&quot;, &quot;physical_left&quot;: &quot;7&quot;, &quot;physical_right&quot;: &quot;0&quot; } ],
+                      &quot;PAYLD&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_payld&quot;, &quot;physical_left&quot;: &quot;89&quot;, &quot;physical_right&quot;: &quot;0&quot; } ]
+                    }
+                  },
+                  &quot;S01_SC&quot;: {
+                    &quot;vlnv&quot;: &quot;xilinx.com:interface:sc:1.0&quot;,
+                    &quot;abstraction_type&quot;: &quot;xilinx.com:interface:sc_rtl:1.0&quot;,
+                    &quot;mode&quot;: &quot;slave&quot;,
+                    &quot;parameters&quot;: {
+                      &quot;BRIDGES&quot;: [ { &quot;value&quot;: &quot;M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC&quot;, &quot;value_src&quot;: &quot;constant&quot;, &quot;value_permission&quot;: &quot;bd&quot;, &quot;usage&quot;: &quot;all&quot; } ]
+                    },
+                    &quot;port_maps&quot;: {
+                      &quot;SEND&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_send&quot;, &quot;physical_left&quot;: &quot;7&quot;, &quot;physical_right&quot;: &quot;4&quot; } ],
+                      &quot;REQ&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_req&quot;, &quot;physical_left&quot;: &quot;7&quot;, &quot;physical_right&quot;: &quot;4&quot; } ],
+                      &quot;INFO&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_info&quot;, &quot;physical_left&quot;: &quot;7&quot;, &quot;physical_right&quot;: &quot;4&quot; } ],
+                      &quot;PAYLD&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_payld&quot;, &quot;physical_left&quot;: &quot;179&quot;, &quot;physical_right&quot;: &quot;90&quot; } ],
+                      &quot;RECV&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_recv&quot;, &quot;physical_left&quot;: &quot;7&quot;, &quot;physical_right&quot;: &quot;4&quot; } ]
+                    }
+                  },
+                  &quot;M01_SC&quot;: {
+                    &quot;vlnv&quot;: &quot;xilinx.com:interface:sc:1.0&quot;,
+                    &quot;abstraction_type&quot;: &quot;xilinx.com:interface:sc_rtl:1.0&quot;,
+                    &quot;mode&quot;: &quot;master&quot;,
+                    &quot;port_maps&quot;: {
+                      &quot;RECV&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_recv&quot;, &quot;physical_left&quot;: &quot;15&quot;, &quot;physical_right&quot;: &quot;8&quot; } ],
+                      &quot;SEND&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_send&quot;, &quot;physical_left&quot;: &quot;15&quot;, &quot;physical_right&quot;: &quot;8&quot; } ],
+                      &quot;REQ&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_req&quot;, &quot;physical_left&quot;: &quot;15&quot;, &quot;physical_right&quot;: &quot;8&quot; } ],
+                      &quot;INFO&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_info&quot;, &quot;physical_left&quot;: &quot;15&quot;, &quot;physical_right&quot;: &quot;8&quot; } ],
+                      &quot;PAYLD&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_payld&quot;, &quot;physical_left&quot;: &quot;179&quot;, &quot;physical_right&quot;: &quot;90&quot; } ]
+                    }
+                  },
+                  &quot;S02_SC&quot;: {
+                    &quot;vlnv&quot;: &quot;xilinx.com:interface:sc:1.0&quot;,
+                    &quot;abstraction_type&quot;: &quot;xilinx.com:interface:sc_rtl:1.0&quot;,
+                    &quot;mode&quot;: &quot;slave&quot;,
+                    &quot;parameters&quot;: {
+                      &quot;BRIDGES&quot;: [ { &quot;value&quot;: &quot;M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC&quot;, &quot;value_src&quot;: &quot;constant&quot;, &quot;value_permission&quot;: &quot;bd&quot;, &quot;usage&quot;: &quot;all&quot; } ]
+                    },
+                    &quot;port_maps&quot;: {
+                      &quot;SEND&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_send&quot;, &quot;physical_left&quot;: &quot;11&quot;, &quot;physical_right&quot;: &quot;8&quot; } ],
+                      &quot;REQ&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_req&quot;, &quot;physical_left&quot;: &quot;11&quot;, &quot;physical_right&quot;: &quot;8&quot; } ],
+                      &quot;INFO&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_info&quot;, &quot;physical_left&quot;: &quot;11&quot;, &quot;physical_right&quot;: &quot;8&quot; } ],
+                      &quot;PAYLD&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_payld&quot;, &quot;physical_left&quot;: &quot;269&quot;, &quot;physical_right&quot;: &quot;180&quot; } ],
+                      &quot;RECV&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_recv&quot;, &quot;physical_left&quot;: &quot;11&quot;, &quot;physical_right&quot;: &quot;8&quot; } ]
+                    }
+                  },
+                  &quot;M02_SC&quot;: {
+                    &quot;vlnv&quot;: &quot;xilinx.com:interface:sc:1.0&quot;,
+                    &quot;abstraction_type&quot;: &quot;xilinx.com:interface:sc_rtl:1.0&quot;,
+                    &quot;mode&quot;: &quot;master&quot;,
+                    &quot;port_maps&quot;: {
+                      &quot;RECV&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_recv&quot;, &quot;physical_left&quot;: &quot;23&quot;, &quot;physical_right&quot;: &quot;16&quot; } ],
+                      &quot;SEND&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_send&quot;, &quot;physical_left&quot;: &quot;23&quot;, &quot;physical_right&quot;: &quot;16&quot; } ],
+                      &quot;REQ&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_req&quot;, &quot;physical_left&quot;: &quot;23&quot;, &quot;physical_right&quot;: &quot;16&quot; } ],
+                      &quot;INFO&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_info&quot;, &quot;physical_left&quot;: &quot;23&quot;, &quot;physical_right&quot;: &quot;16&quot; } ],
+                      &quot;PAYLD&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_payld&quot;, &quot;physical_left&quot;: &quot;269&quot;, &quot;physical_right&quot;: &quot;180&quot; } ]
+                    }
+                  },
+                  &quot;S03_SC&quot;: {
+                    &quot;vlnv&quot;: &quot;xilinx.com:interface:sc:1.0&quot;,
+                    &quot;abstraction_type&quot;: &quot;xilinx.com:interface:sc_rtl:1.0&quot;,
+                    &quot;mode&quot;: &quot;slave&quot;,
+                    &quot;parameters&quot;: {
+                      &quot;BRIDGES&quot;: [ { &quot;value&quot;: &quot;M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC&quot;, &quot;value_src&quot;: &quot;constant&quot;, &quot;value_permission&quot;: &quot;bd&quot;, &quot;usage&quot;: &quot;all&quot; } ]
+                    },
+                    &quot;port_maps&quot;: {
+                      &quot;SEND&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_send&quot;, &quot;physical_left&quot;: &quot;15&quot;, &quot;physical_right&quot;: &quot;12&quot; } ],
+                      &quot;REQ&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_req&quot;, &quot;physical_left&quot;: &quot;15&quot;, &quot;physical_right&quot;: &quot;12&quot; } ],
+                      &quot;INFO&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_info&quot;, &quot;physical_left&quot;: &quot;15&quot;, &quot;physical_right&quot;: &quot;12&quot; } ],
+                      &quot;PAYLD&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_payld&quot;, &quot;physical_left&quot;: &quot;359&quot;, &quot;physical_right&quot;: &quot;270&quot; } ],
+                      &quot;RECV&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_recv&quot;, &quot;physical_left&quot;: &quot;15&quot;, &quot;physical_right&quot;: &quot;12&quot; } ]
+                    }
+                  },
+                  &quot;M03_SC&quot;: {
+                    &quot;vlnv&quot;: &quot;xilinx.com:interface:sc:1.0&quot;,
+                    &quot;abstraction_type&quot;: &quot;xilinx.com:interface:sc_rtl:1.0&quot;,
+                    &quot;mode&quot;: &quot;master&quot;,
+                    &quot;port_maps&quot;: {
+                      &quot;RECV&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_recv&quot;, &quot;physical_left&quot;: &quot;31&quot;, &quot;physical_right&quot;: &quot;24&quot; } ],
+                      &quot;SEND&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_send&quot;, &quot;physical_left&quot;: &quot;31&quot;, &quot;physical_right&quot;: &quot;24&quot; } ],
+                      &quot;REQ&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_req&quot;, &quot;physical_left&quot;: &quot;31&quot;, &quot;physical_right&quot;: &quot;24&quot; } ],
+                      &quot;INFO&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_info&quot;, &quot;physical_left&quot;: &quot;31&quot;, &quot;physical_right&quot;: &quot;24&quot; } ],
+                      &quot;PAYLD&quot;: [ { &quot;physical_name&quot;: &quot;m_sc_payld&quot;, &quot;physical_left&quot;: &quot;359&quot;, &quot;physical_right&quot;: &quot;270&quot; } ]
+                    }
+                  },
+                  &quot;S04_SC&quot;: {
+                    &quot;vlnv&quot;: &quot;xilinx.com:interface:sc:1.0&quot;,
+                    &quot;abstraction_type&quot;: &quot;xilinx.com:interface:sc_rtl:1.0&quot;,
+                    &quot;mode&quot;: &quot;slave&quot;,
+                    &quot;parameters&quot;: {
+                      &quot;BRIDGES&quot;: [ { &quot;value&quot;: &quot;M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC&quot;, &quot;value_src&quot;: &quot;constant&quot;, &quot;value_permission&quot;: &quot;bd&quot;, &quot;usage&quot;: &quot;all&quot; } ]
+                    },
+                    &quot;port_maps&quot;: {
+                      &quot;SEND&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_send&quot;, &quot;physical_left&quot;: &quot;19&quot;, &quot;physical_right&quot;: &quot;16&quot; } ],
+                      &quot;REQ&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_req&quot;, &quot;physical_left&quot;: &quot;19&quot;, &quot;physical_right&quot;: &quot;16&quot; } ],
+                      &quot;INFO&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_info&quot;, &quot;physical_left&quot;: &quot;19&quot;, &quot;physical_right&quot;: &quot;16&quot; } ],
+                      &quot;PAYLD&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_payld&quot;, &quot;physical_left&quot;: &quot;449&quot;, &quot;physical_right&quot;: &quot;360&quot; } ],
+                      &quot;RECV&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_recv&quot;, &quot;physical_left&quot;: &quot;19&quot;, &quot;physical_right&quot;: &quot;16&quot; } ]
+                    }
+                  },
+                  &quot;S05_SC&quot;: {
+                    &quot;vlnv&quot;: &quot;xilinx.com:interface:sc:1.0&quot;,
+                    &quot;abstraction_type&quot;: &quot;xilinx.com:interface:sc_rtl:1.0&quot;,
+                    &quot;mode&quot;: &quot;slave&quot;,
+                    &quot;parameters&quot;: {
+                      &quot;BRIDGES&quot;: [ { &quot;value&quot;: &quot;M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC&quot;, &quot;value_src&quot;: &quot;constant&quot;, &quot;value_permission&quot;: &quot;bd&quot;, &quot;usage&quot;: &quot;all&quot; } ]
+                    },
+                    &quot;port_maps&quot;: {
+                      &quot;SEND&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_send&quot;, &quot;physical_left&quot;: &quot;23&quot;, &quot;physical_right&quot;: &quot;20&quot; } ],
+                      &quot;REQ&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_req&quot;, &quot;physical_left&quot;: &quot;23&quot;, &quot;physical_right&quot;: &quot;20&quot; } ],
+                      &quot;INFO&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_info&quot;, &quot;physical_left&quot;: &quot;23&quot;, &quot;physical_right&quot;: &quot;20&quot; } ],
+                      &quot;PAYLD&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_payld&quot;, &quot;physical_left&quot;: &quot;539&quot;, &quot;physical_right&quot;: &quot;450&quot; } ],
+                      &quot;RECV&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_recv&quot;, &quot;physical_left&quot;: &quot;23&quot;, &quot;physical_right&quot;: &quot;20&quot; } ]
+                    }
+                  },
+                  &quot;S06_SC&quot;: {
+                    &quot;vlnv&quot;: &quot;xilinx.com:interface:sc:1.0&quot;,
+                    &quot;abstraction_type&quot;: &quot;xilinx.com:interface:sc_rtl:1.0&quot;,
+                    &quot;mode&quot;: &quot;slave&quot;,
+                    &quot;parameters&quot;: {
+                      &quot;BRIDGES&quot;: [ { &quot;value&quot;: &quot;M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC&quot;, &quot;value_src&quot;: &quot;constant&quot;, &quot;value_permission&quot;: &quot;bd&quot;, &quot;usage&quot;: &quot;all&quot; } ]
+                    },
+                    &quot;port_maps&quot;: {
+                      &quot;SEND&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_send&quot;, &quot;physical_left&quot;: &quot;27&quot;, &quot;physical_right&quot;: &quot;24&quot; } ],
+                      &quot;REQ&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_req&quot;, &quot;physical_left&quot;: &quot;27&quot;, &quot;physical_right&quot;: &quot;24&quot; } ],
+                      &quot;INFO&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_info&quot;, &quot;physical_left&quot;: &quot;27&quot;, &quot;physical_right&quot;: &quot;24&quot; } ],
+                      &quot;PAYLD&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_payld&quot;, &quot;physical_left&quot;: &quot;629&quot;, &quot;physical_right&quot;: &quot;540&quot; } ],
+                      &quot;RECV&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_recv&quot;, &quot;physical_left&quot;: &quot;27&quot;, &quot;physical_right&quot;: &quot;24&quot; } ]
+                    }
+                  },
+                  &quot;S07_SC&quot;: {
+                    &quot;vlnv&quot;: &quot;xilinx.com:interface:sc:1.0&quot;,
+                    &quot;abstraction_type&quot;: &quot;xilinx.com:interface:sc_rtl:1.0&quot;,
+                    &quot;mode&quot;: &quot;slave&quot;,
+                    &quot;parameters&quot;: {
+                      &quot;BRIDGES&quot;: [ { &quot;value&quot;: &quot;M00_SC:M01_SC:M02_SC:M03_SC:M04_SC:M05_SC:M06_SC:M07_SC:M08_SC:M09_SC:M10_SC:M11_SC:M12_SC:M13_SC:M14_SC:M15_SC&quot;, &quot;value_src&quot;: &quot;constant&quot;, &quot;value_permission&quot;: &quot;bd&quot;, &quot;usage&quot;: &quot;all&quot; } ]
+                    },
+                    &quot;port_maps&quot;: {
+                      &quot;SEND&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_send&quot;, &quot;physical_left&quot;: &quot;31&quot;, &quot;physical_right&quot;: &quot;28&quot; } ],
+                      &quot;REQ&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_req&quot;, &quot;physical_left&quot;: &quot;31&quot;, &quot;physical_right&quot;: &quot;28&quot; } ],
+                      &quot;INFO&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_info&quot;, &quot;physical_left&quot;: &quot;31&quot;, &quot;physical_right&quot;: &quot;28&quot; } ],
+                      &quot;PAYLD&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_payld&quot;, &quot;physical_left&quot;: &quot;719&quot;, &quot;physical_right&quot;: &quot;630&quot; } ],
+                      &quot;RECV&quot;: [ { &quot;physical_name&quot;: &quot;s_sc_recv&quot;, &quot;physical_left&quot;: &quot;31&quot;, &quot;physical_right&quot;: &quot;28&quot; } ]
+                    }
+                  }
+                }
+              }
+            }"/>
+          </xilinx:boundaryDescriptionInfo>
+        </xilinx:componentInstanceExtensions>
+      </spirit:vendorExtensions>
+    </spirit:componentInstance>
+  </spirit:componentInstances>
+</spirit:design>

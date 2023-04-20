@@ -102,9 +102,6 @@ public:
   sc_core::sc_out< bool > SPI1_SS1_O;
   sc_core::sc_out< bool > SPI1_SS2_O;
   sc_core::sc_out< bool > SPI1_SS_T;
-  sc_core::sc_out< bool > TTC0_WAVE0_OUT;
-  sc_core::sc_out< bool > TTC0_WAVE1_OUT;
-  sc_core::sc_out< bool > TTC0_WAVE2_OUT;
   sc_core::sc_out< sc_dt::sc_bv<2> > USB0_PORT_INDCTL;
   sc_core::sc_out< bool > USB0_VBUS_PWRSELECT;
   sc_core::sc_in< bool > USB0_VBUS_PWRFAULT;
@@ -157,7 +154,7 @@ public:
   sc_core::sc_out< sc_dt::sc_bv<2> > S_AXI_HP0_RRESP;
   sc_core::sc_out< sc_dt::sc_bv<6> > S_AXI_HP0_BID;
   sc_core::sc_out< sc_dt::sc_bv<6> > S_AXI_HP0_RID;
-  sc_core::sc_out< sc_dt::sc_bv<32> > S_AXI_HP0_RDATA;
+  sc_core::sc_out< sc_dt::sc_bv<64> > S_AXI_HP0_RDATA;
   sc_core::sc_out< sc_dt::sc_bv<8> > S_AXI_HP0_RCOUNT;
   sc_core::sc_out< sc_dt::sc_bv<8> > S_AXI_HP0_WCOUNT;
   sc_core::sc_out< sc_dt::sc_bv<3> > S_AXI_HP0_RACOUNT;
@@ -190,8 +187,8 @@ public:
   sc_core::sc_in< sc_dt::sc_bv<6> > S_AXI_HP0_ARID;
   sc_core::sc_in< sc_dt::sc_bv<6> > S_AXI_HP0_AWID;
   sc_core::sc_in< sc_dt::sc_bv<6> > S_AXI_HP0_WID;
-  sc_core::sc_in< sc_dt::sc_bv<32> > S_AXI_HP0_WDATA;
-  sc_core::sc_in< sc_dt::sc_bv<4> > S_AXI_HP0_WSTRB;
+  sc_core::sc_in< sc_dt::sc_bv<64> > S_AXI_HP0_WDATA;
+  sc_core::sc_in< sc_dt::sc_bv<8> > S_AXI_HP0_WSTRB;
   sc_core::sc_in< sc_dt::sc_bv<6> > IRQ_F2P;
   sc_core::sc_out< bool > FCLK_CLK0;
   sc_core::sc_out< bool > FCLK_RESET0_N;
@@ -236,7 +233,7 @@ private:
   xsc::common::vector2vector_converter<8,4>* mp_M_AXI_GP0_AWLEN_converter;
   sc_signal< sc_bv<8> > m_M_AXI_GP0_AWLEN_converter_signal;
   sc_signal< bool > m_M_AXI_GP0_transactor_rst_signal;
-  xtlm::xaximm_pin2xtlm_t<32,32,6,1,1,1,1,1>* mp_S_AXI_HP0_transactor;
+  xtlm::xaximm_pin2xtlm_t<64,32,6,1,1,1,1,1>* mp_S_AXI_HP0_transactor;
   xsc::common::vectorN2scalar_converter<2>* mp_S_AXI_HP0_ARLOCK_converter;
   sc_signal< bool > m_S_AXI_HP0_ARLOCK_converter_signal;
   xsc::common::vectorN2scalar_converter<2>* mp_S_AXI_HP0_AWLOCK_converter;
@@ -285,9 +282,6 @@ public:
   sc_core::sc_out< bool > SPI1_SS1_O;
   sc_core::sc_out< bool > SPI1_SS2_O;
   sc_core::sc_out< bool > SPI1_SS_T;
-  sc_core::sc_out< bool > TTC0_WAVE0_OUT;
-  sc_core::sc_out< bool > TTC0_WAVE1_OUT;
-  sc_core::sc_out< bool > TTC0_WAVE2_OUT;
   sc_core::sc_out< sc_dt::sc_bv<2> > USB0_PORT_INDCTL;
   sc_core::sc_out< bool > USB0_VBUS_PWRSELECT;
   sc_core::sc_in< bool > USB0_VBUS_PWRFAULT;
@@ -340,7 +334,7 @@ public:
   sc_core::sc_out< sc_dt::sc_bv<2> > S_AXI_HP0_RRESP;
   sc_core::sc_out< sc_dt::sc_bv<6> > S_AXI_HP0_BID;
   sc_core::sc_out< sc_dt::sc_bv<6> > S_AXI_HP0_RID;
-  sc_core::sc_out< sc_dt::sc_bv<32> > S_AXI_HP0_RDATA;
+  sc_core::sc_out< sc_dt::sc_bv<64> > S_AXI_HP0_RDATA;
   sc_core::sc_out< sc_dt::sc_bv<8> > S_AXI_HP0_RCOUNT;
   sc_core::sc_out< sc_dt::sc_bv<8> > S_AXI_HP0_WCOUNT;
   sc_core::sc_out< sc_dt::sc_bv<3> > S_AXI_HP0_RACOUNT;
@@ -373,8 +367,8 @@ public:
   sc_core::sc_in< sc_dt::sc_bv<6> > S_AXI_HP0_ARID;
   sc_core::sc_in< sc_dt::sc_bv<6> > S_AXI_HP0_AWID;
   sc_core::sc_in< sc_dt::sc_bv<6> > S_AXI_HP0_WID;
-  sc_core::sc_in< sc_dt::sc_bv<32> > S_AXI_HP0_WDATA;
-  sc_core::sc_in< sc_dt::sc_bv<4> > S_AXI_HP0_WSTRB;
+  sc_core::sc_in< sc_dt::sc_bv<64> > S_AXI_HP0_WDATA;
+  sc_core::sc_in< sc_dt::sc_bv<8> > S_AXI_HP0_WSTRB;
   sc_core::sc_in< sc_dt::sc_bv<6> > IRQ_F2P;
   sc_core::sc_out< bool > FCLK_CLK0;
   sc_core::sc_out< bool > FCLK_RESET0_N;
@@ -419,7 +413,7 @@ private:
   xsc::common::vector2vector_converter<8,4>* mp_M_AXI_GP0_AWLEN_converter;
   sc_signal< sc_bv<8> > m_M_AXI_GP0_AWLEN_converter_signal;
   sc_signal< bool > m_M_AXI_GP0_transactor_rst_signal;
-  xtlm::xaximm_pin2xtlm_t<32,32,6,1,1,1,1,1>* mp_S_AXI_HP0_transactor;
+  xtlm::xaximm_pin2xtlm_t<64,32,6,1,1,1,1,1>* mp_S_AXI_HP0_transactor;
   xsc::common::vectorN2scalar_converter<2>* mp_S_AXI_HP0_ARLOCK_converter;
   sc_signal< bool > m_S_AXI_HP0_ARLOCK_converter_signal;
   xsc::common::vectorN2scalar_converter<2>* mp_S_AXI_HP0_AWLOCK_converter;
@@ -468,9 +462,6 @@ public:
   sc_core::sc_out< bool > SPI1_SS1_O;
   sc_core::sc_out< bool > SPI1_SS2_O;
   sc_core::sc_out< bool > SPI1_SS_T;
-  sc_core::sc_out< bool > TTC0_WAVE0_OUT;
-  sc_core::sc_out< bool > TTC0_WAVE1_OUT;
-  sc_core::sc_out< bool > TTC0_WAVE2_OUT;
   sc_core::sc_out< sc_dt::sc_bv<2> > USB0_PORT_INDCTL;
   sc_core::sc_out< bool > USB0_VBUS_PWRSELECT;
   sc_core::sc_in< bool > USB0_VBUS_PWRFAULT;
@@ -523,7 +514,7 @@ public:
   sc_core::sc_out< sc_dt::sc_bv<2> > S_AXI_HP0_RRESP;
   sc_core::sc_out< sc_dt::sc_bv<6> > S_AXI_HP0_BID;
   sc_core::sc_out< sc_dt::sc_bv<6> > S_AXI_HP0_RID;
-  sc_core::sc_out< sc_dt::sc_bv<32> > S_AXI_HP0_RDATA;
+  sc_core::sc_out< sc_dt::sc_bv<64> > S_AXI_HP0_RDATA;
   sc_core::sc_out< sc_dt::sc_bv<8> > S_AXI_HP0_RCOUNT;
   sc_core::sc_out< sc_dt::sc_bv<8> > S_AXI_HP0_WCOUNT;
   sc_core::sc_out< sc_dt::sc_bv<3> > S_AXI_HP0_RACOUNT;
@@ -556,8 +547,8 @@ public:
   sc_core::sc_in< sc_dt::sc_bv<6> > S_AXI_HP0_ARID;
   sc_core::sc_in< sc_dt::sc_bv<6> > S_AXI_HP0_AWID;
   sc_core::sc_in< sc_dt::sc_bv<6> > S_AXI_HP0_WID;
-  sc_core::sc_in< sc_dt::sc_bv<32> > S_AXI_HP0_WDATA;
-  sc_core::sc_in< sc_dt::sc_bv<4> > S_AXI_HP0_WSTRB;
+  sc_core::sc_in< sc_dt::sc_bv<64> > S_AXI_HP0_WDATA;
+  sc_core::sc_in< sc_dt::sc_bv<8> > S_AXI_HP0_WSTRB;
   sc_core::sc_in< sc_dt::sc_bv<6> > IRQ_F2P;
   sc_core::sc_out< bool > FCLK_CLK0;
   sc_core::sc_out< bool > FCLK_RESET0_N;
@@ -602,7 +593,7 @@ private:
   xsc::common::vector2vector_converter<8,4>* mp_M_AXI_GP0_AWLEN_converter;
   sc_signal< sc_bv<8> > m_M_AXI_GP0_AWLEN_converter_signal;
   sc_signal< bool > m_M_AXI_GP0_transactor_rst_signal;
-  xtlm::xaximm_pin2xtlm_t<32,32,6,1,1,1,1,1>* mp_S_AXI_HP0_transactor;
+  xtlm::xaximm_pin2xtlm_t<64,32,6,1,1,1,1,1>* mp_S_AXI_HP0_transactor;
   xsc::common::vectorN2scalar_converter<2>* mp_S_AXI_HP0_ARLOCK_converter;
   sc_signal< bool > m_S_AXI_HP0_ARLOCK_converter_signal;
   xsc::common::vectorN2scalar_converter<2>* mp_S_AXI_HP0_AWLOCK_converter;
@@ -655,9 +646,6 @@ public:
   sc_core::sc_out< bool > SPI1_SS1_O;
   sc_core::sc_out< bool > SPI1_SS2_O;
   sc_core::sc_out< bool > SPI1_SS_T;
-  sc_core::sc_out< bool > TTC0_WAVE0_OUT;
-  sc_core::sc_out< bool > TTC0_WAVE1_OUT;
-  sc_core::sc_out< bool > TTC0_WAVE2_OUT;
   sc_core::sc_out< sc_dt::sc_bv<2> > USB0_PORT_INDCTL;
   sc_core::sc_out< bool > USB0_VBUS_PWRSELECT;
   sc_core::sc_in< bool > USB0_VBUS_PWRFAULT;
@@ -710,7 +698,7 @@ public:
   sc_core::sc_out< sc_dt::sc_bv<2> > S_AXI_HP0_RRESP;
   sc_core::sc_out< sc_dt::sc_bv<6> > S_AXI_HP0_BID;
   sc_core::sc_out< sc_dt::sc_bv<6> > S_AXI_HP0_RID;
-  sc_core::sc_out< sc_dt::sc_bv<32> > S_AXI_HP0_RDATA;
+  sc_core::sc_out< sc_dt::sc_bv<64> > S_AXI_HP0_RDATA;
   sc_core::sc_out< sc_dt::sc_bv<8> > S_AXI_HP0_RCOUNT;
   sc_core::sc_out< sc_dt::sc_bv<8> > S_AXI_HP0_WCOUNT;
   sc_core::sc_out< sc_dt::sc_bv<3> > S_AXI_HP0_RACOUNT;
@@ -743,8 +731,8 @@ public:
   sc_core::sc_in< sc_dt::sc_bv<6> > S_AXI_HP0_ARID;
   sc_core::sc_in< sc_dt::sc_bv<6> > S_AXI_HP0_AWID;
   sc_core::sc_in< sc_dt::sc_bv<6> > S_AXI_HP0_WID;
-  sc_core::sc_in< sc_dt::sc_bv<32> > S_AXI_HP0_WDATA;
-  sc_core::sc_in< sc_dt::sc_bv<4> > S_AXI_HP0_WSTRB;
+  sc_core::sc_in< sc_dt::sc_bv<64> > S_AXI_HP0_WDATA;
+  sc_core::sc_in< sc_dt::sc_bv<8> > S_AXI_HP0_WSTRB;
   sc_core::sc_in< sc_dt::sc_bv<6> > IRQ_F2P;
   sc_core::sc_out< bool > FCLK_CLK0;
   sc_core::sc_out< bool > FCLK_RESET0_N;
@@ -789,7 +777,7 @@ private:
   xsc::common::vector2vector_converter<8,4>* mp_M_AXI_GP0_AWLEN_converter;
   sc_signal< sc_bv<8> > m_M_AXI_GP0_AWLEN_converter_signal;
   sc_signal< bool > m_M_AXI_GP0_transactor_rst_signal;
-  xtlm::xaximm_pin2xtlm_t<32,32,6,1,1,1,1,1>* mp_S_AXI_HP0_transactor;
+  xtlm::xaximm_pin2xtlm_t<64,32,6,1,1,1,1,1>* mp_S_AXI_HP0_transactor;
   xsc::common::vectorN2scalar_converter<2>* mp_S_AXI_HP0_ARLOCK_converter;
   sc_signal< bool > m_S_AXI_HP0_ARLOCK_converter_signal;
   xsc::common::vectorN2scalar_converter<2>* mp_S_AXI_HP0_AWLOCK_converter;
@@ -850,9 +838,6 @@ public:
   sc_core::sc_out< bool > SPI1_SS1_O;
   sc_core::sc_out< bool > SPI1_SS2_O;
   sc_core::sc_out< bool > SPI1_SS_T;
-  sc_core::sc_out< bool > TTC0_WAVE0_OUT;
-  sc_core::sc_out< bool > TTC0_WAVE1_OUT;
-  sc_core::sc_out< bool > TTC0_WAVE2_OUT;
   sc_core::sc_out< sc_dt::sc_bv<2> > USB0_PORT_INDCTL;
   sc_core::sc_out< bool > USB0_VBUS_PWRSELECT;
   sc_core::sc_in< bool > USB0_VBUS_PWRFAULT;
@@ -905,7 +890,7 @@ public:
   sc_core::sc_out< sc_dt::sc_bv<2> > S_AXI_HP0_RRESP;
   sc_core::sc_out< sc_dt::sc_bv<6> > S_AXI_HP0_BID;
   sc_core::sc_out< sc_dt::sc_bv<6> > S_AXI_HP0_RID;
-  sc_core::sc_out< sc_dt::sc_bv<32> > S_AXI_HP0_RDATA;
+  sc_core::sc_out< sc_dt::sc_bv<64> > S_AXI_HP0_RDATA;
   sc_core::sc_out< sc_dt::sc_bv<8> > S_AXI_HP0_RCOUNT;
   sc_core::sc_out< sc_dt::sc_bv<8> > S_AXI_HP0_WCOUNT;
   sc_core::sc_out< sc_dt::sc_bv<3> > S_AXI_HP0_RACOUNT;
@@ -938,8 +923,8 @@ public:
   sc_core::sc_in< sc_dt::sc_bv<6> > S_AXI_HP0_ARID;
   sc_core::sc_in< sc_dt::sc_bv<6> > S_AXI_HP0_AWID;
   sc_core::sc_in< sc_dt::sc_bv<6> > S_AXI_HP0_WID;
-  sc_core::sc_in< sc_dt::sc_bv<32> > S_AXI_HP0_WDATA;
-  sc_core::sc_in< sc_dt::sc_bv<4> > S_AXI_HP0_WSTRB;
+  sc_core::sc_in< sc_dt::sc_bv<64> > S_AXI_HP0_WDATA;
+  sc_core::sc_in< sc_dt::sc_bv<8> > S_AXI_HP0_WSTRB;
   sc_core::sc_in< sc_dt::sc_bv<6> > IRQ_F2P;
   sc_core::sc_out< bool > FCLK_CLK0;
   sc_core::sc_out< bool > FCLK_RESET0_N;
@@ -984,7 +969,7 @@ private:
   xsc::common::vector2vector_converter<8,4>* mp_M_AXI_GP0_AWLEN_converter;
   sc_signal< sc_bv<8> > m_M_AXI_GP0_AWLEN_converter_signal;
   sc_signal< bool > m_M_AXI_GP0_transactor_rst_signal;
-  xtlm::xaximm_pin2xtlm_t<32,32,6,1,1,1,1,1>* mp_S_AXI_HP0_transactor;
+  xtlm::xaximm_pin2xtlm_t<64,32,6,1,1,1,1,1>* mp_S_AXI_HP0_transactor;
   xsc::common::vectorN2scalar_converter<2>* mp_S_AXI_HP0_ARLOCK_converter;
   sc_signal< bool > m_S_AXI_HP0_ARLOCK_converter_signal;
   xsc::common::vectorN2scalar_converter<2>* mp_S_AXI_HP0_AWLOCK_converter;

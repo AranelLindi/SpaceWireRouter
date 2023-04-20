@@ -327,7 +327,7 @@ ARCHITECTURE main_design_AXI_SpaceWire_IP_0_0_arch OF main_design_AXI_SpaceWire_
     );
   END COMPONENT AXI_SpaceWire_IP_v1_0;
   ATTRIBUTE X_CORE_INFO : STRING;
-  ATTRIBUTE X_CORE_INFO OF main_design_AXI_SpaceWire_IP_0_0_arch: ARCHITECTURE IS "AXI_SpaceWire_IP_v1_0,Vivado 2022.2";
+  ATTRIBUTE X_CORE_INFO OF main_design_AXI_SpaceWire_IP_0_0_arch: ARCHITECTURE IS "AXI_SpaceWire_IP_v1_0,Vivado 2022.1";
   ATTRIBUTE CHECK_LICENSE_TYPE : STRING;
   ATTRIBUTE CHECK_LICENSE_TYPE OF main_design_AXI_SpaceWire_IP_0_0_arch : ARCHITECTURE IS "main_design_AXI_SpaceWire_IP_0_0,AXI_SpaceWire_IP_v1_0,{}";
   ATTRIBUTE X_INTERFACE_INFO : STRING;
