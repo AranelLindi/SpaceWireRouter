@@ -47,26 +47,26 @@ set_property IOSTANDARD LVCMOS25 [get_ports spw_so_1]
 
 # SpaceWire Port 2
 # LPC
-set_property PACKAGE_PIN AE26 [get_ports spw_di_2]
-set_property IOSTANDARD LVCMOS25 [get_ports spw_di_2]
-set_property PACKAGE_PIN AD25 [get_ports spw_si_2]
-set_property IOSTANDARD LVCMOS25 [get_ports spw_si_2]
-
-set_property PACKAGE_PIN AG29 [get_ports spw_do_2]
-set_property IOSTANDARD LVCMOS25 [get_ports spw_do_2]
-set_property PACKAGE_PIN AF29 [get_ports spw_so_2]
-set_property IOSTANDARD LVCMOS25 [get_ports spw_so_2]
-
-# HPC
-#set_property PACKAGE_PIN R30 [get_ports spw_di_2]
+#set_property PACKAGE_PIN AE26 [get_ports spw_di_2]
 #set_property IOSTANDARD LVCMOS25 [get_ports spw_di_2]
-#set_property PACKAGE_PIN P30 [get_ports spw_si_2]
+#set_property PACKAGE_PIN AD25 [get_ports spw_si_2]
 #set_property IOSTANDARD LVCMOS25 [get_ports spw_si_2]
 
-#set_property PACKAGE_PIN U29 [get_ports spw_do_2]
+#set_property PACKAGE_PIN AG29 [get_ports spw_do_2]
 #set_property IOSTANDARD LVCMOS25 [get_ports spw_do_2]
-#set_property PACKAGE_PIN T29 [get_ports spw_so_2]
+#set_property PACKAGE_PIN AF29 [get_ports spw_so_2]
 #set_property IOSTANDARD LVCMOS25 [get_ports spw_so_2]
+
+# HPC
+set_property PACKAGE_PIN R30 [get_ports spw_di_2]
+set_property IOSTANDARD LVCMOS25 [get_ports spw_di_2]
+set_property PACKAGE_PIN P30 [get_ports spw_si_2]
+set_property IOSTANDARD LVCMOS25 [get_ports spw_si_2]
+
+set_property PACKAGE_PIN U29 [get_ports spw_do_2]
+set_property IOSTANDARD LVCMOS25 [get_ports spw_do_2]
+set_property PACKAGE_PIN T29 [get_ports spw_so_2]
+set_property IOSTANDARD LVCMOS25 [get_ports spw_so_2]
 
 
 # SpaceWire Port 3
