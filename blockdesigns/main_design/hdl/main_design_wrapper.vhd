@@ -1,7 +1,7 @@
 --Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
---Date        : Fri Apr 21 16:08:07 2023
+--Date        : Wed May 31 10:44:34 2023
 --Host        : stl56jc-MS-7C95 running 64-bit Ubuntu 22.04.2 LTS
 --Command     : generate_target main_design_wrapper.bd
 --Design      : main_design_wrapper
@@ -81,6 +81,7 @@ architecture STRUCTURE of main_design_wrapper is
     spw_do_4 : out STD_LOGIC;
     spw_so_4 : out STD_LOGIC;
     rst_logic : in STD_LOGIC;
+    reset : in STD_LOGIC;
     SYSCLK_IN_clk_n : in STD_LOGIC;
     SYSCLK_IN_clk_p : in STD_LOGIC;
     DDR_cas_n : inout STD_LOGIC;
@@ -103,8 +104,7 @@ architecture STRUCTURE of main_design_wrapper is
     FIXED_IO_ddr_vrp : inout STD_LOGIC;
     FIXED_IO_ps_srstb : inout STD_LOGIC;
     FIXED_IO_ps_clk : inout STD_LOGIC;
-    FIXED_IO_ps_porb : inout STD_LOGIC;
-    reset : in STD_LOGIC
+    FIXED_IO_ps_porb : inout STD_LOGIC
   );
   end component main_design;
 begin

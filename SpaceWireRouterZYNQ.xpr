@@ -256,11 +256,11 @@
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
-        <CompFileExtendedInfo CompFileName="main_design.bd" FileRelPathName="ip/main_design_proc_sys_reset_0_1/main_design_proc_sys_reset_0_1.xci">
-          <Proxy FileSetName="main_design_proc_sys_reset_0_1"/>
-        </CompFileExtendedInfo>
         <CompFileExtendedInfo CompFileName="main_design.bd" FileRelPathName="ip/main_design_processing_system7_0_2/main_design_processing_system7_0_2.xci">
           <Proxy FileSetName="main_design_processing_system7_0_2"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="main_design.bd" FileRelPathName="ip/main_design_proc_sys_reset_0_1/main_design_proc_sys_reset_0_1.xci">
+          <Proxy FileSetName="main_design_proc_sys_reset_0_1"/>
         </CompFileExtendedInfo>
         <CompFileExtendedInfo CompFileName="main_design.bd" FileRelPathName="ip/main_design_clk_wiz_0_1/main_design_clk_wiz_0_1.xci">
           <Proxy FileSetName="main_design_clk_wiz_0_1"/>

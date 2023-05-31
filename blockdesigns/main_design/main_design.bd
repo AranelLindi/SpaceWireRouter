@@ -2166,12 +2166,12 @@
       "clk_wiz_0_clk_100": {
         "ports": [
           "clk_wiz_0/clk_100",
+          "AXI_SpaceWire_IP_0/clk_logic",
           "router_implementation_0/clk",
           "router_implementation_0/rxclk",
           "router_implementation_0/txclk",
-          "AXI_SpaceWire_IP_0/txclk",
           "AXI_SpaceWire_IP_0/rxclk",
-          "AXI_SpaceWire_IP_0/clk_logic"
+          "AXI_SpaceWire_IP_0/txclk"
         ]
       },
       "proc_sys_reset_0_peripheral_aresetn": {
