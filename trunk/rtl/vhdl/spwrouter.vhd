@@ -286,7 +286,8 @@ BEGIN
                 bus_request => s_bus_m_request(i), -- O
                 bus_ack_in => s_bus_m_ack(i), -- I
                 -- Port Control/Status Bus IO:
-                portstatus => s_portstatus(i) -- O
+                portstatus => s_portstatus(i), -- O
+                watchdog_cycle => s_watchcycle -- I
             );
         END GENERATE spw_ports;
     ELSE GENERATE
@@ -346,7 +347,8 @@ BEGIN
                 bus_request => s_bus_m_request(i), -- O
                 bus_ack_in => s_bus_m_ack(i), -- I
                 -- Port Control/Status Bus IO:
-                portstatus => OPEN -- O -- wont be needed when externPort = FALSE!
+                portstatus => OPEN, -- O -- wont be needed when externPort = FALSE!
+                watchdog_cycle => (OTHERS => '0') -- watchdog cycle is disabled
             );
         END GENERATE spw_ports_const;
     END GENERATE spw_port_config;

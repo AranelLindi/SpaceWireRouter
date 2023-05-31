@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
 -- Company: University of Wuerzburg, Germany
--- Engineer: Stefan Lindoerfer
+-- Engineer: Stefan Lindoerfer, Frederik Pilz
 -- 
 -- Create Date: 31.07.2021 14:59
 -- Design Name: SpaceWire Router - Package
@@ -62,8 +62,10 @@ PACKAGE spwrouterpkg IS
         S_Data3,
         S_Dummy0,
         S_Dummy1,
-        S_Dummy2
-    ); -- 14
+        S_Dummy2,
+        S_Timeout0,
+        S_Timeout1
+    ); -- 16
 
     -- Pre-defined arrays for implementation types (front-end of receiver/transmitter).
     TYPE rximpl_array IS ARRAY (NATURAL RANGE <>) OF spw_implementation_type_rec;
@@ -251,7 +253,8 @@ PACKAGE spwrouterpkg IS
             bus_strobe : OUT STD_LOGIC;
             bus_request : OUT STD_LOGIC;
             bus_ack_in : IN STD_LOGIC;
-            portstatus : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+            portstatus : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            watchdog_cycle : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
     END COMPONENT;
 

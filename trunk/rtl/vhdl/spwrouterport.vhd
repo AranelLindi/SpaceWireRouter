@@ -1,11 +1,12 @@
 ----------------------------------------------------------------------------------
 -- Company: University of Wuerzburg, Germany
--- Engineer: Stefan Lindoerfer
+-- Engineer: Stefan Lindoerfer, Frederik Pilz
 -- 
 -- Create Date: 11.08.2021 21:27
 -- Design Name: SpaceWire Router - SpaceWire Port (Container for spwstream)
 -- Module Name: spwrouterport
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA,
+--               Bachelor Thesis: Extension and Validation of a SpaceWire router on an FPGA
 -- Target Devices: Xilinx FPGAs
 -- Tool Versions: -/-
 -- Description: Container of SpaceWire IP Core Light (spwstream) for SpaceWire
@@ -212,10 +213,13 @@ ENTITY spwrouterport IS
         --      PORT STATUS & CONTROL BUS
         -- ====================================
         -- Contains port status (see manual).
-        portstatus : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        portstatus : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 
         -- Control information for port (see manual).
         --portcontrol : IN STD_LOGIC_VECTOR(31 DOWNTO 0) -- Not used yet inside this entity !
+        
+        -- Watchdog Cycle
+        watchdog_cycle : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
     );
 END spwrouterport;
 
@@ -265,6 +269,9 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
 
     -- Register status signals.
     SIGNAL s_discardedcounter : unsigned(15 DOWNTO 0);
+    
+    -- Watchdog Counter
+    SIGNAL s_timeout : UNSIGNED(31 DOWNTO 0);
 BEGIN
     -- Drive outputs.
     -- Bus & router signals.
@@ -388,6 +395,7 @@ BEGIN
                 s_routing_table_request <= '0';
                 s_strobe_out <= '0';
                 s_discardedcounter <= (OTHERS => '0');
+                s_timeout <= (OTHERS => '0');
                 state <= S_Idle;
             ELSE
                 CASE state IS
@@ -472,18 +480,24 @@ BEGIN
                         -- Since only single unconnected if statements can be generated, the order must be
                         -- reversed (descending), therefore the last if query has the highes priority. (Can
                         -- overwrite result again.)
-                        FOR i IN (numports - 1) DOWNTO 0 LOOP
-                            IF (linkstatus(i) = '1' AND bus_data_in(i) = '1') THEN
-                                s_destination_port <= STD_LOGIC_VECTOR(to_unsigned(i, s_destination_port'length));
-                                s_request_out <= '1';
-                                state <= S_RT2;
+--                        FOR i IN (numports - 1) DOWNTO 0 LOOP
+--                            IF (linkstatus(i) = '1' AND bus_data_in(i) = '1') THEN
+--                                s_destination_port <= STD_LOGIC_VECTOR(to_unsigned(i, s_destination_port'length));
+--                                s_request_out <= '1';
+--                                state <= S_RT2;
 
-                                -- Check if mapped physical port is addressable.
-                                v_reqports := '1';
-                            END IF;
-                        END LOOP;
+--                                -- Check if mapped physical port is addressable.
+--                                v_reqports := '1';
+--                            END IF;
+--                        END LOOP;
 
-                        IF (v_reqports = '0') THEN -- discard invalid addressed packet (TODO: Warning ! Packet addressed to port which is currently not connected will be deleted ! No usefull behaviour ! Change !)
+                        -- Correct behaviour according to 5.6.8.10 (d) of the standard
+                        
+                        IF (OR (linkstatus AND bus_data_in((numports - 1) DOWNTO 0)) = '1') THEN
+                            s_request_out <= '1';
+                            state <= S_RT2;
+                        ELSE -- discard invalid addressed packet
+                            -- (v_reqports = '0') THEN -- discard invalid addressed packet (TODO: Warning ! Packet addressed to port which is currently not connected will be deleted ! No usefull behaviour ! Change !)
                             state <= S_Dummy0;
                         END IF;
 
@@ -497,8 +511,21 @@ BEGIN
                         -- Wait for permission from arbiter and/or for new received N-chars of current packet (physical addresses only).
                         s_strobe_out <= '0';
 
+                        IF (unsigned(watchdog_cycle) /= 0) THEN
+                            IF (s_timeout = unsigned(watchdog_cycle)) THEN
+                                state <= S_Timeout0;
+                            END IF;
+                        END IF;
+                        
+                        -- Increment timeout counter each iteration where no N-char was received.
+                        IF (arb_granted = '1' AND s_rxvalid = '0') THEN
+                            s_timeout <= s_timeout + 1;
+                        END IF;
+
+                        -- New N-char was been received and can be transfered.
                         IF (arb_granted = '1' AND s_rxvalid = '1') THEN
                             s_rxread <= '1';
+                            s_timeout <= (OTHERS => '0'); -- reset timeout counter
                             state <= S_Data1;
                         END IF;
 
@@ -560,6 +587,20 @@ BEGIN
                         ELSE
                             state <= S_Dummy0;
                         END IF;
+                        
+                    WHEN S_Timeout0 =>
+                        -- send EEP
+                        s_strobe_out <= '1';
+                        s_packet_cargo <= "100000001"; -- this is interpreted as an EEP character
+                        
+                        -- reset timeout
+                        s_timeout <= (OTHERS => '0');
+                        state <= S_Timeout1;
+                        
+                    WHEN S_Timeout1 =>
+                        s_strobe_out <= '0';
+                        s_request_out <= '0';
+                        state <= S_Dummy0; -- throw away remainder of packet TODO: Evaluate whether its good practice and standard compliant
 
                     WHEN OTHERS => -- (Necessary because of unused state problem)
                         state <= S_Idle;

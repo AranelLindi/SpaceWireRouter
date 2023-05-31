@@ -1,7 +1,7 @@
 --Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
---Date        : Wed May 31 10:44:33 2023
+--Date        : Wed May 31 13:11:12 2023
 --Host        : stl56jc-MS-7C95 running 64-bit Ubuntu 22.04.2 LTS
 --Command     : generate_target main_design.bd
 --Design      : main_design
@@ -697,43 +697,6 @@ architecture STRUCTURE of main_design is
     gpio_io_o : out STD_LOGIC_VECTOR ( 0 to 0 )
   );
   end component main_design_axi_gpio_1_1;
-  component main_design_router_implementation_0_1 is
-  port (
-    clk : in STD_LOGIC;
-    rxclk : in STD_LOGIC;
-    txclk : in STD_LOGIC;
-    rst : in STD_LOGIC;
-    rx : in STD_LOGIC;
-    tx : out STD_LOGIC;
-    spw_di_0 : in STD_LOGIC;
-    spw_si_0 : in STD_LOGIC;
-    spw_do_0 : out STD_LOGIC;
-    spw_so_0 : out STD_LOGIC;
-    spw_di_1 : in STD_LOGIC;
-    spw_si_1 : in STD_LOGIC;
-    spw_do_1 : out STD_LOGIC;
-    spw_so_1 : out STD_LOGIC;
-    spw_di_2 : in STD_LOGIC;
-    spw_si_2 : in STD_LOGIC;
-    spw_do_2 : out STD_LOGIC;
-    spw_so_2 : out STD_LOGIC;
-    spw_di_3 : in STD_LOGIC;
-    spw_si_3 : in STD_LOGIC;
-    spw_do_3 : out STD_LOGIC;
-    spw_so_3 : out STD_LOGIC;
-    spw_di_4 : in STD_LOGIC;
-    spw_si_4 : in STD_LOGIC;
-    spw_do_4 : out STD_LOGIC;
-    spw_so_4 : out STD_LOGIC;
-    clka : in STD_LOGIC;
-    addra : in STD_LOGIC_VECTOR ( 31 downto 0 );
-    dina : in STD_LOGIC_VECTOR ( 31 downto 0 );
-    douta : out STD_LOGIC_VECTOR ( 31 downto 0 );
-    ena : in STD_LOGIC;
-    rsta : in STD_LOGIC;
-    wea : in STD_LOGIC_VECTOR ( 3 downto 0 )
-  );
-  end component main_design_router_implementation_0_1;
   component main_design_AXI_SpaceWire_IP_0_1 is
   port (
     clk_logic : in STD_LOGIC;
@@ -904,6 +867,43 @@ architecture STRUCTURE of main_design is
     m_axis_tuser : out STD_LOGIC_VECTOR ( 15 downto 0 )
   );
   end component main_design_axis_data_fifo_0_1;
+  component main_design_router_implementation_0_1 is
+  port (
+    clk : in STD_LOGIC;
+    rxclk : in STD_LOGIC;
+    txclk : in STD_LOGIC;
+    rst : in STD_LOGIC;
+    rx : in STD_LOGIC;
+    tx : out STD_LOGIC;
+    spw_di_0 : in STD_LOGIC;
+    spw_si_0 : in STD_LOGIC;
+    spw_do_0 : out STD_LOGIC;
+    spw_so_0 : out STD_LOGIC;
+    spw_di_1 : in STD_LOGIC;
+    spw_si_1 : in STD_LOGIC;
+    spw_do_1 : out STD_LOGIC;
+    spw_so_1 : out STD_LOGIC;
+    spw_di_2 : in STD_LOGIC;
+    spw_si_2 : in STD_LOGIC;
+    spw_do_2 : out STD_LOGIC;
+    spw_so_2 : out STD_LOGIC;
+    spw_di_3 : in STD_LOGIC;
+    spw_si_3 : in STD_LOGIC;
+    spw_do_3 : out STD_LOGIC;
+    spw_so_3 : out STD_LOGIC;
+    spw_di_4 : in STD_LOGIC;
+    spw_si_4 : in STD_LOGIC;
+    spw_do_4 : out STD_LOGIC;
+    spw_so_4 : out STD_LOGIC;
+    clka : in STD_LOGIC;
+    addra : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    dina : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    douta : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    ena : in STD_LOGIC;
+    rsta : in STD_LOGIC;
+    wea : in STD_LOGIC_VECTOR ( 3 downto 0 )
+  );
+  end component main_design_router_implementation_0_1;
   signal AXI_SpaceWire_IP_0_error_intr : STD_LOGIC;
   signal AXI_SpaceWire_IP_0_packet_intr : STD_LOGIC;
   signal AXI_SpaceWire_IP_0_spw_do : STD_LOGIC;

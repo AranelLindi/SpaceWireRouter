@@ -20,10 +20,10 @@
       "util_reduced_logic_0": "",
       "axi_gpio_0": "",
       "axi_gpio_1": "",
-      "router_implementation_0": "",
       "AXI_SpaceWire_IP_0": "",
       "axi_bram_ctrl_0": "",
-      "axis_data_fifo_0": ""
+      "axis_data_fifo_0": "",
+      "router_implementation_0": ""
     },
     "interface_ports": {
       "DDR": {
@@ -1779,6 +1779,32 @@
           }
         }
       },
+      "AXI_SpaceWire_IP_0": {
+        "vlnv": "uni-wuerzburg.informatikviii:user:AXI_SpaceWire_IP:1.0",
+        "xci_name": "main_design_AXI_SpaceWire_IP_0_1",
+        "xci_path": "ip/main_design_AXI_SpaceWire_IP_0_1/main_design_AXI_SpaceWire_IP_0_1.xci",
+        "inst_hier_path": "AXI_SpaceWire_IP_0"
+      },
+      "axi_bram_ctrl_0": {
+        "vlnv": "xilinx.com:ip:axi_bram_ctrl:4.1",
+        "xci_name": "main_design_axi_bram_ctrl_0_1",
+        "xci_path": "ip/main_design_axi_bram_ctrl_0_1/main_design_axi_bram_ctrl_0_1.xci",
+        "inst_hier_path": "axi_bram_ctrl_0",
+        "parameters": {
+          "PROTOCOL": {
+            "value": "AXI4LITE"
+          },
+          "SINGLE_PORT_BRAM": {
+            "value": "1"
+          }
+        }
+      },
+      "axis_data_fifo_0": {
+        "vlnv": "xilinx.com:ip:axis_data_fifo:2.0",
+        "xci_name": "main_design_axis_data_fifo_0_1",
+        "xci_path": "ip/main_design_axis_data_fifo_0_1/main_design_axis_data_fifo_0_1.xci",
+        "inst_hier_path": "axis_data_fifo_0"
+      },
       "router_implementation_0": {
         "vlnv": "xilinx.com:module_ref:router_implementation:1.0",
         "xci_name": "main_design_router_implementation_0_1",
@@ -1946,32 +1972,6 @@
             "right": "0"
           }
         }
-      },
-      "AXI_SpaceWire_IP_0": {
-        "vlnv": "uni-wuerzburg.informatikviii:user:AXI_SpaceWire_IP:1.0",
-        "xci_name": "main_design_AXI_SpaceWire_IP_0_1",
-        "xci_path": "ip/main_design_AXI_SpaceWire_IP_0_1/main_design_AXI_SpaceWire_IP_0_1.xci",
-        "inst_hier_path": "AXI_SpaceWire_IP_0"
-      },
-      "axi_bram_ctrl_0": {
-        "vlnv": "xilinx.com:ip:axi_bram_ctrl:4.1",
-        "xci_name": "main_design_axi_bram_ctrl_0_1",
-        "xci_path": "ip/main_design_axi_bram_ctrl_0_1/main_design_axi_bram_ctrl_0_1.xci",
-        "inst_hier_path": "axi_bram_ctrl_0",
-        "parameters": {
-          "PROTOCOL": {
-            "value": "AXI4LITE"
-          },
-          "SINGLE_PORT_BRAM": {
-            "value": "1"
-          }
-        }
-      },
-      "axis_data_fifo_0": {
-        "vlnv": "xilinx.com:ip:axis_data_fifo:2.0",
-        "xci_name": "main_design_axis_data_fifo_0_1",
-        "xci_path": "ip/main_design_axis_data_fifo_0_1/main_design_axis_data_fifo_0_1.xci",
-        "inst_hier_path": "axis_data_fifo_0"
       }
     },
     "interface_nets": {
@@ -2167,11 +2167,11 @@
         "ports": [
           "clk_wiz_0/clk_100",
           "AXI_SpaceWire_IP_0/clk_logic",
+          "AXI_SpaceWire_IP_0/rxclk",
+          "AXI_SpaceWire_IP_0/txclk",
           "router_implementation_0/clk",
           "router_implementation_0/rxclk",
-          "router_implementation_0/txclk",
-          "AXI_SpaceWire_IP_0/rxclk",
-          "AXI_SpaceWire_IP_0/txclk"
+          "router_implementation_0/txclk"
         ]
       },
       "proc_sys_reset_0_peripheral_aresetn": {
