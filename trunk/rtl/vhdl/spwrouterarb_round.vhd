@@ -1,11 +1,12 @@
 ----------------------------------------------------------------------------------
 -- Company: University of Wuerzburg, Germany
--- Engineer: Stefan Lindoerfer
+-- Engineer: Stefan Lindoerfer, Frederik Pilz
 -- 
 -- Create Date: 31.07.2021 22:38
 -- Design Name: SpaceWire Router - Router Arbiter Round Robin
 -- Module Name: spwrouterarb_round
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA,
+--              Bachelor Thesis: Extension and Validation of a SpaceWire router on an FPGA
 -- Target Devices: Xilinx FPGAs
 -- Tool Versions: -/-
 -- Description: A ring is constructed that contains all (source) ports.
@@ -42,6 +43,9 @@ ENTITY spwrouterarb_round IS
 
         -- Shows which ports making an transfer request to this port.
         request : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+        
+        -- Grant access to given port. Negative if no override requested.
+        override : IN INTEGER;
 
         -- Shows which port has been guaranteed access to this port.
         granted : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0)
@@ -71,39 +75,50 @@ BEGIN
                 -- Synchronous reset.
                 s_granted <= (OTHERS => '0');
                 s_last_granted <= STD_LOGIC_VECTOR(to_unsigned(0, s_last_granted'length));
+
             ELSE
-                -- Roll-out arbitration logic for every port.
-                arbitration : FOR i IN (numports - 1) DOWNTO 0 LOOP
-                    IF (s_last_granted = STD_LOGIC_VECTOR(to_unsigned(i, s_last_granted'length))) THEN
-
-                        -- The following ports in the line (0..1..(numports-1)..0) will give prefered access to current
-                        -- port. Normally in if-statements early conditions takes priority above later.
-                        -- Through rolling out for-loops, many seperate if-statements will be
-                        -- created. Therefore the highes priority must be listed in the last order to
-                        -- be able to overwrite any previous decision with lower priority.
-
-                        lowerpriority : FOR j IN i DOWNTO 0 LOOP -- [i <= j <= 0]
-                            IF (s_request(j) = '1' AND s_occupied = '0') THEN
-                                s_granted <= STD_LOGIC_VECTOR(to_unsigned(2 ** j, s_granted'length));
-                                s_last_granted <= STD_LOGIC_VECTOR(to_unsigned(j, s_last_granted'length));
-                            END IF;
-                        END LOOP lowerpriority;
-
-                        higherpriority : FOR k IN (numports - 1) DOWNTO (i + 1) LOOP -- [(numports-1) <= k <= (i+1)]
-                            IF (s_request(k) = '1' AND s_occupied = '0') THEN
-                                s_granted <= STD_LOGIC_VECTOR(to_unsigned(2 ** k, s_granted'length));
-                                s_last_granted <= STD_LOGIC_VECTOR(to_unsigned(k, s_last_granted'length));
-                            END IF;
-                        END LOOP higherpriority;
-                    END IF;
-                END LOOP arbitration;
-
-                -- Revoke previously granted access that is no longer required.
-                FOR i IN 0 TO (numports - 1) LOOP
-                    IF (s_request(i) = '0' AND s_granted(i) = '1') THEN
-                        s_granted(i) <= '0';
-                    END IF;
-                END LOOP;
+                if override >= 0 THEN
+                    -- The arbiter has to make sure that the override can't withdraw the granted signal from a port that's already transmitting,
+                    -- as well as the override having to be a valid port.
+                    -- This does not affect the last_granted, since the multicast arbiter keeps a seperate round-robin rotation
+                    s_granted <= (OTHERS => '0');
+                    s_granted(override) <= '1';
+                
+                else
+                
+                    -- Roll-out arbitration logic for every port.
+                    arbitration : FOR i IN (numports - 1) DOWNTO 0 LOOP
+                        IF (s_last_granted = STD_LOGIC_VECTOR(to_unsigned(i, s_last_granted'length))) THEN
+    
+                            -- The following ports in the line (0..1..(numports-1)..0) will give prefered access to current
+                            -- port. Normally in if-statements early conditions takes priority above later.
+                            -- Through rolling out for-loops, many seperate if-statements will be
+                            -- created. Therefore the highes priority must be listed in the last order to
+                            -- be able to overwrite any previous decision with lower priority.
+    
+                            lowerpriority : FOR j IN i DOWNTO 0 LOOP -- [i <= j <= 0]
+                                IF (s_request(j) = '1' AND s_occupied = '0') THEN
+                                    s_granted <= STD_LOGIC_VECTOR(to_unsigned(2 ** j, s_granted'length));
+                                    s_last_granted <= STD_LOGIC_VECTOR(to_unsigned(j, s_last_granted'length));
+                                END IF;
+                            END LOOP lowerpriority;
+    
+                            higherpriority : FOR k IN (numports - 1) DOWNTO (i + 1) LOOP -- [(numports-1) <= k <= (i+1)]
+                                IF (s_request(k) = '1' AND s_occupied = '0') THEN
+                                    s_granted <= STD_LOGIC_VECTOR(to_unsigned(2 ** k, s_granted'length));
+                                    s_last_granted <= STD_LOGIC_VECTOR(to_unsigned(k, s_last_granted'length));
+                                END IF;
+                            END LOOP higherpriority;
+                        END IF;
+                    END LOOP arbitration;
+    
+                    -- Revoke previously granted access that is no longer required.
+                    FOR i IN 0 TO (numports - 1) LOOP
+                        IF (s_request(i) = '0' AND s_granted(i) = '1') THEN
+                            s_granted(i) <= '0';
+                        END IF;
+                    END LOOP;
+                end if;
             END IF;
         END IF;
     END PROCESS;

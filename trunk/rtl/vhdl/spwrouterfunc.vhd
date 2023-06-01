@@ -1,11 +1,12 @@
 ----------------------------------------------------------------------------------
 -- Company: University of Wuerzburg, Germany
--- Engineer: Stefan Lindoerfer
+-- Engineer: Stefan Lindoerfer, Frederik Pilz
 -- 
 -- Create Date: 26.09.2021 17:54
 -- Design Name: SpaceWire Router - Function Package
 -- Module Name: spwrouterfunc
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA,
+--              Bachelor Thesis: Extension and Validation of a SpaceWire router on an FPGA
 -- Target Devices: Xilinx FPGAs
 -- Tool Versions: -/-
 -- Description: Contains filtering generic functions.

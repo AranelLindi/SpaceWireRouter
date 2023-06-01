@@ -5,7 +5,8 @@
 -- Create Date: 31.07.2021 14:59
 -- Design Name: SpaceWire Router - Package
 -- Module Name: spwrouterpkg
--- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA
+-- Project Name: Bachelor Thesis: Implementation of a SpaceWire Router on an FPGA,
+--              Bachelor Thesis: Extension and Validation of a SpaceWire router on an FPGA
 -- Target Devices: Xilinx FPGAs
 -- Tool Versions: -/-
 -- Description: Contains type and component definitions of spwrouter elements.
@@ -74,6 +75,7 @@ PACKAGE spwrouterpkg IS
     -- General used types.
     TYPE array_t IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR;
     TYPE matrix_t IS ARRAY(NATURAL RANGE <>, NATURAL RANGE <>) OF STD_LOGIC;
+    TYPE int_array IS ARRAY(NATURAL RANGE <>) OF INTEGER; -- used only for multi/broadcast mechanism
 
     -- Component declarations:
     -- Round Robin arbiter (spwrouterarb_table.vhd).
@@ -87,6 +89,7 @@ PACKAGE spwrouterpkg IS
             rst : IN STD_LOGIC;
             occupied : IN STD_LOGIC;
             request : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            override : IN INTEGER;
             granted : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0)
         );
     END COMPONENT;
@@ -100,7 +103,7 @@ PACKAGE spwrouterpkg IS
         PORT (
             clk : IN STD_LOGIC;
             rst : IN STD_LOGIC;
-            destport : IN array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0);
+            destport : IN array_t((numports - 1) DOWNTO 0)((numports - 1) DOWNTO 0);
             request : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
             granted : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
             routing_matrix : OUT array_t((numports - 1) DOWNTO 0)((numports - 1) DOWNTO 0)
@@ -241,7 +244,7 @@ PACKAGE spwrouterpkg IS
             linkstatus : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
             request_out : OUT STD_LOGIC;
             request_in : IN STD_LOGIC;
-            destination_port : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+            destination_ports : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
             arb_granted : IN STD_LOGIC;
             strobe_out : OUT STD_LOGIC;
             strobe_in : IN STD_LOGIC;

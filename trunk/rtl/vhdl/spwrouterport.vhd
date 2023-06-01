@@ -171,7 +171,7 @@ ENTITY spwrouterport IS
         request_in : IN STD_LOGIC;
 
         -- First byte of a packet (address byte) with destination port (both physical and logical addressing).
-        destination_port : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        destination_ports : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
 
         -- High if the port gets permission from router arbiter for data transfer.
         arb_granted : IN STD_LOGIC;
@@ -265,7 +265,7 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
     -- Bus & router signals.
     SIGNAL s_strobe_out : STD_LOGIC; -- Strobe signal to destination port when cargo/EOP/EEP byte need to be transmitted
     SIGNAL s_request_out : STD_LOGIC; -- High as long as a packet is started and sent but not yet completed
-    SIGNAL s_destination_port : STD_LOGIC_VECTOR(7 DOWNTO 0); -- Contains first byte of a packet (address byte)
+    SIGNAL s_destination_ports : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0); -- TODO: NEW DESCRIPTION!
 
     -- Register status signals.
     SIGNAL s_discardedcounter : unsigned(15 DOWNTO 0);
@@ -275,7 +275,7 @@ ARCHITECTURE spwrouterport_arch OF spwrouterport IS
 BEGIN
     -- Drive outputs.
     -- Bus & router signals.
-    destination_port <= s_destination_port;
+    destination_ports <= s_destination_ports;
     request_out <= s_request_out;
     strobe_out <= s_strobe_out;
     rxdata <= s_packet_cargo;
@@ -386,7 +386,7 @@ BEGIN
                 -- Synchronous reset.
                 v_validport := '0';
                 v_reqports := '0';
-                s_destination_port <= (OTHERS => '0');
+                s_destination_ports <= (OTHERS => '0');
                 s_packet_cargo <= (OTHERS => '0');
                 s_logical_address <= (OTHERS => '0');
                 s_rxdata <= (OTHERS => '0');
@@ -423,13 +423,16 @@ BEGIN
                         IF (s_rxdata(8) = '0') THEN -- Data byte
                             IF (s_rxdata(7 DOWNTO 5) = "000") THEN -- [DestPort] < 32 (physical port)
                                 -- Physical port is addressed.
-                                s_destination_port <= s_rxdata(7 DOWNTO 0); -- Destination port number (first byte of packet)
-
+                                
                                 IF (unsigned(s_rxdata(7 DOWNTO 0)) > (numports - 1)) THEN
                                     -- Discard invalid addressed packet (destination port does not exist).
                                     state <= S_Dummy0;
                                 ELSE
                                     -- Destination port exists, packet can be delivered.
+                                    -- first byte of packet contains the dest port number, set the corresponding bit
+                                    s_destination_ports <= (OTHERS => '0');
+                                    s_destination_ports(to_integer(unsigned(s_rxdata(7 DOWNTO 0)))) <= '1';
+
                                     state <= S_Dest2;
                                 END IF;
                             ELSE -- DestPort >= 32 (logical port)
@@ -450,12 +453,12 @@ BEGIN
 
                         -- Check if target port is addressable.
                         FOR i IN 1 TO (numports - 1) LOOP -- Auf Port0 kann hiernach nicht gesendet werden, bitte überprüfen!
-                            IF (linkstatus(i) = '1' AND s_destination_port(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(i, blen + 1))) THEN
+                            IF (linkstatus(i) = '1' AND s_destination_ports(i) = '1') THEN
                                 v_validport := '1'; -- potenzielle Fehlerquelle mit blen+1 !! Im Original Code werden hier 5 Bits (4 downto 0) abgefragt. falls blen == 4 ist, muss folglich blen+1 für 5 gelten!
                             END IF;
                         END LOOP;
 
-                        IF ((s_destination_port(blen DOWNTO 0) = STD_LOGIC_VECTOR(to_unsigned(0, blen + 1))) OR (v_validport = '1')) THEN
+                        IF ((s_destination_ports(0) = '1') OR (v_validport = '1')) THEN
                             -- Packet address matches available physical ports, packet can be sent through router.
                             s_request_out <= '1';
                             state <= S_Data0;
@@ -492,6 +495,7 @@ BEGIN
 --                        END LOOP;
 
                         -- Correct behaviour according to 5.6.8.10 (d) of the standard
+                        s_destination_ports <= linkstatus AND bus_data_in((numports - 1) DOWNTO 0);
                         
                         IF (OR (linkstatus AND bus_data_in((numports - 1) DOWNTO 0)) = '1') THEN
                             s_request_out <= '1';
@@ -514,12 +518,11 @@ BEGIN
                         IF (unsigned(watchdog_cycle) /= 0) THEN
                             IF (s_timeout = unsigned(watchdog_cycle)) THEN
                                 state <= S_Timeout0;
-                            END IF;
-                        END IF;
-                        
-                        -- Increment timeout counter each iteration where no N-char was received.
-                        IF (arb_granted = '1' AND s_rxvalid = '0') THEN
-                            s_timeout <= s_timeout + 1;
+                            
+                            ELSIF (arb_granted = '1' AND s_rxvalid = '0') THEN
+                                -- Increment timeout counter each iteration where no N-char was received.
+                                s_timeout <= s_timeout + 1;
+                            END IF;                                
                         END IF;
 
                         -- New N-char was been received and can be transfered.

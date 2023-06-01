@@ -155,7 +155,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
     SIGNAL s_routing_matrix : array_t((numports - 1) DOWNTO 0)((numports - 1) DOWNTO 0); -- Routing switch matrix: Maps source ports (row) to target ports (column)
     SIGNAL s_source_port_row : array_t((numports - 1) DOWNTO 0)((numports - 1) DOWNTO 0); -- Copy of routing_matrix for easier further processing
     SIGNAL s_request_out : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0); -- High for any port currently transferring data
-    SIGNAL s_destination_port : array_t((numports - 1) DOWNTO 0)(7 DOWNTO 0); -- First byte of packet (address byte) with destination port (both physical and logical addressing (after mapping to physical port))
+    SIGNAL s_destination_ports : array_t((numports - 1) DOWNTO 0)((numports - 1) DOWNTO 0); -- First byte of packet (address byte) with destination port (both physical and logical addressing (after mapping to physical port))
     SIGNAL s_granted : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0); -- Contains ports that have granted access to port that is specified in destport
 
     -- SpaceWire-port-specific signals (spwrouterport).
@@ -220,7 +220,7 @@ BEGIN
     PORT MAP(
         clk => clk,
         rst => rst,
-        destport => s_destination_port,
+        destport => s_destination_ports,
         request => s_request_out,
         granted => s_granted,
         routing_matrix => s_routing_matrix
@@ -272,7 +272,7 @@ BEGIN
                 linkstatus => s_running, -- I
                 request_out => s_request_out(i), -- O
                 request_in => s_request_in(i), -- I
-                destination_port => s_destination_port(i),
+                destination_ports => s_destination_ports(i),
                 arb_granted => s_granted(i), -- I
                 strobe_out => s_strobe_out(i), -- O
                 strobe_in => s_strobe_in(i), -- I
@@ -333,7 +333,7 @@ BEGIN
                 linkstatus => s_running, -- I
                 request_out => s_request_out(i), -- O
                 request_in => s_request_in(i), -- I
-                destination_port => s_destination_port(i),
+                destination_ports => s_destination_ports(i),
                 arb_granted => s_granted(i), -- I
                 strobe_out => s_strobe_out(i), -- O
                 strobe_in => s_strobe_in(i), -- I
@@ -476,7 +476,8 @@ BEGIN
 
     -- Routing process: Assigns information from source ports to destination ports to ports.
     crossbar : FOR i IN 0 TO (numports - 1) GENERATE
-        s_ready_in(i) <= spwrouterfunc.select_port(s_routing_matrix_transposed(i), s_txrdy);
+        --s_ready_in(i) <= spwrouterfunc.select_port(s_routing_matrix_transposed(i), s_txrdy);
+        s_ready_in(i) <= '1' WHEN (s_routing_matrix_transposed(i) = (s_txrdy AND s_routing_matrix_transposed(i))) ELSE '0'; -- multi-/broadcast
         s_request_in(i) <= spwrouterfunc.select_port(s_source_port_row(i), s_request_out);
         s_txdata(i) <= spwrouterfunc.select_nchar(s_source_port_row(i), s_rxdata);
         s_strobe_in(i) <= spwrouterfunc.select_port(s_source_port_row(i), s_strobe_out);
