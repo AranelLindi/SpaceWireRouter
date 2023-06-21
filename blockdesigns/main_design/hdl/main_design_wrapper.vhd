@@ -1,7 +1,7 @@
 --Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
---Date        : Thu Jun  1 12:26:21 2023
+--Date        : Wed Jun 21 15:55:08 2023
 --Host        : stl56jc-MS-7C95 running 64-bit Ubuntu 22.04.2 LTS
 --Command     : generate_target main_design_wrapper.bd
 --Design      : main_design_wrapper
@@ -13,6 +13,8 @@ library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
 entity main_design_wrapper is
   port (
+    CLK_IN1_D_0_clk_n : in STD_LOGIC;
+    CLK_IN1_D_0_clk_p : in STD_LOGIC;
     DDR_addr : inout STD_LOGIC_VECTOR ( 14 downto 0 );
     DDR_ba : inout STD_LOGIC_VECTOR ( 2 downto 0 );
     DDR_cas_n : inout STD_LOGIC;
@@ -34,8 +36,6 @@ entity main_design_wrapper is
     FIXED_IO_ps_clk : inout STD_LOGIC;
     FIXED_IO_ps_porb : inout STD_LOGIC;
     FIXED_IO_ps_srstb : inout STD_LOGIC;
-    SYSCLK_IN_clk_n : in STD_LOGIC;
-    SYSCLK_IN_clk_p : in STD_LOGIC;
     reset : in STD_LOGIC;
     rst_logic : in STD_LOGIC;
     rx : in STD_LOGIC;
@@ -82,8 +82,8 @@ architecture STRUCTURE of main_design_wrapper is
     spw_so_4 : out STD_LOGIC;
     rst_logic : in STD_LOGIC;
     reset : in STD_LOGIC;
-    SYSCLK_IN_clk_n : in STD_LOGIC;
-    SYSCLK_IN_clk_p : in STD_LOGIC;
+    CLK_IN1_D_0_clk_n : in STD_LOGIC;
+    CLK_IN1_D_0_clk_p : in STD_LOGIC;
     DDR_cas_n : inout STD_LOGIC;
     DDR_cke : inout STD_LOGIC;
     DDR_ck_n : inout STD_LOGIC;
@@ -110,6 +110,8 @@ architecture STRUCTURE of main_design_wrapper is
 begin
 main_design_i: component main_design
      port map (
+      CLK_IN1_D_0_clk_n => CLK_IN1_D_0_clk_n,
+      CLK_IN1_D_0_clk_p => CLK_IN1_D_0_clk_p,
       DDR_addr(14 downto 0) => DDR_addr(14 downto 0),
       DDR_ba(2 downto 0) => DDR_ba(2 downto 0),
       DDR_cas_n => DDR_cas_n,
@@ -131,8 +133,6 @@ main_design_i: component main_design
       FIXED_IO_ps_clk => FIXED_IO_ps_clk,
       FIXED_IO_ps_porb => FIXED_IO_ps_porb,
       FIXED_IO_ps_srstb => FIXED_IO_ps_srstb,
-      SYSCLK_IN_clk_n => SYSCLK_IN_clk_n,
-      SYSCLK_IN_clk_p => SYSCLK_IN_clk_p,
       reset => reset,
       rst_logic => rst_logic,
       rx => rx,

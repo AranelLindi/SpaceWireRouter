@@ -1,7 +1,7 @@
 --Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
---Date        : Thu Jun  1 12:26:21 2023
+--Date        : Wed Jun 21 15:55:08 2023
 --Host        : stl56jc-MS-7C95 running 64-bit Ubuntu 22.04.2 LTS
 --Command     : generate_target main_design.bd
 --Design      : main_design
@@ -13,6 +13,8 @@ library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
 entity main_design is
   port (
+    CLK_IN1_D_0_clk_n : in STD_LOGIC;
+    CLK_IN1_D_0_clk_p : in STD_LOGIC;
     DDR_addr : inout STD_LOGIC_VECTOR ( 14 downto 0 );
     DDR_ba : inout STD_LOGIC_VECTOR ( 2 downto 0 );
     DDR_cas_n : inout STD_LOGIC;
@@ -34,8 +36,6 @@ entity main_design is
     FIXED_IO_ps_clk : inout STD_LOGIC;
     FIXED_IO_ps_porb : inout STD_LOGIC;
     FIXED_IO_ps_srstb : inout STD_LOGIC;
-    SYSCLK_IN_clk_n : in STD_LOGIC;
-    SYSCLK_IN_clk_p : in STD_LOGIC;
     reset : in STD_LOGIC;
     rst_logic : in STD_LOGIC;
     rx : in STD_LOGIC;
@@ -1309,6 +1309,10 @@ architecture STRUCTURE of main_design is
   signal NLW_smartconnect_0_M03_AXI_arprot_UNCONNECTED : STD_LOGIC_VECTOR ( 2 downto 0 );
   signal NLW_smartconnect_0_M03_AXI_awprot_UNCONNECTED : STD_LOGIC_VECTOR ( 2 downto 0 );
   attribute X_INTERFACE_INFO : string;
+  attribute X_INTERFACE_INFO of CLK_IN1_D_0_clk_n : signal is "xilinx.com:interface:diff_clock:1.0 CLK_IN1_D_0 CLK_N";
+  attribute X_INTERFACE_PARAMETER : string;
+  attribute X_INTERFACE_PARAMETER of CLK_IN1_D_0_clk_n : signal is "XIL_INTERFACENAME CLK_IN1_D_0, CAN_DEBUG false, FREQ_HZ 100000000";
+  attribute X_INTERFACE_INFO of CLK_IN1_D_0_clk_p : signal is "xilinx.com:interface:diff_clock:1.0 CLK_IN1_D_0 CLK_P";
   attribute X_INTERFACE_INFO of DDR_cas_n : signal is "xilinx.com:interface:ddrx:1.0 DDR CAS_N";
   attribute X_INTERFACE_INFO of DDR_ck_n : signal is "xilinx.com:interface:ddrx:1.0 DDR CK_N";
   attribute X_INTERFACE_INFO of DDR_ck_p : signal is "xilinx.com:interface:ddrx:1.0 DDR CK_P";
@@ -1319,15 +1323,11 @@ architecture STRUCTURE of main_design is
   attribute X_INTERFACE_INFO of DDR_reset_n : signal is "xilinx.com:interface:ddrx:1.0 DDR RESET_N";
   attribute X_INTERFACE_INFO of DDR_we_n : signal is "xilinx.com:interface:ddrx:1.0 DDR WE_N";
   attribute X_INTERFACE_INFO of FIXED_IO_ddr_vrn : signal is "xilinx.com:display_processing_system7:fixedio:1.0 FIXED_IO DDR_VRN";
-  attribute X_INTERFACE_PARAMETER : string;
   attribute X_INTERFACE_PARAMETER of FIXED_IO_ddr_vrn : signal is "XIL_INTERFACENAME FIXED_IO, CAN_DEBUG false";
   attribute X_INTERFACE_INFO of FIXED_IO_ddr_vrp : signal is "xilinx.com:display_processing_system7:fixedio:1.0 FIXED_IO DDR_VRP";
   attribute X_INTERFACE_INFO of FIXED_IO_ps_clk : signal is "xilinx.com:display_processing_system7:fixedio:1.0 FIXED_IO PS_CLK";
   attribute X_INTERFACE_INFO of FIXED_IO_ps_porb : signal is "xilinx.com:display_processing_system7:fixedio:1.0 FIXED_IO PS_PORB";
   attribute X_INTERFACE_INFO of FIXED_IO_ps_srstb : signal is "xilinx.com:display_processing_system7:fixedio:1.0 FIXED_IO PS_SRSTB";
-  attribute X_INTERFACE_INFO of SYSCLK_IN_clk_n : signal is "xilinx.com:interface:diff_clock:1.0 SYSCLK_IN CLK_N";
-  attribute X_INTERFACE_PARAMETER of SYSCLK_IN_clk_n : signal is "XIL_INTERFACENAME SYSCLK_IN, CAN_DEBUG false, FREQ_HZ 100000000";
-  attribute X_INTERFACE_INFO of SYSCLK_IN_clk_p : signal is "xilinx.com:interface:diff_clock:1.0 SYSCLK_IN CLK_P";
   attribute X_INTERFACE_INFO of reset : signal is "xilinx.com:signal:reset:1.0 RST.RESET RST";
   attribute X_INTERFACE_PARAMETER of reset : signal is "XIL_INTERFACENAME RST.RESET, INSERT_VIP 0, POLARITY ACTIVE_HIGH";
   attribute X_INTERFACE_INFO of rst_logic : signal is "xilinx.com:signal:reset:1.0 RST.RST_LOGIC RST";
@@ -1341,8 +1341,8 @@ architecture STRUCTURE of main_design is
   attribute X_INTERFACE_INFO of DDR_dqs_p : signal is "xilinx.com:interface:ddrx:1.0 DDR DQS_P";
   attribute X_INTERFACE_INFO of FIXED_IO_mio : signal is "xilinx.com:display_processing_system7:fixedio:1.0 FIXED_IO MIO";
 begin
-  CLK_IN1_D_0_1_CLK_N <= SYSCLK_IN_clk_n;
-  CLK_IN1_D_0_1_CLK_P <= SYSCLK_IN_clk_p;
+  CLK_IN1_D_0_1_CLK_N <= CLK_IN1_D_0_clk_n;
+  CLK_IN1_D_0_1_CLK_P <= CLK_IN1_D_0_clk_p;
   reset_1 <= reset;
   rst_0_1 <= rst_logic;
   rx_0_1 <= rx;

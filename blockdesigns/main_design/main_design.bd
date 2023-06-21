@@ -1,7 +1,7 @@
 {
   "design": {
     "design_info": {
-      "boundary_crc": "0x57055AFB4BF0F7DA",
+      "boundary_crc": "0xB8351D2C43045D23",
       "device": "xc7z045ffg900-2",
       "name": "main_design",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
@@ -92,7 +92,7 @@
           }
         }
       },
-      "SYSCLK_IN": {
+      "CLK_IN1_D_0": {
         "mode": "Slave",
         "vlnv_bus_definition": "xilinx.com:interface:diff_clock:1.0",
         "vlnv": "xilinx.com:interface:diff_clock_rtl:1.0",
@@ -1249,6 +1249,18 @@
           "CLKOUT2_USED": {
             "value": "true"
           },
+          "CLKOUT3_JITTER": {
+            "value": "155.330"
+          },
+          "CLKOUT3_PHASE_ERROR": {
+            "value": "89.971"
+          },
+          "CLKOUT3_REQUESTED_OUT_FREQ": {
+            "value": "20.000"
+          },
+          "CLKOUT3_USED": {
+            "value": "false"
+          },
           "CLK_IN1_BOARD_INTERFACE": {
             "value": "sys_diff_clock"
           },
@@ -1257,6 +1269,9 @@
           },
           "CLK_OUT2_PORT": {
             "value": "clk_100"
+          },
+          "CLK_OUT3_PORT": {
+            "value": "clk_20"
           },
           "MMCM_CLKFBOUT_MULT_F": {
             "value": "5.000"
@@ -1272,6 +1287,9 @@
           },
           "MMCM_CLKOUT1_DIVIDE": {
             "value": "10"
+          },
+          "MMCM_CLKOUT2_DIVIDE": {
+            "value": "1"
           },
           "NUM_OUT_CLKS": {
             "value": "2"
@@ -1977,7 +1995,7 @@
     "interface_nets": {
       "CLK_IN1_D_0_1": {
         "interface_ports": [
-          "SYSCLK_IN",
+          "CLK_IN1_D_0",
           "clk_wiz_0/CLK_IN1_D"
         ]
       },
@@ -2167,11 +2185,11 @@
         "ports": [
           "clk_wiz_0/clk_100",
           "AXI_SpaceWire_IP_0/clk_logic",
-          "AXI_SpaceWire_IP_0/rxclk",
-          "AXI_SpaceWire_IP_0/txclk",
           "router_implementation_0/clk",
+          "router_implementation_0/txclk",
           "router_implementation_0/rxclk",
-          "router_implementation_0/txclk"
+          "AXI_SpaceWire_IP_0/txclk",
+          "AXI_SpaceWire_IP_0/rxclk"
         ]
       },
       "proc_sys_reset_0_peripheral_aresetn": {
