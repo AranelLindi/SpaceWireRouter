@@ -269,6 +269,7 @@ PACKAGE spwrouterpkg IS
             txclkfreq : real;
             externPort : BOOLEAN := True;
             rx_impl : rximpl_array((numports - 1) DOWNTO 0);
+            rxchunk : integer range 1 to 4 := 1;
             tx_impl : tximpl_array((numports - 1) DOWNTO 0)
         );
         PORT (

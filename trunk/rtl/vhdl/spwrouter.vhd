@@ -44,6 +44,8 @@ ENTITY spwrouter IS
 
         -- Selection of receiver front-end implementation.
         rx_impl : rximpl_array((numports - 1) DOWNTO 0);-- := (OTHERS => impl_fast);
+        
+        rxchunk : integer range 1 to 4 := 1;
 
         -- Selection of transmitter implementation.
         tx_impl : tximpl_array((numports - 1) DOWNTO 0)-- := (OTHERS => impl_fast)
@@ -237,6 +239,7 @@ BEGIN
                 sysfreq => sysfreq,
                 txclkfreq => txclkfreq,
                 rximpl => rx_impl(i),
+                rxchunk => rxchunk,
                 tximpl => tx_impl(i)
                 -- (Generics that are not listed here have default values !)
             )
@@ -298,6 +301,7 @@ BEGIN
                 sysfreq => sysfreq,
                 txclkfreq => txclkfreq,
                 rximpl => rx_impl(i),
+                rxchunk => rxchunk,
                 tximpl => tx_impl(i)
                 -- (Generics that are not listed here have default values !)
             )

@@ -1,7 +1,7 @@
 --Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
---Date        : Wed Jun 21 15:55:08 2023
+--Date        : Tue Jul  4 10:07:47 2023
 --Host        : stl56jc-MS-7C95 running 64-bit Ubuntu 22.04.2 LTS
 --Command     : generate_target main_design.bd
 --Design      : main_design
@@ -156,7 +156,7 @@ architecture STRUCTURE of main_design is
     S_AXI_HP0_WID : in STD_LOGIC_VECTOR ( 5 downto 0 );
     S_AXI_HP0_WDATA : in STD_LOGIC_VECTOR ( 31 downto 0 );
     S_AXI_HP0_WSTRB : in STD_LOGIC_VECTOR ( 3 downto 0 );
-    IRQ_F2P : in STD_LOGIC_VECTOR ( 5 downto 0 );
+    IRQ_F2P : in STD_LOGIC_VECTOR ( 7 downto 0 );
     FCLK_CLK0 : out STD_LOGIC;
     FCLK_RESET0_N : out STD_LOGIC;
     MIO : inout STD_LOGIC_VECTOR ( 53 downto 0 );
@@ -640,7 +640,9 @@ architecture STRUCTURE of main_design is
     In3 : in STD_LOGIC_VECTOR ( 0 to 0 );
     In4 : in STD_LOGIC_VECTOR ( 0 to 0 );
     In5 : in STD_LOGIC_VECTOR ( 0 to 0 );
-    dout : out STD_LOGIC_VECTOR ( 5 downto 0 )
+    In6 : in STD_LOGIC_VECTOR ( 0 to 0 );
+    In7 : in STD_LOGIC_VECTOR ( 0 to 0 );
+    dout : out STD_LOGIC_VECTOR ( 7 downto 0 )
   );
   end component main_design_xlconcat_1_1;
   component main_design_util_reduced_logic_0_1 is
@@ -990,6 +992,8 @@ architecture STRUCTURE of main_design is
   signal axi_mcdma_0_M_AXI_SG_WREADY : STD_LOGIC;
   signal axi_mcdma_0_M_AXI_SG_WSTRB : STD_LOGIC_VECTOR ( 3 downto 0 );
   signal axi_mcdma_0_M_AXI_SG_WVALID : STD_LOGIC;
+  signal axi_mcdma_0_mm2s_ch1_introut : STD_LOGIC;
+  signal axi_mcdma_0_s2mm_ch1_introut : STD_LOGIC;
   signal axis_data_fifo_0_M_AXIS_TDATA : STD_LOGIC_VECTOR ( 31 downto 0 );
   signal axis_data_fifo_0_M_AXIS_TDEST : STD_LOGIC_VECTOR ( 3 downto 0 );
   signal axis_data_fifo_0_M_AXIS_TID : STD_LOGIC_VECTOR ( 7 downto 0 );
@@ -999,6 +1003,7 @@ architecture STRUCTURE of main_design is
   signal axis_data_fifo_0_M_AXIS_TUSER : STD_LOGIC_VECTOR ( 15 downto 0 );
   signal axis_data_fifo_0_M_AXIS_TVALID : STD_LOGIC;
   signal clk_wiz_0_clk_100 : STD_LOGIC;
+  signal clk_wiz_0_clk_200 : STD_LOGIC;
   signal proc_sys_reset_0_peripheral_aresetn : STD_LOGIC_VECTOR ( 0 to 0 );
   signal processing_system7_0_DDR_ADDR : STD_LOGIC_VECTOR ( 14 downto 0 );
   signal processing_system7_0_DDR_BA : STD_LOGIC_VECTOR ( 2 downto 0 );
@@ -1277,12 +1282,9 @@ architecture STRUCTURE of main_design is
   signal spw_si_4_0_1 : STD_LOGIC;
   signal util_reduced_logic_0_Res : STD_LOGIC;
   signal xlconcat_0_dout : STD_LOGIC_VECTOR ( 1 downto 0 );
-  signal xlconcat_1_dout : STD_LOGIC_VECTOR ( 5 downto 0 );
-  signal NLW_axi_mcdma_0_mm2s_ch1_introut_UNCONNECTED : STD_LOGIC;
+  signal xlconcat_1_dout : STD_LOGIC_VECTOR ( 7 downto 0 );
   signal NLW_axi_mcdma_0_mm2s_prmry_reset_out_n_UNCONNECTED : STD_LOGIC;
-  signal NLW_axi_mcdma_0_s2mm_ch1_introut_UNCONNECTED : STD_LOGIC;
   signal NLW_axi_mcdma_0_s2mm_prmry_reset_out_n_UNCONNECTED : STD_LOGIC;
-  signal NLW_clk_wiz_0_clk_200_UNCONNECTED : STD_LOGIC;
   signal NLW_clk_wiz_0_locked_UNCONNECTED : STD_LOGIC;
   signal NLW_proc_sys_reset_0_mb_reset_UNCONNECTED : STD_LOGIC;
   signal NLW_proc_sys_reset_0_bus_struct_reset_UNCONNECTED : STD_LOGIC_VECTOR ( 0 to 0 );
@@ -1369,7 +1371,7 @@ AXI_SpaceWire_IP_0: component main_design_AXI_SpaceWire_IP_0_1
       error_intr => AXI_SpaceWire_IP_0_error_intr,
       packet_intr => AXI_SpaceWire_IP_0_packet_intr,
       rst_logic => util_reduced_logic_0_Res,
-      rxclk => clk_wiz_0_clk_100,
+      rxclk => clk_wiz_0_clk_200,
       s00_axi_tx_aclk => processing_system7_0_FCLK_CLK0,
       s00_axi_tx_araddr(2 downto 0) => smartconnect_1_M04_AXI_ARADDR(2 downto 0),
       s00_axi_tx_arburst(1 downto 0) => smartconnect_1_M04_AXI_ARBURST(1 downto 0),
@@ -1628,9 +1630,9 @@ axi_mcdma_0: component main_design_axi_mcdma_0_1
       m_axis_mm2s_tready => axi_mcdma_0_M_AXIS_MM2S_TREADY,
       m_axis_mm2s_tuser(15 downto 0) => axi_mcdma_0_M_AXIS_MM2S_TUSER(15 downto 0),
       m_axis_mm2s_tvalid => axi_mcdma_0_M_AXIS_MM2S_TVALID,
-      mm2s_ch1_introut => NLW_axi_mcdma_0_mm2s_ch1_introut_UNCONNECTED,
+      mm2s_ch1_introut => axi_mcdma_0_mm2s_ch1_introut,
       mm2s_prmry_reset_out_n => NLW_axi_mcdma_0_mm2s_prmry_reset_out_n_UNCONNECTED,
-      s2mm_ch1_introut => NLW_axi_mcdma_0_s2mm_ch1_introut_UNCONNECTED,
+      s2mm_ch1_introut => axi_mcdma_0_s2mm_ch1_introut,
       s2mm_prmry_reset_out_n => NLW_axi_mcdma_0_s2mm_prmry_reset_out_n_UNCONNECTED,
       s_axi_aclk => processing_system7_0_FCLK_CLK0,
       s_axi_lite_aclk => processing_system7_0_FCLK_CLK0,
@@ -1683,7 +1685,7 @@ axis_data_fifo_0: component main_design_axis_data_fifo_0_1
 clk_wiz_0: component main_design_clk_wiz_0_1
      port map (
       clk_100 => clk_wiz_0_clk_100,
-      clk_200 => NLW_clk_wiz_0_clk_200_UNCONNECTED,
+      clk_200 => clk_wiz_0_clk_200,
       clk_in1_n => CLK_IN1_D_0_1_CLK_N,
       clk_in1_p => CLK_IN1_D_0_1_CLK_P,
       locked => NLW_clk_wiz_0_locked_UNCONNECTED,
@@ -1723,7 +1725,7 @@ processing_system7_0: component main_design_processing_system7_0_2
       DDR_WEB => DDR_we_n,
       FCLK_CLK0 => processing_system7_0_FCLK_CLK0,
       FCLK_RESET0_N => processing_system7_0_FCLK_RESET0_N,
-      IRQ_F2P(5 downto 0) => xlconcat_1_dout(5 downto 0),
+      IRQ_F2P(7 downto 0) => xlconcat_1_dout(7 downto 0),
       MIO(53 downto 0) => FIXED_IO_mio(53 downto 0),
       M_AXI_GP0_ACLK => processing_system7_0_FCLK_CLK0,
       M_AXI_GP0_ARADDR(31 downto 0) => processing_system7_0_M_AXI_GP0_ARADDR(31 downto 0),
@@ -1831,7 +1833,7 @@ router_implementation_0: component main_design_router_implementation_0_1
       rst => util_reduced_logic_0_Res,
       rsta => axi_bram_ctrl_0_bram_rst_a,
       rx => rx_0_1,
-      rxclk => clk_wiz_0_clk_100,
+      rxclk => clk_wiz_0_clk_200,
       spw_di_0 => AXI_SpaceWire_IP_0_spw_do,
       spw_di_1 => spw_di_1_0_1,
       spw_di_2 => spw_di_2_0_1,
@@ -2188,6 +2190,8 @@ xlconcat_1: component main_design_xlconcat_1_1
       In3(0) => AXI_SpaceWire_IP_0_error_intr,
       In4(0) => AXI_SpaceWire_IP_0_state_intr,
       In5(0) => AXI_SpaceWire_IP_0_packet_intr,
-      dout(5 downto 0) => xlconcat_1_dout(5 downto 0)
+      In6(0) => axi_mcdma_0_mm2s_ch1_introut,
+      In7(0) => axi_mcdma_0_s2mm_ch1_introut,
+      dout(7 downto 0) => xlconcat_1_dout(7 downto 0)
     );
 end STRUCTURE;

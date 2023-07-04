@@ -369,15 +369,6 @@
           "PCW_I2C0_PERIPHERAL_ENABLE": {
             "value": "0"
           },
-          "PCW_I2C0_RESET_ENABLE": {
-            "value": "1"
-          },
-          "PCW_I2C0_RESET_IO": {
-            "value": "MIO 46"
-          },
-          "PCW_I2C_PERIPHERAL_FREQMHZ": {
-            "value": "111.111115"
-          },
           "PCW_I2C_RESET_ENABLE": {
             "value": "1"
           },
@@ -1751,7 +1742,7 @@
         "inst_hier_path": "xlconcat_1",
         "parameters": {
           "NUM_PORTS": {
-            "value": "6"
+            "value": "8"
           }
         }
       },
@@ -1801,7 +1792,12 @@
         "vlnv": "uni-wuerzburg.informatikviii:user:AXI_SpaceWire_IP:1.0",
         "xci_name": "main_design_AXI_SpaceWire_IP_0_1",
         "xci_path": "ip/main_design_AXI_SpaceWire_IP_0_1/main_design_AXI_SpaceWire_IP_0_1.xci",
-        "inst_hier_path": "AXI_SpaceWire_IP_0"
+        "inst_hier_path": "AXI_SpaceWire_IP_0",
+        "parameters": {
+          "rxchunk": {
+            "value": "2"
+          }
+        }
       },
       "axi_bram_ctrl_0": {
         "vlnv": "xilinx.com:ip:axi_bram_ctrl:4.1",
@@ -1860,7 +1856,7 @@
             "direction": "I",
             "parameters": {
               "FREQ_HZ": {
-                "value": "100000000",
+                "value": "200000000",
                 "value_src": "ip_prop"
               },
               "PHASE": {
@@ -1869,7 +1865,7 @@
               },
               "CLK_DOMAIN": {
                 "value": "main_design_clk_wiz_0_1_clk_200",
-                "value_src": "ip_prop"
+                "value_src": "default_prop"
               }
             }
           },
@@ -2181,14 +2177,31 @@
           "AXI_SpaceWire_IP_0/tc_in"
         ]
       },
+      "axi_mcdma_0_mm2s_ch1_introut": {
+        "ports": [
+          "axi_mcdma_0/mm2s_ch1_introut",
+          "xlconcat_1/In6"
+        ]
+      },
+      "axi_mcdma_0_s2mm_ch1_introut": {
+        "ports": [
+          "axi_mcdma_0/s2mm_ch1_introut",
+          "xlconcat_1/In7"
+        ]
+      },
       "clk_wiz_0_clk_100": {
         "ports": [
           "clk_wiz_0/clk_100",
-          "AXI_SpaceWire_IP_0/clk_logic",
           "router_implementation_0/clk",
           "router_implementation_0/txclk",
+          "AXI_SpaceWire_IP_0/clk_logic",
+          "AXI_SpaceWire_IP_0/txclk"
+        ]
+      },
+      "clk_wiz_0_clk_200": {
+        "ports": [
+          "clk_wiz_0/clk_200",
           "router_implementation_0/rxclk",
-          "AXI_SpaceWire_IP_0/txclk",
           "AXI_SpaceWire_IP_0/rxclk"
         ]
       },

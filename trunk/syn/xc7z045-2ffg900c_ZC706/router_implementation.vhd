@@ -271,9 +271,10 @@ begin
         generic map (
             numports => 6,
             sysfreq => 100.0e6,
-            txclkfreq => 100.0e6,
+            txclkfreq => 0.0, -- changed to default value (100.0e6 before!) 
             rx_impl => (others => impl_fast),
-            tx_impl => (others => impl_fast)
+            rxchunk => 2,
+            tx_impl => (others => impl_generic) -- changed to impl_generic (impl_fast before!)
         )
         port map (
             clk => clk,
@@ -313,9 +314,9 @@ begin
             sysfreq => sysfreq,
             txclkfreq => sysfreq,
             rximpl => impl_fast,
-            rxchunk => 1,
+            rxchunk => 2,
             WIDTH => 2,
-            tximpl => impl_fast,
+            tximpl => impl_generic,
             rxfifosize_bits => 11,
             txfifosize_bits => 11
         )
