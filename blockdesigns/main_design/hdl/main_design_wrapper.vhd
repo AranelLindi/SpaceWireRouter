@@ -1,7 +1,7 @@
 --Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
---Date        : Tue Jul  4 10:07:47 2023
+--Date        : Wed Jul  5 13:10:52 2023
 --Host        : stl56jc-MS-7C95 running 64-bit Ubuntu 22.04.2 LTS
 --Command     : generate_target main_design_wrapper.bd
 --Design      : main_design_wrapper
@@ -13,6 +13,8 @@ library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
 entity main_design_wrapper is
   port (
+    CAN_0_rx : in STD_LOGIC;
+    CAN_0_tx : out STD_LOGIC;
     CLK_IN1_D_0_clk_n : in STD_LOGIC;
     CLK_IN1_D_0_clk_p : in STD_LOGIC;
     DDR_addr : inout STD_LOGIC_VECTOR ( 14 downto 0 );
@@ -36,6 +38,16 @@ entity main_design_wrapper is
     FIXED_IO_ps_clk : inout STD_LOGIC;
     FIXED_IO_ps_porb : inout STD_LOGIC;
     FIXED_IO_ps_srstb : inout STD_LOGIC;
+    IIC_0_scl_io : inout STD_LOGIC;
+    IIC_0_sda_io : inout STD_LOGIC;
+    SPI_0_io0_io : inout STD_LOGIC;
+    SPI_0_io1_io : inout STD_LOGIC;
+    SPI_0_sck_io : inout STD_LOGIC;
+    SPI_0_ss1_o : out STD_LOGIC;
+    SPI_0_ss2_o : out STD_LOGIC;
+    SPI_0_ss_io : inout STD_LOGIC;
+    UART_0_rxd : in STD_LOGIC;
+    UART_0_txd : out STD_LOGIC;
     reset : in STD_LOGIC;
     rst_logic : in STD_LOGIC;
     rx : in STD_LOGIC;
@@ -84,6 +96,8 @@ architecture STRUCTURE of main_design_wrapper is
     reset : in STD_LOGIC;
     CLK_IN1_D_0_clk_n : in STD_LOGIC;
     CLK_IN1_D_0_clk_p : in STD_LOGIC;
+    CAN_0_tx : out STD_LOGIC;
+    CAN_0_rx : in STD_LOGIC;
     DDR_cas_n : inout STD_LOGIC;
     DDR_cke : inout STD_LOGIC;
     DDR_ck_n : inout STD_LOGIC;
@@ -104,12 +118,104 @@ architecture STRUCTURE of main_design_wrapper is
     FIXED_IO_ddr_vrp : inout STD_LOGIC;
     FIXED_IO_ps_srstb : inout STD_LOGIC;
     FIXED_IO_ps_clk : inout STD_LOGIC;
-    FIXED_IO_ps_porb : inout STD_LOGIC
+    FIXED_IO_ps_porb : inout STD_LOGIC;
+    IIC_0_sda_i : in STD_LOGIC;
+    IIC_0_sda_o : out STD_LOGIC;
+    IIC_0_sda_t : out STD_LOGIC;
+    IIC_0_scl_i : in STD_LOGIC;
+    IIC_0_scl_o : out STD_LOGIC;
+    IIC_0_scl_t : out STD_LOGIC;
+    SPI_0_sck_i : in STD_LOGIC;
+    SPI_0_sck_o : out STD_LOGIC;
+    SPI_0_sck_t : out STD_LOGIC;
+    SPI_0_io0_i : in STD_LOGIC;
+    SPI_0_io0_o : out STD_LOGIC;
+    SPI_0_io0_t : out STD_LOGIC;
+    SPI_0_io1_i : in STD_LOGIC;
+    SPI_0_io1_o : out STD_LOGIC;
+    SPI_0_io1_t : out STD_LOGIC;
+    SPI_0_ss_i : in STD_LOGIC;
+    SPI_0_ss_o : out STD_LOGIC;
+    SPI_0_ss1_o : out STD_LOGIC;
+    SPI_0_ss2_o : out STD_LOGIC;
+    SPI_0_ss_t : out STD_LOGIC;
+    UART_0_txd : out STD_LOGIC;
+    UART_0_rxd : in STD_LOGIC
   );
   end component main_design;
+  component IOBUF is
+  port (
+    I : in STD_LOGIC;
+    O : out STD_LOGIC;
+    T : in STD_LOGIC;
+    IO : inout STD_LOGIC
+  );
+  end component IOBUF;
+  signal IIC_0_scl_i : STD_LOGIC;
+  signal IIC_0_scl_o : STD_LOGIC;
+  signal IIC_0_scl_t : STD_LOGIC;
+  signal IIC_0_sda_i : STD_LOGIC;
+  signal IIC_0_sda_o : STD_LOGIC;
+  signal IIC_0_sda_t : STD_LOGIC;
+  signal SPI_0_io0_i : STD_LOGIC;
+  signal SPI_0_io0_o : STD_LOGIC;
+  signal SPI_0_io0_t : STD_LOGIC;
+  signal SPI_0_io1_i : STD_LOGIC;
+  signal SPI_0_io1_o : STD_LOGIC;
+  signal SPI_0_io1_t : STD_LOGIC;
+  signal SPI_0_sck_i : STD_LOGIC;
+  signal SPI_0_sck_o : STD_LOGIC;
+  signal SPI_0_sck_t : STD_LOGIC;
+  signal SPI_0_ss_i : STD_LOGIC;
+  signal SPI_0_ss_o : STD_LOGIC;
+  signal SPI_0_ss_t : STD_LOGIC;
 begin
+IIC_0_scl_iobuf: component IOBUF
+     port map (
+      I => IIC_0_scl_o,
+      IO => IIC_0_scl_io,
+      O => IIC_0_scl_i,
+      T => IIC_0_scl_t
+    );
+IIC_0_sda_iobuf: component IOBUF
+     port map (
+      I => IIC_0_sda_o,
+      IO => IIC_0_sda_io,
+      O => IIC_0_sda_i,
+      T => IIC_0_sda_t
+    );
+SPI_0_io0_iobuf: component IOBUF
+     port map (
+      I => SPI_0_io0_o,
+      IO => SPI_0_io0_io,
+      O => SPI_0_io0_i,
+      T => SPI_0_io0_t
+    );
+SPI_0_io1_iobuf: component IOBUF
+     port map (
+      I => SPI_0_io1_o,
+      IO => SPI_0_io1_io,
+      O => SPI_0_io1_i,
+      T => SPI_0_io1_t
+    );
+SPI_0_sck_iobuf: component IOBUF
+     port map (
+      I => SPI_0_sck_o,
+      IO => SPI_0_sck_io,
+      O => SPI_0_sck_i,
+      T => SPI_0_sck_t
+    );
+SPI_0_ss_iobuf: component IOBUF
+     port map (
+      I => SPI_0_ss_o,
+      IO => SPI_0_ss_io,
+      O => SPI_0_ss_i,
+      T => SPI_0_ss_t
+    );
 main_design_i: component main_design
      port map (
+      CAN_0_rx => CAN_0_rx,
+      CAN_0_tx => CAN_0_tx,
       CLK_IN1_D_0_clk_n => CLK_IN1_D_0_clk_n,
       CLK_IN1_D_0_clk_p => CLK_IN1_D_0_clk_p,
       DDR_addr(14 downto 0) => DDR_addr(14 downto 0),
@@ -133,6 +239,28 @@ main_design_i: component main_design
       FIXED_IO_ps_clk => FIXED_IO_ps_clk,
       FIXED_IO_ps_porb => FIXED_IO_ps_porb,
       FIXED_IO_ps_srstb => FIXED_IO_ps_srstb,
+      IIC_0_scl_i => IIC_0_scl_i,
+      IIC_0_scl_o => IIC_0_scl_o,
+      IIC_0_scl_t => IIC_0_scl_t,
+      IIC_0_sda_i => IIC_0_sda_i,
+      IIC_0_sda_o => IIC_0_sda_o,
+      IIC_0_sda_t => IIC_0_sda_t,
+      SPI_0_io0_i => SPI_0_io0_i,
+      SPI_0_io0_o => SPI_0_io0_o,
+      SPI_0_io0_t => SPI_0_io0_t,
+      SPI_0_io1_i => SPI_0_io1_i,
+      SPI_0_io1_o => SPI_0_io1_o,
+      SPI_0_io1_t => SPI_0_io1_t,
+      SPI_0_sck_i => SPI_0_sck_i,
+      SPI_0_sck_o => SPI_0_sck_o,
+      SPI_0_sck_t => SPI_0_sck_t,
+      SPI_0_ss1_o => SPI_0_ss1_o,
+      SPI_0_ss2_o => SPI_0_ss2_o,
+      SPI_0_ss_i => SPI_0_ss_i,
+      SPI_0_ss_o => SPI_0_ss_o,
+      SPI_0_ss_t => SPI_0_ss_t,
+      UART_0_rxd => UART_0_rxd,
+      UART_0_txd => UART_0_txd,
       reset => reset,
       rst_logic => rst_logic,
       rx => rx,

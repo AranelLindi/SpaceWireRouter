@@ -1,7 +1,7 @@
 --Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
---Date        : Tue Jul  4 10:07:47 2023
+--Date        : Wed Jul  5 13:10:51 2023
 --Host        : stl56jc-MS-7C95 running 64-bit Ubuntu 22.04.2 LTS
 --Command     : generate_target main_design.bd
 --Design      : main_design
@@ -13,6 +13,8 @@ library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
 entity main_design is
   port (
+    CAN_0_rx : in STD_LOGIC;
+    CAN_0_tx : out STD_LOGIC;
     CLK_IN1_D_0_clk_n : in STD_LOGIC;
     CLK_IN1_D_0_clk_p : in STD_LOGIC;
     DDR_addr : inout STD_LOGIC_VECTOR ( 14 downto 0 );
@@ -36,6 +38,28 @@ entity main_design is
     FIXED_IO_ps_clk : inout STD_LOGIC;
     FIXED_IO_ps_porb : inout STD_LOGIC;
     FIXED_IO_ps_srstb : inout STD_LOGIC;
+    IIC_0_scl_i : in STD_LOGIC;
+    IIC_0_scl_o : out STD_LOGIC;
+    IIC_0_scl_t : out STD_LOGIC;
+    IIC_0_sda_i : in STD_LOGIC;
+    IIC_0_sda_o : out STD_LOGIC;
+    IIC_0_sda_t : out STD_LOGIC;
+    SPI_0_io0_i : in STD_LOGIC;
+    SPI_0_io0_o : out STD_LOGIC;
+    SPI_0_io0_t : out STD_LOGIC;
+    SPI_0_io1_i : in STD_LOGIC;
+    SPI_0_io1_o : out STD_LOGIC;
+    SPI_0_io1_t : out STD_LOGIC;
+    SPI_0_sck_i : in STD_LOGIC;
+    SPI_0_sck_o : out STD_LOGIC;
+    SPI_0_sck_t : out STD_LOGIC;
+    SPI_0_ss1_o : out STD_LOGIC;
+    SPI_0_ss2_o : out STD_LOGIC;
+    SPI_0_ss_i : in STD_LOGIC;
+    SPI_0_ss_o : out STD_LOGIC;
+    SPI_0_ss_t : out STD_LOGIC;
+    UART_0_rxd : in STD_LOGIC;
+    UART_0_txd : out STD_LOGIC;
     reset : in STD_LOGIC;
     rst_logic : in STD_LOGIC;
     rx : in STD_LOGIC;
@@ -66,6 +90,30 @@ end main_design;
 architecture STRUCTURE of main_design is
   component main_design_processing_system7_0_2 is
   port (
+    CAN0_PHY_TX : out STD_LOGIC;
+    CAN0_PHY_RX : in STD_LOGIC;
+    I2C0_SDA_I : in STD_LOGIC;
+    I2C0_SDA_O : out STD_LOGIC;
+    I2C0_SDA_T : out STD_LOGIC;
+    I2C0_SCL_I : in STD_LOGIC;
+    I2C0_SCL_O : out STD_LOGIC;
+    I2C0_SCL_T : out STD_LOGIC;
+    SPI0_SCLK_I : in STD_LOGIC;
+    SPI0_SCLK_O : out STD_LOGIC;
+    SPI0_SCLK_T : out STD_LOGIC;
+    SPI0_MOSI_I : in STD_LOGIC;
+    SPI0_MOSI_O : out STD_LOGIC;
+    SPI0_MOSI_T : out STD_LOGIC;
+    SPI0_MISO_I : in STD_LOGIC;
+    SPI0_MISO_O : out STD_LOGIC;
+    SPI0_MISO_T : out STD_LOGIC;
+    SPI0_SS_I : in STD_LOGIC;
+    SPI0_SS_O : out STD_LOGIC;
+    SPI0_SS1_O : out STD_LOGIC;
+    SPI0_SS2_O : out STD_LOGIC;
+    SPI0_SS_T : out STD_LOGIC;
+    UART0_TX : out STD_LOGIC;
+    UART0_RX : in STD_LOGIC;
     TTC0_WAVE0_OUT : out STD_LOGIC;
     TTC0_WAVE1_OUT : out STD_LOGIC;
     TTC0_WAVE2_OUT : out STD_LOGIC;
@@ -1005,6 +1053,8 @@ architecture STRUCTURE of main_design is
   signal clk_wiz_0_clk_100 : STD_LOGIC;
   signal clk_wiz_0_clk_200 : STD_LOGIC;
   signal proc_sys_reset_0_peripheral_aresetn : STD_LOGIC_VECTOR ( 0 to 0 );
+  signal processing_system7_0_CAN_0_RX : STD_LOGIC;
+  signal processing_system7_0_CAN_0_TX : STD_LOGIC;
   signal processing_system7_0_DDR_ADDR : STD_LOGIC_VECTOR ( 14 downto 0 );
   signal processing_system7_0_DDR_BA : STD_LOGIC_VECTOR ( 2 downto 0 );
   signal processing_system7_0_DDR_CAS_N : STD_LOGIC;
@@ -1028,6 +1078,12 @@ architecture STRUCTURE of main_design is
   signal processing_system7_0_FIXED_IO_PS_CLK : STD_LOGIC;
   signal processing_system7_0_FIXED_IO_PS_PORB : STD_LOGIC;
   signal processing_system7_0_FIXED_IO_PS_SRSTB : STD_LOGIC;
+  signal processing_system7_0_IIC_0_SCL_I : STD_LOGIC;
+  signal processing_system7_0_IIC_0_SCL_O : STD_LOGIC;
+  signal processing_system7_0_IIC_0_SCL_T : STD_LOGIC;
+  signal processing_system7_0_IIC_0_SDA_I : STD_LOGIC;
+  signal processing_system7_0_IIC_0_SDA_O : STD_LOGIC;
+  signal processing_system7_0_IIC_0_SDA_T : STD_LOGIC;
   signal processing_system7_0_M_AXI_GP0_ARADDR : STD_LOGIC_VECTOR ( 31 downto 0 );
   signal processing_system7_0_M_AXI_GP0_ARBURST : STD_LOGIC_VECTOR ( 1 downto 0 );
   signal processing_system7_0_M_AXI_GP0_ARCACHE : STD_LOGIC_VECTOR ( 3 downto 0 );
@@ -1066,6 +1122,22 @@ architecture STRUCTURE of main_design is
   signal processing_system7_0_M_AXI_GP0_WREADY : STD_LOGIC;
   signal processing_system7_0_M_AXI_GP0_WSTRB : STD_LOGIC_VECTOR ( 3 downto 0 );
   signal processing_system7_0_M_AXI_GP0_WVALID : STD_LOGIC;
+  signal processing_system7_0_SPI_0_IO0_I : STD_LOGIC;
+  signal processing_system7_0_SPI_0_IO0_O : STD_LOGIC;
+  signal processing_system7_0_SPI_0_IO0_T : STD_LOGIC;
+  signal processing_system7_0_SPI_0_IO1_I : STD_LOGIC;
+  signal processing_system7_0_SPI_0_IO1_O : STD_LOGIC;
+  signal processing_system7_0_SPI_0_IO1_T : STD_LOGIC;
+  signal processing_system7_0_SPI_0_SCK_I : STD_LOGIC;
+  signal processing_system7_0_SPI_0_SCK_O : STD_LOGIC;
+  signal processing_system7_0_SPI_0_SCK_T : STD_LOGIC;
+  signal processing_system7_0_SPI_0_SS1_O : STD_LOGIC;
+  signal processing_system7_0_SPI_0_SS2_O : STD_LOGIC;
+  signal processing_system7_0_SPI_0_SS_I : STD_LOGIC;
+  signal processing_system7_0_SPI_0_SS_O : STD_LOGIC;
+  signal processing_system7_0_SPI_0_SS_T : STD_LOGIC;
+  signal processing_system7_0_UART_0_RxD : STD_LOGIC;
+  signal processing_system7_0_UART_0_TxD : STD_LOGIC;
   signal reset_1 : STD_LOGIC;
   signal router_implementation_0_douta : STD_LOGIC_VECTOR ( 31 downto 0 );
   signal router_implementation_0_spw_do_0 : STD_LOGIC;
@@ -1311,6 +1383,8 @@ architecture STRUCTURE of main_design is
   signal NLW_smartconnect_0_M03_AXI_arprot_UNCONNECTED : STD_LOGIC_VECTOR ( 2 downto 0 );
   signal NLW_smartconnect_0_M03_AXI_awprot_UNCONNECTED : STD_LOGIC_VECTOR ( 2 downto 0 );
   attribute X_INTERFACE_INFO : string;
+  attribute X_INTERFACE_INFO of CAN_0_rx : signal is "xilinx.com:interface:can:1.0 CAN_0 RX";
+  attribute X_INTERFACE_INFO of CAN_0_tx : signal is "xilinx.com:interface:can:1.0 CAN_0 TX";
   attribute X_INTERFACE_INFO of CLK_IN1_D_0_clk_n : signal is "xilinx.com:interface:diff_clock:1.0 CLK_IN1_D_0 CLK_N";
   attribute X_INTERFACE_PARAMETER : string;
   attribute X_INTERFACE_PARAMETER of CLK_IN1_D_0_clk_n : signal is "XIL_INTERFACENAME CLK_IN1_D_0, CAN_DEBUG false, FREQ_HZ 100000000";
@@ -1330,6 +1404,28 @@ architecture STRUCTURE of main_design is
   attribute X_INTERFACE_INFO of FIXED_IO_ps_clk : signal is "xilinx.com:display_processing_system7:fixedio:1.0 FIXED_IO PS_CLK";
   attribute X_INTERFACE_INFO of FIXED_IO_ps_porb : signal is "xilinx.com:display_processing_system7:fixedio:1.0 FIXED_IO PS_PORB";
   attribute X_INTERFACE_INFO of FIXED_IO_ps_srstb : signal is "xilinx.com:display_processing_system7:fixedio:1.0 FIXED_IO PS_SRSTB";
+  attribute X_INTERFACE_INFO of IIC_0_scl_i : signal is "xilinx.com:interface:iic:1.0 IIC_0 SCL_I";
+  attribute X_INTERFACE_INFO of IIC_0_scl_o : signal is "xilinx.com:interface:iic:1.0 IIC_0 SCL_O";
+  attribute X_INTERFACE_INFO of IIC_0_scl_t : signal is "xilinx.com:interface:iic:1.0 IIC_0 SCL_T";
+  attribute X_INTERFACE_INFO of IIC_0_sda_i : signal is "xilinx.com:interface:iic:1.0 IIC_0 SDA_I";
+  attribute X_INTERFACE_INFO of IIC_0_sda_o : signal is "xilinx.com:interface:iic:1.0 IIC_0 SDA_O";
+  attribute X_INTERFACE_INFO of IIC_0_sda_t : signal is "xilinx.com:interface:iic:1.0 IIC_0 SDA_T";
+  attribute X_INTERFACE_INFO of SPI_0_io0_i : signal is "xilinx.com:interface:spi:1.0 SPI_0 IO0_I";
+  attribute X_INTERFACE_INFO of SPI_0_io0_o : signal is "xilinx.com:interface:spi:1.0 SPI_0 IO0_O";
+  attribute X_INTERFACE_INFO of SPI_0_io0_t : signal is "xilinx.com:interface:spi:1.0 SPI_0 IO0_T";
+  attribute X_INTERFACE_INFO of SPI_0_io1_i : signal is "xilinx.com:interface:spi:1.0 SPI_0 IO1_I";
+  attribute X_INTERFACE_INFO of SPI_0_io1_o : signal is "xilinx.com:interface:spi:1.0 SPI_0 IO1_O";
+  attribute X_INTERFACE_INFO of SPI_0_io1_t : signal is "xilinx.com:interface:spi:1.0 SPI_0 IO1_T";
+  attribute X_INTERFACE_INFO of SPI_0_sck_i : signal is "xilinx.com:interface:spi:1.0 SPI_0 SCK_I";
+  attribute X_INTERFACE_INFO of SPI_0_sck_o : signal is "xilinx.com:interface:spi:1.0 SPI_0 SCK_O";
+  attribute X_INTERFACE_INFO of SPI_0_sck_t : signal is "xilinx.com:interface:spi:1.0 SPI_0 SCK_T";
+  attribute X_INTERFACE_INFO of SPI_0_ss1_o : signal is "xilinx.com:interface:spi:1.0 SPI_0 SS1_O";
+  attribute X_INTERFACE_INFO of SPI_0_ss2_o : signal is "xilinx.com:interface:spi:1.0 SPI_0 SS2_O";
+  attribute X_INTERFACE_INFO of SPI_0_ss_i : signal is "xilinx.com:interface:spi:1.0 SPI_0 SS_I";
+  attribute X_INTERFACE_INFO of SPI_0_ss_o : signal is "xilinx.com:interface:spi:1.0 SPI_0 SS_O";
+  attribute X_INTERFACE_INFO of SPI_0_ss_t : signal is "xilinx.com:interface:spi:1.0 SPI_0 SS_T";
+  attribute X_INTERFACE_INFO of UART_0_rxd : signal is "xilinx.com:interface:uart:1.0 UART_0 RxD";
+  attribute X_INTERFACE_INFO of UART_0_txd : signal is "xilinx.com:interface:uart:1.0 UART_0 TxD";
   attribute X_INTERFACE_INFO of reset : signal is "xilinx.com:signal:reset:1.0 RST.RESET RST";
   attribute X_INTERFACE_PARAMETER of reset : signal is "XIL_INTERFACENAME RST.RESET, INSERT_VIP 0, POLARITY ACTIVE_HIGH";
   attribute X_INTERFACE_INFO of rst_logic : signal is "xilinx.com:signal:reset:1.0 RST.RST_LOGIC RST";
@@ -1343,8 +1439,32 @@ architecture STRUCTURE of main_design is
   attribute X_INTERFACE_INFO of DDR_dqs_p : signal is "xilinx.com:interface:ddrx:1.0 DDR DQS_P";
   attribute X_INTERFACE_INFO of FIXED_IO_mio : signal is "xilinx.com:display_processing_system7:fixedio:1.0 FIXED_IO MIO";
 begin
+  CAN_0_tx <= processing_system7_0_CAN_0_TX;
   CLK_IN1_D_0_1_CLK_N <= CLK_IN1_D_0_clk_n;
   CLK_IN1_D_0_1_CLK_P <= CLK_IN1_D_0_clk_p;
+  IIC_0_scl_o <= processing_system7_0_IIC_0_SCL_O;
+  IIC_0_scl_t <= processing_system7_0_IIC_0_SCL_T;
+  IIC_0_sda_o <= processing_system7_0_IIC_0_SDA_O;
+  IIC_0_sda_t <= processing_system7_0_IIC_0_SDA_T;
+  SPI_0_io0_o <= processing_system7_0_SPI_0_IO0_O;
+  SPI_0_io0_t <= processing_system7_0_SPI_0_IO0_T;
+  SPI_0_io1_o <= processing_system7_0_SPI_0_IO1_O;
+  SPI_0_io1_t <= processing_system7_0_SPI_0_IO1_T;
+  SPI_0_sck_o <= processing_system7_0_SPI_0_SCK_O;
+  SPI_0_sck_t <= processing_system7_0_SPI_0_SCK_T;
+  SPI_0_ss1_o <= processing_system7_0_SPI_0_SS1_O;
+  SPI_0_ss2_o <= processing_system7_0_SPI_0_SS2_O;
+  SPI_0_ss_o <= processing_system7_0_SPI_0_SS_O;
+  SPI_0_ss_t <= processing_system7_0_SPI_0_SS_T;
+  UART_0_txd <= processing_system7_0_UART_0_TxD;
+  processing_system7_0_CAN_0_RX <= CAN_0_rx;
+  processing_system7_0_IIC_0_SCL_I <= IIC_0_scl_i;
+  processing_system7_0_IIC_0_SDA_I <= IIC_0_sda_i;
+  processing_system7_0_SPI_0_IO0_I <= SPI_0_io0_i;
+  processing_system7_0_SPI_0_IO1_I <= SPI_0_io1_i;
+  processing_system7_0_SPI_0_SCK_I <= SPI_0_sck_i;
+  processing_system7_0_SPI_0_SS_I <= SPI_0_ss_i;
+  processing_system7_0_UART_0_RxD <= UART_0_rxd;
   reset_1 <= reset;
   rst_0_1 <= rst_logic;
   rx_0_1 <= rx;
@@ -1478,7 +1598,7 @@ AXI_SpaceWire_IP_0: component main_design_AXI_SpaceWire_IP_0_1
       state_intr => AXI_SpaceWire_IP_0_state_intr,
       tc_in => axi_gpio_1_gpio_io_o(0),
       tc_out_intr => AXI_SpaceWire_IP_0_tc_out_intr,
-      txclk => clk_wiz_0_clk_100
+      txclk => clk_wiz_0_clk_200
     );
 axi_bram_ctrl_0: component main_design_axi_bram_ctrl_0_1
      port map (
@@ -1706,6 +1826,8 @@ proc_sys_reset_0: component main_design_proc_sys_reset_0_1
     );
 processing_system7_0: component main_design_processing_system7_0_2
      port map (
+      CAN0_PHY_RX => processing_system7_0_CAN_0_RX,
+      CAN0_PHY_TX => processing_system7_0_CAN_0_TX,
       DDR_Addr(14 downto 0) => DDR_addr(14 downto 0),
       DDR_BankAddr(2 downto 0) => DDR_ba(2 downto 0),
       DDR_CAS_n => DDR_cas_n,
@@ -1725,6 +1847,12 @@ processing_system7_0: component main_design_processing_system7_0_2
       DDR_WEB => DDR_we_n,
       FCLK_CLK0 => processing_system7_0_FCLK_CLK0,
       FCLK_RESET0_N => processing_system7_0_FCLK_RESET0_N,
+      I2C0_SCL_I => processing_system7_0_IIC_0_SCL_I,
+      I2C0_SCL_O => processing_system7_0_IIC_0_SCL_O,
+      I2C0_SCL_T => processing_system7_0_IIC_0_SCL_T,
+      I2C0_SDA_I => processing_system7_0_IIC_0_SDA_I,
+      I2C0_SDA_O => processing_system7_0_IIC_0_SDA_O,
+      I2C0_SDA_T => processing_system7_0_IIC_0_SDA_T,
       IRQ_F2P(7 downto 0) => xlconcat_1_dout(7 downto 0),
       MIO(53 downto 0) => FIXED_IO_mio(53 downto 0),
       M_AXI_GP0_ACLK => processing_system7_0_FCLK_CLK0,
@@ -1769,6 +1897,20 @@ processing_system7_0: component main_design_processing_system7_0_2
       PS_CLK => FIXED_IO_ps_clk,
       PS_PORB => FIXED_IO_ps_porb,
       PS_SRSTB => FIXED_IO_ps_srstb,
+      SPI0_MISO_I => processing_system7_0_SPI_0_IO1_I,
+      SPI0_MISO_O => processing_system7_0_SPI_0_IO1_O,
+      SPI0_MISO_T => processing_system7_0_SPI_0_IO1_T,
+      SPI0_MOSI_I => processing_system7_0_SPI_0_IO0_I,
+      SPI0_MOSI_O => processing_system7_0_SPI_0_IO0_O,
+      SPI0_MOSI_T => processing_system7_0_SPI_0_IO0_T,
+      SPI0_SCLK_I => processing_system7_0_SPI_0_SCK_I,
+      SPI0_SCLK_O => processing_system7_0_SPI_0_SCK_O,
+      SPI0_SCLK_T => processing_system7_0_SPI_0_SCK_T,
+      SPI0_SS1_O => processing_system7_0_SPI_0_SS1_O,
+      SPI0_SS2_O => processing_system7_0_SPI_0_SS2_O,
+      SPI0_SS_I => processing_system7_0_SPI_0_SS_I,
+      SPI0_SS_O => processing_system7_0_SPI_0_SS_O,
+      SPI0_SS_T => processing_system7_0_SPI_0_SS_T,
       S_AXI_HP0_ACLK => processing_system7_0_FCLK_CLK0,
       S_AXI_HP0_ARADDR(31 downto 0) => smartconnect_1_M00_AXI_ARADDR(31 downto 0),
       S_AXI_HP0_ARBURST(1 downto 0) => smartconnect_1_M00_AXI_ARBURST(1 downto 0),
@@ -1817,6 +1959,8 @@ processing_system7_0: component main_design_processing_system7_0_2
       TTC0_WAVE0_OUT => NLW_processing_system7_0_TTC0_WAVE0_OUT_UNCONNECTED,
       TTC0_WAVE1_OUT => NLW_processing_system7_0_TTC0_WAVE1_OUT_UNCONNECTED,
       TTC0_WAVE2_OUT => NLW_processing_system7_0_TTC0_WAVE2_OUT_UNCONNECTED,
+      UART0_RX => processing_system7_0_UART_0_RxD,
+      UART0_TX => processing_system7_0_UART_0_TxD,
       USB0_PORT_INDCTL(1 downto 0) => NLW_processing_system7_0_USB0_PORT_INDCTL_UNCONNECTED(1 downto 0),
       USB0_VBUS_PWRFAULT => '0',
       USB0_VBUS_PWRSELECT => NLW_processing_system7_0_USB0_VBUS_PWRSELECT_UNCONNECTED
@@ -1855,7 +1999,7 @@ router_implementation_0: component main_design_router_implementation_0_1
       spw_so_3 => router_implementation_0_spw_so_3,
       spw_so_4 => router_implementation_0_spw_so_4,
       tx => router_implementation_0_tx,
-      txclk => clk_wiz_0_clk_100,
+      txclk => clk_wiz_0_clk_200,
       wea(3 downto 0) => axi_bram_ctrl_0_bram_we_a(3 downto 0)
     );
 smartconnect_0: component main_design_smartconnect_1_0

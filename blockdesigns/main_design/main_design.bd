@@ -1,7 +1,7 @@
 {
   "design": {
     "design_info": {
-      "boundary_crc": "0xB8351D2C43045D23",
+      "boundary_crc": "0x7F55949797403626",
       "device": "xc7z045ffg900-2",
       "name": "main_design",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
@@ -106,6 +106,26 @@
             "value_src": "default"
           }
         }
+      },
+      "IIC_0": {
+        "mode": "Master",
+        "vlnv_bus_definition": "xilinx.com:interface:iic:1.0",
+        "vlnv": "xilinx.com:interface:iic_rtl:1.0"
+      },
+      "UART_0": {
+        "mode": "Master",
+        "vlnv_bus_definition": "xilinx.com:interface:uart:1.0",
+        "vlnv": "xilinx.com:interface:uart_rtl:1.0"
+      },
+      "SPI_0": {
+        "mode": "Master",
+        "vlnv_bus_definition": "xilinx.com:interface:spi:1.0",
+        "vlnv": "xilinx.com:interface:spi_rtl:1.0"
+      },
+      "CAN_0": {
+        "mode": "Master",
+        "vlnv_bus_definition": "xilinx.com:interface:can:1.0",
+        "vlnv": "xilinx.com:interface:can_rtl:1.0"
       }
     },
     "ports": {
@@ -202,7 +222,7 @@
             "value": "666.666687"
           },
           "PCW_ACT_CAN_PERIPHERAL_FREQMHZ": {
-            "value": "10.000000"
+            "value": "100.000000"
           },
           "PCW_ACT_DCI_PERIPHERAL_FREQMHZ": {
             "value": "10.158730"
@@ -238,7 +258,7 @@
             "value": "10.000000"
           },
           "PCW_ACT_SPI_PERIPHERAL_FREQMHZ": {
-            "value": "10.000000"
+            "value": "166.666672"
           },
           "PCW_ACT_TPIU_PERIPHERAL_FREQMHZ": {
             "value": "200.000000"
@@ -270,8 +290,20 @@
           "PCW_APU_PERIPHERAL_FREQMHZ": {
             "value": "667.000000"
           },
-          "PCW_CAN0_PERIPHERAL_ENABLE": {
+          "PCW_CAN0_CAN0_IO": {
+            "value": "EMIO"
+          },
+          "PCW_CAN0_GRP_CLK_ENABLE": {
             "value": "0"
+          },
+          "PCW_CAN0_PERIPHERAL_ENABLE": {
+            "value": "1"
+          },
+          "PCW_CAN_PERIPHERAL_FREQMHZ": {
+            "value": "100"
+          },
+          "PCW_CAN_PERIPHERAL_VALID": {
+            "value": "1"
           },
           "PCW_CLK0_FREQ": {
             "value": "50000000"
@@ -318,14 +350,26 @@
           "PCW_ENET_RESET_SELECT": {
             "value": "Share reset pin"
           },
+          "PCW_EN_CAN0": {
+            "value": "1"
+          },
+          "PCW_EN_EMIO_CAN0": {
+            "value": "1"
+          },
+          "PCW_EN_EMIO_I2C0": {
+            "value": "1"
+          },
           "PCW_EN_EMIO_MODEM_UART1": {
             "value": "0"
+          },
+          "PCW_EN_EMIO_SPI0": {
+            "value": "1"
           },
           "PCW_EN_EMIO_TTC0": {
             "value": "1"
           },
           "PCW_EN_EMIO_UART0": {
-            "value": "0"
+            "value": "1"
           },
           "PCW_EN_ENET0": {
             "value": "1"
@@ -334,7 +378,7 @@
             "value": "1"
           },
           "PCW_EN_I2C0": {
-            "value": "0"
+            "value": "1"
           },
           "PCW_EN_MODEM_UART1": {
             "value": "0"
@@ -345,11 +389,14 @@
           "PCW_EN_SDIO0": {
             "value": "1"
           },
+          "PCW_EN_SPI0": {
+            "value": "1"
+          },
           "PCW_EN_TTC0": {
             "value": "1"
           },
           "PCW_EN_UART0": {
-            "value": "0"
+            "value": "1"
           },
           "PCW_EN_UART1": {
             "value": "1"
@@ -366,11 +413,26 @@
           "PCW_GPIO_MIO_GPIO_IO": {
             "value": "MIO"
           },
+          "PCW_I2C0_I2C0_IO": {
+            "value": "EMIO"
+          },
           "PCW_I2C0_PERIPHERAL_ENABLE": {
-            "value": "0"
+            "value": "1"
+          },
+          "PCW_I2C0_RESET_ENABLE": {
+            "value": "1"
+          },
+          "PCW_I2C0_RESET_IO": {
+            "value": "MIO 46"
+          },
+          "PCW_I2C_PERIPHERAL_FREQMHZ": {
+            "value": "111.111115"
           },
           "PCW_I2C_RESET_ENABLE": {
             "value": "1"
+          },
+          "PCW_I2C_RESET_SELECT": {
+            "value": "Share reset pin"
           },
           "PCW_IRQ_F2P_INTR": {
             "value": "1"
@@ -841,10 +903,10 @@
             "value": "slow"
           },
           "PCW_MIO_TREE_PERIPHERALS": {
-            "value": "Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#USB Reset#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#SD 0#SD 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#SD 0#SD 0#SD 0#SD 0#SD 0#SD 0#GPIO#ENET Reset#UART 1#UART 1#GPIO#GPIO#Enet 0#Enet 0"
+            "value": "Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#USB Reset#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#SD 0#SD 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#SD 0#SD 0#SD 0#SD 0#SD 0#SD 0#I2C Reset#ENET Reset#UART 1#UART 1#GPIO#GPIO#Enet 0#Enet 0"
           },
           "PCW_MIO_TREE_SIGNALS": {
-            "value": "qspi1_ss_b#qspi0_ss_b#qspi0_io[0]#qspi0_io[1]#qspi0_io[2]#qspi0_io[3]/HOLD_B#qspi0_sclk#reset#qspi_fbclk#qspi1_sclk#qspi1_io[0]#qspi1_io[1]#qspi1_io[2]#qspi1_io[3]#cd#wp#tx_clk#txd[0]#txd[1]#txd[2]#txd[3]#tx_ctl#rx_clk#rxd[0]#rxd[1]#rxd[2]#rxd[3]#rx_ctl#data[4]#dir#stp#nxt#data[0]#data[1]#data[2]#data[3]#clk#data[5]#data[6]#data[7]#clk#cmd#data[0]#data[1]#data[2]#data[3]#gpio[46]#reset#tx#rx#gpio[50]#gpio[51]#mdc#mdio"
+            "value": "qspi1_ss_b#qspi0_ss_b#qspi0_io[0]#qspi0_io[1]#qspi0_io[2]#qspi0_io[3]/HOLD_B#qspi0_sclk#reset#qspi_fbclk#qspi1_sclk#qspi1_io[0]#qspi1_io[1]#qspi1_io[2]#qspi1_io[3]#cd#wp#tx_clk#txd[0]#txd[1]#txd[2]#txd[3]#tx_ctl#rx_clk#rxd[0]#rxd[1]#rxd[2]#rxd[3]#rx_ctl#data[4]#dir#stp#nxt#data[0]#data[1]#data[2]#data[3]#clk#data[5]#data[6]#data[7]#clk#cmd#data[0]#data[1]#data[2]#data[3]#reset#reset#tx#rx#gpio[50]#gpio[51]#mdc#mdio"
           },
           "PCW_PJTAG_PERIPHERAL_ENABLE": {
             "value": "0"
@@ -912,6 +974,18 @@
           "PCW_SDIO_PERIPHERAL_VALID": {
             "value": "1"
           },
+          "PCW_SPI0_PERIPHERAL_ENABLE": {
+            "value": "1"
+          },
+          "PCW_SPI0_SPI0_IO": {
+            "value": "EMIO"
+          },
+          "PCW_SPI_PERIPHERAL_FREQMHZ": {
+            "value": "166.666666"
+          },
+          "PCW_SPI_PERIPHERAL_VALID": {
+            "value": "1"
+          },
           "PCW_S_AXI_HP0_DATA_WIDTH": {
             "value": "32"
           },
@@ -924,8 +998,14 @@
           "PCW_TTC_PERIPHERAL_FREQMHZ": {
             "value": "50"
           },
-          "PCW_UART0_PERIPHERAL_ENABLE": {
+          "PCW_UART0_GRP_FULL_ENABLE": {
             "value": "0"
+          },
+          "PCW_UART0_PERIPHERAL_ENABLE": {
+            "value": "1"
+          },
+          "PCW_UART0_UART0_IO": {
+            "value": "EMIO"
           },
           "PCW_UART1_GRP_FULL_ENABLE": {
             "value": "0"
@@ -1873,7 +1953,7 @@
             "direction": "I",
             "parameters": {
               "FREQ_HZ": {
-                "value": "100000000",
+                "value": "200000000",
                 "value_src": "ip_prop"
               },
               "PHASE": {
@@ -1882,7 +1962,7 @@
               },
               "CLK_DOMAIN": {
                 "value": "main_design_clk_wiz_0_1_clk_200",
-                "value_src": "ip_prop"
+                "value_src": "default_prop"
               }
             }
           },
@@ -2025,6 +2105,12 @@
           "axi_mcdma_0/S_AXIS_S2MM"
         ]
       },
+      "processing_system7_0_CAN_0": {
+        "interface_ports": [
+          "CAN_0",
+          "processing_system7_0/CAN_0"
+        ]
+      },
       "processing_system7_0_DDR": {
         "interface_ports": [
           "DDR",
@@ -2037,10 +2123,28 @@
           "processing_system7_0/FIXED_IO"
         ]
       },
+      "processing_system7_0_IIC_0": {
+        "interface_ports": [
+          "IIC_0",
+          "processing_system7_0/IIC_0"
+        ]
+      },
       "processing_system7_0_M_AXI_GP0": {
         "interface_ports": [
           "processing_system7_0/M_AXI_GP0",
           "smartconnect_0/S00_AXI"
+        ]
+      },
+      "processing_system7_0_SPI_0": {
+        "interface_ports": [
+          "SPI_0",
+          "processing_system7_0/SPI_0"
+        ]
+      },
+      "processing_system7_0_UART_0": {
+        "interface_ports": [
+          "UART_0",
+          "processing_system7_0/UART_0"
         ]
       },
       "smartconnect_1_M00_AXI": {
@@ -2192,17 +2296,17 @@
       "clk_wiz_0_clk_100": {
         "ports": [
           "clk_wiz_0/clk_100",
-          "router_implementation_0/clk",
-          "router_implementation_0/txclk",
           "AXI_SpaceWire_IP_0/clk_logic",
-          "AXI_SpaceWire_IP_0/txclk"
+          "router_implementation_0/clk"
         ]
       },
       "clk_wiz_0_clk_200": {
         "ports": [
           "clk_wiz_0/clk_200",
+          "AXI_SpaceWire_IP_0/rxclk",
+          "AXI_SpaceWire_IP_0/txclk",
           "router_implementation_0/rxclk",
-          "AXI_SpaceWire_IP_0/rxclk"
+          "router_implementation_0/txclk"
         ]
       },
       "proc_sys_reset_0_peripheral_aresetn": {
