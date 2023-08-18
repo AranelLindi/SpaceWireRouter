@@ -1,8 +1,8 @@
 --Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
---Date        : Wed Jul  5 13:10:51 2023
---Host        : stl56jc-MS-7C95 running 64-bit Ubuntu 22.04.2 LTS
+--Date        : Fri Aug 18 15:28:46 2023
+--Host        : stl56jc-MS-7C95 running 64-bit Ubuntu 22.04.3 LTS
 --Command     : generate_target main_design.bd
 --Design      : main_design
 --Purpose     : IP block netlist
@@ -204,7 +204,7 @@ architecture STRUCTURE of main_design is
     S_AXI_HP0_WID : in STD_LOGIC_VECTOR ( 5 downto 0 );
     S_AXI_HP0_WDATA : in STD_LOGIC_VECTOR ( 31 downto 0 );
     S_AXI_HP0_WSTRB : in STD_LOGIC_VECTOR ( 3 downto 0 );
-    IRQ_F2P : in STD_LOGIC_VECTOR ( 7 downto 0 );
+    IRQ_F2P : in STD_LOGIC_VECTOR ( 5 downto 0 );
     FCLK_CLK0 : out STD_LOGIC;
     FCLK_RESET0_N : out STD_LOGIC;
     MIO : inout STD_LOGIC_VECTOR ( 53 downto 0 );
@@ -688,9 +688,7 @@ architecture STRUCTURE of main_design is
     In3 : in STD_LOGIC_VECTOR ( 0 to 0 );
     In4 : in STD_LOGIC_VECTOR ( 0 to 0 );
     In5 : in STD_LOGIC_VECTOR ( 0 to 0 );
-    In6 : in STD_LOGIC_VECTOR ( 0 to 0 );
-    In7 : in STD_LOGIC_VECTOR ( 0 to 0 );
-    dout : out STD_LOGIC_VECTOR ( 7 downto 0 )
+    dout : out STD_LOGIC_VECTOR ( 5 downto 0 )
   );
   end component main_design_xlconcat_1_1;
   component main_design_util_reduced_logic_0_1 is
@@ -747,6 +745,97 @@ architecture STRUCTURE of main_design is
     gpio_io_o : out STD_LOGIC_VECTOR ( 0 to 0 )
   );
   end component main_design_axi_gpio_1_1;
+  component main_design_axi_bram_ctrl_0_1 is
+  port (
+    s_axi_aclk : in STD_LOGIC;
+    s_axi_aresetn : in STD_LOGIC;
+    s_axi_awaddr : in STD_LOGIC_VECTOR ( 12 downto 0 );
+    s_axi_awprot : in STD_LOGIC_VECTOR ( 2 downto 0 );
+    s_axi_awvalid : in STD_LOGIC;
+    s_axi_awready : out STD_LOGIC;
+    s_axi_wdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    s_axi_wstrb : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    s_axi_wvalid : in STD_LOGIC;
+    s_axi_wready : out STD_LOGIC;
+    s_axi_bresp : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    s_axi_bvalid : out STD_LOGIC;
+    s_axi_bready : in STD_LOGIC;
+    s_axi_araddr : in STD_LOGIC_VECTOR ( 12 downto 0 );
+    s_axi_arprot : in STD_LOGIC_VECTOR ( 2 downto 0 );
+    s_axi_arvalid : in STD_LOGIC;
+    s_axi_arready : out STD_LOGIC;
+    s_axi_rdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    s_axi_rresp : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    s_axi_rvalid : out STD_LOGIC;
+    s_axi_rready : in STD_LOGIC;
+    bram_rst_a : out STD_LOGIC;
+    bram_clk_a : out STD_LOGIC;
+    bram_en_a : out STD_LOGIC;
+    bram_we_a : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    bram_addr_a : out STD_LOGIC_VECTOR ( 12 downto 0 );
+    bram_wrdata_a : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    bram_rddata_a : in STD_LOGIC_VECTOR ( 31 downto 0 )
+  );
+  end component main_design_axi_bram_ctrl_0_1;
+  component main_design_axis_data_fifo_0_1 is
+  port (
+    s_axis_aresetn : in STD_LOGIC;
+    s_axis_aclk : in STD_LOGIC;
+    s_axis_tvalid : in STD_LOGIC;
+    s_axis_tready : out STD_LOGIC;
+    s_axis_tdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    s_axis_tkeep : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    s_axis_tlast : in STD_LOGIC;
+    s_axis_tid : in STD_LOGIC_VECTOR ( 7 downto 0 );
+    s_axis_tdest : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    s_axis_tuser : in STD_LOGIC_VECTOR ( 15 downto 0 );
+    m_axis_tvalid : out STD_LOGIC;
+    m_axis_tready : in STD_LOGIC;
+    m_axis_tdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    m_axis_tkeep : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    m_axis_tlast : out STD_LOGIC;
+    m_axis_tid : out STD_LOGIC_VECTOR ( 7 downto 0 );
+    m_axis_tdest : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    m_axis_tuser : out STD_LOGIC_VECTOR ( 15 downto 0 )
+  );
+  end component main_design_axis_data_fifo_0_1;
+  component main_design_router_implementation_0_1 is
+  port (
+    clk : in STD_LOGIC;
+    rxclk : in STD_LOGIC;
+    txclk : in STD_LOGIC;
+    rst : in STD_LOGIC;
+    rx : in STD_LOGIC;
+    tx : out STD_LOGIC;
+    spw_di_0 : in STD_LOGIC;
+    spw_si_0 : in STD_LOGIC;
+    spw_do_0 : out STD_LOGIC;
+    spw_so_0 : out STD_LOGIC;
+    spw_di_1 : in STD_LOGIC;
+    spw_si_1 : in STD_LOGIC;
+    spw_do_1 : out STD_LOGIC;
+    spw_so_1 : out STD_LOGIC;
+    spw_di_2 : in STD_LOGIC;
+    spw_si_2 : in STD_LOGIC;
+    spw_do_2 : out STD_LOGIC;
+    spw_so_2 : out STD_LOGIC;
+    spw_di_3 : in STD_LOGIC;
+    spw_si_3 : in STD_LOGIC;
+    spw_do_3 : out STD_LOGIC;
+    spw_so_3 : out STD_LOGIC;
+    spw_di_4 : in STD_LOGIC;
+    spw_si_4 : in STD_LOGIC;
+    spw_do_4 : out STD_LOGIC;
+    spw_so_4 : out STD_LOGIC;
+    clka : in STD_LOGIC;
+    addra : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    dina : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    douta : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    ena : in STD_LOGIC;
+    rsta : in STD_LOGIC;
+    wea : in STD_LOGIC_VECTOR ( 3 downto 0 )
+  );
+  end component main_design_router_implementation_0_1;
   component main_design_AXI_SpaceWire_IP_0_1 is
   port (
     clk_logic : in STD_LOGIC;
@@ -863,97 +952,6 @@ architecture STRUCTURE of main_design is
     s02_axi_reg_rready : in STD_LOGIC
   );
   end component main_design_AXI_SpaceWire_IP_0_1;
-  component main_design_axi_bram_ctrl_0_1 is
-  port (
-    s_axi_aclk : in STD_LOGIC;
-    s_axi_aresetn : in STD_LOGIC;
-    s_axi_awaddr : in STD_LOGIC_VECTOR ( 12 downto 0 );
-    s_axi_awprot : in STD_LOGIC_VECTOR ( 2 downto 0 );
-    s_axi_awvalid : in STD_LOGIC;
-    s_axi_awready : out STD_LOGIC;
-    s_axi_wdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-    s_axi_wstrb : in STD_LOGIC_VECTOR ( 3 downto 0 );
-    s_axi_wvalid : in STD_LOGIC;
-    s_axi_wready : out STD_LOGIC;
-    s_axi_bresp : out STD_LOGIC_VECTOR ( 1 downto 0 );
-    s_axi_bvalid : out STD_LOGIC;
-    s_axi_bready : in STD_LOGIC;
-    s_axi_araddr : in STD_LOGIC_VECTOR ( 12 downto 0 );
-    s_axi_arprot : in STD_LOGIC_VECTOR ( 2 downto 0 );
-    s_axi_arvalid : in STD_LOGIC;
-    s_axi_arready : out STD_LOGIC;
-    s_axi_rdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-    s_axi_rresp : out STD_LOGIC_VECTOR ( 1 downto 0 );
-    s_axi_rvalid : out STD_LOGIC;
-    s_axi_rready : in STD_LOGIC;
-    bram_rst_a : out STD_LOGIC;
-    bram_clk_a : out STD_LOGIC;
-    bram_en_a : out STD_LOGIC;
-    bram_we_a : out STD_LOGIC_VECTOR ( 3 downto 0 );
-    bram_addr_a : out STD_LOGIC_VECTOR ( 12 downto 0 );
-    bram_wrdata_a : out STD_LOGIC_VECTOR ( 31 downto 0 );
-    bram_rddata_a : in STD_LOGIC_VECTOR ( 31 downto 0 )
-  );
-  end component main_design_axi_bram_ctrl_0_1;
-  component main_design_axis_data_fifo_0_1 is
-  port (
-    s_axis_aresetn : in STD_LOGIC;
-    s_axis_aclk : in STD_LOGIC;
-    s_axis_tvalid : in STD_LOGIC;
-    s_axis_tready : out STD_LOGIC;
-    s_axis_tdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-    s_axis_tkeep : in STD_LOGIC_VECTOR ( 3 downto 0 );
-    s_axis_tlast : in STD_LOGIC;
-    s_axis_tid : in STD_LOGIC_VECTOR ( 7 downto 0 );
-    s_axis_tdest : in STD_LOGIC_VECTOR ( 3 downto 0 );
-    s_axis_tuser : in STD_LOGIC_VECTOR ( 15 downto 0 );
-    m_axis_tvalid : out STD_LOGIC;
-    m_axis_tready : in STD_LOGIC;
-    m_axis_tdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-    m_axis_tkeep : out STD_LOGIC_VECTOR ( 3 downto 0 );
-    m_axis_tlast : out STD_LOGIC;
-    m_axis_tid : out STD_LOGIC_VECTOR ( 7 downto 0 );
-    m_axis_tdest : out STD_LOGIC_VECTOR ( 3 downto 0 );
-    m_axis_tuser : out STD_LOGIC_VECTOR ( 15 downto 0 )
-  );
-  end component main_design_axis_data_fifo_0_1;
-  component main_design_router_implementation_0_1 is
-  port (
-    clk : in STD_LOGIC;
-    rxclk : in STD_LOGIC;
-    txclk : in STD_LOGIC;
-    rst : in STD_LOGIC;
-    rx : in STD_LOGIC;
-    tx : out STD_LOGIC;
-    spw_di_0 : in STD_LOGIC;
-    spw_si_0 : in STD_LOGIC;
-    spw_do_0 : out STD_LOGIC;
-    spw_so_0 : out STD_LOGIC;
-    spw_di_1 : in STD_LOGIC;
-    spw_si_1 : in STD_LOGIC;
-    spw_do_1 : out STD_LOGIC;
-    spw_so_1 : out STD_LOGIC;
-    spw_di_2 : in STD_LOGIC;
-    spw_si_2 : in STD_LOGIC;
-    spw_do_2 : out STD_LOGIC;
-    spw_so_2 : out STD_LOGIC;
-    spw_di_3 : in STD_LOGIC;
-    spw_si_3 : in STD_LOGIC;
-    spw_do_3 : out STD_LOGIC;
-    spw_so_3 : out STD_LOGIC;
-    spw_di_4 : in STD_LOGIC;
-    spw_si_4 : in STD_LOGIC;
-    spw_do_4 : out STD_LOGIC;
-    spw_so_4 : out STD_LOGIC;
-    clka : in STD_LOGIC;
-    addra : in STD_LOGIC_VECTOR ( 31 downto 0 );
-    dina : in STD_LOGIC_VECTOR ( 31 downto 0 );
-    douta : out STD_LOGIC_VECTOR ( 31 downto 0 );
-    ena : in STD_LOGIC;
-    rsta : in STD_LOGIC;
-    wea : in STD_LOGIC_VECTOR ( 3 downto 0 )
-  );
-  end component main_design_router_implementation_0_1;
   signal AXI_SpaceWire_IP_0_error_intr : STD_LOGIC;
   signal AXI_SpaceWire_IP_0_packet_intr : STD_LOGIC;
   signal AXI_SpaceWire_IP_0_spw_do : STD_LOGIC;
@@ -1354,7 +1352,7 @@ architecture STRUCTURE of main_design is
   signal spw_si_4_0_1 : STD_LOGIC;
   signal util_reduced_logic_0_Res : STD_LOGIC;
   signal xlconcat_0_dout : STD_LOGIC_VECTOR ( 1 downto 0 );
-  signal xlconcat_1_dout : STD_LOGIC_VECTOR ( 7 downto 0 );
+  signal xlconcat_1_dout : STD_LOGIC_VECTOR ( 5 downto 0 );
   signal NLW_axi_mcdma_0_mm2s_prmry_reset_out_n_UNCONNECTED : STD_LOGIC;
   signal NLW_axi_mcdma_0_s2mm_prmry_reset_out_n_UNCONNECTED : STD_LOGIC;
   signal NLW_clk_wiz_0_locked_UNCONNECTED : STD_LOGIC;
@@ -1853,7 +1851,7 @@ processing_system7_0: component main_design_processing_system7_0_2
       I2C0_SDA_I => processing_system7_0_IIC_0_SDA_I,
       I2C0_SDA_O => processing_system7_0_IIC_0_SDA_O,
       I2C0_SDA_T => processing_system7_0_IIC_0_SDA_T,
-      IRQ_F2P(7 downto 0) => xlconcat_1_dout(7 downto 0),
+      IRQ_F2P(5 downto 0) => xlconcat_1_dout(5 downto 0),
       MIO(53 downto 0) => FIXED_IO_mio(53 downto 0),
       M_AXI_GP0_ACLK => processing_system7_0_FCLK_CLK0,
       M_AXI_GP0_ARADDR(31 downto 0) => processing_system7_0_M_AXI_GP0_ARADDR(31 downto 0),
@@ -2328,14 +2326,12 @@ xlconcat_0: component main_design_xlconcat_0_1
     );
 xlconcat_1: component main_design_xlconcat_1_1
      port map (
-      In0(0) => '0',
-      In1(0) => '0',
+      In0(0) => axi_mcdma_0_mm2s_ch1_introut,
+      In1(0) => axi_mcdma_0_s2mm_ch1_introut,
       In2(0) => AXI_SpaceWire_IP_0_tc_out_intr,
       In3(0) => AXI_SpaceWire_IP_0_error_intr,
       In4(0) => AXI_SpaceWire_IP_0_state_intr,
       In5(0) => AXI_SpaceWire_IP_0_packet_intr,
-      In6(0) => axi_mcdma_0_mm2s_ch1_introut,
-      In7(0) => axi_mcdma_0_s2mm_ch1_introut,
-      dout(7 downto 0) => xlconcat_1_dout(7 downto 0)
+      dout(5 downto 0) => xlconcat_1_dout(5 downto 0)
     );
 end STRUCTURE;
