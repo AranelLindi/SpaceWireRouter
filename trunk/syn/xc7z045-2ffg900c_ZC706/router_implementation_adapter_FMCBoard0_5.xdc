@@ -167,36 +167,36 @@ set_property IOSTANDARD LVCMOS25 [get_ports spw_so_4]
 
 # GPIO Pins on FMC-SpaceWire board
 # UART_0
-set_property PACKAGE_PIN AB24 [get_ports UART_0_rxd]
+set_property PACKAGE_PIN AE17 [get_ports UART_0_rxd]
 set_property IOSTANDARD LVCMOS33 [get_ports UART_0_rxd]
-set_property PACKAGE_PIN AE23 [get_ports UART_0_txd]
+set_property PACKAGE_PIN AK16 [get_ports UART_0_txd]
 set_property IOSTANDARD LVCMOS33 [get_ports UART_0_txd]
 set_property SLEW SLOW [get_ports UART_0_txd]
 
 # I2C_0
-set_property PACKAGE_PIN AJ24 [get_ports IIC_0_scl_io]
+set_property PACKAGE_PIN AA14 [get_ports IIC_0_scl_io]
 set_property IOSTANDARD LVCMOS33 [get_ports IIC_0_scl_io]
-set_property PACKAGE_PIN AF24 [get_ports IIC_0_sda_io]
+set_property PACKAGE_PIN AD15 [get_ports IIC_0_sda_io]
 set_property IOSTANDARD LVCMOS33 [get_ports IIC_0_sda_io]
 set_property PULLUP true [get_ports IIC_0_scl_io]
 set_property PULLUP true [get_ports IIC_0_sda_io]
 
 # CAN_0
-set_property PACKAGE_PIN AD24 [get_ports CAN_0_rx]
+set_property PACKAGE_PIN AF17 [get_ports CAN_0_rx]
 set_property IOSTANDARD LVCMOS33 [get_ports CAN_0_rx]
-set_property PACKAGE_PIN AK20 [get_ports CAN_0_tx]
+set_property PACKAGE_PIN AK15 [get_ports CAN_0_tx]
 set_property IOSTANDARD LVCMOS33 [get_ports CAN_0_tx]
 
 # SPI_0
-set_property PACKAGE_PIN AE21 [get_ports SPI_0_io0_io]
+set_property PACKAGE_PIN AH13 [get_ports SPI_0_io0_io]
 set_property IOSTANDARD LVCMOS33 [get_ports SPI_0_io0_io]
-set_property PACKAGE_PIN AG19 [get_ports SPI_0_io1_io]
+set_property PACKAGE_PIN AD13 [get_ports SPI_0_io1_io]
 set_property IOSTANDARD LVCMOS33 [get_ports SPI_0_io1_io]
-set_property PACKAGE_PIN AH24 [get_ports SPI_0_sck_io]
+set_property PACKAGE_PIN AE15 [get_ports SPI_0_sck_io]
 set_property IOSTANDARD LVCMOS33 [get_ports SPI_0_sck_io]
-set_property PACKAGE_PIN AJ19 [get_ports SPI_0_ss1_o]
+set_property PACKAGE_PIN AH12 [get_ports SPI_0_ss1_o]
 set_property IOSTANDARD LVCMOS33 [get_ports SPI_0_ss1_o]
-set_property PACKAGE_PIN AK18 [get_ports SPI_0_ss2_o]
+set_property PACKAGE_PIN AF12 [get_ports SPI_0_ss2_o]
 set_property IOSTANDARD LVCMOS33 [get_ports SPI_0_ss2_o]
-set_property PACKAGE_PIN AH22 [get_ports SPI_0_ss_io]
+set_property PACKAGE_PIN AC12 [get_ports SPI_0_ss_io]
 set_property IOSTANDARD LVCMOS33 [get_ports SPI_0_ss_io]
