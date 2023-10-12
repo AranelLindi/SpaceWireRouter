@@ -1,7 +1,7 @@
 --Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
---Date        : Thu Sep 28 13:34:47 2023
+--Date        : Thu Oct 12 13:41:36 2023
 --Host        : stl56jc-MS-7C95 running 64-bit Ubuntu 22.04.3 LTS
 --Command     : generate_target main_design_wrapper.bd
 --Design      : main_design_wrapper
@@ -38,8 +38,8 @@ entity main_design_wrapper is
     FIXED_IO_ps_clk : inout STD_LOGIC;
     FIXED_IO_ps_porb : inout STD_LOGIC;
     FIXED_IO_ps_srstb : inout STD_LOGIC;
-    IIC_0_scl_io : inout STD_LOGIC;
-    IIC_0_sda_io : inout STD_LOGIC;
+    IIC_1_scl_io : inout STD_LOGIC;
+    IIC_1_sda_io : inout STD_LOGIC;
     SPI_0_io0_io : inout STD_LOGIC;
     SPI_0_io1_io : inout STD_LOGIC;
     SPI_0_sck_io : inout STD_LOGIC;
@@ -67,6 +67,8 @@ entity main_design_wrapper is
     spw_so_2 : out STD_LOGIC;
     spw_so_3 : out STD_LOGIC;
     spw_so_4 : out STD_LOGIC;
+    tc_in_measurement : out STD_LOGIC_VECTOR ( 0 to 0 );
+    tc_out_measurement : out STD_LOGIC;
     tx : out STD_LOGIC
   );
 end main_design_wrapper;
@@ -119,12 +121,12 @@ architecture STRUCTURE of main_design_wrapper is
     FIXED_IO_ps_srstb : inout STD_LOGIC;
     FIXED_IO_ps_clk : inout STD_LOGIC;
     FIXED_IO_ps_porb : inout STD_LOGIC;
-    IIC_0_sda_i : in STD_LOGIC;
-    IIC_0_sda_o : out STD_LOGIC;
-    IIC_0_sda_t : out STD_LOGIC;
-    IIC_0_scl_i : in STD_LOGIC;
-    IIC_0_scl_o : out STD_LOGIC;
-    IIC_0_scl_t : out STD_LOGIC;
+    IIC_1_sda_i : in STD_LOGIC;
+    IIC_1_sda_o : out STD_LOGIC;
+    IIC_1_sda_t : out STD_LOGIC;
+    IIC_1_scl_i : in STD_LOGIC;
+    IIC_1_scl_o : out STD_LOGIC;
+    IIC_1_scl_t : out STD_LOGIC;
     SPI_0_sck_i : in STD_LOGIC;
     SPI_0_sck_o : out STD_LOGIC;
     SPI_0_sck_t : out STD_LOGIC;
@@ -140,7 +142,9 @@ architecture STRUCTURE of main_design_wrapper is
     SPI_0_ss2_o : out STD_LOGIC;
     SPI_0_ss_t : out STD_LOGIC;
     UART_0_txd : out STD_LOGIC;
-    UART_0_rxd : in STD_LOGIC
+    UART_0_rxd : in STD_LOGIC;
+    tc_out_measurement : out STD_LOGIC;
+    tc_in_measurement : out STD_LOGIC_VECTOR ( 0 to 0 )
   );
   end component main_design;
   component IOBUF is
@@ -151,12 +155,12 @@ architecture STRUCTURE of main_design_wrapper is
     IO : inout STD_LOGIC
   );
   end component IOBUF;
-  signal IIC_0_scl_i : STD_LOGIC;
-  signal IIC_0_scl_o : STD_LOGIC;
-  signal IIC_0_scl_t : STD_LOGIC;
-  signal IIC_0_sda_i : STD_LOGIC;
-  signal IIC_0_sda_o : STD_LOGIC;
-  signal IIC_0_sda_t : STD_LOGIC;
+  signal IIC_1_scl_i : STD_LOGIC;
+  signal IIC_1_scl_o : STD_LOGIC;
+  signal IIC_1_scl_t : STD_LOGIC;
+  signal IIC_1_sda_i : STD_LOGIC;
+  signal IIC_1_sda_o : STD_LOGIC;
+  signal IIC_1_sda_t : STD_LOGIC;
   signal SPI_0_io0_i : STD_LOGIC;
   signal SPI_0_io0_o : STD_LOGIC;
   signal SPI_0_io0_t : STD_LOGIC;
@@ -170,19 +174,19 @@ architecture STRUCTURE of main_design_wrapper is
   signal SPI_0_ss_o : STD_LOGIC;
   signal SPI_0_ss_t : STD_LOGIC;
 begin
-IIC_0_scl_iobuf: component IOBUF
+IIC_1_scl_iobuf: component IOBUF
      port map (
-      I => IIC_0_scl_o,
-      IO => IIC_0_scl_io,
-      O => IIC_0_scl_i,
-      T => IIC_0_scl_t
+      I => IIC_1_scl_o,
+      IO => IIC_1_scl_io,
+      O => IIC_1_scl_i,
+      T => IIC_1_scl_t
     );
-IIC_0_sda_iobuf: component IOBUF
+IIC_1_sda_iobuf: component IOBUF
      port map (
-      I => IIC_0_sda_o,
-      IO => IIC_0_sda_io,
-      O => IIC_0_sda_i,
-      T => IIC_0_sda_t
+      I => IIC_1_sda_o,
+      IO => IIC_1_sda_io,
+      O => IIC_1_sda_i,
+      T => IIC_1_sda_t
     );
 SPI_0_io0_iobuf: component IOBUF
      port map (
@@ -239,12 +243,12 @@ main_design_i: component main_design
       FIXED_IO_ps_clk => FIXED_IO_ps_clk,
       FIXED_IO_ps_porb => FIXED_IO_ps_porb,
       FIXED_IO_ps_srstb => FIXED_IO_ps_srstb,
-      IIC_0_scl_i => IIC_0_scl_i,
-      IIC_0_scl_o => IIC_0_scl_o,
-      IIC_0_scl_t => IIC_0_scl_t,
-      IIC_0_sda_i => IIC_0_sda_i,
-      IIC_0_sda_o => IIC_0_sda_o,
-      IIC_0_sda_t => IIC_0_sda_t,
+      IIC_1_scl_i => IIC_1_scl_i,
+      IIC_1_scl_o => IIC_1_scl_o,
+      IIC_1_scl_t => IIC_1_scl_t,
+      IIC_1_sda_i => IIC_1_sda_i,
+      IIC_1_sda_o => IIC_1_sda_o,
+      IIC_1_sda_t => IIC_1_sda_t,
       SPI_0_io0_i => SPI_0_io0_i,
       SPI_0_io0_o => SPI_0_io0_o,
       SPI_0_io0_t => SPI_0_io0_t,
@@ -280,6 +284,8 @@ main_design_i: component main_design
       spw_so_2 => spw_so_2,
       spw_so_3 => spw_so_3,
       spw_so_4 => spw_so_4,
+      tc_in_measurement(0) => tc_in_measurement(0),
+      tc_out_measurement => tc_out_measurement,
       tx => tx
     );
 end STRUCTURE;

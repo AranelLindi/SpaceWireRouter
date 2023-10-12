@@ -1,7 +1,7 @@
 --Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
---Date        : Thu Sep 28 13:34:47 2023
+--Date        : Thu Oct 12 13:41:36 2023
 --Host        : stl56jc-MS-7C95 running 64-bit Ubuntu 22.04.3 LTS
 --Command     : generate_target main_design.bd
 --Design      : main_design
@@ -38,12 +38,12 @@ entity main_design is
     FIXED_IO_ps_clk : inout STD_LOGIC;
     FIXED_IO_ps_porb : inout STD_LOGIC;
     FIXED_IO_ps_srstb : inout STD_LOGIC;
-    IIC_0_scl_i : in STD_LOGIC;
-    IIC_0_scl_o : out STD_LOGIC;
-    IIC_0_scl_t : out STD_LOGIC;
-    IIC_0_sda_i : in STD_LOGIC;
-    IIC_0_sda_o : out STD_LOGIC;
-    IIC_0_sda_t : out STD_LOGIC;
+    IIC_1_scl_i : in STD_LOGIC;
+    IIC_1_scl_o : out STD_LOGIC;
+    IIC_1_scl_t : out STD_LOGIC;
+    IIC_1_sda_i : in STD_LOGIC;
+    IIC_1_sda_o : out STD_LOGIC;
+    IIC_1_sda_t : out STD_LOGIC;
     SPI_0_io0_i : in STD_LOGIC;
     SPI_0_io0_o : out STD_LOGIC;
     SPI_0_io0_t : out STD_LOGIC;
@@ -79,6 +79,8 @@ entity main_design is
     spw_so_2 : out STD_LOGIC;
     spw_so_3 : out STD_LOGIC;
     spw_so_4 : out STD_LOGIC;
+    tc_in_measurement : out STD_LOGIC_VECTOR ( 0 to 0 );
+    tc_out_measurement : out STD_LOGIC;
     tx : out STD_LOGIC
   );
   attribute CORE_GENERATION_INFO : string;
@@ -92,12 +94,12 @@ architecture STRUCTURE of main_design is
   port (
     CAN0_PHY_TX : out STD_LOGIC;
     CAN0_PHY_RX : in STD_LOGIC;
-    I2C0_SDA_I : in STD_LOGIC;
-    I2C0_SDA_O : out STD_LOGIC;
-    I2C0_SDA_T : out STD_LOGIC;
-    I2C0_SCL_I : in STD_LOGIC;
-    I2C0_SCL_O : out STD_LOGIC;
-    I2C0_SCL_T : out STD_LOGIC;
+    I2C1_SDA_I : in STD_LOGIC;
+    I2C1_SDA_O : out STD_LOGIC;
+    I2C1_SDA_T : out STD_LOGIC;
+    I2C1_SCL_I : in STD_LOGIC;
+    I2C1_SCL_O : out STD_LOGIC;
+    I2C1_SCL_T : out STD_LOGIC;
     SPI0_SCLK_I : in STD_LOGIC;
     SPI0_SCLK_O : out STD_LOGIC;
     SPI0_SCLK_T : out STD_LOGIC;
@@ -1076,12 +1078,12 @@ architecture STRUCTURE of main_design is
   signal processing_system7_0_FIXED_IO_PS_CLK : STD_LOGIC;
   signal processing_system7_0_FIXED_IO_PS_PORB : STD_LOGIC;
   signal processing_system7_0_FIXED_IO_PS_SRSTB : STD_LOGIC;
-  signal processing_system7_0_IIC_0_SCL_I : STD_LOGIC;
-  signal processing_system7_0_IIC_0_SCL_O : STD_LOGIC;
-  signal processing_system7_0_IIC_0_SCL_T : STD_LOGIC;
-  signal processing_system7_0_IIC_0_SDA_I : STD_LOGIC;
-  signal processing_system7_0_IIC_0_SDA_O : STD_LOGIC;
-  signal processing_system7_0_IIC_0_SDA_T : STD_LOGIC;
+  signal processing_system7_0_IIC_1_SCL_I : STD_LOGIC;
+  signal processing_system7_0_IIC_1_SCL_O : STD_LOGIC;
+  signal processing_system7_0_IIC_1_SCL_T : STD_LOGIC;
+  signal processing_system7_0_IIC_1_SDA_I : STD_LOGIC;
+  signal processing_system7_0_IIC_1_SDA_O : STD_LOGIC;
+  signal processing_system7_0_IIC_1_SDA_T : STD_LOGIC;
   signal processing_system7_0_M_AXI_GP0_ARADDR : STD_LOGIC_VECTOR ( 31 downto 0 );
   signal processing_system7_0_M_AXI_GP0_ARBURST : STD_LOGIC_VECTOR ( 1 downto 0 );
   signal processing_system7_0_M_AXI_GP0_ARCACHE : STD_LOGIC_VECTOR ( 3 downto 0 );
@@ -1402,12 +1404,12 @@ architecture STRUCTURE of main_design is
   attribute X_INTERFACE_INFO of FIXED_IO_ps_clk : signal is "xilinx.com:display_processing_system7:fixedio:1.0 FIXED_IO PS_CLK";
   attribute X_INTERFACE_INFO of FIXED_IO_ps_porb : signal is "xilinx.com:display_processing_system7:fixedio:1.0 FIXED_IO PS_PORB";
   attribute X_INTERFACE_INFO of FIXED_IO_ps_srstb : signal is "xilinx.com:display_processing_system7:fixedio:1.0 FIXED_IO PS_SRSTB";
-  attribute X_INTERFACE_INFO of IIC_0_scl_i : signal is "xilinx.com:interface:iic:1.0 IIC_0 SCL_I";
-  attribute X_INTERFACE_INFO of IIC_0_scl_o : signal is "xilinx.com:interface:iic:1.0 IIC_0 SCL_O";
-  attribute X_INTERFACE_INFO of IIC_0_scl_t : signal is "xilinx.com:interface:iic:1.0 IIC_0 SCL_T";
-  attribute X_INTERFACE_INFO of IIC_0_sda_i : signal is "xilinx.com:interface:iic:1.0 IIC_0 SDA_I";
-  attribute X_INTERFACE_INFO of IIC_0_sda_o : signal is "xilinx.com:interface:iic:1.0 IIC_0 SDA_O";
-  attribute X_INTERFACE_INFO of IIC_0_sda_t : signal is "xilinx.com:interface:iic:1.0 IIC_0 SDA_T";
+  attribute X_INTERFACE_INFO of IIC_1_scl_i : signal is "xilinx.com:interface:iic:1.0 IIC_1 SCL_I";
+  attribute X_INTERFACE_INFO of IIC_1_scl_o : signal is "xilinx.com:interface:iic:1.0 IIC_1 SCL_O";
+  attribute X_INTERFACE_INFO of IIC_1_scl_t : signal is "xilinx.com:interface:iic:1.0 IIC_1 SCL_T";
+  attribute X_INTERFACE_INFO of IIC_1_sda_i : signal is "xilinx.com:interface:iic:1.0 IIC_1 SDA_I";
+  attribute X_INTERFACE_INFO of IIC_1_sda_o : signal is "xilinx.com:interface:iic:1.0 IIC_1 SDA_O";
+  attribute X_INTERFACE_INFO of IIC_1_sda_t : signal is "xilinx.com:interface:iic:1.0 IIC_1 SDA_T";
   attribute X_INTERFACE_INFO of SPI_0_io0_i : signal is "xilinx.com:interface:spi:1.0 SPI_0 IO0_I";
   attribute X_INTERFACE_INFO of SPI_0_io0_o : signal is "xilinx.com:interface:spi:1.0 SPI_0 IO0_O";
   attribute X_INTERFACE_INFO of SPI_0_io0_t : signal is "xilinx.com:interface:spi:1.0 SPI_0 IO0_T";
@@ -1428,6 +1430,8 @@ architecture STRUCTURE of main_design is
   attribute X_INTERFACE_PARAMETER of reset : signal is "XIL_INTERFACENAME RST.RESET, INSERT_VIP 0, POLARITY ACTIVE_HIGH";
   attribute X_INTERFACE_INFO of rst_logic : signal is "xilinx.com:signal:reset:1.0 RST.RST_LOGIC RST";
   attribute X_INTERFACE_PARAMETER of rst_logic : signal is "XIL_INTERFACENAME RST.RST_LOGIC, INSERT_VIP 0, POLARITY ACTIVE_LOW";
+  attribute X_INTERFACE_INFO of tc_out_measurement : signal is "xilinx.com:signal:interrupt:1.0 INTR.TC_OUT_MEASUREMENT INTERRUPT";
+  attribute X_INTERFACE_PARAMETER of tc_out_measurement : signal is "XIL_INTERFACENAME INTR.TC_OUT_MEASUREMENT, PortWidth 1, SENSITIVITY LEVEL_HIGH";
   attribute X_INTERFACE_INFO of DDR_addr : signal is "xilinx.com:interface:ddrx:1.0 DDR ADDR";
   attribute X_INTERFACE_PARAMETER of DDR_addr : signal is "XIL_INTERFACENAME DDR, AXI_ARBITRATION_SCHEME TDM, BURST_LENGTH 8, CAN_DEBUG false, CAS_LATENCY 11, CAS_WRITE_LATENCY 11, CS_ENABLED true, DATA_MASK_ENABLED true, DATA_WIDTH 8, MEMORY_TYPE COMPONENTS, MEM_ADDR_MAP ROW_COLUMN_BANK, SLOT Single, TIMEPERIOD_PS 1250";
   attribute X_INTERFACE_INFO of DDR_ba : signal is "xilinx.com:interface:ddrx:1.0 DDR BA";
@@ -1436,14 +1440,16 @@ architecture STRUCTURE of main_design is
   attribute X_INTERFACE_INFO of DDR_dqs_n : signal is "xilinx.com:interface:ddrx:1.0 DDR DQS_N";
   attribute X_INTERFACE_INFO of DDR_dqs_p : signal is "xilinx.com:interface:ddrx:1.0 DDR DQS_P";
   attribute X_INTERFACE_INFO of FIXED_IO_mio : signal is "xilinx.com:display_processing_system7:fixedio:1.0 FIXED_IO MIO";
+  attribute X_INTERFACE_INFO of tc_in_measurement : signal is "xilinx.com:signal:interrupt:1.0 INTR.TC_IN_MEASUREMENT INTERRUPT";
+  attribute X_INTERFACE_PARAMETER of tc_in_measurement : signal is "XIL_INTERFACENAME INTR.TC_IN_MEASUREMENT, PortWidth 1, SENSITIVITY LEVEL_HIGH";
 begin
   CAN_0_tx <= processing_system7_0_CAN_0_TX;
   CLK_IN1_D_0_1_CLK_N <= CLK_IN1_D_0_clk_n;
   CLK_IN1_D_0_1_CLK_P <= CLK_IN1_D_0_clk_p;
-  IIC_0_scl_o <= processing_system7_0_IIC_0_SCL_O;
-  IIC_0_scl_t <= processing_system7_0_IIC_0_SCL_T;
-  IIC_0_sda_o <= processing_system7_0_IIC_0_SDA_O;
-  IIC_0_sda_t <= processing_system7_0_IIC_0_SDA_T;
+  IIC_1_scl_o <= processing_system7_0_IIC_1_SCL_O;
+  IIC_1_scl_t <= processing_system7_0_IIC_1_SCL_T;
+  IIC_1_sda_o <= processing_system7_0_IIC_1_SDA_O;
+  IIC_1_sda_t <= processing_system7_0_IIC_1_SDA_T;
   SPI_0_io0_o <= processing_system7_0_SPI_0_IO0_O;
   SPI_0_io0_t <= processing_system7_0_SPI_0_IO0_T;
   SPI_0_io1_o <= processing_system7_0_SPI_0_IO1_O;
@@ -1456,8 +1462,8 @@ begin
   SPI_0_ss_t <= processing_system7_0_SPI_0_SS_T;
   UART_0_txd <= processing_system7_0_UART_0_TxD;
   processing_system7_0_CAN_0_RX <= CAN_0_rx;
-  processing_system7_0_IIC_0_SCL_I <= IIC_0_scl_i;
-  processing_system7_0_IIC_0_SDA_I <= IIC_0_sda_i;
+  processing_system7_0_IIC_1_SCL_I <= IIC_1_scl_i;
+  processing_system7_0_IIC_1_SDA_I <= IIC_1_sda_i;
   processing_system7_0_SPI_0_IO0_I <= SPI_0_io0_i;
   processing_system7_0_SPI_0_IO1_I <= SPI_0_io1_i;
   processing_system7_0_SPI_0_SCK_I <= SPI_0_sck_i;
@@ -1482,6 +1488,8 @@ begin
   spw_so_2 <= router_implementation_0_spw_so_2;
   spw_so_3 <= router_implementation_0_spw_so_3;
   spw_so_4 <= router_implementation_0_spw_so_4;
+  tc_in_measurement(0) <= axi_gpio_1_gpio_io_o(0);
+  tc_out_measurement <= AXI_SpaceWire_IP_0_tc_out_intr;
   tx <= router_implementation_0_tx;
 AXI_SpaceWire_IP_0: component main_design_AXI_SpaceWire_IP_0_1
      port map (
@@ -1845,12 +1853,12 @@ processing_system7_0: component main_design_processing_system7_0_2
       DDR_WEB => DDR_we_n,
       FCLK_CLK0 => processing_system7_0_FCLK_CLK0,
       FCLK_RESET0_N => processing_system7_0_FCLK_RESET0_N,
-      I2C0_SCL_I => processing_system7_0_IIC_0_SCL_I,
-      I2C0_SCL_O => processing_system7_0_IIC_0_SCL_O,
-      I2C0_SCL_T => processing_system7_0_IIC_0_SCL_T,
-      I2C0_SDA_I => processing_system7_0_IIC_0_SDA_I,
-      I2C0_SDA_O => processing_system7_0_IIC_0_SDA_O,
-      I2C0_SDA_T => processing_system7_0_IIC_0_SDA_T,
+      I2C1_SCL_I => processing_system7_0_IIC_1_SCL_I,
+      I2C1_SCL_O => processing_system7_0_IIC_1_SCL_O,
+      I2C1_SCL_T => processing_system7_0_IIC_1_SCL_T,
+      I2C1_SDA_I => processing_system7_0_IIC_1_SDA_I,
+      I2C1_SDA_O => processing_system7_0_IIC_1_SDA_O,
+      I2C1_SDA_T => processing_system7_0_IIC_1_SDA_T,
       IRQ_F2P(5 downto 0) => xlconcat_1_dout(5 downto 0),
       MIO(53 downto 0) => FIXED_IO_mio(53 downto 0),
       M_AXI_GP0_ACLK => processing_system7_0_FCLK_CLK0,

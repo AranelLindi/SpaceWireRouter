@@ -1,3 +1,11 @@
+set_property PACKAGE_PIN AJ30 [get_ports spw_di_3]
+set_property PACKAGE_PIN AK30 [get_ports spw_si_3]
+set_property PACKAGE_PIN AB29 [get_ports spw_di_1]
+set_property PACKAGE_PIN AB30 [get_ports spw_si_1]
+set_property PACKAGE_PIN AF29 [get_ports spw_di_2]
+set_property PACKAGE_PIN AG29 [get_ports spw_si_2]
+set_property PACKAGE_PIN AK27 [get_ports spw_di_4]
+set_property PACKAGE_PIN AK28 [get_ports spw_si_4]
 # Define the board clock
 
 
@@ -64,9 +72,7 @@ set_property IOSTANDARD LVCMOS25 [get_ports rx]
 # time unit is ns (nano seconds)
 
 # LPC
-set_property PACKAGE_PIN AB29 [get_ports spw_di_1]
 set_property IOSTANDARD LVCMOS25 [get_ports spw_di_1]
-set_property PACKAGE_PIN AB30 [get_ports spw_si_1]
 set_property IOSTANDARD LVCMOS25 [get_ports spw_si_1]
 
 set_property PACKAGE_PIN AD25 [get_ports spw_do_1]
@@ -92,9 +98,7 @@ set_property IOSTANDARD LVCMOS25 [get_ports spw_so_1]
 # SpaceWire Port 2
 
 # LPC
-set_property PACKAGE_PIN AF29 [get_ports spw_di_2]
 set_property IOSTANDARD LVCMOS25 [get_ports spw_di_2]
-set_property PACKAGE_PIN AG29 [get_ports spw_si_2]
 set_property IOSTANDARD LVCMOS25 [get_ports spw_si_2]
 
 set_property PACKAGE_PIN Y26 [get_ports spw_do_2]
@@ -117,9 +121,7 @@ set_property IOSTANDARD LVCMOS25 [get_ports spw_so_2]
 # SpaceWire Port 3
 
 # LPC
-set_property PACKAGE_PIN AJ30 [get_ports spw_di_3]
 set_property IOSTANDARD LVCMOS25 [get_ports spw_di_3]
-set_property PACKAGE_PIN AK30 [get_ports spw_si_3]
 set_property IOSTANDARD LVCMOS25 [get_ports spw_si_3]
 
 set_property PACKAGE_PIN AH28 [get_ports spw_do_3]
@@ -142,9 +144,7 @@ set_property IOSTANDARD LVCMOS25 [get_ports spw_so_3]
 # SpaceWire Port 4
 
 # LPC
-set_property PACKAGE_PIN AK27 [get_ports spw_di_4]
 set_property IOSTANDARD LVCMOS25 [get_ports spw_di_4]
-set_property PACKAGE_PIN AK28 [get_ports spw_si_4]
 set_property IOSTANDARD LVCMOS25 [get_ports spw_si_4]
 
 set_property PACKAGE_PIN AF30 [get_ports spw_do_4]
@@ -174,12 +174,12 @@ set_property IOSTANDARD LVCMOS33 [get_ports UART_0_txd]
 set_property SLEW SLOW [get_ports UART_0_txd]
 
 # I2C_0
-set_property PACKAGE_PIN AA14 [get_ports IIC_0_scl_io]
-set_property IOSTANDARD LVCMOS33 [get_ports IIC_0_scl_io]
-set_property PACKAGE_PIN AD15 [get_ports IIC_0_sda_io]
-set_property IOSTANDARD LVCMOS33 [get_ports IIC_0_sda_io]
-set_property PULLUP true [get_ports IIC_0_scl_io]
-set_property PULLUP true [get_ports IIC_0_sda_io]
+set_property PACKAGE_PIN AA14 [get_ports IIC_1_scl_io]
+set_property IOSTANDARD LVCMOS33 [get_ports IIC_1_scl_io]
+set_property PACKAGE_PIN AD15 [get_ports IIC_1_sda_io]
+set_property IOSTANDARD LVCMOS33 [get_ports IIC_1_sda_io]
+set_property PULLUP true [get_ports IIC_1_scl_io]
+set_property PULLUP true [get_ports IIC_1_sda_io]
 
 # CAN_0
 set_property PACKAGE_PIN AF17 [get_ports CAN_0_rx]
@@ -200,3 +200,20 @@ set_property PACKAGE_PIN AF12 [get_ports SPI_0_ss2_o]
 set_property IOSTANDARD LVCMOS33 [get_ports SPI_0_ss2_o]
 set_property PACKAGE_PIN AC12 [get_ports SPI_0_ss_io]
 set_property IOSTANDARD LVCMOS33 [get_ports SPI_0_ss_io]
+
+set_property SLEW SLOW [get_ports SPI_0_io0_io]
+set_property SLEW SLOW [get_ports SPI_0_io1_io]
+set_property SLEW SLOW [get_ports SPI_0_sck_io]
+set_property SLEW SLOW [get_ports SPI_0_ss_io]
+
+
+# Time-Code Measurement Ports
+#set_property PACKAGE_PIN AJ16 [get_ports tc_in_measurement]
+#set_property IOSTANDARD LVCMOS33 [get_ports tc_in_measurment]
+#set_property PACKAGE_PIN AB12 [get_ports tc_out_measurement]
+#set_property IOSTANDARD LVCMOS33 [get_ports tc_out_measurement]
+
+set_property PACKAGE_PIN AA15 [get_ports {tc_in_measurement[0]}]
+set_property PACKAGE_PIN AB12 [get_ports tc_out_measurement]
+set_property IOSTANDARD LVCMOS33 [get_ports {tc_in_measurement[0]}]
+set_property IOSTANDARD LVCMOS33 [get_ports tc_out_measurement]
