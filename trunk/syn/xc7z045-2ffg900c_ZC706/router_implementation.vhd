@@ -271,7 +271,7 @@ begin
         generic map (
             numports => 6,
             sysfreq => 100.0e6,
-            txclkfreq => 200.0e6, -- changed to default value (100.0e6 before!) 
+            txclkfreq => 100.0e6, -- changed to default value (100.0e6 before!) 
             rx_impl => (others => impl_fast),
             rxchunk => 2,
             tx_impl => (others => impl_fast) -- changed to impl_generic (impl_fast before!)
@@ -312,7 +312,7 @@ begin
             init_output_port => 1,
             activate_commands => FALSE, -- define adapter variant (command (true) / non-command version (false))
             sysfreq => sysfreq,
-            txclkfreq => 200.0e6,
+            txclkfreq => 100.0e6,
             rximpl => impl_fast,
             rxchunk => 2,
             WIDTH => 2,

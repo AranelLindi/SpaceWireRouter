@@ -249,10 +249,10 @@ BEGIN
                 rxclk => rxclk, -- I
                 txclk => txclk, -- I
                 rst => rst, -- I
-                autostart => '1',--s_portcontrol(i)(3), -- I -- via register
-                linkstart => '1',--s_portcontrol(i)(2), -- I -- via register
-                linkdis => '0',--s_portcontrol(i)(1), --'0', -- I -- via register
-                txdivcnt => "00000001", --s_portcontrol(i)(15 downto 8), -- I -- via register
+                autostart => s_portcontrol(i)(3), -- I -- via register
+                linkstart => s_portcontrol(i)(2), -- I -- via register
+                linkdis => s_portcontrol(i)(1), --'0', -- I -- via register
+                txdivcnt => s_portcontrol(i)(15 downto 8), -- I -- via register -- before "00000001"
                 tick_in => s_tick_from_tcc_to_ports(i), -- I
                 time_in => s_tc_from_tcc_to_ports(i), -- I
                 txdata => s_txdata(i), -- I
@@ -442,7 +442,7 @@ BEGIN
             auto_tc_out => s_auto_tc, -- O
             auto_interval => s_auto_cycle -- I
         );        
-    ELSE GENERATE
+    ELSE GENERATE   
         -- Time Code control.
         timecode_control_all : spwroutertcc
         GENERIC MAP(

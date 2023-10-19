@@ -1987,7 +1987,7 @@
             "direction": "I",
             "parameters": {
               "FREQ_HZ": {
-                "value": "200000000",
+                "value": "100000000",
                 "value_src": "ip_prop"
               },
               "PHASE": {
@@ -1996,7 +1996,7 @@
               },
               "CLK_DOMAIN": {
                 "value": "main_design_clk_wiz_0_1_clk_200",
-                "value_src": "default_prop"
+                "value_src": "ip_prop"
               }
             }
           },
@@ -2324,8 +2324,8 @@
       "axi_gpio_1_gpio_io_o": {
         "ports": [
           "axi_gpio_1/gpio_io_o",
-          "AXI_SpaceWire_IP_0/tc_in",
-          "tc_in_measurement"
+          "tc_in_measurement",
+          "AXI_SpaceWire_IP_0/tc_in"
         ]
       },
       "axi_mcdma_0_mm2s_ch1_introut": {
@@ -2344,16 +2344,16 @@
         "ports": [
           "clk_wiz_0/clk_100",
           "router_implementation_0/clk",
-          "AXI_SpaceWire_IP_0/clk_logic"
+          "router_implementation_0/txclk",
+          "AXI_SpaceWire_IP_0/clk_logic",
+          "AXI_SpaceWire_IP_0/txclk"
         ]
       },
       "clk_wiz_0_clk_200": {
         "ports": [
           "clk_wiz_0/clk_200",
           "router_implementation_0/rxclk",
-          "router_implementation_0/txclk",
-          "AXI_SpaceWire_IP_0/rxclk",
-          "AXI_SpaceWire_IP_0/txclk"
+          "AXI_SpaceWire_IP_0/rxclk"
         ]
       },
       "proc_sys_reset_0_peripheral_aresetn": {

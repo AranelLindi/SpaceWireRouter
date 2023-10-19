@@ -1,7 +1,7 @@
 --Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
---Date        : Thu Oct 12 13:41:36 2023
+--Date        : Thu Oct 19 14:39:37 2023
 --Host        : stl56jc-MS-7C95 running 64-bit Ubuntu 22.04.3 LTS
 --Command     : generate_target main_design.bd
 --Design      : main_design
@@ -1604,7 +1604,7 @@ AXI_SpaceWire_IP_0: component main_design_AXI_SpaceWire_IP_0_1
       state_intr => AXI_SpaceWire_IP_0_state_intr,
       tc_in => axi_gpio_1_gpio_io_o(0),
       tc_out_intr => AXI_SpaceWire_IP_0_tc_out_intr,
-      txclk => clk_wiz_0_clk_200
+      txclk => clk_wiz_0_clk_100
     );
 axi_bram_ctrl_0: component main_design_axi_bram_ctrl_0_1
      port map (
@@ -2005,7 +2005,7 @@ router_implementation_0: component main_design_router_implementation_0_1
       spw_so_3 => router_implementation_0_spw_so_3,
       spw_so_4 => router_implementation_0_spw_so_4,
       tx => router_implementation_0_tx,
-      txclk => clk_wiz_0_clk_200,
+      txclk => clk_wiz_0_clk_100,
       wea(3 downto 0) => axi_bram_ctrl_0_bram_we_a(3 downto 0)
     );
 smartconnect_0: component main_design_smartconnect_1_0

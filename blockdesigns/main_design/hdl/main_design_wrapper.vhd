@@ -1,7 +1,7 @@
 --Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
---Date        : Thu Oct 12 13:41:36 2023
+--Date        : Thu Oct 19 14:39:38 2023
 --Host        : stl56jc-MS-7C95 running 64-bit Ubuntu 22.04.3 LTS
 --Command     : generate_target main_design_wrapper.bd
 --Design      : main_design_wrapper
@@ -96,6 +96,8 @@ architecture STRUCTURE of main_design_wrapper is
     spw_so_4 : out STD_LOGIC;
     rst_logic : in STD_LOGIC;
     reset : in STD_LOGIC;
+    tc_out_measurement : out STD_LOGIC;
+    tc_in_measurement : out STD_LOGIC_VECTOR ( 0 to 0 );
     CLK_IN1_D_0_clk_n : in STD_LOGIC;
     CLK_IN1_D_0_clk_p : in STD_LOGIC;
     CAN_0_tx : out STD_LOGIC;
@@ -142,9 +144,7 @@ architecture STRUCTURE of main_design_wrapper is
     SPI_0_ss2_o : out STD_LOGIC;
     SPI_0_ss_t : out STD_LOGIC;
     UART_0_txd : out STD_LOGIC;
-    UART_0_rxd : in STD_LOGIC;
-    tc_out_measurement : out STD_LOGIC;
-    tc_in_measurement : out STD_LOGIC_VECTOR ( 0 to 0 )
+    UART_0_rxd : in STD_LOGIC
   );
   end component main_design;
   component IOBUF is
