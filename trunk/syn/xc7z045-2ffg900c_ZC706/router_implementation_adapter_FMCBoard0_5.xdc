@@ -207,6 +207,6 @@ set_property SLEW SLOW [get_ports SPI_0_ss_io]
 
 # Time-Code Measurement Ports
 set_property PACKAGE_PIN AA15 [get_ports {tc_in_measurement[0]}]
-set_property PACKAGE_PIN AB12 [get_ports tc_out_measurement]
+set_property PACKAGE_PIN AB12 [get_ports tc_out_measurement[0]]
 set_property IOSTANDARD LVCMOS33 [get_ports {tc_in_measurement[0]}]
-set_property IOSTANDARD LVCMOS33 [get_ports tc_out_measurement]
+set_property IOSTANDARD LVCMOS33 [get_ports tc_out_measurement[0]]

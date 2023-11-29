@@ -1,7 +1,7 @@
 {
   "design": {
     "design_info": {
-      "boundary_crc": "0xDB2C6C8F26B26CD2",
+      "boundary_crc": "0x8363DFCB20F3A83E",
       "device": "xc7z045ffg900-2",
       "name": "main_design",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
@@ -23,7 +23,9 @@
       "axi_bram_ctrl_0": "",
       "axis_data_fifo_0": "",
       "router_implementation_0": "",
-      "AXI_SpaceWire_IP_0": ""
+      "AXI_SpaceWire_IP_0": "",
+      "axi_gpio_2": "",
+      "axi_gpio_3": ""
     },
     "interface_ports": {
       "DDR": {
@@ -213,6 +215,8 @@
       "tc_out_measurement": {
         "type": "intr",
         "direction": "O",
+        "left": "0",
+        "right": "0",
         "parameters": {
           "PortWidth": {
             "value": "1",
@@ -220,7 +224,7 @@
           },
           "SENSITIVITY": {
             "value": "LEVEL_HIGH",
-            "value_src": "const_prop"
+            "value_src": "default"
           }
         }
       },
@@ -1505,7 +1509,7 @@
         "inst_hier_path": "smartconnect_0",
         "parameters": {
           "NUM_MI": {
-            "value": "8"
+            "value": "10"
           },
           "NUM_SI": {
             "value": "4"
@@ -1532,7 +1536,9 @@
               "M04_AXI",
               "M05_AXI",
               "M06_AXI",
-              "M07_AXI"
+              "M07_AXI",
+              "M08_AXI",
+              "M09_AXI"
             ]
           },
           "S01_AXI": {
@@ -1555,7 +1561,9 @@
               "M04_AXI",
               "M05_AXI",
               "M06_AXI",
-              "M07_AXI"
+              "M07_AXI",
+              "M08_AXI",
+              "M09_AXI"
             ]
           },
           "S02_AXI": {
@@ -1578,7 +1586,9 @@
               "M04_AXI",
               "M05_AXI",
               "M06_AXI",
-              "M07_AXI"
+              "M07_AXI",
+              "M08_AXI",
+              "M09_AXI"
             ]
           },
           "S03_AXI": {
@@ -1601,7 +1611,9 @@
               "M04_AXI",
               "M05_AXI",
               "M06_AXI",
-              "M07_AXI"
+              "M07_AXI",
+              "M08_AXI",
+              "M09_AXI"
             ]
           },
           "M00_AXI": {
@@ -1822,6 +1834,68 @@
             }
           },
           "M07_AXI": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {
+              "MAX_BURST_LENGTH": {
+                "value": "1"
+              },
+              "NUM_READ_OUTSTANDING": {
+                "value": "8"
+              },
+              "NUM_READ_THREADS": {
+                "value": "1"
+              },
+              "NUM_WRITE_OUTSTANDING": {
+                "value": "8"
+              },
+              "NUM_WRITE_THREADS": {
+                "value": "1"
+              },
+              "RUSER_BITS_PER_BYTE": {
+                "value": "0"
+              },
+              "SUPPORTS_NARROW_BURST": {
+                "value": "0"
+              },
+              "WUSER_BITS_PER_BYTE": {
+                "value": "0"
+              }
+            }
+          },
+          "M08_AXI": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {
+              "MAX_BURST_LENGTH": {
+                "value": "1"
+              },
+              "NUM_READ_OUTSTANDING": {
+                "value": "8"
+              },
+              "NUM_READ_THREADS": {
+                "value": "1"
+              },
+              "NUM_WRITE_OUTSTANDING": {
+                "value": "8"
+              },
+              "NUM_WRITE_THREADS": {
+                "value": "1"
+              },
+              "RUSER_BITS_PER_BYTE": {
+                "value": "0"
+              },
+              "SUPPORTS_NARROW_BURST": {
+                "value": "0"
+              },
+              "WUSER_BITS_PER_BYTE": {
+                "value": "0"
+              }
+            }
+          },
+          "M09_AXI": {
             "mode": "Master",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
             "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
@@ -2111,6 +2185,37 @@
             "value": "2"
           }
         }
+      },
+      "axi_gpio_2": {
+        "vlnv": "xilinx.com:ip:axi_gpio:2.0",
+        "xci_name": "main_design_axi_gpio_2_0",
+        "xci_path": "ip/main_design_axi_gpio_2_0/main_design_axi_gpio_2_0.xci",
+        "inst_hier_path": "axi_gpio_2",
+        "parameters": {
+          "C_ALL_INPUTS": {
+            "value": "0"
+          },
+          "C_ALL_OUTPUTS": {
+            "value": "1"
+          },
+          "C_GPIO_WIDTH": {
+            "value": "1"
+          }
+        }
+      },
+      "axi_gpio_3": {
+        "vlnv": "xilinx.com:ip:axi_gpio:2.0",
+        "xci_name": "main_design_axi_gpio_3_0",
+        "xci_path": "ip/main_design_axi_gpio_3_0/main_design_axi_gpio_3_0.xci",
+        "inst_hier_path": "axi_gpio_3",
+        "parameters": {
+          "C_ALL_OUTPUTS": {
+            "value": "1"
+          },
+          "C_GPIO_WIDTH": {
+            "value": "1"
+          }
+        }
       }
     },
     "interface_nets": {
@@ -2190,6 +2295,18 @@
         "interface_ports": [
           "UART_0",
           "processing_system7_0/UART_0"
+        ]
+      },
+      "smartconnect_0_M08_AXI": {
+        "interface_ports": [
+          "axi_gpio_2/S_AXI",
+          "smartconnect_0/M08_AXI"
+        ]
+      },
+      "smartconnect_0_M09_AXI": {
+        "interface_ports": [
+          "smartconnect_0/M09_AXI",
+          "axi_gpio_3/S_AXI"
         ]
       },
       "smartconnect_1_M00_AXI": {
@@ -2275,8 +2392,7 @@
       "AXI_SpaceWire_IP_0_tc_out_intr": {
         "ports": [
           "AXI_SpaceWire_IP_0/tc_out_intr",
-          "xlconcat_1/In2",
-          "tc_out_measurement"
+          "xlconcat_1/In2"
         ]
       },
       "axi_bram_ctrl_0_bram_addr_a": {
@@ -2324,8 +2440,19 @@
       "axi_gpio_1_gpio_io_o": {
         "ports": [
           "axi_gpio_1/gpio_io_o",
-          "tc_in_measurement",
           "AXI_SpaceWire_IP_0/tc_in"
+        ]
+      },
+      "axi_gpio_2_gpio_io_o": {
+        "ports": [
+          "axi_gpio_2/gpio_io_o",
+          "tc_out_measurement"
+        ]
+      },
+      "axi_gpio_3_gpio_io_o": {
+        "ports": [
+          "axi_gpio_3/gpio_io_o",
+          "tc_in_measurement"
         ]
       },
       "axi_mcdma_0_mm2s_ch1_introut": {
@@ -2367,7 +2494,9 @@
           "axi_gpio_1/s_axi_aresetn",
           "AXI_SpaceWire_IP_0/s00_axi_tx_aresetn",
           "AXI_SpaceWire_IP_0/s01_axi_rx_aresetn",
-          "AXI_SpaceWire_IP_0/s02_axi_reg_aresetn"
+          "AXI_SpaceWire_IP_0/s02_axi_reg_aresetn",
+          "axi_gpio_2/s_axi_aresetn",
+          "axi_gpio_3/s_axi_aresetn"
         ]
       },
       "processing_system7_0_FCLK_CLK0": {
@@ -2385,7 +2514,9 @@
           "processing_system7_0/S_AXI_HP0_ACLK",
           "AXI_SpaceWire_IP_0/s00_axi_tx_aclk",
           "AXI_SpaceWire_IP_0/s01_axi_rx_aclk",
-          "AXI_SpaceWire_IP_0/s02_axi_reg_aclk"
+          "AXI_SpaceWire_IP_0/s02_axi_reg_aclk",
+          "axi_gpio_2/s_axi_aclk",
+          "axi_gpio_3/s_axi_aclk"
         ]
       },
       "processing_system7_0_FCLK_RESET0_N": {
@@ -2593,6 +2724,16 @@
                 "offset": "0x41210000",
                 "range": "64K"
               },
+              "SEG_axi_gpio_2_Reg": {
+                "address_block": "/axi_gpio_2/S_AXI/Reg",
+                "offset": "0x41220000",
+                "range": "64K"
+              },
+              "SEG_axi_gpio_3_Reg": {
+                "address_block": "/axi_gpio_3/S_AXI/Reg",
+                "offset": "0x41230000",
+                "range": "64K"
+              },
               "SEG_axi_mcdma_0_Reg": {
                 "address_block": "/axi_mcdma_0/S_AXI_LITE/Reg",
                 "offset": "0x43C00000",
@@ -2651,6 +2792,18 @@
                 "range": "64K",
                 "is_excluded": "TRUE"
               },
+              "SEG_axi_gpio_2_Reg": {
+                "address_block": "/axi_gpio_2/S_AXI/Reg",
+                "offset": "0x41220000",
+                "range": "64K",
+                "is_excluded": "TRUE"
+              },
+              "SEG_axi_gpio_3_Reg": {
+                "address_block": "/axi_gpio_3/S_AXI/Reg",
+                "offset": "0x41230000",
+                "range": "64K",
+                "is_excluded": "TRUE"
+              },
               "SEG_axi_mcdma_0_Reg": {
                 "address_block": "/axi_mcdma_0/S_AXI_LITE/Reg",
                 "offset": "0x43C00000",
@@ -2705,6 +2858,18 @@
                 "range": "64K",
                 "is_excluded": "TRUE"
               },
+              "SEG_axi_gpio_2_Reg": {
+                "address_block": "/axi_gpio_2/S_AXI/Reg",
+                "offset": "0x41220000",
+                "range": "64K",
+                "is_excluded": "TRUE"
+              },
+              "SEG_axi_gpio_3_Reg": {
+                "address_block": "/axi_gpio_3/S_AXI/Reg",
+                "offset": "0x41230000",
+                "range": "64K",
+                "is_excluded": "TRUE"
+              },
               "SEG_axi_mcdma_0_Reg": {
                 "address_block": "/axi_mcdma_0/S_AXI_LITE/Reg",
                 "offset": "0x43C00000",
@@ -2756,6 +2921,18 @@
               "SEG_axi_gpio_1_Reg": {
                 "address_block": "/axi_gpio_1/S_AXI/Reg",
                 "offset": "0x41210000",
+                "range": "64K",
+                "is_excluded": "TRUE"
+              },
+              "SEG_axi_gpio_2_Reg": {
+                "address_block": "/axi_gpio_2/S_AXI/Reg",
+                "offset": "0x41220000",
+                "range": "64K",
+                "is_excluded": "TRUE"
+              },
+              "SEG_axi_gpio_3_Reg": {
+                "address_block": "/axi_gpio_3/S_AXI/Reg",
+                "offset": "0x41230000",
                 "range": "64K",
                 "is_excluded": "TRUE"
               },

@@ -1,7 +1,7 @@
 --Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
---Date        : Wed Oct 25 16:25:32 2023
+--Date        : Tue Nov 14 13:16:01 2023
 --Host        : stl56jc-MS-7C95 running 64-bit Ubuntu 22.04.3 LTS
 --Command     : generate_target main_design_wrapper.bd
 --Design      : main_design_wrapper
@@ -68,7 +68,7 @@ entity main_design_wrapper is
     spw_so_3 : out STD_LOGIC;
     spw_so_4 : out STD_LOGIC;
     tc_in_measurement : out STD_LOGIC_VECTOR ( 0 to 0 );
-    tc_out_measurement : out STD_LOGIC;
+    tc_out_measurement : out STD_LOGIC_VECTOR ( 0 to 0 );
     tx : out STD_LOGIC
   );
 end main_design_wrapper;
@@ -96,7 +96,7 @@ architecture STRUCTURE of main_design_wrapper is
     spw_so_4 : out STD_LOGIC;
     rst_logic : in STD_LOGIC;
     reset : in STD_LOGIC;
-    tc_out_measurement : out STD_LOGIC;
+    tc_out_measurement : out STD_LOGIC_VECTOR ( 0 to 0 );
     tc_in_measurement : out STD_LOGIC_VECTOR ( 0 to 0 );
     CLK_IN1_D_0_clk_n : in STD_LOGIC;
     CLK_IN1_D_0_clk_p : in STD_LOGIC;
@@ -285,7 +285,7 @@ main_design_i: component main_design
       spw_so_3 => spw_so_3,
       spw_so_4 => spw_so_4,
       tc_in_measurement(0) => tc_in_measurement(0),
-      tc_out_measurement => tc_out_measurement,
+      tc_out_measurement(0) => tc_out_measurement(0),
       tx => tx
     );
 end STRUCTURE;
