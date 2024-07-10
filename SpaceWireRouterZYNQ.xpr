@@ -256,6 +256,12 @@
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
+        <CompFileExtendedInfo CompFileName="main_design.bd" FileRelPathName="ip/main_design_AXI_SpaceWire_IP_0_1/main_design_AXI_SpaceWire_IP_0_1.xci">
+          <Proxy FileSetName="main_design_AXI_SpaceWire_IP_0_1"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="main_design.bd" FileRelPathName="ip/main_design_router_implementation_0_1/main_design_router_implementation_0_1.xci">
+          <Proxy FileSetName="main_design_router_implementation_0_1"/>
+        </CompFileExtendedInfo>
         <CompFileExtendedInfo CompFileName="main_design.bd" FileRelPathName="ip/main_design_processing_system7_0_2/main_design_processing_system7_0_2.xci">
           <Proxy FileSetName="main_design_processing_system7_0_2"/>
         </CompFileExtendedInfo>
@@ -273,12 +279,6 @@
         </CompFileExtendedInfo>
         <CompFileExtendedInfo CompFileName="main_design.bd" FileRelPathName="ip/main_design_xbar_4/main_design_xbar_4.xci">
           <Proxy FileSetName="main_design_xbar_4"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="main_design.bd" FileRelPathName="ip/main_design_AXI_SpaceWire_IP_0_1/main_design_AXI_SpaceWire_IP_0_1.xci">
-          <Proxy FileSetName="main_design_AXI_SpaceWire_IP_0_1"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="main_design.bd" FileRelPathName="ip/main_design_router_implementation_0_1/main_design_router_implementation_0_1.xci">
-          <Proxy FileSetName="main_design_router_implementation_0_1"/>
         </CompFileExtendedInfo>
       </File>
       <File Path="$PPRDIR/blockdesigns/main_design/hdl/main_design_wrapper.vhd">

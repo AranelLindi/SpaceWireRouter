@@ -1,7 +1,7 @@
 --Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
---Date        : Wed Jul 10 11:34:44 2024
+--Date        : Wed Jul 10 12:49:45 2024
 --Host        : stl56jc-MS-7C95 running 64-bit Ubuntu 22.04.4 LTS
 --Command     : generate_target main_design.bd
 --Design      : main_design
@@ -98,7 +98,7 @@ entity m00_couplers_imp_138RTGO is
 end m00_couplers_imp_138RTGO;
 
 architecture STRUCTURE of m00_couplers_imp_138RTGO is
-  component main_design_m00_data_fifo_31 is
+  component main_design_m00_data_fifo_33 is
   port (
     aclk : in STD_LOGIC;
     aresetn : in STD_LOGIC;
@@ -181,7 +181,7 @@ architecture STRUCTURE of m00_couplers_imp_138RTGO is
     m_axi_rvalid : in STD_LOGIC;
     m_axi_rready : out STD_LOGIC
   );
-  end component main_design_m00_data_fifo_31;
+  end component main_design_m00_data_fifo_33;
   component main_design_auto_pc_0 is
   port (
     aclk : in STD_LOGIC;
@@ -545,7 +545,7 @@ auto_pc: component main_design_auto_pc_0
       s_axi_wstrb(3 downto 0) => m00_data_fifo_to_auto_pc_WSTRB(3 downto 0),
       s_axi_wvalid => m00_data_fifo_to_auto_pc_WVALID
     );
-m00_data_fifo: component main_design_m00_data_fifo_31
+m00_data_fifo: component main_design_m00_data_fifo_33
      port map (
       aclk => S_ACLK_1,
       aresetn => S_ARESETN_1,
@@ -715,7 +715,7 @@ entity m00_couplers_imp_BCGDT2 is
 end m00_couplers_imp_BCGDT2;
 
 architecture STRUCTURE of m00_couplers_imp_BCGDT2 is
-  component main_design_m00_data_fifo_32 is
+  component main_design_m00_data_fifo_34 is
   port (
     aclk : in STD_LOGIC;
     aresetn : in STD_LOGIC;
@@ -798,7 +798,7 @@ architecture STRUCTURE of m00_couplers_imp_BCGDT2 is
     m_axi_rvalid : in STD_LOGIC;
     m_axi_rready : out STD_LOGIC
   );
-  end component main_design_m00_data_fifo_32;
+  end component main_design_m00_data_fifo_34;
   component main_design_auto_pc_1 is
   port (
     aclk : in STD_LOGIC;
@@ -1341,7 +1341,7 @@ auto_us: component main_design_auto_us_0
       s_axi_wstrb(3 downto 0) => auto_pc_to_auto_us_WSTRB(3 downto 0),
       s_axi_wvalid => auto_pc_to_auto_us_WVALID
     );
-m00_data_fifo: component main_design_m00_data_fifo_32
+m00_data_fifo: component main_design_m00_data_fifo_34
      port map (
       aclk => S_ACLK_1,
       aresetn => S_ARESETN_1,
@@ -1517,7 +1517,7 @@ entity m01_couplers_imp_1EUDUNS is
 end m01_couplers_imp_1EUDUNS;
 
 architecture STRUCTURE of m01_couplers_imp_1EUDUNS is
-  component main_design_m01_data_fifo_32 is
+  component main_design_m01_data_fifo_34 is
   port (
     aclk : in STD_LOGIC;
     aresetn : in STD_LOGIC;
@@ -1600,7 +1600,7 @@ architecture STRUCTURE of m01_couplers_imp_1EUDUNS is
     m_axi_rvalid : in STD_LOGIC;
     m_axi_rready : out STD_LOGIC
   );
-  end component main_design_m01_data_fifo_32;
+  end component main_design_m01_data_fifo_34;
   signal S_ACLK_1 : STD_LOGIC;
   signal S_ARESETN_1 : STD_LOGIC;
   signal m01_couplers_to_m01_data_fifo_ARADDR : STD_LOGIC_VECTOR ( 31 downto 0 );
@@ -1762,7 +1762,7 @@ begin
   m01_data_fifo_to_m01_couplers_RRESP(1 downto 0) <= M_AXI_rresp(1 downto 0);
   m01_data_fifo_to_m01_couplers_RVALID <= M_AXI_rvalid;
   m01_data_fifo_to_m01_couplers_WREADY <= M_AXI_wready;
-m01_data_fifo: component main_design_m01_data_fifo_32
+m01_data_fifo: component main_design_m01_data_fifo_34
      port map (
       aclk => S_ACLK_1,
       aresetn => S_ARESETN_1,
@@ -1938,7 +1938,7 @@ entity m01_couplers_imp_56VDYU is
 end m01_couplers_imp_56VDYU;
 
 architecture STRUCTURE of m01_couplers_imp_56VDYU is
-  component main_design_m01_data_fifo_31 is
+  component main_design_m01_data_fifo_33 is
   port (
     aclk : in STD_LOGIC;
     aresetn : in STD_LOGIC;
@@ -2021,7 +2021,7 @@ architecture STRUCTURE of m01_couplers_imp_56VDYU is
     m_axi_rvalid : in STD_LOGIC;
     m_axi_rready : out STD_LOGIC
   );
-  end component main_design_m01_data_fifo_31;
+  end component main_design_m01_data_fifo_33;
   signal S_ACLK_1 : STD_LOGIC;
   signal S_ARESETN_1 : STD_LOGIC;
   signal m01_couplers_to_m01_data_fifo_ARADDR : STD_LOGIC_VECTOR ( 31 downto 0 );
@@ -2183,7 +2183,7 @@ begin
   m01_data_fifo_to_m01_couplers_RRESP(1 downto 0) <= M_AXI_rresp(1 downto 0);
   m01_data_fifo_to_m01_couplers_RVALID <= M_AXI_rvalid;
   m01_data_fifo_to_m01_couplers_WREADY <= M_AXI_wready;
-m01_data_fifo: component main_design_m01_data_fifo_31
+m01_data_fifo: component main_design_m01_data_fifo_33
      port map (
       aclk => S_ACLK_1,
       aresetn => S_ARESETN_1,
@@ -2347,7 +2347,7 @@ entity s00_couplers_imp_1IMRFUE is
 end s00_couplers_imp_1IMRFUE;
 
 architecture STRUCTURE of s00_couplers_imp_1IMRFUE is
-  component main_design_s00_data_fifo_32 is
+  component main_design_s00_data_fifo_34 is
   port (
     aclk : in STD_LOGIC;
     aresetn : in STD_LOGIC;
@@ -2422,7 +2422,7 @@ architecture STRUCTURE of s00_couplers_imp_1IMRFUE is
     m_axi_rvalid : in STD_LOGIC;
     m_axi_rready : out STD_LOGIC
   );
-  end component main_design_s00_data_fifo_32;
+  end component main_design_s00_data_fifo_34;
   signal M_ACLK_1 : STD_LOGIC;
   signal M_ARESETN_1 : STD_LOGIC;
   signal s00_couplers_to_s00_data_fifo_ARADDR : STD_LOGIC_VECTOR ( 31 downto 0 );
@@ -2562,7 +2562,7 @@ begin
   s00_data_fifo_to_s00_couplers_RRESP(1 downto 0) <= M_AXI_rresp(1 downto 0);
   s00_data_fifo_to_s00_couplers_RVALID <= M_AXI_rvalid;
   s00_data_fifo_to_s00_couplers_WREADY <= M_AXI_wready;
-s00_data_fifo: component main_design_s00_data_fifo_32
+s00_data_fifo: component main_design_s00_data_fifo_34
      port map (
       aclk => M_ACLK_1,
       aresetn => M_ARESETN_1,
@@ -2718,7 +2718,7 @@ entity s00_couplers_imp_R17OXK is
 end s00_couplers_imp_R17OXK;
 
 architecture STRUCTURE of s00_couplers_imp_R17OXK is
-  component main_design_s00_data_fifo_31 is
+  component main_design_s00_data_fifo_33 is
   port (
     aclk : in STD_LOGIC;
     aresetn : in STD_LOGIC;
@@ -2793,7 +2793,7 @@ architecture STRUCTURE of s00_couplers_imp_R17OXK is
     m_axi_rvalid : in STD_LOGIC;
     m_axi_rready : out STD_LOGIC
   );
-  end component main_design_s00_data_fifo_31;
+  end component main_design_s00_data_fifo_33;
   signal M_ACLK_1 : STD_LOGIC;
   signal M_ARESETN_1 : STD_LOGIC;
   signal s00_couplers_to_s00_data_fifo_ARADDR : STD_LOGIC_VECTOR ( 31 downto 0 );
@@ -2933,7 +2933,7 @@ begin
   s00_data_fifo_to_s00_couplers_RRESP(1 downto 0) <= M_AXI_rresp(1 downto 0);
   s00_data_fifo_to_s00_couplers_RVALID <= M_AXI_rvalid;
   s00_data_fifo_to_s00_couplers_WREADY <= M_AXI_wready;
-s00_data_fifo: component main_design_s00_data_fifo_31
+s00_data_fifo: component main_design_s00_data_fifo_33
      port map (
       aclk => M_ACLK_1,
       aresetn => M_ARESETN_1,
@@ -3089,7 +3089,7 @@ entity s01_couplers_imp_1YO6YQU is
 end s01_couplers_imp_1YO6YQU;
 
 architecture STRUCTURE of s01_couplers_imp_1YO6YQU is
-  component main_design_s01_data_fifo_31 is
+  component main_design_s01_data_fifo_33 is
   port (
     aclk : in STD_LOGIC;
     aresetn : in STD_LOGIC;
@@ -3164,7 +3164,7 @@ architecture STRUCTURE of s01_couplers_imp_1YO6YQU is
     m_axi_rvalid : in STD_LOGIC;
     m_axi_rready : out STD_LOGIC
   );
-  end component main_design_s01_data_fifo_31;
+  end component main_design_s01_data_fifo_33;
   signal M_ACLK_1 : STD_LOGIC;
   signal M_ARESETN_1 : STD_LOGIC;
   signal s01_couplers_to_s01_data_fifo_ARADDR : STD_LOGIC_VECTOR ( 31 downto 0 );
@@ -3304,7 +3304,7 @@ begin
   s01_data_fifo_to_s01_couplers_RRESP(1 downto 0) <= M_AXI_rresp(1 downto 0);
   s01_data_fifo_to_s01_couplers_RVALID <= M_AXI_rvalid;
   s01_data_fifo_to_s01_couplers_WREADY <= M_AXI_wready;
-s01_data_fifo: component main_design_s01_data_fifo_31
+s01_data_fifo: component main_design_s01_data_fifo_33
      port map (
       aclk => M_ACLK_1,
       aresetn => M_ARESETN_1,
@@ -3460,7 +3460,7 @@ entity s01_couplers_imp_PBG6SO is
 end s01_couplers_imp_PBG6SO;
 
 architecture STRUCTURE of s01_couplers_imp_PBG6SO is
-  component main_design_s01_data_fifo_32 is
+  component main_design_s01_data_fifo_34 is
   port (
     aclk : in STD_LOGIC;
     aresetn : in STD_LOGIC;
@@ -3535,7 +3535,7 @@ architecture STRUCTURE of s01_couplers_imp_PBG6SO is
     m_axi_rvalid : in STD_LOGIC;
     m_axi_rready : out STD_LOGIC
   );
-  end component main_design_s01_data_fifo_32;
+  end component main_design_s01_data_fifo_34;
   signal M_ACLK_1 : STD_LOGIC;
   signal M_ARESETN_1 : STD_LOGIC;
   signal s01_couplers_to_s01_data_fifo_ARADDR : STD_LOGIC_VECTOR ( 31 downto 0 );
@@ -3675,7 +3675,7 @@ begin
   s01_data_fifo_to_s01_couplers_RRESP(1 downto 0) <= M_AXI_rresp(1 downto 0);
   s01_data_fifo_to_s01_couplers_RVALID <= M_AXI_rvalid;
   s01_data_fifo_to_s01_couplers_WREADY <= M_AXI_wready;
-s01_data_fifo: component main_design_s01_data_fifo_32
+s01_data_fifo: component main_design_s01_data_fifo_34
      port map (
       aclk => M_ACLK_1,
       aresetn => M_ARESETN_1,

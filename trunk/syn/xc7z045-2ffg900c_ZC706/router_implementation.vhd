@@ -256,6 +256,11 @@ begin
     s_spw_s_to_router(4) <= spw_si_4;
     spw_do_4 <= s_spw_d_from_router(4);
     spw_so_4 <= s_spw_s_from_router(4);
+    
+    status_intr_1 <= s_status_intr_vec(1);
+    status_intr_2 <= s_status_intr_vec(2);
+    status_intr_3 <= s_status_intr_vec(3);
+    status_intr_4 <= s_status_intr_vec(4);
 
 
     -- Creates 100 MHz clock.
