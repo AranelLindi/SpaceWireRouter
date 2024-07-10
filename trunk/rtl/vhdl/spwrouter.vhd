@@ -95,6 +95,13 @@ ENTITY spwrouter IS
 
         -- Strobe Out signals from SpaceWire bus.
         spw_so : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+        
+        -- Interrupt signals.
+        -- Bus clock. Necessary for resetting the status_intr signals.
+        clk_intr : in std_logic;
+        
+        -- Status interrupt signal. Is assigned if the connection state of a port changes.
+        status_intr : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
 
         -- PORTA (extern port for CPU access, if externPort = TRUE it must be implemented
         -- to intialize memory, for externPort = FALSE the port has no meaning)
@@ -129,7 +136,7 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
     -- General constants and signals.
     -- ====================================
     CONSTANT blen : INTEGER RANGE 0 TO 5 := INTEGER(ceil(log2(real((numports - 1))))); -- Necessary number of bits to represent [numport]-ports
-
+    CONSTANT intr_stretch_length : POSITIVE := 9; -- Necessary to stretch an interrupt signal otherwise the Generic Interrupt Controller would not recognise it
 
     -- ====================================
     -- TIME CODES (Bus I)
@@ -209,6 +216,30 @@ ARCHITECTURE spwrouter_arch OF spwrouter IS
     SIGNAL s_portstatus : array_t((numports - 1) DOWNTO 0)(31 DOWNTO 0); -- Contains status of each port
     SIGNAL s_portcontrol : array_t((numports - 1) DOWNTO 0)(31 DOWNTO 0); -- Contains control information for each port 
     SIGNAL s_timecode_en : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0); -- Contains time code enable flag for each port
+    
+
+    -- ====================================
+    -- INTERRUPTS (STATUS & ERRORS)
+    -- ====================================
+    -- 1. State interrupt.
+    -- Signal to reset pulse.
+    SIGNAL s_rst_pulse_state : std_logic_vector((numports - 1) DOWNTO 0) := (OTHERS => '0');
+    -- Shiftregister to stretch pulse.
+    signal s_pulse_reg_state : array_t((numports - 1) DOWNTO 0)((intr_stretch_length - 1) downto 0) := (OTHERS => (OTHERS => '0'));
+    -- Actual pulse transport signal.
+    signal s_pulse_state : std_logic_vector((numports - 1) DOWNTO 0) := (OTHERS => '0');
+    -- Data signal
+    signal s_state : STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+    
+    -- 2. Error interrupt.
+    -- Signal to reset pulse.
+    signal s_rst_pulse_error : std_logic_vector((numports - 1) downto 0) := (OTHERS => '0');
+    -- Shiftregister to stretch pulse.
+    signal s_pulse_reg_error : array_t((numports - 1) downto 0)((intr_stretch_length - 1) downto 0) := (OTHERS => (OTHERS => '0'));
+    -- Actual pulse transport signal.
+    signal s_pulse_error : std_logic_vector((numports - 1) downto 0) := (OTHERS => '0');
+    -- Data signal.
+    signal s_error : std_logic_vector((numports - 1) downto 0);
 BEGIN
     -- Drive outputs.
     running <= s_running;
@@ -356,7 +387,56 @@ BEGIN
             );
         END GENERATE spw_ports_const;
     END GENERATE spw_port_config;
-
+    
+    -- Status & Error interrupts.
+    state_intr0 : status_intr <= s_pulse_state;    
+    state_intr_gen : FOR i in 0 TO (numports - 1) GENERATE
+        -- 1. Status interrupt.
+        state_intr1 : s_rst_pulse_state(i) <= s_pulse_reg_state(i)((s_pulse_reg_state(i)'length - 1));
+            
+        state_intr2 : process(clk)
+            variable prev : std_logic;
+            variable curr : std_logic;
+        begin
+            if rising_edge(clk) then
+                curr := s_running(i);
+                
+                if prev /= curr then
+                    s_state(i) <= '1';
+                else
+                    s_state(i) <= '0';
+                end if;
+                
+                prev := curr;
+            end if;        
+        end process;
+        
+        state_intr3 : process(clk)
+        begin
+            if s_rst_pulse_state(i) = '1' then
+                -- Asynchronous reset.
+                s_pulse_state(i) <= '0';
+            elsif rising_edge(s_state(i)) then
+                s_pulse_state(i) <= '1';
+            end if;
+        end process;
+        
+        state_intr4 : process(clk_intr)
+        begin
+            if rising_edge(clk_intr) then
+                if s_pulse_state(i) = '0' then
+                    -- Synchronous reset.
+                    s_pulse_reg_state(i) <= (OTHERS => '0');
+                else
+                    s_pulse_reg_state(i)(0) <= '1';
+                    
+                    for j in 0 to s_pulse_reg_state(i)'length - 2 loop
+                        s_pulse_reg_state(i)(j + 1) <= s_pulse_reg_state(i)(j);
+                    end loop;
+                end if;
+            end if;
+        end process;
+    END GENERATE;
 
     -- Router register:
     router_registers : IF externPort = TRUE GENERATE

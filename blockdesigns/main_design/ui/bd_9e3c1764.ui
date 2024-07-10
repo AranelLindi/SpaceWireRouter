@@ -1,18 +1,18 @@
 {
    "ActiveEmotionalView":"Default View",
    "Default View_ScaleFactor":"0.945242",
-   "Default View_TopLeft":"-282,-53",
+   "Default View_TopLeft":"-272,-10",
    "ExpandedHierarchyInLayout":"",
    "guistr":"# # String gsaved with Nlview 7.0r4  2019-12-20 bk=1.5203 VDI=41 GEI=36 GUI=JA:10.0 TLS
 #  -string -flagsOSRD
-preplace port DDR -pg 1 -lvl 6 -x 2380 -y 390 -defaultsOSRD
-preplace port FIXED_IO -pg 1 -lvl 6 -x 2380 -y 410 -defaultsOSRD
+preplace port DDR -pg 1 -lvl 6 -x 2460 -y 390 -defaultsOSRD
+preplace port FIXED_IO -pg 1 -lvl 6 -x 2460 -y 410 -defaultsOSRD
 preplace port CLK_IN1_D_0 -pg 1 -lvl 0 -x -130 -y 1220 -defaultsOSRD
-preplace port IIC_1 -pg 1 -lvl 6 -x 2380 -y 450 -defaultsOSRD
-preplace port UART_0 -pg 1 -lvl 6 -x 2380 -y 430 -defaultsOSRD
-preplace port SPI_0 -pg 1 -lvl 6 -x 2380 -y 470 -defaultsOSRD
-preplace port CAN_0 -pg 1 -lvl 6 -x 2380 -y 490 -defaultsOSRD
-preplace port port-id_tx -pg 1 -lvl 6 -x 2380 -y 1280 -defaultsOSRD
+preplace port IIC_1 -pg 1 -lvl 6 -x 2460 -y 450 -defaultsOSRD
+preplace port UART_0 -pg 1 -lvl 6 -x 2460 -y 430 -defaultsOSRD
+preplace port SPI_0 -pg 1 -lvl 6 -x 2460 -y 470 -defaultsOSRD
+preplace port CAN_0 -pg 1 -lvl 6 -x 2460 -y 490 -defaultsOSRD
+preplace port port-id_tx -pg 1 -lvl 6 -x 2460 -y 1280 -defaultsOSRD
 preplace port port-id_rx -pg 1 -lvl 0 -x -130 -y 1310 -defaultsOSRD
 preplace port port-id_spw_di_1 -pg 1 -lvl 0 -x -130 -y 1330 -defaultsOSRD
 preplace port port-id_spw_si_1 -pg 1 -lvl 0 -x -130 -y 1350 -defaultsOSRD
@@ -22,77 +22,81 @@ preplace port port-id_spw_di_3 -pg 1 -lvl 0 -x -130 -y 1410 -defaultsOSRD
 preplace port port-id_spw_si_3 -pg 1 -lvl 0 -x -130 -y 1430 -defaultsOSRD
 preplace port port-id_spw_di_4 -pg 1 -lvl 0 -x -130 -y 1450 -defaultsOSRD
 preplace port port-id_spw_si_4 -pg 1 -lvl 0 -x -130 -y 1470 -defaultsOSRD
-preplace port port-id_spw_do_1 -pg 1 -lvl 6 -x 2380 -y 1340 -defaultsOSRD
-preplace port port-id_spw_so_1 -pg 1 -lvl 6 -x 2380 -y 1360 -defaultsOSRD
-preplace port port-id_spw_do_2 -pg 1 -lvl 6 -x 2380 -y 1380 -defaultsOSRD
-preplace port port-id_spw_so_2 -pg 1 -lvl 6 -x 2380 -y 1400 -defaultsOSRD
-preplace port port-id_spw_do_3 -pg 1 -lvl 6 -x 2380 -y 1420 -defaultsOSRD
-preplace port port-id_spw_so_3 -pg 1 -lvl 6 -x 2380 -y 1440 -defaultsOSRD
-preplace port port-id_spw_do_4 -pg 1 -lvl 6 -x 2380 -y 1460 -defaultsOSRD
-preplace port port-id_spw_so_4 -pg 1 -lvl 6 -x 2380 -y 1480 -defaultsOSRD
+preplace port port-id_spw_do_1 -pg 1 -lvl 6 -x 2460 -y 1340 -defaultsOSRD
+preplace port port-id_spw_so_1 -pg 1 -lvl 6 -x 2460 -y 1360 -defaultsOSRD
+preplace port port-id_spw_do_2 -pg 1 -lvl 6 -x 2460 -y 1380 -defaultsOSRD
+preplace port port-id_spw_so_2 -pg 1 -lvl 6 -x 2460 -y 1400 -defaultsOSRD
+preplace port port-id_spw_do_3 -pg 1 -lvl 6 -x 2460 -y 1420 -defaultsOSRD
+preplace port port-id_spw_so_3 -pg 1 -lvl 6 -x 2460 -y 1440 -defaultsOSRD
+preplace port port-id_spw_do_4 -pg 1 -lvl 6 -x 2460 -y 1460 -defaultsOSRD
+preplace port port-id_spw_so_4 -pg 1 -lvl 6 -x 2460 -y 1480 -defaultsOSRD
 preplace port port-id_rst_logic -pg 1 -lvl 0 -x -130 -y 1100 -defaultsOSRD
 preplace port port-id_reset -pg 1 -lvl 0 -x -130 -y 1240 -defaultsOSRD
 preplace inst processing_system7_0 -pg 1 -lvl 4 -x 2035 -y 510 -defaultsOSRD
 preplace inst proc_sys_reset_0 -pg 1 -lvl 1 -x 300 -y 350 -defaultsOSRD
 preplace inst clk_wiz_0 -pg 1 -lvl 2 -x 740 -y 1230 -defaultsOSRD
 preplace inst xlconcat_0 -pg 1 -lvl 1 -x 300 -y 1110 -defaultsOSRD
-preplace inst xlconcat_1 -pg 1 -lvl 3 -x 1400 -y 800 -defaultsOSRD
+preplace inst xlconcat_1 -pg 1 -lvl 3 -x 1400 -y 820 -defaultsOSRD
 preplace inst util_reduced_logic_0 -pg 1 -lvl 2 -x 740 -y 1110 -defaultsOSRD
 preplace inst axi_gpio_0 -pg 1 -lvl 2 -x 740 -y 350 -defaultsOSRD
 preplace inst axi_gpio_1 -pg 1 -lvl 2 -x 740 -y 990 -defaultsOSRD
 preplace inst axi_bram_ctrl_0 -pg 1 -lvl 2 -x 740 -y 1580 -defaultsOSRD
-preplace inst router_implementation_0 -pg 1 -lvl 3 -x 1400 -y 1390 -defaultsOSRD
 preplace inst axi_cdma_0 -pg 1 -lvl 2 -x 740 -y 520 -defaultsOSRD
 preplace inst axi_cdma_1 -pg 1 -lvl 2 -x 740 -y 790 -defaultsOSRD
-preplace inst AXI_SpaceWire_IP_0 -pg 1 -lvl 4 -x 2035 -y 1040 -defaultsOSRD
 preplace inst axi_interconnect_0 -pg 1 -lvl 3 -x 1400 -y 520 -defaultsOSRD
 preplace inst axi_interconnect_1 -pg 1 -lvl 3 -x 1400 -y 170 -defaultsOSRD
 preplace inst smartconnect_0 -pg 1 -lvl 1 -x 300 -y 560 -defaultsOSRD
-preplace netloc AXI_SpaceWire_IP_0_error_intr 1 2 3 1000 910 1560J 790 2290
-preplace netloc AXI_SpaceWire_IP_0_packet_intr 1 2 3 990 950 1580J 800 2310
-preplace netloc AXI_SpaceWire_IP_0_spw_do 1 2 3 1010 1010 1630J 810 2300
-preplace netloc AXI_SpaceWire_IP_0_spw_so 1 2 3 1000 980 1570J 780 2320
-preplace netloc AXI_SpaceWire_IP_0_state_intr 1 2 3 1010 920 1590J 820 2280
-preplace netloc AXI_SpaceWire_IP_0_tc_out_intr 1 2 3 980 940 1620J 830 2270
-preplace netloc axi_bram_ctrl_0_bram_addr_a 1 2 1 950 1510n
-preplace netloc axi_bram_ctrl_0_bram_clk_a 1 2 1 920 1490n
-preplace netloc axi_bram_ctrl_0_bram_en_a 1 2 1 990 1550n
-preplace netloc axi_bram_ctrl_0_bram_rst_a 1 2 1 1000 1570n
-preplace netloc axi_bram_ctrl_0_bram_we_a 1 2 1 1010 1590n
-preplace netloc axi_bram_ctrl_0_bram_wrdata_a 1 2 1 970 1530n
-preplace netloc axi_cdma_0_cdma_introut 1 2 1 950 530n
-preplace netloc axi_cdma_1_cdma_introut 1 2 1 930 770n
+preplace inst AXI_SpaceWire_IP_0 -pg 1 -lvl 4 -x 2035 -y 1040 -defaultsOSRD
+preplace inst router_implementation_0 -pg 1 -lvl 3 -x 1400 -y 1390 -defaultsOSRD
+preplace netloc AXI_SpaceWire_IP_0_error_intr 1 2 3 1030 350 1560J 330 2320
+preplace netloc AXI_SpaceWire_IP_0_packet_intr 1 2 3 1030 990 1560J 790 2310
+preplace netloc AXI_SpaceWire_IP_0_spw_do 1 2 3 1030 1040 1610J 800 2300
+preplace netloc AXI_SpaceWire_IP_0_spw_so 1 2 3 970 1020 1620J 810 2290
+preplace netloc AXI_SpaceWire_IP_0_state_intr 1 2 3 1020 980 1570J 820 2280
+preplace netloc AXI_SpaceWire_IP_0_tc_out_intr 1 2 3 970 1000 1630J 830 2270
+preplace netloc axi_bram_ctrl_0_bram_addr_a 1 2 1 1000 1520n
+preplace netloc axi_bram_ctrl_0_bram_clk_a 1 2 1 920 1500n
+preplace netloc axi_bram_ctrl_0_bram_en_a 1 2 1 1000 1560n
+preplace netloc axi_bram_ctrl_0_bram_rst_a 1 2 1 1020 1580n
+preplace netloc axi_bram_ctrl_0_bram_we_a 1 2 1 1030 1600n
+preplace netloc axi_bram_ctrl_0_bram_wrdata_a 1 2 1 960 1540n
+preplace netloc axi_cdma_0_cdma_introut 1 2 1 910 530n
+preplace netloc axi_cdma_1_cdma_introut 1 2 1 930 750n
 preplace netloc axi_gpio_0_gpio_io_o 1 0 3 -110 230 520J 240 910
-preplace netloc axi_gpio_1_gpio_io_o 1 2 2 N 1000 1650J
-preplace netloc clk_wiz_0_clk_100 1 2 2 940 990 1680
-preplace netloc clk_wiz_0_clk_200 1 2 2 920 970 NJ
-preplace netloc proc_sys_reset_0_peripheral_aresetn 1 1 3 560 270 970 1020 1570
-preplace netloc processing_system7_0_FCLK_CLK0 1 0 5 -100 240 510 250 960 960 1660 700 2270
-preplace netloc processing_system7_0_FCLK_RESET0_N 1 0 5 -90 250 500J 260 940J 340 1550J 330 2320
+preplace netloc axi_gpio_1_gpio_io_o 1 2 2 920 1030 NJ
+preplace netloc clk_wiz_0_clk_100 1 2 2 920 1120 1660
+preplace netloc clk_wiz_0_clk_200 1 2 2 910 1010 1600J
+preplace netloc proc_sys_reset_0_peripheral_aresetn 1 1 3 560 270 960 1050 1640
+preplace netloc processing_system7_0_FCLK_CLK0 1 0 5 -90 240 510 250 950 1060 1650 690 2270
+preplace netloc processing_system7_0_FCLK_RESET0_N 1 0 5 -80 250 500J 260 940J 340 1550J 320 2280
 preplace netloc reset_1 1 0 2 NJ 1240 NJ
-preplace netloc router_implementation_0_douta 1 2 2 940J 1650 1610
+preplace netloc router_implementation_0_douta 1 2 2 930J 1660 1600
 preplace netloc router_implementation_0_spw_do_0 1 3 1 1670 1050n
-preplace netloc router_implementation_0_spw_do_1 1 3 3 NJ 1340 NJ 1340 N
-preplace netloc router_implementation_0_spw_do_2 1 3 3 NJ 1380 NJ 1380 N
-preplace netloc router_implementation_0_spw_do_3 1 3 3 NJ 1420 NJ 1420 N
-preplace netloc router_implementation_0_spw_do_4 1 3 3 NJ 1460 NJ 1460 N
+preplace netloc router_implementation_0_spw_do_1 1 3 3 NJ 1300 NJ 1300 2430
+preplace netloc router_implementation_0_spw_do_2 1 3 3 NJ 1340 NJ 1340 2410
+preplace netloc router_implementation_0_spw_do_3 1 3 3 NJ 1380 NJ 1380 2390
+preplace netloc router_implementation_0_spw_do_4 1 3 3 NJ 1420 NJ 1420 2370
 preplace netloc router_implementation_0_spw_so_0 1 3 1 1680 1070n
-preplace netloc router_implementation_0_spw_so_1 1 3 3 NJ 1360 NJ 1360 N
-preplace netloc router_implementation_0_spw_so_2 1 3 3 NJ 1400 NJ 1400 N
-preplace netloc router_implementation_0_spw_so_3 1 3 3 NJ 1440 NJ 1440 N
-preplace netloc router_implementation_0_spw_so_4 1 3 3 NJ 1480 NJ 1480 N
-preplace netloc router_implementation_0_tx 1 3 3 NJ 1280 NJ 1280 N
+preplace netloc router_implementation_0_spw_so_1 1 3 3 NJ 1320 NJ 1320 2420
+preplace netloc router_implementation_0_spw_so_2 1 3 3 NJ 1360 NJ 1360 2400
+preplace netloc router_implementation_0_spw_so_3 1 3 3 NJ 1400 NJ 1400 2380
+preplace netloc router_implementation_0_spw_so_4 1 3 3 NJ 1440 NJ 1440 2360
+preplace netloc router_implementation_0_status_intr_1 1 2 2 980 1070 1620
+preplace netloc router_implementation_0_status_intr_2 1 2 2 990 1080 1600
+preplace netloc router_implementation_0_status_intr_3 1 2 2 1000 1090 1590
+preplace netloc router_implementation_0_status_intr_4 1 2 2 1010 1100 1560
+preplace netloc router_implementation_0_tx 1 3 3 1660J 1250 NJ 1250 2430
 preplace netloc rst_0_1 1 0 1 NJ 1100
-preplace netloc rx_0_1 1 0 3 NJ 1310 NJ 1310 950J
-preplace netloc spw_di_1_0_1 1 0 3 NJ 1330 NJ 1330 NJ
-preplace netloc spw_di_2_0_1 1 0 3 NJ 1370 NJ 1370 NJ
-preplace netloc spw_di_3_0_1 1 0 3 NJ 1410 NJ 1410 NJ
-preplace netloc spw_di_4_0_1 1 0 3 -110J 1440 NJ 1440 980J
-preplace netloc spw_si_1_0_1 1 0 3 NJ 1350 NJ 1350 NJ
-preplace netloc spw_si_2_0_1 1 0 3 NJ 1390 NJ 1390 NJ
-preplace netloc spw_si_3_0_1 1 0 3 NJ 1430 NJ 1430 NJ
-preplace netloc spw_si_4_0_1 1 0 3 -90J 1450 NJ 1450 920J
-preplace netloc util_reduced_logic_0_Res 1 2 2 980 1030 1640J
+preplace netloc rx_0_1 1 0 3 NJ 1310 NJ 1310 910J
+preplace netloc spw_di_1_0_1 1 0 3 -100J 1320 NJ 1320 NJ
+preplace netloc spw_di_2_0_1 1 0 3 -100J 1360 NJ 1360 NJ
+preplace netloc spw_di_3_0_1 1 0 3 -100J 1400 NJ 1400 NJ
+preplace netloc spw_di_4_0_1 1 0 3 -100J 1440 NJ 1440 NJ
+preplace netloc spw_si_1_0_1 1 0 3 -90J 1340 NJ 1340 NJ
+preplace netloc spw_si_2_0_1 1 0 3 -90J 1380 NJ 1380 NJ
+preplace netloc spw_si_3_0_1 1 0 3 -90J 1420 NJ 1420 NJ
+preplace netloc spw_si_4_0_1 1 0 3 -80J 1450 NJ 1450 910J
+preplace netloc util_reduced_logic_0_Res 1 2 2 930 1110 1630J
 preplace netloc xlconcat_0_dout 1 1 1 N 1110
 preplace netloc xlconcat_1_dout 1 3 1 1550 580n
 preplace netloc CLK_IN1_D_0_1 1 0 2 NJ 1220 NJ
@@ -101,24 +105,24 @@ preplace netloc S01_AXI_2 1 1 2 530J 230 910
 preplace netloc axi_cdma_0_M_AXI 1 2 1 940 410n
 preplace netloc axi_cdma_1_M_AXI 1 2 1 920 60n
 preplace netloc axi_interconnect_0_M00_AXI 1 3 1 1550 480n
-preplace netloc axi_interconnect_0_M01_AXI 1 3 1 1600 530n
-preplace netloc axi_interconnect_1_M00_AXI 1 3 1 1660 160n
-preplace netloc axi_interconnect_1_M01_AXI 1 3 1 1610 180n
+preplace netloc axi_interconnect_0_M01_AXI 1 3 1 1580 530n
+preplace netloc axi_interconnect_1_M00_AXI 1 3 1 1650 160n
+preplace netloc axi_interconnect_1_M01_AXI 1 3 1 1590 180n
 preplace netloc processing_system7_0_CAN_0 1 4 2 NJ 490 N
 preplace netloc processing_system7_0_DDR 1 4 2 NJ 390 N
 preplace netloc processing_system7_0_FIXED_IO 1 4 2 NJ 410 N
 preplace netloc processing_system7_0_IIC_1 1 4 2 NJ 450 N
-preplace netloc processing_system7_0_M_AXI_GP0 1 0 5 -90 690 NJ 690 NJ 690 NJ 690 2280
+preplace netloc processing_system7_0_M_AXI_GP0 1 0 5 -100 0 NJ 0 NJ 0 NJ 0 2310
 preplace netloc processing_system7_0_SPI_0 1 4 2 NJ 470 N
 preplace netloc processing_system7_0_UART_0 1 4 2 NJ 430 N
 preplace netloc smartconnect_0_M00_AXI 1 1 1 N 490
 preplace netloc smartconnect_0_M01_AXI 1 1 1 490 510n
 preplace netloc smartconnect_0_M02_AXI 1 1 1 500 530n
-preplace netloc smartconnect_0_M03_AXI 1 1 3 540 680 940J 930 NJ
+preplace netloc smartconnect_0_M03_AXI 1 1 3 540 700 940J 970 1590J
 preplace netloc smartconnect_0_M06_AXI 1 1 1 570 330n
 preplace netloc smartconnect_0_M07_AXI 1 1 1 480 630n
-levelinfo -pg 1 -130 300 740 1400 2035 2340 2380
-pagesize -pg 1 -db -bbox -sgen -280 -220 2500 2610
+levelinfo -pg 1 -130 300 740 1400 2035 2340 2460
+pagesize -pg 1 -db -bbox -sgen -280 -220 2580 2610
 "
 }
 {

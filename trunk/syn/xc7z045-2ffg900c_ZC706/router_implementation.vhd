@@ -64,7 +64,12 @@ entity router_implementation is
         spw_di_4 : in std_logic;
         spw_si_4 : in std_logic;
         spw_do_4 : out std_logic;
-        spw_so_4 : out std_logic;                                
+        spw_so_4 : out std_logic;
+        clk_intr_status : in std_logic;
+        status_intr_1 : out std_logic;
+        status_intr_2 : out std_logic;
+        status_intr_3 : out std_logic;
+        status_intr_4 : out std_logic;                          
         clka : in std_logic;
         addra : in std_logic_vector(31 downto 0);
         dina : in std_logic_vector(31 downto 0);
@@ -218,6 +223,10 @@ architecture Behavioral of router_implementation is
     signal s_spw_s_to_router : std_logic_vector(5 downto 0);
     signal s_spw_d_from_router : std_logic_vector(5 downto 0);
     signal s_spw_s_from_router : std_logic_vector(5 downto 0);
+    
+    -- Interrupt signals.
+    signal s_status_intr_vec : std_logic_vector(5 downto 0);
+    signal s_error_intr_vec : std_logic_vector(5 downto 0);
 begin
     -- Differential input clock buffer.
 --    bufgds: IBUFDS port map (I => SYSCLK_P, IB => SYSCLK_N, O => clk_ibufg); -- eventuell auch IBUFGDS, mal schauen ob Fehler auftreten
@@ -292,6 +301,8 @@ begin
             spw_si => s_spw_s_to_router,
             spw_do => s_spw_d_from_router,
             spw_so => s_spw_s_from_router,
+            clk_intr => clk_intr_status,
+            status_intr => s_status_intr_vec,
             clka => clka,
             addra => addra,
             dina => dina,

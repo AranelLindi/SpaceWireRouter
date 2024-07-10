@@ -288,6 +288,8 @@ PACKAGE spwrouterpkg IS
             spw_si : IN STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
             spw_do : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
             spw_so : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
+            clk_intr : IN STD_LOGIC := '0';
+            status_intr : OUT STD_LOGIC_VECTOR((numports - 1) DOWNTO 0);
             clka : IN STD_LOGIC := '0';
             addra : IN STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
             dina : IN STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
